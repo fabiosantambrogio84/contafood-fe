@@ -33,6 +33,7 @@ $(document).ready(function() {
 				{"name": "ragioneSociale", "data": "ragioneSociale"},
 				{"data": null, render: function ( data, type, row ) {
 	                return '<a class="deleteFornitore" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+	                // <i class="far fa-edit"></i>
 	            }}
 			]
 		});
