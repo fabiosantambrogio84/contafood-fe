@@ -120,11 +120,21 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid">
+        <div class="container-fluid" id="containerFornitori">
 
           <!-- Page Heading -->
           <h1 class="h3 mb-4 text-gray-800">Elenco fornitori</h1>
-          
+
+          <div id="alertFornitore"></div>
+          <!--
+          <div class="alert alert-success alert-dismissible fade hide" role="alert">
+            <strong>Fornitore</strong> cancellato con successo.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          -->
+
           <!-- DataTales Example -->
           <div class="card shadow mb-4" id="fornitoriMainDiv">
             <div class="card-body">
@@ -142,11 +152,6 @@
             </div>
           </div>
 
-          <!-- Button trigger modal -->
-          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#deleteFornitoreModal">
-            Launch demo modal
-          </button>
-
           <!-- Modal -->
           <div class="modal fade" id="deleteFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="deleteFornitoreModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -158,23 +163,15 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  ...
+                  Sei sicuro di voler rimuovere il fornitore?
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteFornitore">Conferma</button>
                 </div>
               </div>
             </div>
           </div>
-
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <strong>Holy guacamole!</strong> You should check in on some of those fields below.
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-
 
         </div>
         <!-- /.container-fluid -->
