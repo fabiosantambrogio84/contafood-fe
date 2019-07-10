@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fornitori</title>
+  <title>ContaFood - Fornitori Modifica</title>
 
   <!-- Custom fonts for this template -->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -21,9 +21,23 @@
   <!-- Custom styles for this page -->
   <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <!-- Bootstrap core JavaScript-->
+  <script src="vendor/jquery/jquery.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <script src="js/fornitori.js"></script>
+
+  <script>
+	var idFornitore = $.fn.extractIdFornitoreFromUrl();
+    $.fn.getFornitore(idFornitore);
+  </script>
+
 </head>
 
-<body id="page-top">
+<body id="page-top" class="fornitoreBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -123,72 +137,9 @@
         <div class="container-fluid" id="containerFornitori">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Elenco fornitori</h1>
+          <h1 class="h3 mb-4 text-gray-800">Modifica fornitore</h1>
 
           <div id="alertFornitore"></div>
-          <!--
-          <div class="alert alert-success alert-dismissible fade hide" role="alert">
-            <strong>Fornitore</strong> cancellato con successo.
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          -->
-
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="fornitoriMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="fornitoriTable" width="100%" cellspacing="0">
-                  <thead>
-        					<tr>
-        						<th>Codice</th>
-        						<th>Ragione sociale</th>
-                    <th></th>
-        					</tr>
-        				  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="deleteFornitoreModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteFornitoreModalTitle">Conferma rimozione fornitore</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  Sei sicuro di voler rimuovere il fornitore?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteFornitore">Conferma</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal Details-->
-          <div class="modal fade" id="detailsFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="detailsFornitoreModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="detailsFornitoreModalTitle">Dettagli fornitore</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body" id="detailsFornitoreMainDiv">
-                  Dettagli
-                </div>
-              </div>
-            </div>
-          </div>
 
         </div>
         <!-- /.container-fluid -->
@@ -233,8 +184,6 @@
 
   <!-- Page level custom scripts -->
   <!--<script src="js/demo/datatables-demo.js"></script>-->
-
-  <script src="js/fornitori.js"></script>	
 
 </body>
 

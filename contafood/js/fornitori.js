@@ -1,5 +1,6 @@
+var baseUrl = "http://localhost:8090/contafood-be/";
+
 $(document).ready(function() {
-	var baseUrl = "http://localhost:8090/contafood-be/";
 
 	$('#fornitoriTable').DataTable({
 		"ajax": {
@@ -30,7 +31,8 @@ $(document).ready(function() {
 			{"name": "codice", "data": "codice"},
 			{"name": "ragioneSociale", "data": "ragioneSociale"},
 			{"data": null, render: function ( data, type, row ) {
-				var links = '<a class="updateFornitore pr-2" data-id="'+data.id+'" href="#"><i class="far fa-edit"></i></a>';
+				var links = '<a class="detailsFornitore pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
+				links = links + '<a class="updateFornitore pr-2" data-id="'+data.id+'" href="fornitori-edit.html?idFornitore=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links = links + '<a class="deleteFornitore" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -92,18 +94,48 @@ $(document).ready(function() {
 		}
   	});
 	*/
+
+	$(document).on('click','.detailsFornitore', function(){
+        var idFornitore = $(this).attr('data-id');
+
+        var alertContent = '<strong>Errore nel recupero del fornitore.</strong>';
+
+        $.ajax({
+            url: baseUrl + "fornitori----/" + idFornitore,
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+              if(result != null && result != undefined && result != ''){
+
+                //$('.fornitoreBody').data(result);
+
+              } else{
+                $('#detailsFornitoreMainDiv').addClass('alert alert-danger alert-dismissible fade show m-2').attr('role','alert');
+                $('#detailsFornitoreMainDiv').html(alertContent);
+              }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('#detailsFornitoreMainDiv').addClass('alert alert-danger alert-dismissible fade show m-2').attr('role','alert');
+                $('#detailsFornitoreMainDiv').html(alertContent);
+                console.log('Response text: ' + jqXHR.responseText);
+            }
+        });
+
+        $('#detailsFornitoreModal').modal('show');
+    });
+
 	$(document).on('click','.deleteFornitore', function(){
-		var fornitoreId = $(this).attr('data-id');
-		$('#confirmDeleteFornitore').attr('data-id', fornitoreId);
+		var idFornitore = $(this).attr('data-id');
+		$('#confirmDeleteFornitore').attr('data-id', idFornitore);
 		$('#deleteFornitoreModal').modal('show');
 	});
 
 	$(document).on('click','#confirmDeleteFornitore', function(){
 		$('#deleteFornitoreModal').modal('hide');
-		var fornitoreId = $(this).attr('data-id');
+		var idFornitore = $(this).attr('data-id');
 
 		$.ajax({
-			url: baseUrl + "fornitori/" + fornitoreId,
+			url: baseUrl + "fornitori/" + idFornitore,
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<strong>Fornitore</strong> cancellato con successo.\n' +
@@ -117,7 +149,51 @@ $(document).ready(function() {
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		});
-
 	});
 
 });
+
+$.fn.extractIdFornitoreFromUrl = function(){
+    var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+        paramNames,
+        i;
+
+    for (i = 0; i < urlVariables.length; i++) {
+        paramNames = urlVariables[i].split('=');
+
+        if (paramNames[0] === 'idFornitore') {
+        	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+        }
+    }
+}
+
+$.fn.getFornitore = function(idFornitore){
+
+    var alertContent = '<strong>Errore nel recupero del fornitore.</strong>\n' +
+    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+
+    $.ajax({
+        url: baseUrl + "fornitori/" + idFornitore,
+        type: 'GET',
+        dataType: 'json',
+        success: function(result) {
+          if(result != null && result != undefined && result != ''){
+
+            $('.fornitoreBody').data(result);
+
+          } else{
+            $('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
+            $('#alertFornitore').html(alertContent);
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
+            $('#alertFornitore').html(alertContent);
+            console.log('Response text: ' + jqXHR.responseText);
+        }
+    });
+
+
+}
