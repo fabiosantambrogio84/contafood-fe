@@ -196,7 +196,7 @@
               <div class="form-group col-md-2">
                 <label for="provincia">Provincia</label>
                 <select id="provincia" class="form-control">
-                  <option selected>Choose...</option>
+
                 </select>
               </div>
               <div class="form-group col-md-1">
@@ -268,8 +268,16 @@
                 <input type="text" class="form-control" id="pagamento" placeholder="">
               </div>
             </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="iban">Note</label>
+                <textarea class="form-control" id="note"></textarea>
+              </div>
+            </div>
 
-            <button type="submit" class="btn btn-primary">Salva</button>
+            <input type="hidden" id="hiddenIdFornitore"/>
+            <button type="submit" class="btn btn-primary" id="updateFornitoreButton">Salva</button>
+            <a href="fornitori.html" class="btn btn-secondary">Annulla</a>
           </form>
 
           <script>

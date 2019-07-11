@@ -151,6 +151,25 @@ $(document).ready(function() {
 		});
 	});
 
+	if($('#dittaIndividuale') != null && $('#dittaIndividuale') != undefined){
+		$(document).on('change','#dittaIndividuale', function(){
+			var isChecked = $('#dittaIndividuale').prop('checked');
+			if(isChecked){
+				$('#nome').attr('disabled', false);
+				$('#cognome').attr('disabled', false);
+			} else{
+				$('#nome').attr('disabled', true);
+				$('#cognome').attr('disabled', true);
+			}
+		});
+	}
+
+	if($('#updateFornitoreButton') != null && $('#updateFornitoreButton') != undefined){
+		$(document).on('click','#updateFornitoreButton', function(event){
+			event.preventDefault();
+			console.log('SALVA');
+		});
+	}
 });
 
 $.fn.extractIdFornitoreFromUrl = function(){
@@ -175,13 +194,57 @@ $.fn.getFornitore = function(idFornitore){
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
 
     $.ajax({
+		url: baseUrl + "util/province",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				//result = $.parseJSON(result);
+				$.each(result, function(i, item){
+					$('#provincia').append('<option value="'+item+'">'+item+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+    $.ajax({
         url: baseUrl + "fornitori/" + idFornitore,
         type: 'GET',
         dataType: 'json',
         success: function(result) {
           if(result != null && result != undefined && result != ''){
+            //$('.fornitoreBody').data('fornitore', result);
 
-            $('.fornitoreBody').data(result);
+			$('#hiddenIdFornitore').attr('value', result.id);
+			$('#codiceFornitore').attr('value', result.codice);
+            $('#ragioneSociale').attr('value', result.ragioneSociale);
+            $('#ragioneSociale2').attr('value', result.ragioneSociale2);
+            if(result.dittaIndividuale === true){
+				$('#dittaIndividuale').prop('checked', true);
+				$('#nome').attr('disabled', 'false');
+				$('#cognome').attr('disabled', 'false');
+			}
+            $('#nome').attr('value', result.nome);
+            $('#cognome').attr('value', result.cognome);
+            $('#indirizzo').attr('value', result.indirizzo);
+            $('#citta').attr('value', result.citta);
+            $('#provincia option[value="' + result.provincia +'"]').attr('selected', true);
+            $('#cap').attr('value', result.cap);
+            $('#nazione').attr('value', result.nazione);
+            $('#partitaIva').attr('value', result.partitaIva);
+            $('#codiceFiscale').attr('value', result.codiceFiscale);
+			$('#telefono').attr('value', result.telefono);
+			$('#telefono2').attr('value', result.telefono2);
+			$('#telefono3').attr('value', result.telefono3);
+			$('#email').attr('value', result.email);
+			$('#emailPec').attr('value', result.emailPec);
+			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
+			$('#iban').attr('value', result.iban);
+			$('#pagamento').attr('value', result.pagamento);
+			$('#note').attr('value', result.note);
 
           } else{
             $('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
@@ -191,6 +254,7 @@ $.fn.getFornitore = function(idFornitore){
         error: function(jqXHR, textStatus, errorThrown) {
             $('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
             $('#alertFornitore').html(alertContent);
+            $('#updateFornitoreButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }
     });
