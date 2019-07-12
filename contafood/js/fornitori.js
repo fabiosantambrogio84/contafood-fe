@@ -11,6 +11,10 @@ $(document).ready(function() {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
+				var alertContent = '<strong>Errore nel recupero dei fornitori</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+				$('#alertFornitore').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
+				$('#alertFornitore').html(alertContent);
 			}
 		},
 		"language": {
@@ -30,6 +34,7 @@ $(document).ready(function() {
 		"columns": [
 			{"name": "codice", "data": "codice"},
 			{"name": "ragioneSociale", "data": "ragioneSociale"},
+			{"name": "note", "data": "note"},
 			{"data": null, render: function ( data, type, row ) {
 				var links = '<a class="detailsFornitore pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links = links + '<a class="updateFornitore pr-2" data-id="'+data.id+'" href="fornitori-edit.html?idFornitore=' + data.id + '"><i class="far fa-edit"></i></a>';
@@ -38,62 +43,6 @@ $(document).ready(function() {
 			}}
 		]
 	});
-
-	/*
-	$.ajax({
-    	url: baseUrl + "fornitori",
-    	type: 'GET',
-    	dataType: 'json',
-    	success: function(result) {
-		  if(result != null && result != undefined && result != ''){
-			//var jsonData = JSON.stringify(result);
-			//console.log('--> ' + jsonData);
-			result.forEach(function(elem, index){
-				console.log("Fornitore num "+index+" - "+JSON.stringify(elem));
-			});
-			$('#fornitoriTable').DataTable({
-				"ajax": {
-					"url": baseUrl + "fornitori",
-					"content-type": "json",
-					"cache": false,
-					"dataSrc": ""
-				},
-				"language": {
-					"search": "Cerca",
-					"paginate": {
-						"first": "Inizio",
-						"last": "Fine",
-						"next": "Succ.",
-						"previous": "Prec."
-					},
-					"emptyTable": "Nessun fornitore disponibile",
-					"zeroRecords": "Nessun fornitore disponibile"
-				},
-				"pageLength": 20,
-				"lengthChange": false,
-				"info": false,
-				"data": result,
-				"columns": [
-					{"name": "codice", "data": "codice"},
-					{"name": "ragioneSociale", "data": "ragioneSociale"},
-					{"data": null, render: function ( data, type, row ) {
-						var links = '<a class="updateFornitore" data-id="'+data.id+'" href="#"><i class="far fa-edit"></i></a>';
-						links = links + '<a class="deleteFornitore" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-						return links;
-						// <i class="far fa-edit"></i>
-					}}
-				]
-			});
-
-		  } else{
-			//$('#fornitoriMainDiv').html('<p font-size:24px;">Nessun dato disponibile</p>')
-		  }
-    	},
-		error: function(jqXHR, textStatus, errorThrown) {
-		  console.log('Response text: ' + jqXHR.responseText);
-		}
-  	});
-	*/
 
 	$(document).on('click','.detailsFornitore', function(){
         var idFornitore = $(this).attr('data-id');
@@ -167,10 +116,133 @@ $(document).ready(function() {
 	if($('#updateFornitoreButton') != null && $('#updateFornitoreButton') != undefined){
 		$(document).on('click','#updateFornitoreButton', function(event){
 			event.preventDefault();
-			console.log('SALVA');
+
+			var fornitore = new Object();
+			fornitore.id = $('#hiddenIdFornitore').val();
+			fornitore.codice = $('#codiceFornitore').val();
+			fornitore.ragioneSociale = $('#ragioneSociale').val();
+			fornitore.ragioneSociale2 = $('#ragioneSociale2').val();
+			if($('#dittaIndividuale').prop('checked') === true){
+				fornitore.dittaIndividuale = true;
+			}else{
+				fornitore.dittaIndividuale = false;
+			}
+			fornitore.nome = $('#nome').val();
+			fornitore.cognome = $('#cognome').val();
+			fornitore.indirizzo = $('#indirizzo').val();
+			fornitore.citta = $('#citta').val();
+			fornitore.provincia = $('#provincia option:selected').text();
+			fornitore.cap = $('#cap').val();
+			fornitore.nazione = $('#nazione').val();
+			fornitore.partitaIva = $('#partitaIva').val();
+			fornitore.codiceFiscale = $('#codiceFiscale').val();
+			fornitore.telefono = $('#telefono').val();
+			fornitore.telefono2 = $('#telefono2').val();
+			fornitore.telefono3 = $('#telefono3').val();
+			fornitore.email = $('#email').val();
+			fornitore.emailPec = $('#emailPec').val();
+			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
+			fornitore.iban = $('#iban').val();
+			fornitore.pagamento = $('#pagamento').val();
+			fornitore.note = $('#note').val();
+
+			var fornitoreJson = JSON.stringify(fornitore);
+
+			var alertContent = '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+
+			$.ajax({
+				url: baseUrl + "fornitori/" + $('#hiddenIdFornitore').val(),
+				type: 'PUT',
+				contentType: "application/json",
+				dataType: 'json',
+				data: fornitoreJson,
+				success: function(result) {
+					$('#alertFornitore').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
+					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Fornitore modificato con successo'));
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
+					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore'));
+				}
+			});
+		});
+	}
+
+	if($('#newFornitoreButton') != null && $('#newFornitoreButton') != undefined){
+		$(document).on('click','#newFornitoreButton', function(event){
+			event.preventDefault();
+
+			var fornitore = new Object();
+			fornitore.codice = $('#codiceFornitore').val();
+			fornitore.ragioneSociale = $('#ragioneSociale').val();
+			fornitore.ragioneSociale2 = $('#ragioneSociale2').val();
+			if($('#dittaIndividuale').prop('checked') === true){
+				fornitore.dittaIndividuale = true;
+			}else{
+				fornitore.dittaIndividuale = false;
+			}
+			fornitore.nome = $('#nome').val();
+			fornitore.cognome = $('#cognome').val();
+			fornitore.indirizzo = $('#indirizzo').val();
+			fornitore.citta = $('#citta').val();
+			fornitore.provincia = $('#provincia option:selected').text();
+			fornitore.cap = $('#cap').val();
+			fornitore.nazione = $('#nazione').val();
+			fornitore.partitaIva = $('#partitaIva').val();
+			fornitore.codiceFiscale = $('#codiceFiscale').val();
+			fornitore.telefono = $('#telefono').val();
+			fornitore.telefono2 = $('#telefono2').val();
+			fornitore.telefono3 = $('#telefono3').val();
+			fornitore.email = $('#email').val();
+			fornitore.emailPec = $('#emailPec').val();
+			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
+			fornitore.iban = $('#iban').val();
+			fornitore.pagamento = $('#pagamento').val();
+			fornitore.note = $('#note').val();
+
+			var fornitoreJson = JSON.stringify(fornitore);
+
+			var alertContent = '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+
+			$.ajax({
+				url: baseUrl + "fornitori",
+				type: 'POST',
+				contentType: "application/json",
+				dataType: 'json',
+				data: fornitoreJson,
+				success: function(result) {
+					$('#alertFornitore').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
+					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Fornitore creato con successo'));
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
+					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore'));
+				}
+			});
 		});
 	}
 });
+
+$.fn.getProvince = function(){
+	$.ajax({
+		url: baseUrl + "util/province",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				//result = $.parseJSON(result);
+				$.each(result, function(i, item){
+					$('#provincia').append('<option value="'+item+'">'+item+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
 
 $.fn.extractIdFornitoreFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
@@ -244,7 +316,7 @@ $.fn.getFornitore = function(idFornitore){
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#iban').attr('value', result.iban);
 			$('#pagamento').attr('value', result.pagamento);
-			$('#note').attr('value', result.note);
+			$('#note').val(result.note);
 
           } else{
             $('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
