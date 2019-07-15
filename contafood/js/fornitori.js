@@ -50,13 +50,41 @@ $(document).ready(function() {
         var alertContent = '<strong>Errore nel recupero del fornitore.</strong>';
 
         $.ajax({
-            url: baseUrl + "fornitori----/" + idFornitore,
+            url: baseUrl + "fornitori/" + idFornitore,
             type: 'GET',
             dataType: 'json',
             success: function(result) {
               if(result != null && result != undefined && result != ''){
+              	var contentDetails = '<p><strong>Codice fornitore: </strong>'+result.codice+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Ragione sociale: </strong>'+result.ragioneSociale+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Ragione sociale 2: </strong>'+result.ragioneSociale2+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Ditta individuale: </strong>';
+				  if(result.dittaIndividuale === true){
+					contentDetails = contentDetails + 'Si';
+				  } else{
+				  	contentDetails = contentDetails + 'No';
+				  }
+				  contentDetails = contentDetails + '<p><strong>Nome: </strong>'+result.nome+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Cognome: </strong>'+result.cognome+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Indirizzo: </strong>'+result.indirizzo+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Citt&agrave;: </strong>'+result.citta+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Provincia: </strong>'+result.provincia+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Cap: </strong>'+result.cap+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Nazione: </strong>'+result.nazione+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Partita IVA: </strong>'+result.partitaIva+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Codice fiscale: </strong>'+result.codiceFiscale+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Telefono: </strong>'+result.telefono+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Telefono2: </strong>'+result.telefono2+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Telefono3: </strong>'+result.telefono3+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Email: </strong>'+result.email+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Email PEC: </strong>'+result.emailPec+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Codice univoco SDI: </strong>'+result.codiceUnivocoSdi+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Iban: </strong>'+result.iban+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+result.pagamento+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+result.note+'</p>';
 
-                //$('.fornitoreBody').data(result);
+				  $('#detailsFornitoreMainDiv').attr('style', 'overflow-y: auto; max-height: 500px;');
+				  $('#detailsFornitoreMainDiv').append(contentDetails);
 
               } else{
                 $('#detailsFornitoreMainDiv').addClass('alert alert-danger alert-dismissible fade show m-2').attr('role','alert');
