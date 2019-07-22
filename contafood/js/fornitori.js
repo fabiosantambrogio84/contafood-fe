@@ -83,7 +83,7 @@ $(document).ready(function() {
 				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+result.pagamento+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+result.note+'</p>';
 
-				  $('#detailsFornitoreMainDiv').attr('style', 'overflow-y: auto; max-height: 500px;');
+				  //$('#detailsFornitoreMainDiv').attr('style', 'overflow-y: auto; max-height: 500px;');
 				  $('#detailsFornitoreMainDiv').append(contentDetails);
 
               } else{
