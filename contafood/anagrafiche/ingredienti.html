@@ -9,17 +9,17 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fornitori</title>
+  <title>ContaFood - Ingredienti</title>
 
   <!-- Custom fonts for this template -->
-  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="css/styles.css" rel="stylesheet">
+  <link href="../css/styles.css" rel="stylesheet">
 
   <!-- Custom styles for this page -->
-  <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
 </head>
 
@@ -32,10 +32,10 @@
     <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar">
 
       <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../index.html">
         <div class="sidebar-brand-icon">
           <!--<i class="fas fa-laugh-wink"></i>-->
-          <img src="img/ui_avatar.png">
+          <img src="../img/ui_avatar.png">
         </div>
       
         <div class="sidebar-brand-text mx-3">ContaFood</div>
@@ -45,8 +45,8 @@
       <hr class="sidebar-divider my-0">
 
       <!-- Nav Item - Fornitori -->
-      <li class="nav-item active">
-        <a class="nav-link" href="fornitori.html">
+      <li class="nav-item">
+        <a class="nav-link" href="../fornitori.html">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Fornitori</span></a>
       </li>
@@ -55,26 +55,26 @@
       <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link" href="ricette.html">
+        <a class="nav-link" href="../ricette.html">
           <i class="fas fa-fw fa-table"></i>
           <span>Ricette</span></a>
       </li>
 
-      <hr class="sidebar-divider">
+        <hr class="sidebar-divider">
 
-      <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-              <!--<i class="fas fa-fw fa-table"></i>-->
-              <i class="far fa-address-card"></i>
-              <span>Anagrafiche</span>
-          </a>
-          <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="anagrafiche/categorie-ricette.html">Categorie ricette</a>
-                <a class="collapse-item" href="anagrafiche/ingredienti.html">Ingredienti</a>
-              </div>
-          </div>
-      </li>
+        <li class="nav-item active">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                <!--<i class="fas fa-fw fa-table"></i>-->
+                <i class="far fa-address-card"></i>
+                <span>Anagrafiche</span>
+            </a>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                  <a class="collapse-item" href="categorie-ricette.html">Categorie ricette</a>
+                  <a class="collapse-item" href="ingredienti.html">Ingredienti</a>
+                </div>
+            </div>
+        </li>
 
       <!-- Sidebar Toggler (Sidebar) -->
       <div class="text-center d-none d-md-inline">
@@ -109,37 +109,35 @@
                 <span class="mr-2 d-none d-lg-inline text-gray-600">Urbani Alimentari</span>
               </a>
             </li>
-
           </ul>
-
         </nav>
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerFornitori">
+        <div class="container-fluid" id="containerIngredienti">
 
           <!-- Page Heading -->
           <div class="row">
             <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco fornitori</h1>
+              <h1 class="h3 mb-4 text-gray-800">Elenco ingredienti</h1>
             </div>
             <div class="col-md-2">
-              <a href="fornitori-new.html" class="btn btn-primary">Nuovo</a>
+              <a href="ingredienti-new.html" class="btn btn-primary">Nuovo</a>
             </div>
           </div>
 
-          <div id="alertFornitore"></div>
+          <div id="alertIngrediente"></div>
 
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="fornitoriMainDiv">
+          <!-- DataTables -->
+          <div class="card shadow mb-4" id="ingredientiMainDiv">
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered" id="fornitoriTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="ingredientiTable" width="100%" cellspacing="0">
                   <thead>
         		    <tr>
         			  <th>Codice</th>
-        			  <th>Ragione sociale</th>
-                      <th>Note</th>
+                      <th>Descrizione</th>
+                      <th>Prezzo</th>
                       <th></th>
                     </tr>
         		  </thead>
@@ -149,37 +147,22 @@
           </div>
 
           <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="deleteFornitoreModal" aria-hidden="true">
+          <div class="modal fade" id="deleteIngredienteModal" tabindex="-1" role="dialog" aria-labelledby="deleteIngredienteModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteFornitoreModalTitle">Conferma rimozione fornitore</h5>
+                  <h5 class="modal-title" id="deleteIngredienteModalTitle">Conferma rimozione ingrediente</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  Sei sicuro di voler rimuovere il fornitore?
+                  Sei sicuro di voler rimuovere l'ingrediente?
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteFornitore">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteIngrediente">Conferma</button>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal Details-->
-          <div class="modal fade" id="detailsFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="detailsFornitoreModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="detailsFornitoreModalTitle">Dettagli fornitore</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body" id="detailsFornitoreMainDiv">
               </div>
             </div>
           </div>
@@ -212,23 +195,20 @@
   </a>
 
   <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="../vendor/jquery/jquery.js"></script>
+  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+  <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <!-- Custom scripts for all pages-->
-  <script src="js/sb-admin-2.min.js"></script>
+  <script src="../js/sb-admin-2.min.js"></script>
 
   <!-- Page level plugins -->
-  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-  <!-- Page level custom scripts -->
-  <!--<script src="js/demo/datatables-demo.js"></script>-->
-
-  <script src="js/fornitori.js"></script>	
+  <script src="../js/ingredienti.js"></script>
 
 </body>
 

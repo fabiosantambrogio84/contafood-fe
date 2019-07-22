@@ -9,30 +9,30 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Categoria articoli Nuovo</title>
+  <title>ContaFood - Ricette Nuovo</title>
 
   <!-- Custom fonts for this template -->
-  <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
   <!-- Custom styles for this template -->
-  <link href="../css/styles.css" rel="stylesheet">
+  <link href="css/styles.css" rel="stylesheet">
 
   <!-- Custom styles for this page -->
-  <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
   <!-- Bootstrap core JavaScript-->
-  <script src="../vendor/jquery/jquery.js"></script>
-  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/jquery/jquery.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
-  <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
-  <script src="../js/categorieArticoli.js"></script>
+  <script src="js/ricette.js"></script>
 
 </head>
 
-<body id="page-top" class="categoriaArticoliBody">
+<body id="page-top" class="ricettaBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -44,7 +44,7 @@
       <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
         <div class="sidebar-brand-icon">
           <!--<i class="fas fa-laugh-wink"></i>-->
-          <img src="../img/ui_avatar.png">
+          <img src="img/ui_avatar.png">
         </div>
       
         <div class="sidebar-brand-text mx-3">ContaFood</div>
@@ -64,7 +64,7 @@
       <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="ricette.html">
           <i class="fas fa-fw fa-table"></i>
           <span>Ricette</span></a>
       </li>
@@ -79,7 +79,8 @@
         </a>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="anagrafiche/categorie-articoli.html">Categorie articoli</a>
+            <a class="collapse-item" href="anagrafiche/categorie-ricette.html">Categorie ricette</a>
+            <a class="collapse-item" href="anagrafiche/ingredienti.html">Ingredienti</a>
           </div>
         </div>
       </li>
@@ -124,15 +125,22 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerCategoriaArticoli">
+        <div class="container-fluid" id="containerRicette">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Nuova categoria articoli</h1>
+          <h1 class="h3 mb-4 text-gray-800">Nuova ricetta</h1>
 
-          <div id="alertCategorieArticoli"></div>
+          <div id="alertRicetta"></div>
 
-          <form id="newCategoriaArticoliForm" class="needs-validation" novalidate>
+          <form id="newRicettaForm" class="needs-validation" novalidate>
             <div class="form-row">
+              <div class="form-group col-md-2">
+                <label for="codiceRicetta">Codice</label>
+                <input type="text" class="form-control" id="codiceRicetta" placeholder="" required>
+                <div class="invalid-feedback">
+                  Inserisci un codice
+                </div>
+              </div>
               <div class="form-group col-md-4">
                 <label for="nome">Nome</label>
                 <input type="text" class="form-control" id="nome" placeholder="" required>
@@ -140,17 +148,75 @@
                   Inserisci un nome
                 </div>
               </div>
-              <div class="form-group col-md-2">
-                <label for="ordine">Ordine</label>
-                <input type="integer" class="form-control" id="ordine" required>
+              <div class="form-group col-md-4">
+                <label for="categoria">Categoria</label>
+                <select id="categoria" class="form-control">
+                </select>
                 <div class="invalid-feedback">
-                  Inserisci un valore
+                  Seleziona una categoria
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="tempoPreparazione">Tempo preparazione</label>
+                <input type="text" class="form-control" id="tempoPreparazione" placeholder="">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="numeroPorzioni">Num. porzioni</label>
+                <input type="text" class="form-control" id="numeroPorzioni" placeholder="">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="costoIngredienti">Costo ingredienti</label>
+                <input type="number" class="form-control" id="costoIngredienti" required step=".01" min="0">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="costoPreparazione">Costo preparazione</label>
+                <input type="number" class="form-control" id="costoPreparazione" required step=".01" min="0">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="costoTotale">Costo totale</label>
+                <input type="number" class="form-control" id="costoTotale" required step=".01" min="0">
+              </div>
+            </div>
+
+            <!-- TODO: INGREDIENTI -->
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <label for="ingredienti">Ingredienti</label>
+                <div id="ingredienti" class="mb-4">
+                  <a href="#" class="btn btn-primary btn-sm">Aggiungi</a>
                 </div>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="newCategoriaArticoliButton">Salva</button>
-            <a href="anagrafiche/categorie-articoli.html" class="btn btn-secondary">Annulla</a>
+            <div class="form-row">
+              <div class="form-group col-md-12">
+                <label for="preparazione">Preparazione</label>
+                <textarea class="form-control" id="preparazione"></textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="allergeni">Allergeni</label>
+                <textarea class="form-control" id="allergeni"></textarea>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="valoriNutrizionali">Valori nutrizionali</label>
+                <textarea class="form-control" id="valoriNutrizionali"></textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="note">Note</label>
+                <textarea class="form-control" id="note"></textarea>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="newRicettaButton">Salva</button>
+            <a href="ricette.html" class="btn btn-secondary">Annulla</a>
           </form>
 
           <script>
@@ -202,18 +268,18 @@
   </a>
 
   <!-- Bootstrap core JavaScript-->
-  <script src="../vendor/jquery/jquery.js"></script>
-  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="vendor/jquery/jquery.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
-  <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <!-- Custom scripts for all pages-->
-  <script src="../js/sb-admin-2.min.js"></script>
+  <script src="js/sb-admin-2.min.js"></script>
 
   <!-- Page level plugins -->
-  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+  <script src="vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 </body>
 

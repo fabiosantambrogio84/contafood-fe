@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fornitori</title>
+  <title>ContaFood - Ricette Modifica</title>
 
   <!-- Custom fonts for this template -->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -21,9 +21,23 @@
   <!-- Custom styles for this page -->
   <link href="vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <!-- Bootstrap core JavaScript-->
+  <script src="vendor/jquery/jquery.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <script src="js/ricette.js"></script>
+
+  <script>
+	var idRicetta = $.fn.extractIdRicettaFromUrl();
+    $.fn.getRicetta(idRicetta);
+  </script>
+
 </head>
 
-<body id="page-top">
+<body id="page-top" class="ricettaBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -60,21 +74,21 @@
           <span>Ricette</span></a>
       </li>
 
-      <hr class="sidebar-divider">
+        <hr class="sidebar-divider">
 
-      <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-              <!--<i class="fas fa-fw fa-table"></i>-->
-              <i class="far fa-address-card"></i>
-              <span>Anagrafiche</span>
-          </a>
-          <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="anagrafiche/categorie-ricette.html">Categorie ricette</a>
-                <a class="collapse-item" href="anagrafiche/ingredienti.html">Ingredienti</a>
-              </div>
-          </div>
-      </li>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                <!--<i class="fas fa-fw fa-table"></i>-->
+                <i class="far fa-address-card"></i>
+                <span>Anagrafiche</span>
+            </a>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                  <a class="collapse-item" href="anagrafiche/categorie-ricette.html">Categorie ricette</a>
+                  <a class="collapse-item" href="anagrafiche/ingredienti.html">Ingredienti</a>
+                </div>
+            </div>
+        </li>
 
       <!-- Sidebar Toggler (Sidebar) -->
       <div class="text-center d-none d-md-inline">
@@ -116,73 +130,41 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerFornitori">
+        <div class="container-fluid" id="containerRicette">
 
           <!-- Page Heading -->
-          <div class="row">
-            <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco fornitori</h1>
-            </div>
-            <div class="col-md-2">
-              <a href="fornitori-new.html" class="btn btn-primary">Nuovo</a>
-            </div>
-          </div>
+          <h1 class="h3 mb-4 text-gray-800">Modifica ricetta</h1>
 
-          <div id="alertFornitore"></div>
+          <div id="alertRicetta"></div>
 
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="fornitoriMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="fornitoriTable" width="100%" cellspacing="0">
-                  <thead>
-        		    <tr>
-        			  <th>Codice</th>
-        			  <th>Ragione sociale</th>
-                      <th>Note</th>
-                      <th></th>
-                    </tr>
-        		  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
+          <form id="editRicettaForm" class="needs-validation" novalidate>
 
-          <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="deleteFornitoreModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteFornitoreModalTitle">Conferma rimozione fornitore</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  Sei sicuro di voler rimuovere il fornitore?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteFornitore">Conferma</button>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- Modal Details-->
-          <div class="modal fade" id="detailsFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="detailsFornitoreModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="detailsFornitoreModalTitle">Dettagli fornitore</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body" id="detailsFornitoreMainDiv">
-              </div>
-            </div>
-          </div>
+            <input type="hidden" id="hiddenIdRicetta"/>
+            <button type="submit" class="btn btn-primary" id="updateRicettaButton">Salva</button>
+            <a href="ricette.html" class="btn btn-secondary">Annulla</a>
+          </form>
+
+          <script>
+            // Example starter JavaScript for disabling form submissions if there are invalid fields
+            (function() {
+              'use strict';
+              window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                  form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                  }, false);
+                });
+              }, false);
+            })();
+            </script>
 
         </div>
         <!-- /.container-fluid -->
@@ -224,11 +206,6 @@
   <!-- Page level plugins -->
   <script src="vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-  <!-- Page level custom scripts -->
-  <!--<script src="js/demo/datatables-demo.js"></script>-->
-
-  <script src="js/fornitori.js"></script>	
 
 </body>
 

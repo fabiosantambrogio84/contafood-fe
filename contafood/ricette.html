@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fornitori</title>
+  <title>ContaFood - Ricette</title>
 
   <!-- Custom fonts for this template -->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -116,29 +116,29 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerFornitori">
+        <div class="container-fluid" id="containerRicette">
 
           <!-- Page Heading -->
           <div class="row">
             <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco fornitori</h1>
+              <h1 class="h3 mb-4 text-gray-800">Elenco ricette</h1>
             </div>
             <div class="col-md-2">
-              <a href="fornitori-new.html" class="btn btn-primary">Nuovo</a>
+              <a href="ricette-new.html" class="btn btn-primary">Nuovo</a>
             </div>
           </div>
 
-          <div id="alertFornitore"></div>
+          <div id="alertRicetta"></div>
 
           <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="fornitoriMainDiv">
+          <div class="card shadow mb-4" id="ricetteMainDiv">
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered" id="fornitoriTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="ricetteTable" width="100%" cellspacing="0">
                   <thead>
         		    <tr>
         			  <th>Codice</th>
-        			  <th>Ragione sociale</th>
+        			  <th>Nome</th>
                       <th>Note</th>
                       <th></th>
                     </tr>
@@ -149,37 +149,37 @@
           </div>
 
           <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="deleteFornitoreModal" aria-hidden="true">
+          <div class="modal fade" id="deleteRicettaModal" tabindex="-1" role="dialog" aria-labelledby="deleteRicettaModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteFornitoreModalTitle">Conferma rimozione fornitore</h5>
+                  <h5 class="modal-title" id="deleteRicettaModalTitle">Conferma rimozione ricetta</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  Sei sicuro di voler rimuovere il fornitore?
+                  Sei sicuro di voler rimuovere la ricetta?
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteFornitore">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteRicetta">Conferma</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Modal Details-->
-          <div class="modal fade" id="detailsFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="detailsFornitoreModal" aria-hidden="true">
+          <div class="modal fade" id="detailsRicettaModal" tabindex="-1" role="dialog" aria-labelledby="detailsRicettaModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="detailsFornitoreModalTitle">Dettagli fornitore</h5>
+                  <h5 class="modal-title" id="detailsRicettaModalTitle">Dettagli ricetta</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body" id="detailsFornitoreMainDiv">
+                <div class="modal-body" id="detailsRicettaMainDiv">
               </div>
             </div>
           </div>
@@ -225,10 +225,7 @@
   <script src="vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-  <!-- Page level custom scripts -->
-  <!--<script src="js/demo/datatables-demo.js"></script>-->
-
-  <script src="js/fornitori.js"></script>	
+  <script src="js/ricette.js"></script>
 
 </body>
 

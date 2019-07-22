@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Categoria articoli Modifica</title>
+  <title>ContaFood - Categoria ricette Modifica</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -28,16 +28,16 @@
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-  <script src="../js/categorieArticoli.js"></script>
+  <script src="../js/categorieRicette.js"></script>
 
   <script>
-	var idCategoriaArticoli = $.fn.extractIdCategoriaArticoliFromUrl();
-    $.fn.getCategoriaArticoli(idCategoriaArticoli);
+	var idCategoriaRicette = $.fn.extractIdCategoriaRicetteFromUrl();
+    $.fn.getCategoriaRicette(idCategoriaRicette);
   </script>
 
 </head>
 
-<body id="page-top" class="fornitoreBody">
+<body id="page-top" class="categorieRicetteBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -46,7 +46,7 @@
     <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar">
 
       <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="../index.html">
         <div class="sidebar-brand-icon">
           <!--<i class="fas fa-laugh-wink"></i>-->
           <img src="../img/ui_avatar.png">
@@ -59,8 +59,8 @@
       <hr class="sidebar-divider my-0">
 
       <!-- Nav Item - Fornitori -->
-      <li class="nav-item active">
-        <a class="nav-link" href="fornitori.html">
+      <li class="nav-item">
+        <a class="nav-link" href="../fornitori.html">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Fornitori</span></a>
       </li>
@@ -69,14 +69,14 @@
       <hr class="sidebar-divider">
 
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="../ricette.html">
           <i class="fas fa-fw fa-table"></i>
           <span>Ricette</span></a>
       </li>
 
       <hr class="sidebar-divider">
 
-      <li class="nav-item">
+      <li class="nav-item active">
         <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
           <!--<i class="fas fa-fw fa-table"></i>-->
           <i class="far fa-address-card"></i>
@@ -84,7 +84,8 @@
         </a>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item" href="anagrafiche/categorie-articoli.html">Categorie articoli</a>
+            <a class="collapse-item" href="categorie-ricette.html">Categorie ricette</a>
+            <a class="collapse-item" href="ingredienti.html">Ingredienti</a>
           </div>
         </div>
       </li>
@@ -153,147 +154,31 @@
         <div class="container-fluid" id="containerFornitori">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Modifica fornitore</h1>
+          <h1 class="h3 mb-4 text-gray-800">Modifica categoria ricette</h1>
 
-          <div id="alertFornitore"></div>
+          <div id="alertCategoriaRicette"></div>
 
-          <form id="editFornitoreForm" class="needs-validation" novalidate>
+          <form id="updateCategoriaRicetteForm" class="needs-validation" novalidate>
             <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="codiceFornitore">Codice fornitore</label>
-                <input type="text" class="form-control" id="codiceFornitore" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci un codice
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="ragioneSociale">Ragione sociale</label>
-                <input type="text" class="form-control" id="ragioneSociale" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci una ragione sociale
-                </div>
-              </div>
-              <div class="form-group col-md-3">
-                <label for="ragioneSociale2">Ragione sociale 2</label>
-                <input type="text" class="form-control" id="ragioneSociale2" placeholder="">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="dittaIndividuale">
-                  <label class="form-check-label" for="dittaIndividuale">
-                    Ditta individuale
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
+              <div class="form-group col-md-4">
                 <label for="nome">Nome</label>
-                <input type="text" class="form-control" id="nome" placeholder="" disabled>
-              </div>
-              <div class="form-group col-md-2">
-                <label for="nome">Cognome</label>
-                <input type="text" class="form-control" id="cognome" placeholder="" disabled>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="indirizzo">Indirizzo</label>
-                <input type="text" class="form-control" id="indirizzo" placeholder="">
-              </div>
-              <div class="form-group col-md-3">
-                <label for="citta">Citt&agrave;</label>
-                <input type="text" class="form-control" id="citta" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="provincia">Provincia</label>
-                <select id="provincia" class="form-control">
-
-                </select>
-              </div>
-              <div class="form-group col-md-1">
-                <label for="cap">Cap</label>
-                <input type="text" class="form-control" id="cap" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="nazione">Nazione</label>
-                <input type="text" class="form-control" id="nazione" placeholder="">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="partitaIva">Partita IVA</label>
-                <input type="text" class="form-control" id="partitaIva" placeholder="" required>
+                <input type="text" class="form-control" id="nome" placeholder="" required>
                 <div class="invalid-feedback">
-                  Inserisci una partiva iva
-                </div>
-              </div>
-              <div class="form-group col-md-3">
-                <label for="codiceFiscale">Codice fiscale</label>
-                <input type="text" class="form-control" id="codiceFiscale" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci un codice fiscale
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="telefono">Telefono</label>
-                <input type="text" class="form-control" id="telefono" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="telefono2">Telefono 2</label>
-                <input type="text" class="form-control" id="telefono2" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="telefono3">Telefono 3</label>
-                <input type="text" class="form-control" id="telefono3" placeholder="">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" placeholder="" >
-                <div class="invalid-feedback">
-                  Inserisci un email valida
+                  Inserisci un nome
                 </div>
               </div>
               <div class="form-group col-md-2">
-                <label for="emailPec">Email PEC</label>
-                <input type="email" class="form-control" id="emailPec" placeholder="">
+                <label for="ordine">Ordine</label>
+                <input type="number" class="form-control" id="ordine" required="" step="1" min="0">
                 <div class="invalid-feedback">
-                  Inserisci un email valida
+                  Inserisci un valore
                 </div>
-              </div>
-              <div class="form-group col-md-2">
-                <label for="codiceUnivocoSdi">Codice univoco SDI</label>
-                <input type="text" class="form-control" id="codiceUnivocoSdi" placeholder="">
-              </div>
-            </diV>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="iban">Iban</label>
-                <input type="text" class="form-control" id="iban" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="pagamento">Pagamento</label>
-                <input type="text" class="form-control" id="pagamento" placeholder="">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="iban">Note</label>
-                <textarea class="form-control" id="note"></textarea>
               </div>
             </div>
 
-            <input type="hidden" id="hiddenIdFornitore"/>
-            <button type="submit" class="btn btn-primary" id="updateFornitoreButton">Salva</button>
-            <a href="fornitori.html" class="btn btn-secondary">Annulla</a>
+            <input type="hidden" id="hiddenIdCategoriaRicette"/>
+            <button type="submit" class="btn btn-primary" id="updateCategoriaRicetteButton">Salva</button>
+            <a href="categorie-ricette.html" class="btn btn-secondary">Annulla</a>
           </form>
 
           <script>
