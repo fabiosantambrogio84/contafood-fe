@@ -13,7 +13,7 @@ $(document).ready(function() {
 				console.log('Response text: ' + jqXHR.responseText);
 				var alertContent = '<strong>Errore nel recupero delle ricette</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-				$('#alertRicetta').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
+				$('#alertRicetta').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
 				$('#alertRicetta').html(alertContent);
 			}
 		},
@@ -189,7 +189,110 @@ $(document).ready(function() {
 			});
 		});
 	}
+
+	$(document).on('click','#addIngrediente', function(){
+		$('#addIngredienteModal').modal('show');
+
+		$('#addIngredienteModalTable').DataTable({
+			"ajax": {
+				"url": baseUrl + "ingredienti",
+				"type": "GET",
+				"content-type": "json",
+				"cache": false,
+				"dataSrc": "",
+				"error": function(jqXHR, textStatus, errorThrown) {
+					var alertContent = '<strong>Errore nel recupero degli ingredienti</strong>\n' +
+						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+					$('#alertRicettaAddIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
+					$('#alertRicettaAddIngrediente').html(alertContent);
+				}
+			},
+			"language": {
+				"search": "Cerca",
+				"emptyTable": "Nessuna ingrediente disponibile",
+				"zeroRecords": "Nessuna ingrediente disponibile"
+			},
+			"paging": false,
+			"lengthChange": false,
+			"info": false,
+			"columns": [
+				{"data": null, render: function ( data, type, row ) {
+					var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" data-codice="'+data.codice+'" data-descrizione="'+data.descrizione+'" ' +
+						'data-prezzo="'+data.prezzo+'" id="checkbox_'+data.id+'" class="addIngredienteCheckbox">';
+					return checkboxHtml;
+				}},
+				{"name": "codice", "data": "codice"},
+				{"name": "descrizione", "data": "descrizione"},
+				{"name": "prezzo", "data": "prezzo"}
+			]
+		});
+	});
+
+	$(document).on('click','#confirmAddIngredienteModal', function(){
+		var numChecked = $('.addIngredienteCheckbox:checkbox:checked').length;
+		if(numChecked == null || numChecked == undefined || numChecked == 0){
+			var alertContent = '<strong>Selezionare almeno un ingrediente</strong>\n' +
+				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+			$('#alertRicettaAddIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
+			$('#alertRicettaAddIngrediente').html(alertContent);
+		} else{
+			$('.addIngredienteCheckbox:checkbox:checked').each(function(i, item){
+				//$('#categoria').append('<option value="'+item.id+'">'+item.nome+'</option>');
+				var codice = $('#'+item.id).attr('data-codice');
+				var descrizione = $('#'+item.id).attr('data-descrizione');
+				var prezzo = $('#'+item.id).attr('data-prezzo');
+
+				var rowHtml = '<div class="form-row" data-id="'+item.id+'" class="formRowIngrediente">' +
+					'<div class="form-group col-md-2">';
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="codiceIngrediente">Codice</label>';
+				}
+				rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceIngrediente_"'+item.id+' disabled value="'+codice+'"></div>';
+				rowHtml = rowHtml + '<div class="form-group col-md-4">';
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="descrizioneIngrediente">Descrizione</label>';
+				}
+				rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneIngrediente'+item.id+'" disabled value="'+descrizione+'"></div>';
+				rowHtml = rowHtml + '<div class="form-group col-md-2">';
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo</label>';
+				}
+				rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente'+item.id+'" disabled value="'+prezzo+'"></div>';
+				rowHtml = rowHtml + '<div class="form-group col-md-2">';
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
+				}
+				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente'+item.id+'" step="1" min="0"></div>';
+
+				rowHtml = rowHtml + '<div class="form-group col-md-1"><label for="deleteIngrediente"></label><i id="deleteIngrediente" class="far fa-trash-alt"></div>';
+
+				rowHtml = rowHtml + '</div>';
+
+				$('#formRowIngredienti').append(rowHtml);
+				$('#addIngredienteModal').modal('hide');
+			});
+		}
+	});
 });
+
+$.fn.getCategorieRicette = function(){
+	$.ajax({
+		url: baseUrl + "categorie-ricette",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				//result = $.parseJSON(result);
+				$.each(result, function(i, item){
+					$('#categoria').append('<option value="'+item.id+'">'+item.nome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
 
 $.fn.extractIdRicettaFromUrl = function(){
     var pageUrl = window.location.search.substring(1);

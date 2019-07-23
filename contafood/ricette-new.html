@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 
 <head>
 
@@ -30,6 +30,9 @@
 
   <script src="js/ricette.js"></script>
 
+  <script>
+    $.fn.getCategorieRicette();
+  </script>
 </head>
 
 <body id="page-top" class="ricettaBody">
@@ -164,35 +167,35 @@
               </div>
               <div class="form-group col-md-3">
                 <label for="numeroPorzioni">Num. porzioni</label>
-                <input type="text" class="form-control" id="numeroPorzioni" placeholder="">
+                <input type="number" class="form-control" id="numeroPorzioni" placeholder="" step="1" min="0">
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="costoIngredienti">Costo ingredienti</label>
-                <input type="number" class="form-control" id="costoIngredienti" required step=".01" min="0">
+                <input type="number" class="form-control" id="costoIngredienti" step=".01" min="0">
               </div>
               <div class="form-group col-md-3">
                 <label for="costoPreparazione">Costo preparazione</label>
-                <input type="number" class="form-control" id="costoPreparazione" required step=".01" min="0">
+                <input type="number" class="form-control" id="costoPreparazione" step=".01" min="0">
               </div>
               <div class="form-group col-md-3">
                 <label for="costoTotale">Costo totale</label>
-                <input type="number" class="form-control" id="costoTotale" required step=".01" min="0">
+                <input type="number" class="form-control" id="costoTotale" step=".01" min="0">
               </div>
             </div>
 
             <!-- TODO: INGREDIENTI -->
-            <div class="form-row">
-              <div class="form-group col-md-12">
+            <div class="form-row" id="formRowIngredienti">
+              <div class="form-group col-md-12" id="formRowIngredientiBody">
                 <label for="ingredienti">Ingredienti</label>
-                <div id="ingredienti" class="mb-4">
-                  <a href="#" class="btn btn-primary btn-sm">Aggiungi</a>
+                <div id="ingredienti" class="mb-2">
+                  <a id="addIngrediente" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
                 </div>
               </div>
             </div>
 
-            <div class="form-row">
+            <div class="form-row mt-4">
               <div class="form-group col-md-12">
                 <label for="preparazione">Preparazione</label>
                 <textarea class="form-control" id="preparazione"></textarea>
@@ -245,6 +248,39 @@
 
       </div>
       <!-- End of Main Content -->
+
+      <!-- Modal aggiungi ingrediente -->
+      <div id="addIngredienteModal" class="modal fade addIngredienteModal" tabindex="-1" role="dialog" aria-labelledby="addIngredienteModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addIngredienteModalTitle">Aggiungi ingrediente</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div id="alertRicettaAddIngrediente"></div>
+              <div class="table-responsive">
+                <table class="table table-bordered" id="addIngredienteModalTable" width="100%" cellspacing="0">
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th>Codice</th>
+                    <th>Descrizione</th>
+                    <th>Prezzo</th>
+                  </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="confirmAddIngredienteModal">Conferma</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Footer -->
       <footer class="sticky-footer bg-white">
