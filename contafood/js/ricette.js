@@ -236,41 +236,88 @@ $(document).ready(function() {
 			$('#alertRicettaAddIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
 			$('#alertRicettaAddIngrediente').html(alertContent);
 		} else{
+			var alreadyAddedRows = $('.formRowIngrediente').length;
+			if(alreadyAddedRows == null || alreadyAddedRows == undefined){
+				alreadyAddedRows = 0;
+			}
 			$('.addIngredienteCheckbox:checkbox:checked').each(function(i, item){
 				//$('#categoria').append('<option value="'+item.id+'">'+item.nome+'</option>');
+				var id = item.id.replace('checkbox_','');
 				var codice = $('#'+item.id).attr('data-codice');
 				var descrizione = $('#'+item.id).attr('data-descrizione');
 				var prezzo = $('#'+item.id).attr('data-prezzo');
 
-				var rowHtml = '<div class="form-row" data-id="'+item.id+'" class="formRowIngrediente">' +
+				/*
+				if(i == 0 && alreadyAddedRows == 0){
+					var rowHeaderHtml = '<div class="form-row" id="formRowIngredienteHeader">\n' +
+						'              <div class="form-group col-md-2">\n' +
+						'                <p>Codice</p>\n' +
+						'              </div>\n' +
+						'              <div class="form-group col-md-4">\n' +
+						'                <p>Descrizione</p>\n' +
+						'              </div>\n' +
+						'              <div class="form-group col-md-2">\n' +
+						'                <p>Prezzo</p>\n' +
+						'              </div>\n' +
+						'              <div class="form-group col-md-2">\n' +
+						'                <p>Quantita</p>\n' +
+						'              </div>\n' +
+						'            </div>';
+					$('#formRowIngredienti').append(rowHeaderHtml);
+				}*/
+
+				var rowHtml = '<div class="form-row formRowIngrediente" data-id="'+id+'" id="formRowIngrediente_'+id+'">' +
 					'<div class="form-group col-md-2">';
-				if(i == 0){
+
+				if(i == 0 && alreadyAddedRows == 0){
 					rowHtml = rowHtml + '<label for="codiceIngrediente">Codice</label>';
 				}
-				rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceIngrediente_"'+item.id+' disabled value="'+codice+'"></div>';
+				rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceIngrediente_'+id+'" disabled value="'+codice+'"></div>';
 				rowHtml = rowHtml + '<div class="form-group col-md-4">';
-				if(i == 0){
+
+				if(i == 0 && alreadyAddedRows == 0){
 					rowHtml = rowHtml + '<label for="descrizioneIngrediente">Descrizione</label>';
 				}
-				rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneIngrediente'+item.id+'" disabled value="'+descrizione+'"></div>';
+				rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneIngrediente_'+id+'" disabled value="'+descrizione+'"></div>';
 				rowHtml = rowHtml + '<div class="form-group col-md-2">';
-				if(i == 0){
+
+				if(i == 0 && alreadyAddedRows == 0){
 					rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo</label>';
 				}
-				rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente'+item.id+'" disabled value="'+prezzo+'"></div>';
+				rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente_'+id+'" disabled value="'+prezzo+'"></div>';
 				rowHtml = rowHtml + '<div class="form-group col-md-2">';
-				if(i == 0){
+
+				if(i == 0 && alreadyAddedRows == 0){
 					rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 				}
-				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente'+item.id+'" step="1" min="0"></div>';
+				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step="1" min="0"></div>';
 
-				rowHtml = rowHtml + '<div class="form-group col-md-1"><label for="deleteIngrediente"></label><i id="deleteIngrediente" class="far fa-trash-alt"></div>';
-
+				rowHtml = rowHtml + '<div class="form-group col-md-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a></div>';
 				rowHtml = rowHtml + '</div>';
 
 				$('#formRowIngredienti').append(rowHtml);
+				$('#addIngredienteModalTable').DataTable().destroy();
 				$('#addIngredienteModal').modal('hide');
 			});
+		}
+	});
+
+	$(document).on('click','.deleteAddIngrediente', function(){
+		var firstId = $('.formRowIngrediente').first().attr('data-id');
+		if(firstId == null || firstId == undefined){
+			firstId = -1;
+		}
+		var id = $(this).attr('data-id');
+		$('#formRowIngrediente_'+id).remove();
+		if(id == firstId){
+			var firstRow = $('.formRowIngrediente').first();
+			if(firstRow != null && firstRow != undefined && firstRow.length != 0){
+				$('#'+firstRow.attr('id')).find('input').each(function(i, item){
+					var id = item.id;
+					$('#'+id).before('<label>CIAO</label>');
+					//console.log(id);
+				});
+			}
 		}
 	});
 });
