@@ -1,3 +1,4 @@
+
 var baseUrl = "http://localhost:8090/contafood-be/";
 
 $(document).ready(function() {
@@ -14,7 +15,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Errore nel recupero dei fornitori</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertFornitore').append(alertContent);
+				$('#alertFornitore').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -91,7 +92,7 @@ $(document).ready(function() {
 				  $('#detailsFornitoreMainDiv').append(contentDetails);
 
               } else{
-                $('#detailsFornitoreMainDiv').append(alertContent);
+                $('#detailsFornitoreMainDiv').empty().append(alertContent);
               }
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -120,7 +121,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Fornitore</strong> cancellato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertFornitore').append(alertContent);
+				$('#alertFornitore').empty().append(alertContent);
 
 				$('#fornitoriTable').DataTable().ajax.reload();
 			},
@@ -137,14 +138,28 @@ $(document).ready(function() {
 				$('#nome').attr('disabled', false);
 				$('#cognome').attr('disabled', false);
 			} else{
+				$('#nome').val(null);
+				$('#cognome').val(null);
 				$('#nome').attr('disabled', true);
 				$('#cognome').attr('disabled', true);
 			}
 		});
 	}
 
+	if($('#raggruppaRiba') != null && $('#raggruppaRiba') != undefined){
+    		$(document).on('change','#raggruppaRiba', function(){
+    			var isChecked = $('#raggruppaRiba').prop('checked');
+    			if(isChecked){
+    				$('#nomeGruppoRiba').attr('disabled', false);
+    			} else{
+    				$('#nomeGruppoRiba').val(null);
+    				$('#nomeGruppoRiba').attr('disabled', true);
+    			}
+    		});
+    	}
+
 	if($('#updateFornitoreButton') != null && $('#updateFornitoreButton') != undefined){
-		$(document).on('click','#updateFornitoreButton', function(event){
+		$(document).on('submit','#updateFornitoreForm', function(event){
 			event.preventDefault();
 
 			var fornitore = new Object();
@@ -174,6 +189,36 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
+			// manage autista
+            var selectedAutista = $('#autista option:selected').val();
+            if(selectedAutista != null && selectedAutista != undefined && selectedAutista != '-1'){
+                var autista = new Object();
+                autista.id = selectedAutista;
+                fornitore.autista = autista;
+            }
+            // manage agente
+            var selectedAgente = $('#agente option:selected').val();
+            if(selectedAgente != null && selectedAgente != undefined && selectedAgente != '-1'){
+                var agente = new Object();
+                agente.id = selectedAgente;
+                fornitore.agente = agente;
+            }
+            if($('#bloccaDdt').prop('checked') === true){
+                fornitore.bloccaDdt = true;
+            }else{
+                fornitore.bloccaDdt = false;
+            }
+            if($('#nascondiPrezzi').prop('checked') === true){
+                fornitore.nascondiPrezzi = true;
+            }else{
+                fornitore.nascondiPrezzi = false;
+            }
+            if($('#raggruppaRiba').prop('checked') === true){
+                fornitore.raggruppaRiba = true;
+            }else{
+                fornitore.raggruppaRiba = false;
+            }
+            fornitore.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -189,17 +234,17 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: fornitoreJson,
 				success: function(result) {
-					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Fornitore modificato con successo'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore modificato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore'));
 				}
 			});
 		});
 	}
 
 	if($('#newFornitoreButton') != null && $('#newFornitoreButton') != undefined){
-		$(document).on('click','#newFornitoreButton', function(event){
+		$(document).on('submit','#newFornitoreForm', function(event){
 			event.preventDefault();
 
 			var fornitore = new Object();
@@ -228,6 +273,36 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
+			// manage autista
+			var selectedAutista = $('#autista option:selected').val();
+			if(selectedAutista != null && selectedAutista != undefined && selectedAutista != '-1'){
+			    var autista = new Object();
+                autista.id = selectedAutista;
+			    fornitore.autista = autista;
+			}
+			// manage agente
+			var selectedAgente = $('#agente option:selected').val();
+			if(selectedAgente != null && selectedAgente != undefined && selectedAgente != '-1'){
+                var agente = new Object();
+                agente.id = selectedAgente;
+                fornitore.agente = agente;
+            }
+			if($('#bloccaDdt').prop('checked') === true){
+                fornitore.bloccaDdt = true;
+            }else{
+                fornitore.bloccaDdt = false;
+            }
+            if($('#nascondiPrezzi').prop('checked') === true){
+                fornitore.nascondiPrezzi = true;
+            }else{
+                fornitore.nascondiPrezzi = false;
+            }
+            if($('#raggruppaRiba').prop('checked') === true){
+                fornitore.raggruppaRiba = true;
+            }else{
+                fornitore.raggruppaRiba = false;
+            }
+            fornitore.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -243,10 +318,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: fornitoreJson,
 				success: function(result) {
-					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Fornitore creato con successo'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore creato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore'));
 				}
 			});
 		});
@@ -262,6 +337,42 @@ $.fn.getProvince = function(){
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
 					$('#provincia').append('<option value="'+item+'">'+item+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getAutisti = function(){
+	$.ajax({
+		url: baseUrl + "autisti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#autista').append('<option value="'+item.id+'">'+item.nome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getAgenti = function(){
+	$.ajax({
+		url: baseUrl + "agenti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#agente').append('<option value="'+item.id+'">'+item.nome+'</option>');
 				});
 			}
 		},
@@ -293,21 +404,14 @@ $.fn.getFornitore = function(idFornitore){
 	alertContent = alertContent + '<strong>Errore nel recupero del fornitore.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-    $.ajax({
-		url: baseUrl + "util/province",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#provincia').append('<option value="'+item+'">'+item+'</option>');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+    // load province
+    $.fn.getProvince();
+
+	// load autisti
+	$.fn.getAutisti();
+
+	// load agenti
+	$.fn.getAgenti();
 
     $.ajax({
         url: baseUrl + "fornitori/" + idFornitore,
@@ -342,14 +446,31 @@ $.fn.getFornitore = function(idFornitore){
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#iban').attr('value', result.iban);
 			$('#pagamento').attr('value', result.pagamento);
+			if(result.autista != null && result.autista != undefined){
+			    $('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
+			}
+            if(result.agente != null && result.agente != undefined){
+                $('#agente option[value="' + result.agente.id +'"]').attr('selected', true);
+            }
+			if(result.bloccaDdt === true){
+                $('#bloccaDdt').prop('checked', true);
+            }
+            if(result.nascondiPrezzi === true){
+                $('#nascondiPrezzi').prop('checked', true);
+            }
+            if(result.raggruppaRiba === true){
+                $('#raggruppaRiba').prop('checked', true);
+                $('#nomeGruppoRiba').attr('disabled', 'false');
+            }
+            $('#nomeGruppoRiba').attr('value', result.nomeGruppoRiba);
 			$('#note').val(result.note);
 
           } else{
-            $('#alertFornitore').append(alertContent);
+            $('#alertFornitore').empty().append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertFornitore').append(alertContent);
+            $('#alertFornitore').empty().append(alertContent);
             $('#updateFornitoreButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }

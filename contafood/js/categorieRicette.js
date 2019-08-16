@@ -14,7 +14,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Errore nel recupero delle categorie ricette</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertCategoriaRicette').append(alertContent);
+				$('#alertCategoriaRicette').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -63,7 +63,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Categoria ricette</strong> cancellata con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertCategoriaRicette').append(alertContent);
+				$('#alertCategoriaRicette').empty().append(alertContent);
 
 				$('#categorieRicetteTable').DataTable().ajax.reload();
 			},
@@ -95,10 +95,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: categoriaRicetteJson,
 				success: function(result) {
-					$('#alertCategoriaRicette').append(alertContent.replace('@@alertText@@','Categoria ricette modificata con successo'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Categoria ricette modificata con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertCategoriaRicette').append(alertContent.replace('@@alertText@@','Errore nella modifica della categoria ricette'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della categoria ricette'));
 				}
 			});
 		});
@@ -125,10 +125,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: categoriaRicetteJson,
 				success: function(result) {
-					$('#alertCategoriaRicette').append(alertContent.replace('@@alertText@@','Categoria ricette creata con successo'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Categoria ricette creata con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertCategoriaRicette').append(alertContent.replace('@@alertText@@','Errore nella creazione della categoria ricette'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della categoria ricette'));
 				}
 			});
 		});
@@ -169,11 +169,11 @@ $.fn.getCategoriaRicette = function(idCategoriaRicette){
             $('#ordine').attr('value', result.ordine);
 
           } else{
-            $('#alertCategoriaRicette').append(alertContent);
+            $('#alertCategoriaRicette').empty().append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertCategoriaRicette').append(alertContent);
+            $('#alertCategoriaRicette').empty().append(alertContent);
             $('#updateCategoriaRicetteButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 
 <head>
 
@@ -28,6 +28,8 @@
   <!-- Core plugin JavaScript-->
   <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
+  <script src="js/commons.js"></script>
+
   <script src="js/fornitori.js"></script>
 
   <script>
@@ -43,59 +45,7 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar">
-
-      <!-- Sidebar - Brand -->
-      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-        <div class="sidebar-brand-icon">
-          <!--<i class="fas fa-laugh-wink"></i>-->
-          <img src="img/ui_avatar.png">
-        </div>
-      
-        <div class="sidebar-brand-text mx-3">ContaFood</div>
-      </a>
-
-      <!-- Divider -->
-      <hr class="sidebar-divider my-0">
-
-      <!-- Nav Item - Fornitori -->
-      <li class="nav-item active">
-        <a class="nav-link" href="fornitori.html">
-          <i class="fas fa-fw fa-tachometer-alt"></i>
-          <span>Fornitori</span></a>
-      </li>
-
-      <!-- Divider -->
-      <hr class="sidebar-divider">
-
-      <li class="nav-item">
-        <a class="nav-link" href="ricette.html">
-          <i class="fas fa-fw fa-table"></i>
-          <span>Ricette</span></a>
-      </li>
-
-        <hr class="sidebar-divider">
-
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                <!--<i class="fas fa-fw fa-table"></i>-->
-                <i class="far fa-address-card"></i>
-                <span>Anagrafiche</span>
-            </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                  <a class="collapse-item" href="anagrafiche/categorie-ricette.html">Categorie ricette</a>
-                  <a class="collapse-item" href="anagrafiche/ingredienti.html">Ingredienti</a>
-                </div>
-            </div>
-        </li>
-
-      <!-- Sidebar Toggler (Sidebar) -->
-      <div class="text-center d-none d-md-inline">
-        <button class="rounded-circle border-0" id="sidebarToggle"></button>
-      </div>
-
-    </ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -105,28 +55,7 @@
       <div id="content">
 
         <!-- Topbar -->
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-
-          <!-- Sidebar Toggle (Topbar) -->
-          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-            <i class="fa fa-bars"></i>
-          </button>
-
-          <!-- Topbar Navbar -->
-          <ul class="navbar-nav ml-auto">
-
-            <div class="topbar-divider d-none d-sm-block"></div>
-
-            <!-- Nav Item - User Information -->
-            <li class="nav-item dropdown no-arrow">
-              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="mr-2 d-none d-lg-inline text-gray-600">Urbani Alimentari</span>
-              </a>
-            </li>
-
-          </ul>
-
-        </nav>
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"></nav>
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
@@ -137,10 +66,10 @@
 
           <div id="alertFornitore"></div>
 
-          <form id="editFornitoreForm" class="needs-validation" novalidate>
+          <form id="updateFornitoreForm" class="needs-validation" novalidate>
             <div class="form-row">
               <div class="form-group col-md-2">
-                <label for="codiceFornitore">Codice fornitore</label>
+                <label for="codiceFornitore">Codice*</label>
                 <input type="text" class="form-control" id="codiceFornitore" placeholder="" required>
                 <div class="invalid-feedback">
                   Inserisci un codice
@@ -149,7 +78,7 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="ragioneSociale">Ragione sociale</label>
+                <label for="ragioneSociale">Ragione sociale*</label>
                 <input type="text" class="form-control" id="ragioneSociale" placeholder="" required>
                 <div class="invalid-feedback">
                   Inserisci una ragione sociale
@@ -206,14 +135,14 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="partitaIva">Partita IVA</label>
+                <label for="partitaIva">Partita IVA*</label>
                 <input type="text" class="form-control" id="partitaIva" placeholder="" required>
                 <div class="invalid-feedback">
                   Inserisci una partiva iva
                 </div>
               </div>
               <div class="form-group col-md-3">
-                <label for="codiceFiscale">Codice fiscale</label>
+                <label for="codiceFiscale">Codice fiscale*</label>
                 <input type="text" class="form-control" id="codiceFiscale" placeholder="" required>
                 <div class="invalid-feedback">
                   Inserisci un codice fiscale
@@ -236,15 +165,15 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-2">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" placeholder="" >
+                <label for="email">Email*</label>
+                <input type="email" class="form-control" id="email" placeholder="" required>
                 <div class="invalid-feedback">
                   Inserisci un email valida
                 </div>
               </div>
               <div class="form-group col-md-2">
-                <label for="emailPec">Email PEC</label>
-                <input type="email" class="form-control" id="emailPec" placeholder="">
+                <label for="emailPec">Email PEC*</label>
+                <input type="email" class="form-control" id="emailPec" placeholder="" required>
                 <div class="invalid-feedback">
                   Inserisci un email valida
                 </div>
@@ -262,6 +191,54 @@
               <div class="form-group col-md-2">
                 <label for="pagamento">Pagamento</label>
                 <input type="text" class="form-control" id="pagamento" placeholder="">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="autista">Autista</label>
+                <select id="autista" class="form-control">
+                  <option value="-1">Seleziona autista</option>
+                </select>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="agente">Agente</label>
+                <select id="agente" class="form-control">
+                  <option value="-1">Seleziona agente</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="bloccaDdt">
+                  <label class="form-check-label" for="bloccaDdt">
+                    Blocca DDT
+                  </label>
+                </div>
+              </div>
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="nascondiPrezzi">
+                  <label class="form-check-label" for="nascondiPrezzi">
+                    Nascondi prezzi
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="raggruppaRiba">
+                  <label class="form-check-label" for="raggruppaRiba">
+                    Raggruppa RiBa
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="nomeGruppoRiba">Gruppo RiBa</label>
+                <input type="text" class="form-control" id="nomeGruppoRiba" placeholder="" disabled>
               </div>
             </div>
             <div class="form-row">
@@ -324,13 +301,6 @@
     <i class="fas fa-angle-up"></i>
   </a>
 
-  <!-- Bootstrap core JavaScript-->
-  <script src="vendor/jquery/jquery.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Core plugin JavaScript-->
-  <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
   <!-- Custom scripts for all pages-->
   <script src="js/sb-admin-2.min.js"></script>
 
@@ -338,8 +308,6 @@
   <script src="vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-  <!-- Page level custom scripts -->
-  <!--<script src="js/demo/datatables-demo.js"></script>-->
 
 </body>
 

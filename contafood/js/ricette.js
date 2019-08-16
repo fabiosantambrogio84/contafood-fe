@@ -14,7 +14,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Errore nel recupero delle ricette</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertRicetta').append(alertContent);
+				$('#alertRicetta').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -64,7 +64,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Ricetta</strong> cancellata con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertRicetta').append(alertContent);
+				$('#alertRicetta').empty().append(alertContent);
 
 				$('#ricetteTable').DataTable().ajax.reload();
 			},
@@ -75,7 +75,7 @@ $(document).ready(function() {
 	});
 
 	if($('#updateRicettaButton') != null && $('#updateRicettaButton') != undefined){
-		$(document).on('click','#updateRicettaButton', function(event){
+		$(document).on('submit','#updateRicettaForm', function(event){
 			event.preventDefault();
 
 			var ricetta = new Object();
@@ -123,17 +123,17 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ricettaJson,
 				success: function(result) {
-					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Ricetta modificata con successo'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta modificata con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Errore nella modifica della ricetta'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della ricetta'));
 				}
 			});
 		});
 	}
 
 	if($('#newRicettaButton') != null && $('#newRicettaButton') != undefined){
-		$(document).on('click','#newRicettaButton', function(event){
+		$(document).on('submit','#newRicettaForm', function(event){
 			event.preventDefault();
 
 			var ricetta = new Object();
@@ -180,10 +180,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ricettaJson,
 				success: function(result) {
-					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Ricetta creata con successo'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta creata con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Errore nella creazione della ricetta'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della ricetta'));
 				}
 			});
 		});
@@ -203,7 +203,7 @@ $(document).ready(function() {
 					var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 					alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti</strong>\n' +
 						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-					$('#alertRicettaAddIngrediente').append(alertContent);
+					$('#alertRicettaAddIngrediente').empty().append(alertContent);
 				}
 			},
 			"language": {
@@ -237,7 +237,7 @@ $(document).ready(function() {
 			var alertContent = '<div id="alertRicettaAddIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>Selezionare almeno un ingrediente</strong>\n' +
 				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-			$('#alertRicettaAddIngrediente').append(alertContent);
+			$('#alertRicettaAddIngrediente').empty().append(alertContent);
 		} else{
 			var alreadyAddedRows = $('.formRowIngrediente').length;
 			if(alreadyAddedRows == null || alreadyAddedRows == undefined){
@@ -258,7 +258,7 @@ $(document).ready(function() {
 					var alertContent = '<div id="alertRicettaAddIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 					alertContent = alertContent + '<strong>L\' ingrediente '+codice+' &egrave; gi&agrave; stato selezionato</strong>\n' +
 						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-					$('#alertRicettaAddIngrediente').append(alertContent);
+					$('#alertRicettaAddIngrediente').empty().append(alertContent);
 				} else{
 					var descrizione = $('#'+item.id).attr('data-descrizione');
 					var prezzo = $('#'+item.id).attr('data-prezzo');
@@ -378,21 +378,7 @@ $.fn.getRicetta = function(idRicetta){
 	alertContent = alertContent +  '<strong>Errore nel recupero della ricetta.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-	$.ajax({
-		url: baseUrl + "categorie-ricette",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#categoria').append('<option value="'+item.id+'">'+item.nome+'</option>');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+	$.fn.getCategorieRicette();
 
 	$.ajax({
         url: baseUrl + "ricette/" + idRicetta,
@@ -456,7 +442,7 @@ $.fn.getRicetta = function(idRicetta){
 			});
 
           } else{
-            $('#alertRicetta').append(alertContent);
+            $('#alertRicetta').empty().append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {

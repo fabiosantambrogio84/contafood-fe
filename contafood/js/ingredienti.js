@@ -14,7 +14,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertIngrediente').append(alertContent);
+				$('#alertIngrediente').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -64,7 +64,7 @@ $(document).ready(function() {
 				var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Ingrediente</strong> cancellato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertIngrediente').append(alertContent);
+				$('#alertIngrediente').empty().append(alertContent);
 
 				$('#ingredientiTable').DataTable().ajax.reload();
 			},
@@ -97,10 +97,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ingredienteJson,
 				success: function(result) {
-					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Ingrediente modificato con successo'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente modificato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Errore nella modifica dell ingrediente'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell ingrediente'));
 				}
 			});
 		});
@@ -128,10 +128,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ingredienteJson,
 				success: function(result) {
-					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Ingrediente creato con successo'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente creato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Errore nella creazione dell ingrediente'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ingrediente'));
 				}
 			});
 		});
@@ -173,11 +173,11 @@ $.fn.getIngrediente = function(idIngrediente){
             $('#prezzo').attr('value', result.prezzo);
 
           } else{
-            $('#alertIngrediente').append(alertContent);
+            $('#alertIngrediente').empty().append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertIngrediente').append(alertContent);
+            $('#alertIngrediente').empty().append(alertContent);
             $('#updateIngredienteButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }
