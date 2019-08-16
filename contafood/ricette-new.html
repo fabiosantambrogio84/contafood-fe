@@ -57,7 +57,7 @@
       <hr class="sidebar-divider my-0">
 
       <!-- Nav Item - Fornitori -->
-      <li class="nav-item active">
+      <li class="nav-item">
         <a class="nav-link" href="fornitori.html">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Fornitori</span></a>
@@ -66,7 +66,7 @@
       <!-- Divider -->
       <hr class="sidebar-divider">
 
-      <li class="nav-item">
+      <li class="nav-item active">
         <a class="nav-link" href="ricette.html">
           <i class="fas fa-fw fa-table"></i>
           <span>Ricette</span></a>
@@ -185,7 +185,6 @@
               </div>
             </div>
 
-            <!-- TODO: INGREDIENTI -->
             <div class="form-row" id="formRowIngredienti">
               <div class="form-group col-md-12" id="formRowIngredientiBody">
                 <label for="ingredienti">Ingredienti</label>
@@ -255,7 +254,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="addIngredienteModalTitle">Aggiungi ingrediente</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" class="close annullaAddIngredienteModal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -276,7 +275,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" id="confirmAddIngredienteModal">Conferma</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+              <button type="button" class="btn btn-secondary annullaAddIngredienteModal">Annulla</button>
             </div>
           </div>
         </div>

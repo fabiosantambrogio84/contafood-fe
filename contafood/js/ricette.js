@@ -11,10 +11,10 @@ $(document).ready(function() {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<strong>Errore nel recupero delle ricette</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-				$('#alertRicetta').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-				$('#alertRicetta').html(alertContent);
+				var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero delle ricette</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertRicetta').append(alertContent);
 			}
 		},
 		"language": {
@@ -31,77 +31,21 @@ $(document).ready(function() {
 		"pageLength": 20,
 		"lengthChange": false,
 		"info": false,
+		"autoWidth": false,
+		"order": [
+			[0, 'asc']
+		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
 			{"name": "nome", "data": "nome"},
 			{"name": "note", "data": "note"},
-			{"data": null, render: function ( data, type, row ) {
-				//var links = '<a class="detailsFornitore pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
+			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="updateRicetta pr-2" data-id="'+data.id+'" href="ricette-edit.html?idRicetta=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links = links + '<a class="deleteRicetta" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		]
 	});
-
-	/*
-	$(document).on('click','.detailsFornitore', function(){
-        var idFornitore = $(this).attr('data-id');
-
-        var alertContent = '<strong>Errore nel recupero del fornitore.</strong>';
-
-        $.ajax({
-            url: baseUrl + "fornitori/" + idFornitore,
-            type: 'GET',
-            dataType: 'json',
-            success: function(result) {
-              if(result != null && result != undefined && result != ''){
-              	var contentDetails = '<p><strong>Codice fornitore: </strong>'+result.codice+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ragione sociale: </strong>'+result.ragioneSociale+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ragione sociale 2: </strong>'+result.ragioneSociale2+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ditta individuale: </strong>';
-				  if(result.dittaIndividuale === true){
-					contentDetails = contentDetails + 'Si';
-				  } else{
-				  	contentDetails = contentDetails + 'No';
-				  }
-				  contentDetails = contentDetails + '<p><strong>Nome: </strong>'+result.nome+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Cognome: </strong>'+result.cognome+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Indirizzo: </strong>'+result.indirizzo+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Citt&agrave;: </strong>'+result.citta+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Provincia: </strong>'+result.provincia+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Cap: </strong>'+result.cap+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Nazione: </strong>'+result.nazione+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Partita IVA: </strong>'+result.partitaIva+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Codice fiscale: </strong>'+result.codiceFiscale+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Telefono: </strong>'+result.telefono+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Telefono2: </strong>'+result.telefono2+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Telefono3: </strong>'+result.telefono3+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Email: </strong>'+result.email+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Email PEC: </strong>'+result.emailPec+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Codice univoco SDI: </strong>'+result.codiceUnivocoSdi+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Iban: </strong>'+result.iban+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+result.pagamento+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+result.note+'</p>';
-
-				  $('#detailsFornitoreMainDiv').attr('style', 'overflow-y: auto; max-height: 500px;');
-				  $('#detailsFornitoreMainDiv').append(contentDetails);
-
-              } else{
-                $('#detailsFornitoreMainDiv').addClass('alert alert-danger alert-dismissible fade show m-2').attr('role','alert');
-                $('#detailsFornitoreMainDiv').html(alertContent);
-              }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                $('#detailsFornitoreMainDiv').addClass('alert alert-danger alert-dismissible fade show m-2').attr('role','alert');
-                $('#detailsFornitoreMainDiv').html(alertContent);
-                console.log('Response text: ' + jqXHR.responseText);
-            }
-        });
-
-        $('#detailsFornitoreModal').modal('show');
-    });
-	*/
 
 	$(document).on('click','.deleteRicetta', function(){
 		var idRicetta = $(this).attr('data-id');
@@ -117,10 +61,10 @@ $(document).ready(function() {
 			url: baseUrl + "ricette/" + idRicetta,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<strong>Ricetta</strong> cancellata con successo.\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-				$('#alertRicetta').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-				$('#alertRicetta').html(alertContent);
+				var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Ricetta</strong> cancellata con successo.\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertRicetta').append(alertContent);
 
 				$('#ricetteTable').DataTable().ajax.reload();
 			},
@@ -136,25 +80,53 @@ $(document).ready(function() {
 
 			var ricetta = new Object();
 			ricetta.id = $('#hiddenIdRicetta').val();
+			ricetta.codice = $('#codiceRicetta').val();
+			ricetta.nome = $('#nome').val();
+			var categoria = new Object();
+			categoria.id = $('#categoria option:selected').val();
+			ricetta.categoria = categoria;
+			ricetta.tempoPreparazione = $('#tempoPreparazione').val();
+			ricetta.numeroPorzioni = $('#numeroPorzioni').val();
+			ricetta.costoIngredienti = $('#costoIngredienti').val();
+			ricetta.costoPreparazione = $('#costoPreparazione').val();
+			ricetta.costoTotale = $('#costoTotale').val();
+			var ingredientiLength = $('.formRowIngrediente').length;
+			if(ingredientiLength != null && ingredientiLength != undefined && ingredientiLength != 0){
+				var ricettaIngredienti = [];
+				$('.formRowIngrediente').each(function(i, item){
+					var ricettaIngrediente = {};
+					var ricettaIngredienteId = new Object();
+					var ingredienteId = item.id.replace('formRowIngrediente_','');
+					ricettaIngredienteId.ingredienteId = ingredienteId;
+					ricettaIngrediente.id = ricettaIngredienteId;
+					ricettaIngrediente.quantita = $('#quantitaIngrediente_'+ingredienteId).val();
+
+					ricettaIngredienti.push(ricettaIngrediente);
+				});
+				ricetta.ricettaIngredienti = ricettaIngredienti;
+			}
+			ricetta.preparazione = $('#preparazione').val();
+			ricetta.allergeni = $('#allergeni').val();
+			ricetta.valoriNutrizionali = $('#valoriNutrizionali').val();
+			ricetta.note = $('#note').val();
 
 			var ricettaJson = JSON.stringify(ricetta);
 
-			var alertContent = '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+			var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "ricette/" + $('#hiddenIdRicetta').val(),
 				type: 'PUT',
 				contentType: "application/json",
 				dataType: 'json',
-				data: fornitoreJson,
+				data: ricettaJson,
 				success: function(result) {
-					$('#alertRicetta').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-					$('#alertRicetta').html(alertContent.replace('@@alertText@@','Ricetta modificata con successo'));
+					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Ricetta modificata con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertRicetta').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-					$('#alertRicetta').html(alertContent.replace('@@alertText@@','Errore nella modifica della ricetta'));
+					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Errore nella modifica della ricetta'));
 				}
 			});
 		});
@@ -166,25 +138,52 @@ $(document).ready(function() {
 
 			var ricetta = new Object();
 			ricetta.codice = $('#codiceRicetta').val();
+			ricetta.nome = $('#nome').val();
+			var categoria = new Object();
+			categoria.id = $('#categoria option:selected').val();
+			ricetta.categoria = categoria;
+			ricetta.tempoPreparazione = $('#tempoPreparazione').val();
+			ricetta.numeroPorzioni = $('#numeroPorzioni').val();
+			ricetta.costoIngredienti = $('#costoIngredienti').val();
+			ricetta.costoPreparazione = $('#costoPreparazione').val();
+			ricetta.costoTotale = $('#costoTotale').val();
+			var ingredientiLength = $('.formRowIngrediente').length;
+			if(ingredientiLength != null && ingredientiLength != undefined && ingredientiLength != 0){
+				var ricettaIngredienti = [];
+				$('.formRowIngrediente').each(function(i, item){
+					var ricettaIngrediente = {};
+					var ricettaIngredienteId = new Object();
+					var ingredienteId = item.id.replace('formRowIngrediente_','');
+					ricettaIngredienteId.ingredienteId = ingredienteId;
+					ricettaIngrediente.id = ricettaIngredienteId;
+					ricettaIngrediente.quantita = $('#quantitaIngrediente_'+ingredienteId).val();
+
+					ricettaIngredienti.push(ricettaIngrediente);
+				});
+				ricetta.ricettaIngredienti = ricettaIngredienti;
+			}
+			ricetta.preparazione = $('#preparazione').val();
+			ricetta.allergeni = $('#allergeni').val();
+			ricetta.valoriNutrizionali = $('#valoriNutrizionali').val();
+			ricetta.note = $('#note').val();
 
 			var ricettaJson = JSON.stringify(ricetta);
 
-			var alertContent = '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+			var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "ricette",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: ricetteJson,
+				data: ricettaJson,
 				success: function(result) {
-					$('#alertRicetta').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-					$('#alertRicetta').html(alertContent.replace('@@alertText@@','Ricetta creata con successo'));
+					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Ricetta creata con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertRicetta').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-					$('#alertRicetta').html(alertContent.replace('@@alertText@@','Errore nella creazione della ricetta'));
+					$('#alertRicetta').append(alertContent.replace('@@alertText@@','Errore nella creazione della ricetta'));
 				}
 			});
 		});
@@ -201,10 +200,10 @@ $(document).ready(function() {
 				"cache": false,
 				"dataSrc": "",
 				"error": function(jqXHR, textStatus, errorThrown) {
-					var alertContent = '<strong>Errore nel recupero degli ingredienti</strong>\n' +
-						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-					$('#alertRicettaAddIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-					$('#alertRicettaAddIngrediente').html(alertContent);
+					var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+					alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti</strong>\n' +
+						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+					$('#alertRicettaAddIngrediente').append(alertContent);
 				}
 			},
 			"language": {
@@ -215,8 +214,12 @@ $(document).ready(function() {
 			"paging": false,
 			"lengthChange": false,
 			"info": false,
+			"order": [
+				[1,'asc']
+			],
+			"autoWidth": false,
 			"columns": [
-				{"data": null, render: function ( data, type, row ) {
+				{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
 					var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" data-codice="'+data.codice+'" data-descrizione="'+data.descrizione+'" ' +
 						'data-prezzo="'+data.prezzo+'" id="checkbox_'+data.id+'" class="addIngredienteCheckbox">';
 					return checkboxHtml;
@@ -231,75 +234,79 @@ $(document).ready(function() {
 	$(document).on('click','#confirmAddIngredienteModal', function(){
 		var numChecked = $('.addIngredienteCheckbox:checkbox:checked').length;
 		if(numChecked == null || numChecked == undefined || numChecked == 0){
-			var alertContent = '<strong>Selezionare almeno un ingrediente</strong>\n' +
-				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-			$('#alertRicettaAddIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-			$('#alertRicettaAddIngrediente').html(alertContent);
+			var alertContent = '<div id="alertRicettaAddIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>Selezionare almeno un ingrediente</strong>\n' +
+				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$('#alertRicettaAddIngrediente').append(alertContent);
 		} else{
 			var alreadyAddedRows = $('.formRowIngrediente').length;
 			if(alreadyAddedRows == null || alreadyAddedRows == undefined){
 				alreadyAddedRows = 0;
 			}
+			if(alreadyAddedRows != 0){
+				var rowsIdPresent = [];
+				$('.formRowIngrediente').each(function(i,item){
+					var itemId = item.id;
+					rowsIdPresent.push(itemId.replace('formRowIngrediente_',''));
+				});
+			}
 			$('.addIngredienteCheckbox:checkbox:checked').each(function(i, item){
-				//$('#categoria').append('<option value="'+item.id+'">'+item.nome+'</option>');
 				var id = item.id.replace('checkbox_','');
 				var codice = $('#'+item.id).attr('data-codice');
-				var descrizione = $('#'+item.id).attr('data-descrizione');
-				var prezzo = $('#'+item.id).attr('data-prezzo');
 
-				/*
-				if(i == 0 && alreadyAddedRows == 0){
-					var rowHeaderHtml = '<div class="form-row" id="formRowIngredienteHeader">\n' +
-						'              <div class="form-group col-md-2">\n' +
-						'                <p>Codice</p>\n' +
-						'              </div>\n' +
-						'              <div class="form-group col-md-4">\n' +
-						'                <p>Descrizione</p>\n' +
-						'              </div>\n' +
-						'              <div class="form-group col-md-2">\n' +
-						'                <p>Prezzo</p>\n' +
-						'              </div>\n' +
-						'              <div class="form-group col-md-2">\n' +
-						'                <p>Quantita</p>\n' +
-						'              </div>\n' +
-						'            </div>';
-					$('#formRowIngredienti').append(rowHeaderHtml);
-				}*/
+				if($.inArray(id, rowsIdPresent) != -1){
+					var alertContent = '<div id="alertRicettaAddIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+					alertContent = alertContent + '<strong>L\' ingrediente '+codice+' &egrave; gi&agrave; stato selezionato</strong>\n' +
+						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+					$('#alertRicettaAddIngrediente').append(alertContent);
+				} else{
+					var descrizione = $('#'+item.id).attr('data-descrizione');
+					var prezzo = $('#'+item.id).attr('data-prezzo');
 
-				var rowHtml = '<div class="form-row formRowIngrediente" data-id="'+id+'" id="formRowIngrediente_'+id+'">' +
-					'<div class="form-group col-md-2">';
+					var rowHtml = '<div class="form-row formRowIngrediente" data-id="'+id+'" id="formRowIngrediente_'+id+'">' +
+						'<div class="form-group col-md-2">';
 
-				if(i == 0 && alreadyAddedRows == 0){
-					rowHtml = rowHtml + '<label for="codiceIngrediente">Codice</label>';
+					if(i == 0 && alreadyAddedRows == 0){
+						rowHtml = rowHtml + '<label for="codiceIngrediente">Codice</label>';
+					}
+					rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceIngrediente_'+id+'" disabled value="'+codice+'"></div>';
+					rowHtml = rowHtml + '<div class="form-group col-md-4">';
+
+					if(i == 0 && alreadyAddedRows == 0){
+						rowHtml = rowHtml + '<label for="descrizioneIngrediente">Descrizione</label>';
+					}
+					rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneIngrediente_'+id+'" disabled value="'+descrizione+'"></div>';
+					rowHtml = rowHtml + '<div class="form-group col-md-2">';
+
+					if(i == 0 && alreadyAddedRows == 0){
+						rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo</label>';
+					}
+					rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente_'+id+'" disabled value="'+prezzo+'"></div>';
+					rowHtml = rowHtml + '<div class="form-group col-md-2">';
+
+					if(i == 0 && alreadyAddedRows == 0){
+						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
+					}
+					rowHtml = rowHtml + '<div class="input-group">';
+					rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step="1" min="0">';
+					rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
+					rowHtml = rowHtml + '</div></div></div>';
+					rowHtml = rowHtml + '</div>';
+
+					$('#formRowIngredienti').append(rowHtml);
+
+					$('#addIngredienteModalTable').DataTable().destroy();
+					$('#alertRicettaAddIngredienteContent').alert('close');
+					$('#addIngredienteModal').modal('hide');
 				}
-				rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceIngrediente_'+id+'" disabled value="'+codice+'"></div>';
-				rowHtml = rowHtml + '<div class="form-group col-md-4">';
-
-				if(i == 0 && alreadyAddedRows == 0){
-					rowHtml = rowHtml + '<label for="descrizioneIngrediente">Descrizione</label>';
-				}
-				rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneIngrediente_'+id+'" disabled value="'+descrizione+'"></div>';
-				rowHtml = rowHtml + '<div class="form-group col-md-2">';
-
-				if(i == 0 && alreadyAddedRows == 0){
-					rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo</label>';
-				}
-				rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente_'+id+'" disabled value="'+prezzo+'"></div>';
-				rowHtml = rowHtml + '<div class="form-group col-md-2">';
-
-				if(i == 0 && alreadyAddedRows == 0){
-					rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
-				}
-				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step="1" min="0"></div>';
-
-				rowHtml = rowHtml + '<div class="form-group col-md-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a></div>';
-				rowHtml = rowHtml + '</div>';
-
-				$('#formRowIngredienti').append(rowHtml);
-				$('#addIngredienteModalTable').DataTable().destroy();
-				$('#addIngredienteModal').modal('hide');
 			});
 		}
+	});
+
+	$(document).on('click','.annullaAddIngredienteModal', function(){
+		$('#addIngredienteModalTable').DataTable().destroy();
+		$('#alertRicettaAddIngredienteContent').alert('close');
+		$('#addIngredienteModal').modal('hide');
 	});
 
 	$(document).on('click','.deleteAddIngrediente', function(){
@@ -314,8 +321,17 @@ $(document).ready(function() {
 			if(firstRow != null && firstRow != undefined && firstRow.length != 0){
 				$('#'+firstRow.attr('id')).find('input').each(function(i, item){
 					var id = item.id;
-					$('#'+id).before('<label>CIAO</label>');
-					//console.log(id);
+					var label = '';
+					if(id.indexOf('codice') != '-1'){
+						label = '<label for="codiceIngrediente">Codice</label>';
+					} else if(id.indexOf('descrizione') != '-1'){
+						label = '<label for="descrizioneIngrediente">Descrizione</label>';
+					} else if(id.indexOf('prezzo') != '-1'){
+						label = '<label for="prezzoIngrediente">Prezzo</label>';
+					} else{
+						label = '<label for="quantitaIngrediente">Quantita</label>';
+					}
+					$('#'+id).before(label);
 				});
 			}
 		}
@@ -329,7 +345,6 @@ $.fn.getCategorieRicette = function(){
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
-				//result = $.parseJSON(result);
 				$.each(result, function(i, item){
 					$('#categoria').append('<option value="'+item.id+'">'+item.nome+'</option>');
 				});
@@ -359,67 +374,96 @@ $.fn.extractIdRicettaFromUrl = function(){
 
 $.fn.getRicetta = function(idRicetta){
 
-    var alertContent = '<strong>Errore nel recupero della ricetta.</strong>\n' +
-    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+	var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent +  '<strong>Errore nel recupero della ricetta.</strong>\n' +
+    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-    $.ajax({
+	$.ajax({
+		url: baseUrl + "categorie-ricette",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#categoria').append('<option value="'+item.id+'">'+item.nome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
         url: baseUrl + "ricette/" + idRicetta,
         type: 'GET',
         dataType: 'json',
         success: function(result) {
           if(result != null && result != undefined && result != ''){
-            //$('.fornitoreBody').data('fornitore', result);
 
 			$('#hiddenIdRicetta').attr('value', result.id);
 			$('#codiceRicetta').attr('value', result.codice);
+			$('#nome').attr('value', result.nome);
+			$('#categoria option[value="' + result.categoria.id +'"]').attr('selected', true);
+			$('#tempoPreparazione').attr('value', result.tempoPreparazione);
+			$('#numeroPorzioni').attr('value', result.numeroPorzioni);
+			$('#costoIngredienti').attr('value', result.costoIngredienti);
+			$('#costoPreparazione').attr('value', result.costoPreparazione);
+			$('#costoTotale').attr('value', result.costoTotale);
+			$('#preparazione').val(result.preparazione);
+			$('#allergeni').val(result.allergeni);
+			$('#valoriNutrizionali').val(result.valoriNutrizionali);
+			$('#note').val(result.note);
+
+			result.ricettaIngredienti.forEach(function(item, i){
+				var id = item.id.ingredienteId;
+				var codice = item.ingrediente.codice;
+				var descrizione = item.ingrediente.descrizione;
+				var prezzo = item.ingrediente.prezzo;
+				var quantita = item.quantita;
+
+				var rowHtml = '<div class="form-row formRowIngrediente" data-id="'+id+'" id="formRowIngrediente_'+id+'">' +
+					'<div class="form-group col-md-2">';
+
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="codiceIngrediente">Codice</label>';
+				}
+				rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceIngrediente_'+id+'" disabled value="'+codice+'"></div>';
+				rowHtml = rowHtml + '<div class="form-group col-md-4">';
+
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="descrizioneIngrediente">Descrizione</label>';
+				}
+				rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneIngrediente_'+id+'" disabled value="'+descrizione+'"></div>';
+				rowHtml = rowHtml + '<div class="form-group col-md-2">';
+
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo</label>';
+				}
+				rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente_'+id+'" disabled value="'+prezzo+'"></div>';
+				rowHtml = rowHtml + '<div class="form-group col-md-2">';
+
+				if(i == 0){
+					rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
+				}
+				rowHtml = rowHtml + '<div class="input-group">';
+				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step="1" min="0" value="'+quantita+'">';
+				rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
+				rowHtml = rowHtml + '</div></div></div>';
+				rowHtml = rowHtml + '</div>';
+
+				$('#formRowIngredienti').append(rowHtml);
+			});
 
           } else{
-            $('#alertRicetta').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-            $('#alertRicetta').html(alertContent);
+            $('#alertRicetta').append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertRicetta').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-            $('#alertRicetta').html(alertContent);
+            $('#alertRicetta').append(alertContent);
             $('#updateRicettaButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }
     });
 
 }
-
-/*
-<!-- Extra large modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-xl">Extra large modal</button>
-
-<div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      ...
-    </div>
-  </div>
-</div>
-
-<!-- Large modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Large modal</button>
-
-<div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      ...
-    </div>
-  </div>
-</div>
-
-<!-- Small modal -->
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Small modal</button>
-
-<div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
-    <div class="modal-content">
-      ...
-    </div>
-  </div>
-</div>
-
-*/

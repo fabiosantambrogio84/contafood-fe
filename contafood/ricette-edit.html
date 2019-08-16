@@ -59,7 +59,7 @@
       <hr class="sidebar-divider my-0">
 
       <!-- Nav Item - Fornitori -->
-      <li class="nav-item active">
+      <li class="nav-item">
         <a class="nav-link" href="fornitori.html">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Fornitori</span></a>
@@ -68,7 +68,7 @@
       <!-- Divider -->
       <hr class="sidebar-divider">
 
-      <li class="nav-item">
+      <li class="nav-item active">
         <a class="nav-link" href="ricette.html">
           <i class="fas fa-fw fa-table"></i>
           <span>Ricette</span></a>
@@ -139,6 +139,86 @@
 
           <form id="editRicettaForm" class="needs-validation" novalidate>
 
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <label for="codiceRicetta">Codice</label>
+                <input type="text" class="form-control" id="codiceRicetta" placeholder="" required>
+                <div class="invalid-feedback">
+                  Inserisci un codice
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" placeholder="" required>
+                <div class="invalid-feedback">
+                  Inserisci un nome
+                </div>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="categoria">Categoria</label>
+                <select id="categoria" class="form-control">
+                </select>
+                <div class="invalid-feedback">
+                  Seleziona una categoria
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="tempoPreparazione">Tempo preparazione</label>
+                <input type="text" class="form-control" id="tempoPreparazione" placeholder="">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="numeroPorzioni">Num. porzioni</label>
+                <input type="number" class="form-control" id="numeroPorzioni" placeholder="" step="1" min="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="costoIngredienti">Costo ingredienti</label>
+                <input type="number" class="form-control" id="costoIngredienti" step=".01" min="0">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="costoPreparazione">Costo preparazione</label>
+                <input type="number" class="form-control" id="costoPreparazione" step=".01" min="0">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="costoTotale">Costo totale</label>
+                <input type="number" class="form-control" id="costoTotale" step=".01" min="0">
+              </div>
+            </div>
+
+            <div class="form-row" id="formRowIngredienti">
+              <div class="form-group col-md-12" id="formRowIngredientiBody">
+                <label for="ingredienti">Ingredienti</label>
+                <div id="ingredienti" class="mb-2">
+                  <a id="addIngrediente" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row mt-4">
+              <div class="form-group col-md-12">
+                <label for="preparazione">Preparazione</label>
+                <textarea class="form-control" id="preparazione"></textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="allergeni">Allergeni</label>
+                <textarea class="form-control" id="allergeni"></textarea>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="valoriNutrizionali">Valori nutrizionali</label>
+                <textarea class="form-control" id="valoriNutrizionali"></textarea>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="note">Note</label>
+                <textarea class="form-control" id="note"></textarea>
+              </div>
+            </div>
 
             <input type="hidden" id="hiddenIdRicetta"/>
             <button type="submit" class="btn btn-primary" id="updateRicettaButton">Salva</button>
@@ -171,6 +251,38 @@
 
       </div>
       <!-- End of Main Content -->
+
+      <div id="addIngredienteModal" class="modal fade addIngredienteModal" tabindex="-1" role="dialog" aria-labelledby="addIngredienteModal" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addIngredienteModalTitle">Aggiungi ingrediente</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div id="alertRicettaAddIngrediente"></div>
+              <div class="table-responsive">
+                <table class="table table-bordered" id="addIngredienteModalTable" width="100%" cellspacing="0">
+                  <thead>
+                  <tr>
+                    <th></th>
+                    <th>Codice</th>
+                    <th>Descrizione</th>
+                    <th>Prezzo</th>
+                  </tr>
+                  </thead>
+                </table>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" id="confirmAddIngredienteModal">Conferma</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Footer -->
       <footer class="sticky-footer bg-white">

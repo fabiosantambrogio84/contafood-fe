@@ -11,10 +11,10 @@ $(document).ready(function() {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<strong>Errore nel recupero degli ingredienti</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-				$('#alertIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-				$('#alertIngrediente').html(alertContent);
+				var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertIngrediente').append(alertContent);
 			}
 		},
 		"language": {
@@ -31,11 +31,15 @@ $(document).ready(function() {
 		"pageLength": 20,
 		"lengthChange": false,
 		"info": false,
+		"autoWidth": false,
+		"order": [
+			[0, 'asc']
+		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
 			{"name": "descrizione", "data": "descrizione"},
 			{"name": "prezzo", "data": "prezzo"},
-			{"data": null, render: function ( data, type, row ) {
+			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="updateIngrediente pr-2" data-id="'+data.id+'" href="ingredienti-edit.html?idIngrediente=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links = links + '<a class="deleteIngrediente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
@@ -57,10 +61,10 @@ $(document).ready(function() {
 			url: baseUrl + "ingredienti/" + idIngrediente,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<strong>Ingrediente</strong> cancellato con successo.\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-				$('#alertIngrediente').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-				$('#alertIngrediente').html(alertContent);
+				var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Ingrediente</strong> cancellato con successo.\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertIngrediente').append(alertContent);
 
 				$('#ingredientiTable').DataTable().ajax.reload();
 			},
@@ -82,8 +86,9 @@ $(document).ready(function() {
 
 			var ingredienteJson = JSON.stringify(ingrediente);
 
-			var alertContent = '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+			var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "ingredienti/" + $('#hiddenIdIngrediente').val(),
@@ -92,12 +97,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ingredienteJson,
 				success: function(result) {
-					$('#alertIngrediente').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-					$('#alertIngrediente').html(alertContent.replace('@@alertText@@','Ingrediente modificato con successo'));
+					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Ingrediente modificato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-					$('#alertIngrediente').html(alertContent.replace('@@alertText@@','Errore nella modifica dell ingrediente'));
+					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Errore nella modifica dell ingrediente'));
 				}
 			});
 		});
@@ -114,8 +117,9 @@ $(document).ready(function() {
 
 			var ingredienteJson = JSON.stringify(ingrediente);
 
-			var alertContent = '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+			var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "ingredienti",
@@ -124,12 +128,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ingredienteJson,
 				success: function(result) {
-					$('#alertIngrediente').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-					$('#alertIngrediente').html(alertContent.replace('@@alertText@@','Ingrediente creato con successo'));
+					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Ingrediente creato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-					$('#alertIngrediente').html(alertContent.replace('@@alertText@@','Errore nella creazione dell ingrediente'));
+					$('#alertIngrediente').append(alertContent.replace('@@alertText@@','Errore nella creazione dell ingrediente'));
 				}
 			});
 		});
@@ -154,8 +156,9 @@ $.fn.extractIdIngredienteFromUrl = function(){
 
 $.fn.getIngrediente = function(idIngrediente){
 
-    var alertContent = '<strong>Errore nel recupero degli ingredienti.</strong>\n' +
-    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+	var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti.</strong>\n' +
+    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
     $.ajax({
         url: baseUrl + "ingredienti/" + idIngrediente,
@@ -170,13 +173,11 @@ $.fn.getIngrediente = function(idIngrediente){
             $('#prezzo').attr('value', result.prezzo);
 
           } else{
-            $('#alertIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-            $('#alertIngrediente').html(alertContent);
+            $('#alertIngrediente').append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertIngrediente').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-            $('#alertIngrediente').html(alertContent);
+            $('#alertIngrediente').append(alertContent);
             $('#updateIngredienteButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }

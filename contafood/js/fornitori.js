@@ -11,10 +11,10 @@ $(document).ready(function() {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<strong>Errore nel recupero dei fornitori</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-				$('#alertFornitore').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-				$('#alertFornitore').html(alertContent);
+				var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero dei fornitori</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertFornitore').append(alertContent);
 			}
 		},
 		"language": {
@@ -31,11 +31,15 @@ $(document).ready(function() {
 		"pageLength": 20,
 		"lengthChange": false,
 		"info": false,
+		"autoWidth": false,
+		"order": [
+			[0, 'asc']
+		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
 			{"name": "ragioneSociale", "data": "ragioneSociale"},
 			{"name": "note", "data": "note"},
-			{"data": null, render: function ( data, type, row ) {
+			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="detailsFornitore pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links = links + '<a class="updateFornitore pr-2" data-id="'+data.id+'" href="fornitori-edit.html?idFornitore=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links = links + '<a class="deleteFornitore" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
@@ -47,7 +51,8 @@ $(document).ready(function() {
 	$(document).on('click','.detailsFornitore', function(){
         var idFornitore = $(this).attr('data-id');
 
-        var alertContent = '<strong>Errore nel recupero del fornitore.</strong>';
+		var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero del fornitore.</strong></div>';
 
         $.ajax({
             url: baseUrl + "fornitori/" + idFornitore,
@@ -83,17 +88,14 @@ $(document).ready(function() {
 				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+result.pagamento+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+result.note+'</p>';
 
-				  //$('#detailsFornitoreMainDiv').attr('style', 'overflow-y: auto; max-height: 500px;');
 				  $('#detailsFornitoreMainDiv').append(contentDetails);
 
               } else{
-                $('#detailsFornitoreMainDiv').addClass('alert alert-danger alert-dismissible fade show m-2').attr('role','alert');
-                $('#detailsFornitoreMainDiv').html(alertContent);
+                $('#detailsFornitoreMainDiv').append(alertContent);
               }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                $('#detailsFornitoreMainDiv').addClass('alert alert-danger alert-dismissible fade show m-2').attr('role','alert');
-                $('#detailsFornitoreMainDiv').html(alertContent);
+                $('#detailsFornitoreMainDiv').append(alertContent);
                 console.log('Response text: ' + jqXHR.responseText);
             }
         });
@@ -115,10 +117,10 @@ $(document).ready(function() {
 			url: baseUrl + "fornitori/" + idFornitore,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<strong>Fornitore</strong> cancellato con successo.\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-				$('#alertFornitore').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-				$('#alertFornitore').html(alertContent);
+				var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Fornitore</strong> cancellato con successo.\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertFornitore').append(alertContent);
 
 				$('#fornitoriTable').DataTable().ajax.reload();
 			},
@@ -176,8 +178,9 @@ $(document).ready(function() {
 
 			var fornitoreJson = JSON.stringify(fornitore);
 
-			var alertContent = '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+			var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "fornitori/" + $('#hiddenIdFornitore').val(),
@@ -186,12 +189,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: fornitoreJson,
 				success: function(result) {
-					$('#alertFornitore').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Fornitore modificato con successo'));
+					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Fornitore modificato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore'));
+					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore'));
 				}
 			});
 		});
@@ -231,8 +232,9 @@ $(document).ready(function() {
 
 			var fornitoreJson = JSON.stringify(fornitore);
 
-			var alertContent = '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+			var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "fornitori",
@@ -241,12 +243,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: fornitoreJson,
 				success: function(result) {
-					$('#alertFornitore').addClass('alert alert-success alert-dismissible fade show').attr('role','alert');
-					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Fornitore creato con successo'));
+					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Fornitore creato con successo'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-					$('#alertFornitore').html(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore'));
+					$('#alertFornitore').append(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore'));
 				}
 			});
 		});
@@ -260,7 +260,6 @@ $.fn.getProvince = function(){
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
-				//result = $.parseJSON(result);
 				$.each(result, function(i, item){
 					$('#provincia').append('<option value="'+item+'">'+item+'</option>');
 				});
@@ -290,8 +289,9 @@ $.fn.extractIdFornitoreFromUrl = function(){
 
 $.fn.getFornitore = function(idFornitore){
 
-    var alertContent = '<strong>Errore nel recupero del fornitore.</strong>\n' +
-    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+	var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>Errore nel recupero del fornitore.</strong>\n' +
+    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
     $.ajax({
 		url: baseUrl + "util/province",
@@ -299,7 +299,6 @@ $.fn.getFornitore = function(idFornitore){
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
-				//result = $.parseJSON(result);
 				$.each(result, function(i, item){
 					$('#provincia').append('<option value="'+item+'">'+item+'</option>');
 				});
@@ -316,7 +315,6 @@ $.fn.getFornitore = function(idFornitore){
         dataType: 'json',
         success: function(result) {
           if(result != null && result != undefined && result != ''){
-            //$('.fornitoreBody').data('fornitore', result);
 
 			$('#hiddenIdFornitore').attr('value', result.id);
 			$('#codiceFornitore').attr('value', result.codice);
@@ -347,17 +345,13 @@ $.fn.getFornitore = function(idFornitore){
 			$('#note').val(result.note);
 
           } else{
-            $('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-            $('#alertFornitore').html(alertContent);
+            $('#alertFornitore').append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertFornitore').addClass('alert alert-danger alert-dismissible fade show').attr('role','alert');
-            $('#alertFornitore').html(alertContent);
+            $('#alertFornitore').append(alertContent);
             $('#updateFornitoreButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }
     });
-
-
 }
