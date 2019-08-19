@@ -92,13 +92,23 @@
             <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="tempoPreparazione">Tempo preparazione</label>
-                <input type="text" class="form-control" id="tempoPreparazione" placeholder="">
+                <input type="number" class="form-control" id="tempoPreparazione" placeholder="" step="1" min="0">
               </div>
               <div class="form-group col-md-3">
                 <label for="numeroPorzioni">Num. porzioni</label>
                 <input type="number" class="form-control" id="numeroPorzioni" placeholder="" step="1" min="0">
               </div>
             </div>
+
+            <div class="form-row" id="formRowIngredienti">
+              <div class="form-group col-md-12" id="formRowIngredientiBody">
+                <label for="ingredienti">Ingredienti</label>
+                <div id="ingredienti" class="mb-2">
+                  <a id="addIngrediente" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
+                </div>
+              </div>
+            </div>
+
             <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="costoIngredienti">Costo ingredienti</label>
@@ -111,15 +121,6 @@
               <div class="form-group col-md-3">
                 <label for="costoTotale">Costo totale</label>
                 <input type="number" class="form-control" id="costoTotale" step=".01" min="0">
-              </div>
-            </div>
-
-            <div class="form-row" id="formRowIngredienti">
-              <div class="form-group col-md-12" id="formRowIngredientiBody">
-                <label for="ingredienti">Ingredienti</label>
-                <div id="ingredienti" class="mb-2">
-                  <a id="addIngrediente" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
-                </div>
               </div>
             </div>
 

@@ -18,7 +18,7 @@ $(document).ready(function() {
 			}
 		},
 		"language": {
-			"search": "Cerca",
+			"search": "Cerca per codice, descrizione, ingrediente",
 			"paginate": {
 				"first": "Inizio",
 				"last": "Fine",
@@ -288,7 +288,7 @@ $(document).ready(function() {
 						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 					}
 					rowHtml = rowHtml + '<div class="input-group">';
-					rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step="1" min="0">';
+					rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step=".01" min="0">';
 					rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
 					rowHtml = rowHtml + '</div></div></div>';
 					rowHtml = rowHtml + '</div>';
@@ -336,6 +336,26 @@ $(document).ready(function() {
 			}
 		}
 	});
+
+	if($('#tempoPreparazione') != null && $('#tempoPreparazione') != undefined){
+        $(document).on('change','#tempoPreparazione', function(){
+            var tempoPreparazione = $('#tempoPreparazione').val();
+            if(tempoPreparazione != null && tempoPreparazione != undefined && tempoPreparazione != ""){
+                // TODO: costo orario
+                var costoOrarioPreparazione = 2;
+                var costoPreparazione;
+
+                costoPreparazione = costoOrarioPreparazione * tempoPreparazione;
+
+                $('#costoPreparazione').val(costoPreparazione);
+
+            } else {
+                $('#costoPreparazione').val(null);
+            }
+        });
+    }
+
+
 });
 
 $.fn.getCategorieRicette = function(){
@@ -378,6 +398,7 @@ $.fn.getRicetta = function(idRicetta){
 	alertContent = alertContent +  '<strong>Errore nel recupero della ricetta.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+    // load categorie ricette
 	$.fn.getCategorieRicette();
 
 	$.ajax({
@@ -433,7 +454,7 @@ $.fn.getRicetta = function(idRicetta){
 					rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 				}
 				rowHtml = rowHtml + '<div class="input-group">';
-				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step="1" min="0" value="'+quantita+'">';
+				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step=".01" min="0" value="'+quantita+'">';
 				rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
 				rowHtml = rowHtml + '</div></div></div>';
 				rowHtml = rowHtml + '</div>';

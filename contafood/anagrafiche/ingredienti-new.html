@@ -32,6 +32,9 @@
 
   <script src="../js/ingredienti.js"></script>
 
+  <script>
+    $.fn.getFornitori();
+  </script>
 </head>
 
 <body id="page-top" class="ingredientiBody">
@@ -70,7 +73,7 @@
                   Inserisci un codice
                 </div>
               </div>
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-3">
                 <label for="descrizione">Descrizione</label>
                 <input type="text" class="form-control" id="descrizione">
               </div>
@@ -80,6 +83,35 @@
                 <div class="invalid-feedback">
                   Inserisci un prezzo maggiore di 0
                 </div>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="unitaDiMisura">Unit&agrave; di misura*</label>
+                <input type="text" class="form-control" id="unitaDiMisura">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <label for="fornitore">Fornitore*</label>
+                <select id="fornitore" class="form-control" required></select>
+                <div class="invalid-feedback">
+                  Seleziona un fornitore
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="attivo" checked>
+                  <label class="form-check-label" for="attivo">
+                    Attivo
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="note">Note</label>
+                <textarea class="form-control" id="note"></textarea>
               </div>
             </div>
 

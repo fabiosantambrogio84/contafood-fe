@@ -146,18 +146,6 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#raggruppaRiba') != null && $('#raggruppaRiba') != undefined){
-    		$(document).on('change','#raggruppaRiba', function(){
-    			var isChecked = $('#raggruppaRiba').prop('checked');
-    			if(isChecked){
-    				$('#nomeGruppoRiba').attr('disabled', false);
-    			} else{
-    				$('#nomeGruppoRiba').val(null);
-    				$('#nomeGruppoRiba').attr('disabled', true);
-    			}
-    		});
-    	}
-
 	if($('#updateFornitoreButton') != null && $('#updateFornitoreButton') != undefined){
 		$(document).on('submit','#updateFornitoreForm', function(event){
 			event.preventDefault();
@@ -189,36 +177,6 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
-			// manage autista
-            var selectedAutista = $('#autista option:selected').val();
-            if(selectedAutista != null && selectedAutista != undefined && selectedAutista != '-1'){
-                var autista = new Object();
-                autista.id = selectedAutista;
-                fornitore.autista = autista;
-            }
-            // manage agente
-            var selectedAgente = $('#agente option:selected').val();
-            if(selectedAgente != null && selectedAgente != undefined && selectedAgente != '-1'){
-                var agente = new Object();
-                agente.id = selectedAgente;
-                fornitore.agente = agente;
-            }
-            if($('#bloccaDdt').prop('checked') === true){
-                fornitore.bloccaDdt = true;
-            }else{
-                fornitore.bloccaDdt = false;
-            }
-            if($('#nascondiPrezzi').prop('checked') === true){
-                fornitore.nascondiPrezzi = true;
-            }else{
-                fornitore.nascondiPrezzi = false;
-            }
-            if($('#raggruppaRiba').prop('checked') === true){
-                fornitore.raggruppaRiba = true;
-            }else{
-                fornitore.raggruppaRiba = false;
-            }
-            fornitore.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -273,36 +231,6 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
-			// manage autista
-			var selectedAutista = $('#autista option:selected').val();
-			if(selectedAutista != null && selectedAutista != undefined && selectedAutista != '-1'){
-			    var autista = new Object();
-                autista.id = selectedAutista;
-			    fornitore.autista = autista;
-			}
-			// manage agente
-			var selectedAgente = $('#agente option:selected').val();
-			if(selectedAgente != null && selectedAgente != undefined && selectedAgente != '-1'){
-                var agente = new Object();
-                agente.id = selectedAgente;
-                fornitore.agente = agente;
-            }
-			if($('#bloccaDdt').prop('checked') === true){
-                fornitore.bloccaDdt = true;
-            }else{
-                fornitore.bloccaDdt = false;
-            }
-            if($('#nascondiPrezzi').prop('checked') === true){
-                fornitore.nascondiPrezzi = true;
-            }else{
-                fornitore.nascondiPrezzi = false;
-            }
-            if($('#raggruppaRiba').prop('checked') === true){
-                fornitore.raggruppaRiba = true;
-            }else{
-                fornitore.raggruppaRiba = false;
-            }
-            fornitore.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -346,42 +274,6 @@ $.fn.getProvince = function(){
 	});
 }
 
-$.fn.getAutisti = function(){
-	$.ajax({
-		url: baseUrl + "autisti",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#autista').append('<option value="'+item.id+'">'+item.nome+'</option>');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
-}
-
-$.fn.getAgenti = function(){
-	$.ajax({
-		url: baseUrl + "agenti",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#agente').append('<option value="'+item.id+'">'+item.nome+'</option>');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
-}
-
 $.fn.extractIdFornitoreFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -406,12 +298,6 @@ $.fn.getFornitore = function(idFornitore){
 
     // load province
     $.fn.getProvince();
-
-	// load autisti
-	$.fn.getAutisti();
-
-	// load agenti
-	$.fn.getAgenti();
 
     $.ajax({
         url: baseUrl + "fornitori/" + idFornitore,
@@ -446,23 +332,6 @@ $.fn.getFornitore = function(idFornitore){
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#iban').attr('value', result.iban);
 			$('#pagamento').attr('value', result.pagamento);
-			if(result.autista != null && result.autista != undefined){
-			    $('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
-			}
-            if(result.agente != null && result.agente != undefined){
-                $('#agente option[value="' + result.agente.id +'"]').attr('selected', true);
-            }
-			if(result.bloccaDdt === true){
-                $('#bloccaDdt').prop('checked', true);
-            }
-            if(result.nascondiPrezzi === true){
-                $('#nascondiPrezzi').prop('checked', true);
-            }
-            if(result.raggruppaRiba === true){
-                $('#raggruppaRiba').prop('checked', true);
-                $('#nomeGruppoRiba').attr('disabled', 'false');
-            }
-            $('#nomeGruppoRiba').attr('value', result.nomeGruppoRiba);
 			$('#note').val(result.note);
 
           } else{

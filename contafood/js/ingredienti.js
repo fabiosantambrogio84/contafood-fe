@@ -18,7 +18,7 @@ $(document).ready(function() {
 			}
 		},
 		"language": {
-			"search": "Cerca",
+			"search": "Cerca per codice, descrizione",
 			"paginate": {
 				"first": "Inizio",
 				"last": "Fine",
@@ -39,6 +39,31 @@ $(document).ready(function() {
 			{"name": "codice", "data": "codice"},
 			{"name": "descrizione", "data": "descrizione"},
 			{"name": "prezzo", "data": "prezzo"},
+			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
+                var fornitore = data.fornitore;
+                if(fornitore != null && fornitore != undefined){
+                    if(fornitore.dittaIndividuale){
+                        var returnString = fornitore.nome;
+                        if(fornitore.cognome != null && fornitore.cognome != null){
+                            returnString = returnString + " " + fornitore.cognome;
+                        }
+                        return returnString;
+                    } else{
+                        if(fornitore.ragioneSociale != null && fornitore.ragioneSociale != undefined){
+                            return fornitore.ragioneSociale;
+                        } else {
+                            return fornitore.ragioneSociale2;
+                        }
+                    }
+                } else {
+                    return '';
+                }
+            }},
+			{"name": "dataInserimento", "data": null, render: function ( data, type, row ) {
+                var a = moment(data.dataInserimento);
+                return a.format('DD/MM/YYYY HH:mm:ss');
+            }},
+			{"name": "note", "data": "note"},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="updateIngrediente pr-2" data-id="'+data.id+'" href="ingredienti-edit.html?idIngrediente=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links = links + '<a class="deleteIngrediente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
@@ -75,7 +100,7 @@ $(document).ready(function() {
 	});
 
 	if($('#updateIngredienteButton') != null && $('#updateIngredienteButton') != undefined){
-		$(document).on('click','#updateIngredienteButton', function(event){
+		$(document).on('submit','#updateIngredienteForm', function(event){
 			event.preventDefault();
 
 			var ingrediente = new Object();
@@ -83,6 +108,17 @@ $(document).ready(function() {
 			ingrediente.codice = $('#codice').val();
 			ingrediente.descrizione = $('#descrizione').val();
 			ingrediente.prezzo = $('#prezzo').val();
+			ingrediente.unitaDiMisura = $('#unitaDiMisura').val();
+			var fornitore = new Object();
+            fornitore.id = $('#fornitore option:selected').val();
+            ingrediente.fornitore = fornitore;
+            if($('#attivo').prop('checked') === true){
+                ingrediente.attivo = true;
+            }else{
+                ingrediente.attivo = false;
+            }
+            ingrediente.dataInserimento = $('#hiddenDataInserimento').val();
+            ingrediente.note = $('#note').val();
 
 			var ingredienteJson = JSON.stringify(ingrediente);
 
@@ -107,13 +143,23 @@ $(document).ready(function() {
 	}
 
 	if($('#newIngredienteButton') != null && $('#newIngredienteButton') != undefined){
-		$(document).on('click','#newIngredienteButton', function(event){
+		$(document).on('submit','#newIngredienteForm', function(event){
 			event.preventDefault();
 
 			var ingrediente = new Object();
 			ingrediente.codice = $('#codice').val();
 			ingrediente.descrizione = $('#descrizione').val();
 			ingrediente.prezzo = $('#prezzo').val();
+			ingrediente.unitaDiMisura = $('#unitaDiMisura').val();
+			var fornitore = new Object();
+            fornitore.id = $('#fornitore option:selected').val();
+            ingrediente.fornitore = fornitore;
+			if($('#attivo').prop('checked') === true){
+                ingrediente.attivo = true;
+            }else{
+                ingrediente.attivo = false;
+            }
+			ingrediente.note = $('#note').val();
 
 			var ingredienteJson = JSON.stringify(ingrediente);
 
@@ -138,6 +184,37 @@ $(document).ready(function() {
 	}
 });
 
+$.fn.getFornitori = function(){
+	$.ajax({
+		url: baseUrl + "fornitori",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+				    var label;
+				    if(item.dittaIndividuale){
+				        label = item.nome;
+				        if(item.cognome != null && item.cognome != undefined){
+				            label = label + " " + item.cognome;
+				        }
+				    } else{
+				        if(item.ragioneSociale != null && item.ragioneSociale != undefined){
+				            label = item.ragioneSociale;
+				        } else{
+				            label = item.ragioneSociale2;
+				        }
+				    }
+					$('#fornitore').append('<option value="'+item.id+'">'+label+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.extractIdIngredienteFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -160,6 +237,9 @@ $.fn.getIngrediente = function(idIngrediente){
 	alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+    // load fornitori
+    $.fn.getFornitori();
+
     $.ajax({
         url: baseUrl + "ingredienti/" + idIngrediente,
         type: 'GET',
@@ -168,9 +248,16 @@ $.fn.getIngrediente = function(idIngrediente){
           if(result != null && result != undefined && result != ''){
 
 			$('#hiddenIdIngrediente').attr('value', result.id);
+			$('#hiddenDataInserimento').attr('value', result.dataInserimento);
 			$('#codice').attr('value', result.codice);
             $('#descrizione').attr('value', result.descrizione);
             $('#prezzo').attr('value', result.prezzo);
+            $('#unitaDiMisura').attr('value', result.unitaDiMisura);
+            $('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
+            if(result.attivo === true){
+                $('#attivo').prop('checked', true);
+            }
+            $('#note').val(result.note);
 
           } else{
             $('#alertIngrediente').empty().append(alertContent);
