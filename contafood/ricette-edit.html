@@ -114,16 +114,16 @@
 
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="costoIngredienti">Costo ingredienti</label>
-                <input type="number" class="form-control" id="costoIngredienti" step=".01" min="0">
+                <label for="costoIngredienti">Costo ingredienti (&euro;)</label>
+                <input type="number" class="form-control" id="costoIngredienti" step=".01" min="0" readonly>
               </div>
               <div class="form-group col-md-3">
-                <label for="costoPreparazione">Costo preparazione</label>
-                <input type="number" class="form-control" id="costoPreparazione" step=".01" min="0">
+                <label for="costoPreparazione">Costo preparazione (&euro;)</label>
+                <input type="number" class="form-control" id="costoPreparazione" step=".01" min="0" readonly>
               </div>
               <div class="form-group col-md-3">
-                <label for="costoTotale">Costo totale</label>
-                <input type="number" class="form-control" id="costoTotale" step=".01" min="0">
+                <label for="costoTotale">Costo totale (&euro;)</label>
+                <input type="number" class="form-control" id="costoTotale" step=".01" min="0" readonly>
               </div>
             </div>
 
@@ -187,7 +187,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="addIngredienteModalTitle">Aggiungi ingrediente</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button type="button" class="close annullaAddIngredienteModal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -200,7 +200,7 @@
                     <th></th>
                     <th>Codice</th>
                     <th>Descrizione</th>
-                    <th>Prezzo</th>
+                    <th>Prezzo (&euro;)</th>
                   </tr>
                   </thead>
                 </table>
@@ -208,7 +208,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" id="confirmAddIngredienteModal">Conferma</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+              <button type="button" class="btn btn-secondary annullaAddIngredienteModal">Annulla</button>
             </div>
           </div>
         </div>
