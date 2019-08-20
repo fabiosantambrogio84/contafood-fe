@@ -279,7 +279,7 @@ $(document).ready(function() {
 					rowHtml = rowHtml + '<div class="form-group col-md-2">';
 
 					if(i == 0 && alreadyAddedRows == 0){
-						rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo</label>';
+						rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo (&euro;)</label>';
 					}
 					rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente_'+id+'" disabled value="'+prezzo+'"></div>';
 					rowHtml = rowHtml + '<div class="form-group col-md-2">';
@@ -288,7 +288,7 @@ $(document).ready(function() {
 						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 					}
 					rowHtml = rowHtml + '<div class="input-group">';
-					rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step=".01" min="0">';
+					rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" onchange="$.fn.changeQuantitaIngrediente(this);">';
 					rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
 					rowHtml = rowHtml + '</div></div></div>';
 					rowHtml = rowHtml + '</div>';
@@ -327,23 +327,28 @@ $(document).ready(function() {
 					} else if(id.indexOf('descrizione') != '-1'){
 						label = '<label for="descrizioneIngrediente">Descrizione</label>';
 					} else if(id.indexOf('prezzo') != '-1'){
-						label = '<label for="prezzoIngrediente">Prezzo</label>';
+						label = '<label for="prezzoIngrediente">Prezzo (&euro;)</label>';
 					} else{
 						label = '<label for="quantitaIngrediente">Quantita</label>';
 					}
-					$('#'+id).before(label);
+					if(id.indexOf('quantita') != '-1'){
+						$('#'+id).parent().before(label);
+					} else {
+						$('#'+id).before(label);
+					}
 				});
 			}
 		}
+		$.fn.changeQuantitaIngrediente();
 	});
 
 	if($('#tempoPreparazione') != null && $('#tempoPreparazione') != undefined){
         $(document).on('change','#tempoPreparazione', function(){
             var tempoPreparazione = $('#tempoPreparazione').val();
+			var costoPreparazione;
             if(tempoPreparazione != null && tempoPreparazione != undefined && tempoPreparazione != ""){
                 // TODO: costo orario
                 var costoOrarioPreparazione = 2;
-                var costoPreparazione;
 
                 costoPreparazione = costoOrarioPreparazione * tempoPreparazione;
 
@@ -352,9 +357,9 @@ $(document).ready(function() {
             } else {
                 $('#costoPreparazione').val(null);
             }
+			$.fn.computeCostoTotale($('#costoIngredienti').val(), costoPreparazione);
         });
     }
-
 
 });
 
@@ -445,7 +450,7 @@ $.fn.getRicetta = function(idRicetta){
 				rowHtml = rowHtml + '<div class="form-group col-md-2">';
 
 				if(i == 0){
-					rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo</label>';
+					rowHtml = rowHtml + '<label for="prezzoIngrediente">Prezzo (&euro;)</label>';
 				}
 				rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoIngrediente_'+id+'" disabled value="'+prezzo+'"></div>';
 				rowHtml = rowHtml + '<div class="form-group col-md-2">';
@@ -454,7 +459,7 @@ $.fn.getRicetta = function(idRicetta){
 					rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 				}
 				rowHtml = rowHtml + '<div class="input-group">';
-				rowHtml = rowHtml + '<input type="number" class="form-control" id="quantitaIngrediente_'+id+'" step=".01" min="0" value="'+quantita+'">';
+				rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" value="'+quantita+'">';
 				rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
 				rowHtml = rowHtml + '</div></div></div>';
 				rowHtml = rowHtml + '</div>';
@@ -472,5 +477,43 @@ $.fn.getRicetta = function(idRicetta){
             console.log('Response text: ' + jqXHR.responseText);
         }
     });
+}
 
+$.fn.computeCostoTotale = function(costoIngredienti, costoPreparazione){
+	var costoTotale;
+	if(costoIngredienti != null && costoIngredienti != undefined && costoIngredienti != ""){
+		costoTotale = costoIngredienti;
+	}
+	if(costoPreparazione != null && costoPreparazione != undefined){
+		if(costoTotale != null && costoTotale != undefined){
+			costoTotale = costoTotale + parseInt(costoPreparazione);
+		} else {
+			costoTotale = parseInt(costoPreparazione);
+		}
+	}
+	$('#costoTotale').val(costoTotale);
+}
+
+$.fn.changeQuantitaIngrediente = function() {
+	var costoIngredienti;
+	$('.quantitaIngrediente').each(function(i, item){
+		var itemId = item.id;
+		var itemIndex = itemId.substring(itemId.indexOf("_") + 1, itemId.length);
+		var quantita = $('#'+itemId).val();
+		var prezzo = $('#prezzoIngrediente_'+itemIndex).val();
+		if(quantita == null || quantita == undefined || quantita == ""){
+			quantita = 0;
+		}
+		if(prezzo == null || prezzo == undefined || prezzo == ""){
+			prezzo = 0;
+		}
+		var costoIngrediente = parseFloat(quantita) * parseFloat(prezzo);
+		if(costoIngredienti != null && costoIngredienti != undefined && costoIngredienti != ""){
+			costoIngredienti = costoIngredienti + parseFloat(costoIngrediente);
+		} else{
+			costoIngredienti = parseFloat(costoIngrediente);
+		}
+	});
+	$('#costoIngredienti').val(costoIngredienti);
+	$.fn.computeCostoTotale(costoIngredienti, $('#costoPreparazione').val());
 }
