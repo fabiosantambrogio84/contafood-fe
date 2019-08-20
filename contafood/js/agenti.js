@@ -63,7 +63,7 @@ $(document).ready(function() {
 			url: baseUrl + "agenti/" + idAgente,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertAgenteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertAgenteContent" class="alert alert-success alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Agente</strong> cancellato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertAgente').empty().append(alertContent);
@@ -72,6 +72,13 @@ $(document).ready(function() {
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
+
+				var alertContent = '<div id="alertAgenteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+                alertContent = alertContent + '<strong>Errore</strong> nella cancellazione dell\'agente'.\n' +
+                    '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+                $('#alertAgente').empty().append(alertContent);
+
+                $('#agentiTable').DataTable().ajax.reload();
 			}
 		});
 	});
@@ -90,7 +97,7 @@ $(document).ready(function() {
 
 			var agenteJson = JSON.stringify(agente);
 
-			var alertContent = '<div id="alertAgenteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertAgenteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -101,10 +108,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: agenteJson,
 				success: function(result) {
-					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Agente modificato con successo'));
+					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Agente modificato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell\' agente'));
+					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell\' agente').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -123,7 +130,7 @@ $(document).ready(function() {
 
 			var agenteJson = JSON.stringify(agente);
 
-			var alertContent = '<div id="alertAgenteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertAgenteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -134,10 +141,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: agenteJson,
 				success: function(result) {
-					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Agente creato con successo'));
+					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Agente creato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell\' agente'));
+					$('#alertAgente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell\' agente').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});

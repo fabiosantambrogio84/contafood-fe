@@ -86,7 +86,7 @@ $(document).ready(function() {
 			url: baseUrl + "ingredienti/" + idIngrediente,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertIngredienteContent" class="alert alert-success alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Ingrediente</strong> cancellato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertIngrediente').empty().append(alertContent);
@@ -122,7 +122,7 @@ $(document).ready(function() {
 
 			var ingredienteJson = JSON.stringify(ingrediente);
 
-			var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertIngredienteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -133,10 +133,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ingredienteJson,
 				success: function(result) {
-					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente modificato con successo'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente modificato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell ingrediente'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell ingrediente').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -163,7 +163,7 @@ $(document).ready(function() {
 
 			var ingredienteJson = JSON.stringify(ingrediente);
 
-			var alertContent = '<div id="alertIngredienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertIngredienteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -174,10 +174,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ingredienteJson,
 				success: function(result) {
-					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente creato con successo'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente creato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ingrediente'));
+					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ingrediente').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});

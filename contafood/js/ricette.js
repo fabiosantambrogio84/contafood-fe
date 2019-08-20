@@ -61,7 +61,7 @@ $(document).ready(function() {
 			url: baseUrl + "ricette/" + idRicetta,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertRicettaContent" class="alert alert-success alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Ricetta</strong> cancellata con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertRicetta').empty().append(alertContent);
@@ -112,7 +112,7 @@ $(document).ready(function() {
 
 			var ricettaJson = JSON.stringify(ricetta);
 
-			var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertRicettaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -123,10 +123,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ricettaJson,
 				success: function(result) {
-					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta modificata con successo'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta modificata con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della ricetta'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della ricetta').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -169,7 +169,7 @@ $(document).ready(function() {
 
 			var ricettaJson = JSON.stringify(ricetta);
 
-			var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertRicettaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -180,10 +180,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ricettaJson,
 				success: function(result) {
-					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta creata con successo'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta creata con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della ricetta'));
+					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della ricetta').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -208,8 +208,8 @@ $(document).ready(function() {
 			},
 			"language": {
 				"search": "Cerca",
-				"emptyTable": "Nessuna ingrediente disponibile",
-				"zeroRecords": "Nessuna ingrediente disponibile"
+				"emptyTable": "Nessun ingrediente disponibile",
+				"zeroRecords": "Nessun ingrediente disponibile"
 			},
 			"paging": false,
 			"lengthChange": false,

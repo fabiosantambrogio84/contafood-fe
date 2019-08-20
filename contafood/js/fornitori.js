@@ -118,7 +118,7 @@ $(document).ready(function() {
 			url: baseUrl + "fornitori/" + idFornitore,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertFornitoreContent" class="alert alert-success alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Fornitore</strong> cancellato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertFornitore').empty().append(alertContent);
@@ -181,7 +181,7 @@ $(document).ready(function() {
 
 			var fornitoreJson = JSON.stringify(fornitore);
 
-			var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertFornitoreContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -192,10 +192,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: fornitoreJson,
 				success: function(result) {
-					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore modificato con successo'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore modificato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -235,7 +235,7 @@ $(document).ready(function() {
 
 			var fornitoreJson = JSON.stringify(fornitore);
 
-			var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertFornitoreContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -246,10 +246,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: fornitoreJson,
 				success: function(result) {
-					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore creato con successo'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore creato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore'));
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});

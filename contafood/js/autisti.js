@@ -61,7 +61,7 @@ $(document).ready(function() {
 			url: baseUrl + "autisti/" + idAutista,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertAutistaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertAutistaContent" class="alert alert-success alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Autista</strong> cancellato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertAutista').empty().append(alertContent);
@@ -86,7 +86,7 @@ $(document).ready(function() {
 
 			var autistaJson = JSON.stringify(autista);
 
-			var alertContent = '<div id="alertAutistaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertAutistaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -97,10 +97,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: autistaJson,
 				success: function(result) {
-					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Autista modificato con successo'));
+					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Autista modificato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell\' autista'));
+					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell\' autista').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -118,7 +118,7 @@ $(document).ready(function() {
 
 			var autistaJson = JSON.stringify(autista);
 
-			var alertContent = '<div id="alertAutistaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertAutistaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -129,10 +129,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: autistaJson,
 				success: function(result) {
-					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Autista creato con successo'));
+					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Autista creato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell\' autista'));
+					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell\' autista').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});

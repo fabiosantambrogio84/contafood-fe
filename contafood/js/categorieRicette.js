@@ -60,7 +60,7 @@ $(document).ready(function() {
 			url: baseUrl + "categorie-ricette/" + idCategoriaRicette,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-success alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Categoria ricette</strong> cancellata con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertCategoriaRicette').empty().append(alertContent);
@@ -84,7 +84,7 @@ $(document).ready(function() {
 
 			var categoriaRicetteJson = JSON.stringify(categoriaRicette);
 
-			var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -95,10 +95,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: categoriaRicetteJson,
 				success: function(result) {
-					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Categoria ricette modificata con successo'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Categoria ricette modificata con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della categoria ricette'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della categoria ricette').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -114,7 +114,7 @@ $(document).ready(function() {
 
 			var categoriaRicetteJson = JSON.stringify(categoriaRicette);
 
-			var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertCategoriaRicetteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -125,10 +125,10 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: categoriaRicetteJson,
 				success: function(result) {
-					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Categoria ricette creata con successo'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Categoria ricette creata con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della categoria ricette'));
+					$('#alertCategoriaRicette').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della categoria ricette').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});

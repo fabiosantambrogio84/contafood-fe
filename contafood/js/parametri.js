@@ -20,25 +20,6 @@ $(document).on('submit','#authorizationForm', function(){
     var username = $('#username').val();
     var password = $('#password').val();
 
-    /*
-    $.ajax({
-        url: baseUrl + "parametri",
-        type: 'GET',
-        dataType: 'json',
-        headers: {
-            //"Origin": "http://localhost:63342",
-            "Content-Type": "application/json",
-            "Authorization": "Basic " + btoa(username + ":" + password)
-        },
-        success: function(result) {
-            console.log("OK");
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            console.log('Response text: ' + jqXHR.status);
-        }
-    });
-    */
-
     $('#parametriTable').DataTable({
         "ajax": {
             "url": baseUrl + "parametri",
@@ -55,10 +36,6 @@ $(document).on('submit','#authorizationForm', function(){
                 $('#parametriMainDiv').removeClass('d-none');
                 return data;
             },
-            //"success": function(){
-            //    $('#authorizationModal').modal('hide');
-            //    $('#parametriMainDiv').removeClass('d-none');
-            //},
             "error": function(jqXHR, textStatus, errorThrown) {
                 console.log('Response text: ' + jqXHR.status+', '+textStatus+', '+errorThrown);
 
