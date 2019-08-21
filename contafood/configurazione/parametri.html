@@ -29,10 +29,19 @@
     <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <script src="../js/commons.js"></script>
+    <script src="../js/parametri.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 
 </head>
 
 <body id="page-top">
+
+<script>
+    var token = $.fn.extractTokenFromUrl();
+    if(token != null && token != undefined && token != ""){
+        $('body').attr('data-auth',token);
+    }
+</script>
 
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -61,7 +70,7 @@
                     </div>
                 </div>
 
-                <div id="alertParametri"></div>
+                <div id="alertParametro"></div>
 
                 <!-- DataTales -->
                 <div class="card shadow mb-4 d-none" id="parametriMainDiv">
@@ -180,10 +189,6 @@
     <!-- Page level plugins -->
     <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-    <script src="../js/parametri.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
 
 </body>
 

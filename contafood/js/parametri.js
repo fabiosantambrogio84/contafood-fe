@@ -1,25 +1,39 @@
 var baseUrl = "http://localhost:8090/contafood-be/";
 
 $(document).ready(function() {
-    if($('#authorizationModal') !=  null && $('#authorizationModal') != undefined){
-        $('#authorizationModal').modal('show');
+    if($('#authorizationModal') !=  null && $('#authorizationModal') != undefined && $('#authorizationModal').length != 0){
+
+        var token = $('body').attr('data-auth');
+        if(token != null && token != undefined && token != ""){
+            var bytes  = CryptoJS.AES.decrypt(token.toString(), 'contafood');
+            var auth = bytes.toString(CryptoJS.enc.Utf8);
+
+            $.fn.loadParametriTable(auth);
+        } else {
+            $('#authorizationModal').modal('show');
+        }
     }
 });
 
 $(document).on('click','.annullaAuthorizationModal', function(){
     $('#authorizationModal').modal('hide');
 
-    var alertContent = '<div id="alertParametriContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+    var alertContent = '<div id="alertParametroContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
     alertContent = alertContent + '<strong>Accesso negato</strong>\n' + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-    $('#alertParametri').empty().append(alertContent);
+    $('#alertParametro').empty().append(alertContent);
 });
 
-$(document).on('submit','#authorizationForm', function(){
+$(document).on('submit','#authorizationForm', function(event){
     event.preventDefault();
 
     var username = $('#username').val();
     var password = $('#password').val();
+    var auth = "Basic " + btoa(username + ":" + password);
 
+    $.fn.loadParametriTable(auth);
+});
+
+$.fn.loadParametriTable = function(auth){
     $('#parametriTable').DataTable({
         "ajax": {
             "url": baseUrl + "parametri",
@@ -27,9 +41,8 @@ $(document).on('submit','#authorizationForm', function(){
             "content-type": "json",
             "cache": false,
             "headers": {
-                //"Origin": "http://localhost:63342",
                 "Content-Type": "application/json",
-                "Authorization": "Basic " + btoa(username + ":" + password)
+                "Authorization": auth
             },
             "dataSrc": function(data) {
                 $('#authorizationModal').modal('hide');
@@ -41,10 +54,10 @@ $(document).on('submit','#authorizationForm', function(){
 
                 $('#authorizationModal').modal('hide');
 
-                var alertContent = '<div id="alertParametriContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+                var alertContent = '<div id="alertParametroContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
                 alertContent = alertContent + '<strong>Accesso negato</strong>\n' +
-                   '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-                $('#alertParametri').empty().append(alertContent);
+                    '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+                $('#alertParametro').empty().append(alertContent);
             }
         },
         "language": {
@@ -79,15 +92,13 @@ $(document).on('submit','#authorizationForm', function(){
                 var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), 'secret key 123');
                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);
                 */
-                var auth = "Basic " + btoa(username + ":" + password);
                 var token = CryptoJS.AES.encrypt(auth, 'contafood');
                 var links = '<a class="updateParametro pr-2" data-id="'+data.id+'" href="parametri-edit.html?idParametro=' + data.id + '&token=' + token +'"><i class="far fa-edit"></i></a>';
                 return links;
             }}
         ]
     });
-
-});
+}
 
 $.fn.extractIdParametroFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
@@ -122,15 +133,89 @@ $.fn.extractTokenFromUrl = function(){
 }
 
 $.fn.getParametro = function(idParametro, token){
+    var alertContent = '<div id="alertParametroContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+    alertContent = alertContent +  '<strong>Errore nel recupero del parametro.</strong>\n' +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
     var bytes  = CryptoJS.AES.decrypt(token.toString(), 'contafood');
     var auth = bytes.toString(CryptoJS.enc.Utf8);
     console.log(auth);
 
     // remove the token parameter from the url
-    var uri = window.location.toString();
+    /*var uri = window.location.toString();
     if (uri.indexOf("&token") > 0) {
         var clean_uri = uri.substring(0, uri.indexOf("&token"));
         window.history.replaceState({}, document.title, clean_uri);
-    }
-};
+    }*/
 
+    $.ajax({
+        url: baseUrl + "parametri/" + idParametro,
+        type: 'GET',
+        dataType: 'json',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": auth
+        },
+        success: function (result) {
+            if (result != null && result != undefined && result != '') {
+
+                $('#hiddenIdParametro').attr('value', result.id);
+                $('#valore').attr('value', result.valore);
+                $('#unitaDiMisura').attr('value', result.unitaDiMisura);
+                $('#descrizione').val(result.descrizione);
+
+                $('#annullaParametroButton').attr('data-auth', token);
+            };
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $('#alertParametro').append(alertContent);
+            $('#updateParametroButton').attr('disabled', true);
+            console.log('Response text: ' + jqXHR.responseText);
+        }
+    });
+}
+
+$(document).on('click','#annullaParametroButton', function(event){
+    event.preventDefault();
+
+    window.location = 'parametri.html?token=' + $(this).attr('data-auth');
+    //$.fn.loadParametriTable(auth);
+});
+
+$(document).on('submit','#updateParametroForm', function(event) {
+    event.preventDefault();
+
+    var token = $('#annullaParametroButton').attr('data-auth');
+    var bytes  = CryptoJS.AES.decrypt(token.toString(), 'contafood');
+    var auth = bytes.toString(CryptoJS.enc.Utf8);
+
+    var parametro = new Object();
+    parametro.id = $('#hiddenIdParametro').val();
+    parametro.descrizione = $('#descrizione').val();
+    parametro.unitaDiMisura = $('#unitaDiMisura').val();
+    parametro.valore = $('#valore').val();
+
+    var parametroJson = JSON.stringify(parametro);
+
+    var alertContent = '<div id="alertParametroContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+    alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+        '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+    $.ajax({
+        url: baseUrl + "parametro/" + $('#hiddenIdParametro').val(),
+        type: 'PATCH',
+        contentType: "application/json",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": auth
+        },
+        dataType: 'json',
+        data: parametroJson,
+        success: function(result) {
+            $('#alertParametro').empty().append(alertContent.replace('@@alertText@@','Parametro modificato con successo').replace('@@alertResult@@', 'success'));
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $('#alertParametro').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del parametro').replace('@@alertResult@@', 'danger'));
+        }
+    });
+});
