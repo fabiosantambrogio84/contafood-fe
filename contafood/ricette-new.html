@@ -34,6 +34,7 @@
 
   <script>
     $.fn.getCategorieRicette();
+    $.fn.getCostoOrarioPreparazione();
   </script>
 </head>
 
@@ -110,6 +111,7 @@
             </div>
 
             <div class="form-row">
+              <input type="hidden" id="costoOrarioPreparazione"/>
               <div class="form-group col-md-3">
                 <label for="costoIngredienti">Costo ingredienti (&euro;)</label>
                 <input type="number" class="form-control" id="costoIngredienti" step=".01" min="0" readonly>

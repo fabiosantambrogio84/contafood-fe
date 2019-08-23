@@ -160,6 +160,7 @@ $.fn.getParametro = function(idParametro, token){
             if (result != null && result != undefined && result != '') {
 
                 $('#hiddenIdParametro').attr('value', result.id);
+                $('#nome').attr('value', result.nome);
                 $('#valore').attr('value', result.valore);
                 $('#unitaDiMisura').attr('value', result.unitaDiMisura);
                 $('#descrizione').val(result.descrizione);
@@ -191,6 +192,7 @@ $(document).on('submit','#updateParametroForm', function(event) {
 
     var parametro = new Object();
     parametro.id = $('#hiddenIdParametro').val();
+    parametro.nome = $('#nome').val();
     parametro.descrizione = $('#descrizione').val();
     parametro.unitaDiMisura = $('#unitaDiMisura').val();
     parametro.valore = $('#valore').val();
@@ -202,8 +204,8 @@ $(document).on('submit','#updateParametroForm', function(event) {
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
     $.ajax({
-        url: baseUrl + "parametro/" + $('#hiddenIdParametro').val(),
-        type: 'PATCH',
+        url: baseUrl + "parametri/" + $('#hiddenIdParametro').val(),
+        type: 'PUT',
         contentType: "application/json",
         headers: {
             "Content-Type": "application/json",
@@ -212,10 +214,10 @@ $(document).on('submit','#updateParametroForm', function(event) {
         dataType: 'json',
         data: parametroJson,
         success: function(result) {
-            $('#alertParametro').empty().append(alertContent.replace('@@alertText@@','Parametro modificato con successo').replace('@@alertResult@@', 'success'));
+            $('#alertParametri').empty().append(alertContent.replace('@@alertText@@','Parametro modificato con successo').replace('@@alertResult@@', 'success'));
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertParametro').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del parametro').replace('@@alertResult@@', 'danger'));
+            $('#alertParametri').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del parametro').replace('@@alertResult@@', 'danger'));
         }
     });
 });
