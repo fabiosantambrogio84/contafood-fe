@@ -435,6 +435,9 @@ $.fn.getRicetta = function(idRicetta){
     // load categorie ricette
 	$.fn.getCategorieRicette();
 
+	// load costo orario preparazione
+	$.fn.getCostoOrarioPreparazione();
+
 	$.ajax({
         url: baseUrl + "ricette/" + idRicetta,
         type: 'GET',
@@ -442,26 +445,24 @@ $.fn.getRicetta = function(idRicetta){
         success: function(result) {
           if(result != null && result != undefined && result != ''){
 
-          	var ricetta = result.ricetta;
-			$('#hiddenIdRicetta').attr('value', ricetta.id);
-			$('#codiceRicetta').attr('value', ricetta.codice);
-			$('#nome').attr('value', ricetta.nome);
-			if(ricetta.categoria != null && ricetta.categoria != undefined){
-				$('#categoria option[value="' + ricetta.categoria.id +'"]').attr('selected', true);
+			$('#hiddenIdRicetta').attr('value', result.id);
+			$('#codiceRicetta').attr('value', result.codice);
+			$('#nome').attr('value', result.nome);
+			if(result.categoria != null && result.categoria != undefined){
+				$('#categoria option[value="' + result.categoria.id +'"]').attr('selected', true);
 			}
-			$('#tempoPreparazione').attr('value', ricetta.tempoPreparazione);
-			$('#numeroPorzioni').attr('value', ricetta.numeroPorzioni);
-			$('#costoOrarioPreparazione').attr('value', result.costoOrarioPreparazione);
-			$('#costoIngredienti').attr('value', ricetta.costoIngredienti);
-			$('#costoPreparazione').attr('value', ricetta.costoPreparazione);
-			$('#costoTotale').attr('value', ricetta.costoTotale);
-			$('#preparazione').val(ricetta.preparazione);
-			$('#allergeni').val(ricetta.allergeni);
-			$('#valoriNutrizionali').val(ricetta.valoriNutrizionali);
-			$('#note').val(ricetta.note);
+			$('#tempoPreparazione').attr('value', result.tempoPreparazione);
+			$('#numeroPorzioni').attr('value', result.numeroPorzioni);
+			$('#costoIngredienti').attr('value', result.costoIngredienti);
+			$('#costoPreparazione').attr('value', result.costoPreparazione);
+			$('#costoTotale').attr('value', result.costoTotale);
+			$('#preparazione').val(result.preparazione);
+			$('#allergeni').val(result.allergeni);
+			$('#valoriNutrizionali').val(result.valoriNutrizionali);
+			$('#note').val(result.note);
 
-			if(ricetta.ricettaIngredienti != null && ricetta.ricettaIngredienti != undefined && ricetta.ricettaIngredienti.length != 0){
-				ricetta.ricettaIngredienti.forEach(function(item, i){
+			if(result.ricettaIngredienti != null && result.ricettaIngredienti != undefined && result.ricettaIngredienti.length != 0){
+				result.ricettaIngredienti.forEach(function(item, i){
 					var id = item.id.ingredienteId;
 					var codice = item.ingrediente.codice;
 					var descrizione = item.ingrediente.descrizione;
@@ -516,11 +517,11 @@ $.fn.getRicetta = function(idRicetta){
 $.fn.computeCostoTotale = function(costoIngredienti, costoPreparazione){
 	var costoTotale;
 	if(costoIngredienti != null && costoIngredienti != undefined && costoIngredienti != ""){
-		costoTotale = costoIngredienti;
+		costoTotale = parseFloat(costoIngredienti);
 	}
 	if(costoPreparazione != null && costoPreparazione != undefined){
 		if(costoTotale != null && costoTotale != undefined){
-			costoTotale = costoTotale + parseFloat(costoPreparazione);
+			costoTotale = parseFloat(costoTotale) + parseFloat(costoPreparazione);
 		} else {
 			costoTotale = parseFloat(costoPreparazione);
 		}
@@ -537,13 +538,17 @@ $.fn.changeQuantitaIngrediente = function() {
 		var prezzo = $('#prezzoIngrediente_'+itemIndex).val();
 		if(quantita == null || quantita == undefined || quantita == ""){
 			quantita = 0;
-		}
+		} else if(quantita.indexOf(',') != "-1"){
+            quantita = quantita.replace(',','.');
+        }
 		if(prezzo == null || prezzo == undefined || prezzo == ""){
 			prezzo = 0;
+		} else if(prezzo.indexOf(',') != "-1"){
+		    prezzo = prezzo.replace(',','.');
 		}
 		var costoIngrediente = parseFloat(quantita) * parseFloat(prezzo);
 		if(costoIngredienti != null && costoIngredienti != undefined && costoIngredienti != ""){
-			costoIngredienti = costoIngredienti + parseFloat(costoIngrediente);
+			costoIngredienti = parseFloat(costoIngredienti) + parseFloat(costoIngrediente);
 		} else{
 			costoIngredienti = parseFloat(costoIngrediente);
 		}
