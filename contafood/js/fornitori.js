@@ -258,7 +258,7 @@ $(document).ready(function() {
 
 $.fn.getProvince = function(){
 	$.ajax({
-		url: baseUrl + "util/province",
+		url: baseUrl + "utils/province",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

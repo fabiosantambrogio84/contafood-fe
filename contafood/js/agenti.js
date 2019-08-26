@@ -74,7 +74,7 @@ $(document).ready(function() {
 				console.log('Response text: ' + jqXHR.responseText);
 
 				var alertContent = '<div id="alertAgenteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-                alertContent = alertContent + '<strong>Errore</strong> nella cancellazione dell\'agente'.\n' +
+                alertContent = alertContent + '<strong>Errore</strong> nella cancellazione dell\'agente' +
                     '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
                 $('#alertAgente').empty().append(alertContent);
 
