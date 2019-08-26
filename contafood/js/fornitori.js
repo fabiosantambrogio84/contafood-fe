@@ -61,35 +61,35 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(result) {
               if(result != null && result != undefined && result != ''){
-              	var contentDetails = '<p><strong>Codice fornitore: </strong>'+result.codice+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ragione sociale: </strong>'+result.ragioneSociale+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ragione sociale 2: </strong>'+result.ragioneSociale2+'</p>';
+              	var contentDetails = '<p><strong>Codice fornitore: </strong>'+$.fn.printVariable(result.codice)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Ragione sociale: </strong>'+$.fn.printVariable(result.ragioneSociale)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Ragione sociale 2: </strong>'+$.fn.printVariable(result.ragioneSociale2)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Ditta individuale: </strong>';
 				  if(result.dittaIndividuale === true){
 					contentDetails = contentDetails + 'Si';
 				  } else{
 				  	contentDetails = contentDetails + 'No';
 				  }
-				  contentDetails = contentDetails + '<p><strong>Nome: </strong>'+result.nome+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Cognome: </strong>'+result.cognome+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Indirizzo: </strong>'+result.indirizzo+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Citt&agrave;: </strong>'+result.citta+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Provincia: </strong>'+result.provincia+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Cap: </strong>'+result.cap+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Nazione: </strong>'+result.nazione+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Partita IVA: </strong>'+result.partitaIva+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Codice fiscale: </strong>'+result.codiceFiscale+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Telefono: </strong>'+result.telefono+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Telefono2: </strong>'+result.telefono2+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Telefono3: </strong>'+result.telefono3+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Email: </strong>'+result.email+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Email PEC: </strong>'+result.emailPec+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Codice univoco SDI: </strong>'+result.codiceUnivocoSdi+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Iban: </strong>'+result.iban+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+result.pagamento+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+result.note+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Nome: </strong>'+$.fn.printVariable(result.nome)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Cognome: </strong>'+$.fn.printVariable(result.cognome)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Indirizzo: </strong>'+$.fn.printVariable(result.indirizzo)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Citt&agrave;: </strong>'+$.fn.printVariable(result.citta)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Provincia: </strong>'+$.fn.printVariable(result.provincia)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Cap: </strong>'+$.fn.printVariable(result.cap)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Nazione: </strong>'+$.fn.printVariable(result.nazione)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Partita IVA: </strong>'+$.fn.printVariable(result.partitaIva)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Codice fiscale: </strong>'+$.fn.printVariable(result.codiceFiscale)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Telefono: </strong>'+$.fn.printVariable(result.telefono)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Telefono2: </strong>'+$.fn.printVariable(result.telefono2)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Telefono3: </strong>'+$.fn.printVariable(result.telefono3)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Email: </strong>'+$.fn.printVariable(result.email)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Email PEC: </strong>'+$.fn.printVariable(result.emailPec)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Codice univoco SDI: </strong>'+$.fn.printVariable(result.codiceUnivocoSdi)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Iban: </strong>'+$.fn.printVariable(result.iban)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+$.fn.printVariable(result.pagamento)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
 
-				  $('#detailsFornitoreMainDiv').append(contentDetails);
+				  $('#detailsFornitoreMainDiv').empty().append(contentDetails);
 
               } else{
                 $('#detailsFornitoreMainDiv').empty().append(alertContent);
@@ -288,6 +288,13 @@ $.fn.extractIdFornitoreFromUrl = function(){
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
+}
+
+$.fn.printVariable = function(variable){
+    if(variable != null && variable != undefined && variable != ""){
+        return variable;
+    }
+    return "";
 }
 
 $.fn.getFornitore = function(idFornitore){
