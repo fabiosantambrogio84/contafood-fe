@@ -288,7 +288,7 @@ $(document).ready(function() {
 						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 					}
 					rowHtml = rowHtml + '<div class="input-group">';
-					rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" onchange="$.fn.changeQuantitaIngrediente(this);">';
+					rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" onchange="$.fn.computeCostoIngredienti(this);">';
 					rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
 					rowHtml = rowHtml + '</div></div></div>';
 					rowHtml = rowHtml + '</div>';
@@ -339,36 +339,12 @@ $(document).ready(function() {
 				});
 			}
 		}
-		$.fn.changeQuantitaIngrediente();
+		$.fn.computeCostoIngredienti();
 	});
 
 	if($('#tempoPreparazione') != null && $('#tempoPreparazione') != undefined){
         $(document).on('change','#tempoPreparazione', function(){
-            var tempoPreparazione = $('#tempoPreparazione').val();
-			var costoPreparazione;
-            if(tempoPreparazione != null && tempoPreparazione != undefined && tempoPreparazione != ""){
-
-                var costoOrarioPreparazione = $('#costoOrarioPreparazione').val();
-                if(costoOrarioPreparazione != null && costoOrarioPreparazione != undefined && costoOrarioPreparazione.length != 0){
-					if(costoOrarioPreparazione.indexOf(',') != "-1"){
-						costoOrarioPreparazione = costoOrarioPreparazione.replace(',','.');
-					}
-                	costoOrarioPreparazione = parseFloat(costoOrarioPreparazione);
-				} else {
-					costoOrarioPreparazione = parseInt(0);
-				}
-				if(tempoPreparazione.indexOf(',') != "-1"){
-					tempoPreparazione = tempoPreparazione.replace(',','.');
-				}
-				tempoPreparazione = parseFloat(tempoPreparazione)/60;
-                costoPreparazione = parseFloat(costoOrarioPreparazione) * parseFloat(tempoPreparazione);
-
-                $('#costoPreparazione').val(costoPreparazione);
-
-            } else {
-                $('#costoPreparazione').val(null);
-            }
-			$.fn.computeCostoTotale($('#costoIngredienti').val(), costoPreparazione);
+			$.fn.computeCostoTotale($('#costoIngredienti').val(), $.fn.computeCostoPreparazione());
         });
     }
 
@@ -494,7 +470,7 @@ $.fn.getRicetta = function(idRicetta){
 						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 					}
 					rowHtml = rowHtml + '<div class="input-group">';
-					rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" value="'+quantita+'">';
+					rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" value="'+quantita+'" onchange="$.fn.computeCostoIngredienti(this);">';
 					rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddIngrediente" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
 					rowHtml = rowHtml + '</div></div></div>';
 					rowHtml = rowHtml + '</div>';
@@ -514,6 +490,34 @@ $.fn.getRicetta = function(idRicetta){
     });
 }
 
+$.fn.computeCostoPreparazione = function(){
+    var tempoPreparazione = $('#tempoPreparazione').val();
+    var costoPreparazione;
+    if(tempoPreparazione != null && tempoPreparazione != undefined && tempoPreparazione != ""){
+
+        var costoOrarioPreparazione = $('#costoOrarioPreparazione').val();
+        if(costoOrarioPreparazione != null && costoOrarioPreparazione != undefined && costoOrarioPreparazione.length != 0){
+            if(costoOrarioPreparazione.indexOf(',') != "-1"){
+                costoOrarioPreparazione = costoOrarioPreparazione.replace(',','.');
+            }
+            costoOrarioPreparazione = parseFloat(costoOrarioPreparazione);
+        } else {
+            costoOrarioPreparazione = parseInt(0);
+        }
+        if(tempoPreparazione.indexOf(',') != "-1"){
+            tempoPreparazione = tempoPreparazione.replace(',','.');
+        }
+        tempoPreparazione = parseFloat(tempoPreparazione)/60;
+        costoPreparazione = parseFloat(costoOrarioPreparazione) * parseFloat(tempoPreparazione);
+
+        $('#costoPreparazione').val(costoPreparazione);
+
+    } else {
+        $('#costoPreparazione').val(null);
+    }
+    return costoPreparazione;
+}
+
 $.fn.computeCostoTotale = function(costoIngredienti, costoPreparazione){
 	var costoTotale;
 	if(costoIngredienti != null && costoIngredienti != undefined && costoIngredienti != ""){
@@ -529,7 +533,7 @@ $.fn.computeCostoTotale = function(costoIngredienti, costoPreparazione){
 	$('#costoTotale').val(costoTotale);
 }
 
-$.fn.changeQuantitaIngrediente = function() {
+$.fn.computeCostoIngredienti = function() {
 	var costoIngredienti;
 	$('.quantitaIngrediente').each(function(i, item){
 		var itemId = item.id;
