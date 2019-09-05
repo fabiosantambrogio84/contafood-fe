@@ -117,7 +117,7 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#newAgenteButton') != null && $('#newAgeneteButton') != undefined){
+	if($('#newAgenteButton') != null && $('#newAgenteButton') != undefined){
 		$(document).on('submit','#newAgenteForm', function(event){
 			event.preventDefault();
 
