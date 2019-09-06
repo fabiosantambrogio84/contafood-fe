@@ -80,6 +80,7 @@ $(document).ready(function() {
 		});
 	});
 
+    /*
 	if($('#updateRicettaButton') != null && $('#updateRicettaButton') != undefined){
 		$(document).on('submit','#updateRicettaForm', function(event){
 			event.preventDefault();
@@ -137,7 +138,8 @@ $(document).ready(function() {
 			});
 		});
 	}
-
+    */
+    /*
 	if($('#newRicettaButton') != null && $('#newRicettaButton') != undefined){
 		$(document).on('submit','#newRicettaForm', function(event){
 			event.preventDefault();
@@ -194,49 +196,9 @@ $(document).ready(function() {
 			});
 		});
 	}
+    */
 
-	$(document).on('click','#addIngrediente', function(){
-		$('#addIngredienteModal').modal('show');
-
-		$('#addIngredienteModalTable').DataTable({
-			"ajax": {
-				"url": baseUrl + "ingredienti",
-				"type": "GET",
-				"content-type": "json",
-				"cache": false,
-				"dataSrc": "",
-				"error": function(jqXHR, textStatus, errorThrown) {
-					var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-					alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti</strong>\n' +
-						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-					$('#alertRicettaAddIngrediente').empty().append(alertContent);
-				}
-			},
-			"language": {
-				"search": "Cerca",
-				"emptyTable": "Nessun ingrediente disponibile",
-				"zeroRecords": "Nessun ingrediente disponibile"
-			},
-			"paging": false,
-			"lengthChange": false,
-			"info": false,
-			"order": [
-				[1,'asc']
-			],
-			"autoWidth": false,
-			"columns": [
-				{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-					var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" data-codice="'+data.codice+'" data-descrizione="'+data.descrizione+'" ' +
-						'data-prezzo="'+data.prezzo+'" id="checkbox_'+data.id+'" class="addIngredienteCheckbox">';
-					return checkboxHtml;
-				}},
-				{"name": "codice", "data": "codice"},
-				{"name": "descrizione", "data": "descrizione"},
-				{"name": "prezzo", "data": "prezzo"}
-			]
-		});
-	});
-
+    /*
 	$(document).on('click','#confirmAddIngredienteModal', function(){
 		var numChecked = $('.addIngredienteCheckbox:checkbox:checked').length;
 		if(numChecked == null || numChecked == undefined || numChecked == 0){
@@ -353,6 +315,7 @@ $(document).ready(function() {
 			$.fn.computeCostoTotale($('#costoIngredienti').val(), $.fn.computeCostoPreparazione());
         });
     }
+    */
 
 });
 

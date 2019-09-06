@@ -42,7 +42,7 @@ $(document).ready(function() {
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="updateRicetta pr-2" data-id="'+data.id+'" href="ricette-edit.html?idRicetta=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links = links + '<a class="deleteRicetta pr-2" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-				links = links + '<a href="produzioni-new.html?idRicetta='+data.id+'"><i class="far fa-trash-alt"></i></a>';
+				links = links + '<a href="produzioni-new.html?idRicetta='+data.id+'"><i class="fas fa-atom"></i></a>';
 				return links;
 			}}
 		]
