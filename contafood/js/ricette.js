@@ -349,13 +349,6 @@ $(document).ready(function() {
         });
     }
 
-	if($('#newProduzioneForm') != null && $('#newProduzioneForm') != undefined){
-		$(document).on('change','#ricetta', function(){
-			var idCategoria = $('#ricetta option:selected').attr('data-id-categoria');
-			$('#categoria option').attr('selected', false);
-			$('#categoria option[value="' + idCategoria +'"]').attr('selected', true);
-		});
-	}
 });
 
 $.fn.getCategorieRicette = function(){
@@ -384,9 +377,9 @@ $.fn.getRicette = function(field){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					if(i == 0){
-						$('#categoria option[value="' + item.categoria.id +'"]').attr('selected', true);
-					}
+					//if(i == 0){
+					//	$('#categoria option[value="' + item.categoria.id +'"]').attr('selected', true);
+					//}
 					$('#'+field).append('<option value="'+item.id+'" data-id-categoria="'+item.categoria.id+'">'+item.codice+' - '+item.nome+'</option>');
 				});
 			}

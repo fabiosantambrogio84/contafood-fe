@@ -39,7 +39,9 @@
     $.fn.getRicette('ricetta');
 	var idRicetta = $.fn.extractIdRicettaFromUrl();
     if(idRicetta != null && idRicetta != undefined){
-      //$.fn.getRicettaProduzione(idRicetta);
+      $.when($.fn.getCategorieRicette(), $.fn.getConfezioni(), $.fn.getRicette()).then(function(f1,f2,f3){
+        $.fn.getRicettaProduzione(idRicetta);
+      });
     }
   </script>
 
@@ -84,6 +86,7 @@
               <div class="form-group col-md-4">
                 <label for="ricetta">Ricetta*</label>
                 <select id="ricetta" class="form-control" required>
+                  <option value="-1" data-id-categoria="-1" selected>-</option>
                 </select>
                 <div class="invalid-feedback">
                   Seleziona una ricetta
@@ -92,6 +95,7 @@
               <div class="form-group col-md-4">
                 <label for="categoria">Categoria*</label>
                 <select id="categoria" class="form-control" required disabled>
+                  <option value="-1" selected>-</option>
                 </select>
                 <div class="invalid-feedback">
                   Seleziona una categoria
