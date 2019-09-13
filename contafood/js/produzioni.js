@@ -93,6 +93,70 @@ $(document).ready(function() {
 		});
 	}
 
+	if($('#newProduzioneButton') != null && $('#newProduzioneButton') != undefined){
+		$(document).on('submit','#newProduzioneForm', function(event){
+			event.preventDefault();
+
+			var produzione = new Object();
+			produzione.codice = $('#codiceProduzione').val();
+
+			var ricetta = new Object();
+			ricetta.id = $('#ricetta option:selected').val();
+			produzione.ricetta = ricetta;
+
+			var categoria = new Object();
+			categoria.id = $('#categoria option:selected').val();
+			produzione.categoria = categoria;
+
+			var confezione = new Object();
+			confezione.id = $('#confezione option:selected').val();
+			produzione.confezione = confezione;
+
+			produzione.numConfezioni = $('#numeroConfezioni').val();
+
+			var ingredientiLength = $('.formRowIngrediente').length;
+			if(ingredientiLength != null && ingredientiLength != undefined && ingredientiLength != 0){
+				var produzioneIngredienti = [];
+				$('.formRowIngrediente').each(function(i, item){
+					var produzioneIngrediente = {};
+					var produzioneIngredienteId = new Object();
+					var ingredienteId = item.id.replace('formRowIngrediente_','');
+					produzioneIngredienteId.ingredienteId = ingredienteId;
+					produzioneIngrediente.id = produzioneIngredienteId;
+
+					ricettaIngrediente.lotto = $('#lottoIngrediente_'+ingredienteId).val();
+					ricettaIngrediente.scadenza = $('#scadenzaIngrediente_'+ingredienteId).val();
+					ricettaIngrediente.quantita = $('#quantitaIngrediente_'+ingredienteId).val();
+
+					produzioneIngredienti.push(produzioneIngrediente);
+				});
+				produzione.produzioneIngredienti = produzioneIngredienti;
+			}
+
+			var produzioneJson = JSON.stringify(produzione);
+
+			var alertContent = '<div id="alertProduzioneContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			$.ajax({
+				url: baseUrl + "produzioni",
+				type: 'POST',
+				contentType: "application/json",
+				dataType: 'json',
+				data: produzioneJson,
+				success: function(result) {
+					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Produzione creata con successo').replace('@@alertResult@@', 'success'));
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della produzione').replace('@@alertResult@@', 'danger'));
+				}
+			});
+		});
+	}
+
+
+
 });
 
 $.fn.getCategorieRicette = function(){
@@ -155,7 +219,9 @@ $.fn.loadIngredienti = function(idRicetta){
 		dataType: 'json',
 		success: function (result) {
 			if (result != null && result != undefined && result != '') {
-				$('#formRowIngredienti').empty();
+				var labelHtml = '<div class="form-group col-md-12" id="formRowIngredientiBody"><label>Ingredienti</label></div>';
+
+				$('#formRowIngredienti').empty().append(labelHtml);
 
 				if (result.ricettaIngredienti != null && result.ricettaIngredienti != undefined && result.ricettaIngredienti.length != 0) {
 					result.ricettaIngredienti.forEach(function (item, i) {
@@ -220,7 +286,6 @@ $.fn.getRicettaProduzione = function(idRicetta){
 	alertContent = alertContent +  '<strong>Errore nel recupero della ricetta.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-	console.log('-> '+JSON.stringify($('#ricetta')));
 	$.ajax({
         url: baseUrl + "ricette/" + idRicetta,
         type: 'GET',
