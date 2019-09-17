@@ -124,9 +124,9 @@ $(document).ready(function() {
 					produzioneIngredienteId.ingredienteId = ingredienteId;
 					produzioneIngrediente.id = produzioneIngredienteId;
 
-					ricettaIngrediente.lotto = $('#lottoIngrediente_'+ingredienteId).val();
-					ricettaIngrediente.scadenza = $('#scadenzaIngrediente_'+ingredienteId).val();
-					ricettaIngrediente.quantita = $('#quantitaIngrediente_'+ingredienteId).val();
+					produzioneIngrediente.lotto = $('#lottoIngrediente_'+ingredienteId).val();
+					produzioneIngrediente.scadenza = $('#scadenzaIngrediente_'+ingredienteId).val();
+					produzioneIngrediente.quantita = $('#quantitaIngrediente_'+ingredienteId).val();
 
 					produzioneIngredienti.push(produzioneIngrediente);
 				});
