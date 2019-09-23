@@ -37,6 +37,7 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
+			{"name": "lotto", "data": "lotto"},
 			{"name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
 				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
 				return ricettaResult;
