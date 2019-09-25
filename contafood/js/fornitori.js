@@ -1,5 +1,5 @@
 
-var baseUrl = "http://localhost:8090/contafood-be/";
+var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
