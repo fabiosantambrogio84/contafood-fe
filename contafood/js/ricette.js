@@ -87,7 +87,7 @@ $(document).ready(function() {
 			categoria.id = $('#categoria option:selected').val();
 			ricetta.categoria = categoria;
 			ricetta.tempoPreparazione = $('#tempoPreparazione').val();
-			ricetta.numeroPorzioni = $('#numeroPorzioni').val();
+			ricetta.pesoTotale = $('#pesoTotale').val();
 			ricetta.costoIngredienti = $('#costoIngredienti').val();
 			ricetta.costoPreparazione = $('#costoPreparazione').val();
 			ricetta.costoTotale = $('#costoTotale').val();
@@ -144,7 +144,7 @@ $(document).ready(function() {
 			categoria.id = $('#categoria option:selected').val();
 			ricetta.categoria = categoria;
 			ricetta.tempoPreparazione = $('#tempoPreparazione').val();
-			ricetta.numeroPorzioni = $('#numeroPorzioni').val();
+			ricetta.pesoTotale = $('#pesoTotale').val();
 			ricetta.costoIngredienti = $('#costoIngredienti').val();
 			ricetta.costoPreparazione = $('#costoPreparazione').val();
 			ricetta.costoTotale = $('#costoTotale').val();
@@ -286,7 +286,7 @@ $(document).ready(function() {
 					rowHtml = rowHtml + '<div class="form-group col-md-2">';
 
 					if(i == 0 && alreadyAddedRows == 0){
-						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
+						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
 					}
 					rowHtml = rowHtml + '<div class="input-group">';
 					rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" onchange="$.fn.computeCostoIngredienti(this);">';
@@ -330,7 +330,7 @@ $(document).ready(function() {
 					} else if(id.indexOf('prezzo') != '-1'){
 						label = '<label for="prezzoIngrediente">Prezzo (&euro;)</label>';
 					} else{
-						label = '<label for="quantitaIngrediente">Quantita</label>';
+						label = '<label for="quantitaIngrediente">Quantita (Kg)</label>';
 					}
 					if(id.indexOf('quantita') != '-1'){
 						$('#'+id).parent().before(label);
@@ -450,7 +450,7 @@ $.fn.getRicetta = function(idRicetta){
 				$('#categoria option[value="' + result.categoria.id +'"]').attr('selected', true);
 			}
 			$('#tempoPreparazione').attr('value', result.tempoPreparazione);
-			$('#numeroPorzioni').attr('value', result.numeroPorzioni);
+			$('#pesoTotale').attr('value', result.pesoTotale);
 			$('#costoIngredienti').attr('value', result.costoIngredienti);
 			$('#costoPreparazione').attr('value', result.costoPreparazione);
 			$('#costoTotale').attr('value', result.costoTotale);
@@ -489,7 +489,7 @@ $.fn.getRicetta = function(idRicetta){
 					rowHtml = rowHtml + '<div class="form-group col-md-2">';
 
 					if(i == 0){
-						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
+						rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
 					}
 					rowHtml = rowHtml + '<div class="input-group">';
 					rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_'+id+'" step=".01" min="0" value="'+quantita+'" onchange="$.fn.computeCostoIngredienti(this);">';

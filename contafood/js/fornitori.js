@@ -64,14 +64,6 @@ $(document).ready(function() {
               	var contentDetails = '<p><strong>Codice fornitore: </strong>'+$.fn.printVariable(result.codice)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Ragione sociale: </strong>'+$.fn.printVariable(result.ragioneSociale)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Ragione sociale 2: </strong>'+$.fn.printVariable(result.ragioneSociale2)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ditta individuale: </strong>';
-				  if(result.dittaIndividuale === true){
-					contentDetails = contentDetails + 'Si';
-				  } else{
-				  	contentDetails = contentDetails + 'No';
-				  }
-				  contentDetails = contentDetails + '<p><strong>Nome: </strong>'+$.fn.printVariable(result.nome)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Cognome: </strong>'+$.fn.printVariable(result.cognome)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Indirizzo: </strong>'+$.fn.printVariable(result.indirizzo)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Citt&agrave;: </strong>'+$.fn.printVariable(result.citta)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Provincia: </strong>'+$.fn.printVariable(result.provincia)+'</p>';
@@ -131,6 +123,7 @@ $(document).ready(function() {
 		});
 	});
 
+    /*
 	if($('#dittaIndividuale') != null && $('#dittaIndividuale') != undefined){
 		$(document).on('change','#dittaIndividuale', function(){
 			var isChecked = $('#dittaIndividuale').prop('checked');
@@ -145,6 +138,7 @@ $(document).ready(function() {
 			}
 		});
 	}
+	*/
 
 	if($('#updateFornitoreButton') != null && $('#updateFornitoreButton') != undefined){
 		$(document).on('submit','#updateFornitoreForm', function(event){
@@ -155,13 +149,6 @@ $(document).ready(function() {
 			fornitore.codice = $('#codiceFornitore').val();
 			fornitore.ragioneSociale = $('#ragioneSociale').val();
 			fornitore.ragioneSociale2 = $('#ragioneSociale2').val();
-			if($('#dittaIndividuale').prop('checked') === true){
-				fornitore.dittaIndividuale = true;
-			}else{
-				fornitore.dittaIndividuale = false;
-			}
-			fornitore.nome = $('#nome').val();
-			fornitore.cognome = $('#cognome').val();
 			fornitore.indirizzo = $('#indirizzo').val();
 			fornitore.citta = $('#citta').val();
 			fornitore.provincia = $('#provincia option:selected').text();
@@ -209,13 +196,6 @@ $(document).ready(function() {
 			fornitore.codice = $('#codiceFornitore').val();
 			fornitore.ragioneSociale = $('#ragioneSociale').val();
 			fornitore.ragioneSociale2 = $('#ragioneSociale2').val();
-			if($('#dittaIndividuale').prop('checked') === true){
-				fornitore.dittaIndividuale = true;
-			}else{
-				fornitore.dittaIndividuale = false;
-			}
-			fornitore.nome = $('#nome').val();
-			fornitore.cognome = $('#cognome').val();
 			fornitore.indirizzo = $('#indirizzo').val();
 			fornitore.citta = $('#citta').val();
 			fornitore.provincia = $('#provincia option:selected').text();
@@ -317,13 +297,6 @@ $.fn.getFornitore = function(idFornitore){
 			$('#codiceFornitore').attr('value', result.codice);
             $('#ragioneSociale').attr('value', result.ragioneSociale);
             $('#ragioneSociale2').attr('value', result.ragioneSociale2);
-            if(result.dittaIndividuale === true){
-				$('#dittaIndividuale').prop('checked', true);
-				$('#nome').attr('disabled', 'false');
-				$('#cognome').attr('disabled', 'false');
-			}
-            $('#nome').attr('value', result.nome);
-            $('#cognome').attr('value', result.cognome);
             $('#indirizzo').attr('value', result.indirizzo);
             $('#citta').attr('value', result.citta);
             $('#provincia option[value="' + result.provincia +'"]').attr('selected', true);
