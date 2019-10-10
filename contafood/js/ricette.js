@@ -33,11 +33,12 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'asc']
+			[0, 'desc']
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
 			{"name": "nome", "data": "nome"},
+			{"name": "scadenzaGiorni", "data": "scadenzaGiorni"},
 			{"name": "note", "data": "note"},
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="updateRicetta pr-2" data-id="'+data.id+'" href="ricette-edit.html?idRicetta=' + data.id + '"><i class="far fa-edit"></i></a>';
@@ -88,6 +89,7 @@ $(document).ready(function() {
 			ricetta.categoria = categoria;
 			ricetta.tempoPreparazione = $('#tempoPreparazione').val();
 			ricetta.pesoTotale = $('#pesoTotale').val();
+			ricetta.scadenzaGiorni = $('#scadenzaGiorni').val();
 			ricetta.costoIngredienti = $('#costoIngredienti').val();
 			ricetta.costoPreparazione = $('#costoPreparazione').val();
 			ricetta.costoTotale = $('#costoTotale').val();
@@ -145,6 +147,7 @@ $(document).ready(function() {
 			ricetta.categoria = categoria;
 			ricetta.tempoPreparazione = $('#tempoPreparazione').val();
 			ricetta.pesoTotale = $('#pesoTotale').val();
+			ricetta.scadenzaGiorni = $('#scadenzaGiorni').val();
 			ricetta.costoIngredienti = $('#costoIngredienti').val();
 			ricetta.costoPreparazione = $('#costoPreparazione').val();
 			ricetta.costoTotale = $('#costoTotale').val();
@@ -451,6 +454,7 @@ $.fn.getRicetta = function(idRicetta){
 			}
 			$('#tempoPreparazione').attr('value', result.tempoPreparazione);
 			$('#pesoTotale').attr('value', result.pesoTotale);
+			$('#scadenzaGiorni').attr('value', result.scadenzaGiorni);
 			$('#costoIngredienti').attr('value', result.costoIngredienti);
 			$('#costoPreparazione').attr('value', result.costoPreparazione);
 			$('#costoTotale').attr('value', result.costoTotale);
@@ -557,6 +561,7 @@ $.fn.computeCostoTotale = function(costoIngredienti, costoPreparazione){
 
 $.fn.computeCostoIngredienti = function() {
 	var costoIngredienti;
+	var pesoTotale;
 	$('.quantitaIngrediente').each(function(i, item){
 		var itemId = item.id;
 		var itemIndex = itemId.substring(itemId.indexOf("_") + 1, itemId.length);
@@ -578,7 +583,14 @@ $.fn.computeCostoIngredienti = function() {
 		} else{
 			costoIngredienti = parseFloat(costoIngrediente);
 		}
+
+		if(pesoTotale != null && pesoTotale != undefined && pesoTotale != ""){
+			pesoTotale = parseFloat(pesoTotale) + parseFloat(quantita);
+		} else{
+			pesoTotale = parseFloat(quantita);
+		}
 	});
+	$('#pesoTotale').val(pesoTotale);
 	$('#costoIngredienti').val(costoIngredienti);
 	$.fn.computeCostoTotale(costoIngredienti, $('#costoPreparazione').val());
 }

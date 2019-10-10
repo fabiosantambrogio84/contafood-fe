@@ -193,7 +193,6 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var fornitore = new Object();
-			fornitore.codice = $('#codiceFornitore').val();
 			fornitore.ragioneSociale = $('#ragioneSociale').val();
 			fornitore.ragioneSociale2 = $('#ragioneSociale2').val();
 			fornitore.indirizzo = $('#indirizzo').val();

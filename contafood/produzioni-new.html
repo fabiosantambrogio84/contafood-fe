@@ -76,17 +76,10 @@
 
           <form id="newProduzioneForm" class="needs-validation" novalidate>
             <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="codiceProduzione">Codice*</label>
-                <input type="text" class="form-control" id="codiceProduzione" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci un codice
-                </div>
-              </div>
               <div class="form-group col-md-4">
                 <label for="ricetta">Ricetta*</label>
                 <select id="ricetta" class="form-control" required>
-                  <option value="-1" data-id-categoria="-1" selected>-</option>
+                  <option value="-1" data-id-categoria="-1" data-num-giorni-scadenza="-1" selected>-</option>
                 </select>
                 <div class="invalid-feedback">
                   Seleziona una ricetta
@@ -104,18 +97,10 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="confezione">Confezione*</label>
-                <select id="confezione" class="form-control" required>
-                </select>
+                <label for="scadenza">Scadenza*</label>
+                <input type="date" class="form-control" id="scadenza" placeholder="" required>
                 <div class="invalid-feedback">
-                  Seleziona una confezione
-                </div>
-              </div>
-              <div class="form-group col-md-3">
-                <label for="numeroConfezioni">Num. confezioni*</label>
-                <input type="number" class="form-control" id="numeroConfezioni" placeholder="" step="1" min="0" required>
-                <div class="invalid-feedback">
-                  Inserisci un numero
+                  Inserisci una data di scadenza
                 </div>
               </div>
             </div>
@@ -123,6 +108,25 @@
             <div class="form-row" id="formRowIngredienti">
               <div class="form-group col-md-12" id="formRowIngredientiBody">
                 <label>Ingredienti</label>
+              </div>
+            </div>
+
+            <div class="form-row" id="formRowConfezioni">
+              <div class="form-group col-md-12" id="formRowConfezioniBody">
+                <label>Confezioni</label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="generaLotto" id="generaLottoSi" value="vendita" selected>
+                  <label class="form-check-label" for="generaLottoSi">Si</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input class="form-check-input" type="radio" name="generaLotto" id="generaLottoNo" value="campionatura">
+                  <label class="form-check-label" for="generaLottoNo">No</label>
+                </div>
               </div>
             </div>
 

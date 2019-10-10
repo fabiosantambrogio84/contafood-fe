@@ -33,20 +33,16 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'asc']
+			[0, 'desc']
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
 			{"name": "lotto", "data": "lotto"},
+			{"name": "scadenza", "data": "scadenza"},
 			{"name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
 				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
 				return ricettaResult;
 			}},
-			{"name": "confezione", "data": null, "orderable":false, render: function ( data, type, row ) {
-				var confezioneResult = data.confezione.tipo+' '+data.confezione.peso+' gr.';
-				return confezioneResult;
-			}},
-			{"name": "numConfezioni", "data": "numConfezioni"},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="deleteProduzione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
@@ -85,9 +81,15 @@ $(document).ready(function() {
 		$(document).on('change','#ricetta', function(){
 			var idRicetta = $('#ricetta option:selected').val();
 			var idCategoria = $('#ricetta option:selected').attr('data-id-categoria');
+			var numGiorniScadenza = $('#ricetta option:selected').attr('data-num-giorni-scadenza');
 			if(idCategoria != '-1'){
 				$('#categoria option').attr('selected', false);
 				$('#categoria option[value="' + idCategoria +'"]').attr('selected', true);
+			}
+			if(numGiorniScadenza != '-1'){
+				var scadenza = new Date();
+				scadenza.setDate(scadenza.getDate() + parseInt(numGiorniScadenza));
+				$('#scadenza').val(scadenza);
 			}
 			$.fn.loadIngredienti(idRicetta);
 
@@ -99,7 +101,6 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var produzione = new Object();
-			produzione.codice = $('#codiceProduzione').val();
 
 			var ricetta = new Object();
 			ricetta.id = $('#ricetta option:selected').val();
@@ -108,12 +109,6 @@ $(document).ready(function() {
 			var categoria = new Object();
 			categoria.id = $('#categoria option:selected').val();
 			produzione.categoria = categoria;
-
-			var confezione = new Object();
-			confezione.id = $('#confezione option:selected').val();
-			produzione.confezione = confezione;
-
-			produzione.numConfezioni = $('#numeroConfezioni').val();
 
 			var ingredientiLength = $('.formRowIngrediente').length;
 			if(ingredientiLength != null && ingredientiLength != undefined && ingredientiLength != 0){
@@ -133,7 +128,7 @@ $(document).ready(function() {
 				});
 				produzione.produzioneIngredienti = produzioneIngredienti;
 			}
-
+			produzione.scadenza = $('#scadenza').val();
 			var produzioneJson = JSON.stringify(produzione);
 
 			var alertContent = '<div id="alertProduzioneContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
