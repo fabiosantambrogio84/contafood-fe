@@ -87,8 +87,8 @@ $(document).ready(function() {
 				$('#categoria option[value="' + idCategoria +'"]').attr('selected', true);
 			}
 			if(numGiorniScadenza != '-1'){
-				var scadenza = new Date();
-				scadenza.setDate(scadenza.getDate() + parseInt(numGiorniScadenza));
+				var scadenza = moment().add(numGiorniScadenza, 'days').format('YYYY-MM-DD');
+				//scadenza.setDate(scadenza.getDate() + parseInt(numGiorniScadenza));
 				$('#scadenza').val(scadenza);
 			}
 			$.fn.loadIngredienti(idRicetta);
@@ -150,8 +150,6 @@ $(document).ready(function() {
 			});
 		});
 	}
-
-
 
 });
 
