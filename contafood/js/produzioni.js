@@ -164,8 +164,10 @@ $(document).ready(function() {
 
         $(document).on('click','.addConfezione', function(){
             var confezioneRow = $(this).parent().parent().parent().parent();
-            var newConfezioneRow = confezioneRow.clone();
-            $('.confezioneRow').parent().append(newConfezioneRow);
+            var newConfezioneRow = confezioneRow.clone().find('label').each(function( index ) {
+			  $(this).remove();
+			});
+			$('.confezioneRow').last().after(newConfezioneRow);
         });
     }
 
