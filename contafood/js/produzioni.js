@@ -151,6 +151,24 @@ $(document).ready(function() {
 		});
 	}
 
+    if($('.confezioneDescr') != null && $('.confezioneDescr') != undefined){
+        $(document).on('change','.confezioneDescr', function(){
+            var idConfezione = $('.confezioneDescr option:selected').val();
+            if(idConfezione != '-1'){
+                var peso = $('.confezioneDescr option:selected').attr('data-peso');
+                var idSelect = $(this).parent().attr('id');
+                var index = idSelect.substring(idSelect.indexOf("_") + 1, idSelect.length);
+                $('#confezionePeso_'+index).val(peso);
+            }
+        });
+
+        $(document).on('click','.addConfezione', function(){
+            var confezioneRow = $(this).parent().parent().parent().parent();
+            var newConfezioneRow = confezioneRow.clone();
+            $('.confezioneRow').parent().append(newConfezioneRow);
+        });
+    }
+
 });
 
 $.fn.getCategorieRicette = function(){
@@ -194,8 +212,8 @@ $.fn.getConfezioni = function(){
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#confezione').append('<option value="'+item.id+'">'+item.tipo+' '+item.peso+' gr.</option>');
+			    $.each(result, function(i, item){
+                    $('#confezioneDescr_0').append('<option value="'+item.id+'" data-peso="'+item.peso+'">'+item.tipo+' '+item.peso+' gr.</option>');
 				});
 			}
 		},
@@ -213,7 +231,7 @@ $.fn.loadIngredienti = function(idRicetta){
 		dataType: 'json',
 		success: function (result) {
 			if (result != null && result != undefined && result != '') {
-				var labelHtml = '<div class="form-group col-md-12" id="formRowIngredientiBody"><label>Ingredienti</label></div>';
+				var labelHtml = '<div class="form-group col-md-12" id="formRowIngredientiBody"><label class="font-weight-bold">Ingredienti</label></div>';
 
 				$('#formRowIngredienti').empty().append(labelHtml);
 
@@ -255,7 +273,7 @@ $.fn.loadIngredienti = function(idRicetta){
 						if (i == 0) {
 							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
 						}
-						rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);"></div>';
+						rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" disabled></div>';
 
 						rowHtml = rowHtml + '</div></div>';
 						rowHtml = rowHtml + '</div>';
