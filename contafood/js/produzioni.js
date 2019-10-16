@@ -43,11 +43,66 @@ $(document).ready(function() {
 				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
 				return ricettaResult;
 			}},
-			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="deleteProduzione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+			{"name": "numeroConfezioni", "data": "numeroConfezioni"},
+			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
+				var links = '<a class="detailsProduzione pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
+				links = links + '<a class="deleteProduzione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		]
+	});
+
+	$(document).on('click','.detailsProduzione', function(){
+		var idProduzione = $(this).attr('data-id');
+
+		var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della produzione.</strong></div>';
+		
+		$.ajax({
+			url: baseUrl + "confezioni",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				$('#detailsProduzioneModal').modal('show');
+
+				$('#detailsProduzioneModalTable').DataTable({
+					"ajax": {
+						"url": baseUrl + "produzioni/" + idProduzione,
+						"type": "GET",
+						"content-type": "json",
+						"cache": false,
+						"dataSrc": "",
+						"error": function(jqXHR, textStatus, errorThrown) {
+							console.log('Response text: ' + jqXHR.responseText);
+							$('#alertProduzione').append(alertContent);
+						}
+					},
+					"language": {
+						"search": "Cerca",
+						"emptyTable": "Nessuna confezione disponibile",
+						"zeroRecords": "Nessuna confezione disponibile"
+					},
+					"paging": false,
+					"lengthChange": false,
+					"info": false,
+					"order": [
+						[0,'desc']
+					],
+					"autoWidth": false,
+					"columns": [
+						{"name": "confezione", "data": data.produzioneConfezione.},
+						{"name": "peso", "data": "descrizione"},
+						{"name": "numeroConfezioni", "data": "prezzo"}
+					]
+				});	
+				
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				$('#alertProduzione').append(alertContent);
+			}
+		});
+		
 	});
 
 	$(document).on('click','.deleteProduzione', function(){
@@ -92,7 +147,6 @@ $(document).ready(function() {
 				$('#scadenza').val(scadenza);
 			}
 			$.fn.loadIngredienti(idRicetta);
-
 		});
 	}
 
@@ -129,6 +183,33 @@ $(document).ready(function() {
 				produzione.produzioneIngredienti = produzioneIngredienti;
 			}
 			produzione.scadenza = $('#scadenza').val();
+			produzione.quantitaTotale = $('#quantitaTotale').val();
+			var generaLotto = $('input[name="generaLotto"]:checked').val();
+			if(generaLotto){
+				produzione.scopo = 'vendita';
+			} else {
+				produzione.scopo = 'campionatura';
+			}
+			
+			var confezioniLength = $('.confezioneRow').length;
+			produzione.numeroConfezioni = 0;
+			if(confezioniLength != null && confezioniLength != undefined && confezioniLength != 0){
+				produzione.numeroConfezioni = confezioniLength;
+				var produzioneConfezioni = [];
+				$('.confezioneRow').each(function(i, item){
+					var produzioneConfezione = {};
+					var produzioneConfezioneId = new Object();
+					var confezioneId = $(this).find('select option:selected').val();
+					produzioneConfezioneId.confezioneId = confezioneId;
+					produzioneConfezione.id = produzioneConfezioneId;
+
+					produzioneConfezione.numConfezioni = $(this).find('.confezioneNum').val();
+
+					produzioneConfezioni.push(produzioneConfezione);
+				});
+				produzione.produzioneConfezioni = produzioneConfezioni;
+			}
+
 			var produzioneJson = JSON.stringify(produzione);
 
 			var alertContent = '<div id="alertProduzioneContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
@@ -160,6 +241,7 @@ $(document).ready(function() {
 				$(this).parent().next().next().find('input').val(1);
 			}
 			$.fn.computeQuantitaTotale();
+			$.fn.computeQuantitaIngredienti();
 		});
 				
         $(document).on('click','.addConfezione', function(){
@@ -187,10 +269,12 @@ $(document).ready(function() {
             var confezioneRow = $(this).parent().parent().parent();
             confezioneRow.remove();
 			$.fn.computeQuantitaTotale();
+			$.fn.computeQuantitaIngredienti();
         });
 		
 		$(document).on('change','.confezioneNum', function(){
 			$.fn.computeQuantitaTotale();
+			$.fn.computeQuantitaIngredienti();
 		});
     }
 
@@ -267,8 +351,9 @@ $.fn.loadIngredienti = function(idRicetta){
 						var descrizione = item.ingrediente.descrizione;
 						var prezzo = item.ingrediente.prezzo;
 						var quantita = item.quantita;
+						var percentuale = item.percentuale;
 
-						var rowHtml = '<div class="form-row formRowIngrediente" data-id="' + id + '" id="formRowIngrediente_' + id + '">' +
+						var rowHtml = '<div class="form-row formRowIngrediente" data-id="' + id + '" id="formRowIngrediente_' + id + '" data-percentuale="'+percentuale+'">' +
 							'<div class="form-group col-md-2">';
 
 						if (i == 0) {
@@ -296,7 +381,7 @@ $.fn.loadIngredienti = function(idRicetta){
 						rowHtml = rowHtml + '<div class="form-group col-md-2">';
 
 						if (i == 0) {
-							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita</label>';
+							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
 						}
 						rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" disabled></div>';
 
@@ -305,6 +390,7 @@ $.fn.loadIngredienti = function(idRicetta){
 
 						$('#formRowIngredienti').append(rowHtml);
 					});
+					$.fn.computeQuantitaIngredienti();
 				}
 			} else {
 				$('#alertProduzione').empty().append(alertContent);
@@ -363,6 +449,16 @@ $.fn.computeQuantitaTotale = function() {
 	if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
 		quantitaTotale = parseFloat(quantitaTotale)/1000;
 	}
-	$('#quantitaTotale').val(quantitaTotale);
-	
+	$('#quantitaTotale').val(quantitaTotale);	
+}
+
+$.fn.computeQuantitaIngredienti = function() {
+	var quantitaTotale = $('#quantitaTotale').val();
+	if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
+		$('.formRowIngrediente').each(function(i, item){
+			var percentuale = $(this).attr('data-percentuale');
+			var quantitaIngrediente = parseFloat((parseFloat(percentuale)*parseFloat(quantitaTotale))/100);
+			$(this).find('.quantitaIngrediente').val(quantitaIngrediente.toFixed(3));
+		});
+	}
 }
