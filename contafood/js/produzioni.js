@@ -153,22 +153,45 @@ $(document).ready(function() {
 
     if($('.confezioneDescr') != null && $('.confezioneDescr') != undefined){
         $(document).on('change','.confezioneDescr', function(){
-            var idConfezione = $('.confezioneDescr option:selected').val();
-            if(idConfezione != '-1'){
-                var peso = $('.confezioneDescr option:selected').attr('data-peso');
-                var idSelect = $(this).parent().attr('id');
-                var index = idSelect.substring(idSelect.indexOf("_") + 1, idSelect.length);
-                $('#confezionePeso_'+index).val(peso);
-            }
-        });
-
+			var idConfezione = $(this).val();
+			if(idConfezione != '-1'){
+				var peso = $(this).find(':selected').attr('data-peso');
+				$(this).parent().next().find('input').val(peso);
+				$(this).parent().next().next().find('input').val(1);
+			}
+			$.fn.computeQuantitaTotale();
+		});
+				
         $(document).on('click','.addConfezione', function(){
             var confezioneRow = $(this).parent().parent().parent().parent();
-            var newConfezioneRow = confezioneRow.clone().find('label').each(function( index ) {
+            var newConfezioneRow = confezioneRow.clone();
+			newConfezioneRow.find('label').each(function( index ) {
 			  $(this).remove();
 			});
+			newConfezioneRow.find('.confezionePeso').each(function( index ) {
+			  $(this).val(null);
+			});
+			newConfezioneRow.find('.confezioneNum').each(function( index ) {
+			  $(this).val(null);
+			});
+			newConfezioneRow.find('.addConfezione').each(function( index ) {
+			  $(this).remove();
+			});
+			var removeLink = '<a href="#" class="removeConfezione"><i class="fas fa-minus"></i></a>';
+			newConfezioneRow.find('.linkConfezione').after(removeLink);
 			$('.confezioneRow').last().after(newConfezioneRow);
+			newConfezioneRow.focus();
         });
+		
+		$(document).on('click','.removeConfezione', function(){
+            var confezioneRow = $(this).parent().parent().parent();
+            confezioneRow.remove();
+			$.fn.computeQuantitaTotale();
+        });
+		
+		$(document).on('change','.confezioneNum', function(){
+			$.fn.computeQuantitaTotale();
+		});
     }
 
 });
@@ -215,7 +238,7 @@ $.fn.getConfezioni = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 			    $.each(result, function(i, item){
-                    $('#confezioneDescr_0').append('<option value="'+item.id+'" data-peso="'+item.peso+'">'+item.tipo+' '+item.peso+' gr.</option>');
+                    $('.confezioneDescr').append('<option value="'+item.id+'" data-peso="'+item.peso+'">'+item.tipo+' '+item.peso+' gr.</option>');
 				});
 			}
 		},
@@ -323,3 +346,23 @@ $.fn.getRicettaProduzione = function(idRicetta){
     });
 }
 
+$.fn.computeQuantitaTotale = function() {
+	var quantitaTotale;
+	$('.confezioneNum').each(function(i, item){
+		var numeroConfezioni = $(this).val();
+		var peso = $(this).parent().parent().prev().find('input').val();
+		if(numeroConfezioni != undefined && peso != undefined){
+			var pesoConfezione = parseFloat(numeroConfezioni)*parseFloat(peso);
+			if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
+				quantitaTotale = parseFloat(quantitaTotale) + parseFloat(pesoConfezione);
+			} else {
+				quantitaTotale = parseFloat(pesoConfezione);
+			}
+		}
+	});
+	if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
+		quantitaTotale = parseFloat(quantitaTotale)/1000;
+	}
+	$('#quantitaTotale').val(quantitaTotale);
+	
+}

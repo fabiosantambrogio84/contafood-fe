@@ -112,43 +112,31 @@
             </div>
           </div>
           <div class="form-row confezioneRow">
-            <div class="form-group col-md-4" id="confezioneDescrDiv_0">
-              <label for="confezioneDescr_0">Confezione</label>
-              <select id="confezioneDescr_0" class="form-control confezioneDescr" required>
+            <div class="form-group col-md-3">
+              <label>Confezione</label>
+              <select class="form-control confezioneDescr" required>
                 <option value="-1" selected data-peso="-1">-</option>
               </select>
             </div>
-            <div class="form-group col-md-2" id="confezionePesoDiv_0">
-              <label for="confezionePeso_0">Peso (gr.)</label>
+			<div class="form-group col-md-2">
+              <label>Peso (gr.)</label>
+              <input type="number" class="form-control confezionePeso" step=".01" min="0" disabled>
+            </div>
+            <div class="form-group col-md-2">
+              <label>Numero</label>
               <div class="input-group">
-                <input type="number" class="form-control" id="confezionePeso_0" step=".01" min="0">
-                <div class="input-group-append ml-1 mt-1">
-                  <!--<a class="addConfezione" data-id="1"><i class="far fa-trash-alt"></i></a>-->
+                <input type="number" class="form-control confezioneNum" step="1" min="0">
+                <div class="input-group-append ml-1 mt-1 linkConfezione">
                   <a href="#" class="addConfezione"><i class="fas fa-plus"></i></a>
                 </div>
               </div>
             </div>
           </div>
-          <div class="form-row confezioneRow">
-            <div class="form-group col-md-4" id="confezioneDescrDiv_1">
-              <select id="confezioneDescr_1" class="form-control confezioneDescr" required>
-                <option value="-1" selected data-peso="-1">-</option>
-              </select>
-            </div>
-            <div class="form-group col-md-2" id="confezionePesoDiv_1">
-              <div class="input-group">
-                <input type="number" class="form-control" id="confezionePeso_1" step=".01" min="0">
-                <div class="input-group-append ml-1 mt-1">
-                  <!--<a class="addConfezione" data-id="1"><i class="far fa-trash-alt"></i></a>-->
-                  <a href="#" class="addConfezione">Add</a>
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           <div class="form-row">
             <div class="form-group col-md-3">
-              <label for="quantitaTotale">Quantita totale*</label>
+              <label for="quantitaTotale">Quantita totale (Kg)*</label>
               <input type="number" class="form-control" id="quantitaTotale" placeholder="" required step=".01" min="0" disabled>
               <div class="invalid-feedback">
                 Inserisci la quantita totale
