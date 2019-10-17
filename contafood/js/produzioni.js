@@ -58,50 +58,47 @@ $(document).ready(function() {
 		var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>Errore nel recupero della produzione.</strong></div>';
 		
-		$.ajax({
-			url: baseUrl + "confezioni",
-			type: 'GET',
-			dataType: 'json',
-			success: function(result) {
-				$('#detailsProduzioneModal').modal('show');
+		$('#detailsProduzioneModal').modal('show');
 
-				$('#detailsProduzioneModalTable').DataTable({
-					"ajax": {
-						"url": baseUrl + "produzioni/" + idProduzione,
-						"type": "GET",
-						"content-type": "json",
-						"cache": false,
-						"dataSrc": "",
-						"error": function(jqXHR, textStatus, errorThrown) {
-							console.log('Response text: ' + jqXHR.responseText);
-							$('#alertProduzione').append(alertContent);
-						}
-					},
-					"language": {
-						"search": "Cerca",
-						"emptyTable": "Nessuna confezione disponibile",
-						"zeroRecords": "Nessuna confezione disponibile"
-					},
-					"paging": false,
-					"lengthChange": false,
-					"info": false,
-					"order": [
-						[0,'desc']
-					],
-					"autoWidth": false,
-					"columns": [
-						{"name": "confezione", "data": data.produzioneConfezione.},
-						{"name": "peso", "data": "descrizione"},
-						{"name": "numeroConfezioni", "data": "prezzo"}
-					]
-				});	
-				
+		$('#detailsProduzioneModalTable').DataTable({
+			"ajax": {
+				"url": baseUrl + "produzioni/" + idProduzione + "/confezioni",
+				"type": "GET",
+				"content-type": "json",
+				"cache": false,
+				"dataSrc": "",
+				"error": function(jqXHR, textStatus, errorThrown) {
+					console.log('Response text: ' + jqXHR.responseText);
+					$('#alertProduzione').append(alertContent);
+				}
 			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				console.log('Response text: ' + jqXHR.responseText);
-				$('#alertProduzione').append(alertContent);
-			}
-		});
+			"language": {
+				"search": "Cerca",
+				"emptyTable": "Nessuna confezione disponibile",
+				"zeroRecords": "Nessuna confezione disponibile"
+			},
+			"paging": false,
+			"lengthChange": false,
+			"info": false,
+			"order": [
+				[0,'desc']
+			],
+			"autoWidth": false,
+			"columns": [
+				{"data": null, "orderable":false, render: function ( data, type, row ) {
+					return data.confezione.tipo;
+					
+				}},
+				{"data": null, "orderable":false, render: function ( data, type, row ) {
+					return data.confezione.peso;
+					
+				}},
+				{"data": null, "orderable":false, render: function ( data, type, row ) {
+					return data.numConfezioni;
+				}}
+			]
+		});	
+		
 		
 	});
 
