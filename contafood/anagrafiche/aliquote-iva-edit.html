@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Aliquote IVA</title>
+  <title>ContaFood - Aliquote IVA Modifica</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -30,9 +30,16 @@
 
   <script src="../js/commons.js"></script>
 
+  <script src="../js/aliquote-iva.js"></script>
+
+  <script>
+	var idAliquotaIva = $.fn.extractIdAliquotaIvaFromUrl();
+    $.fn.getAliquotaIva(idAliquotaIva);
+  </script>
+
 </head>
 
-<body id="page-top">
+<body id="page-top" class="aliquotaIvaBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -55,53 +62,46 @@
         <div class="container-fluid" id="containerAliquoteIva">
 
           <!-- Page Heading -->
-          <div class="row">
-            <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco aliquote IVA</h1>
-            </div>
-            <div class="col-md-2">
-              <a href="aliquote-iva-new.html" class="btn btn-primary">Nuovo</a>
-            </div>
-          </div>
+          <h1 class="h3 mb-4 text-gray-800">Modifica aliquota iva</h1>
 
           <div id="alertAliquotaIva"></div>
 
-          <!-- DataTables -->
-          <div class="card shadow mb-4" id="aliquoteIvaMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="aliquoteIvaTable" width="100%" cellspacing="0">
-                  <thead>
-        		    <tr>
-        			  <th>Valore</th>
-                      <th></th>
-                    </tr>
-        		  </thead>
-                </table>
+          <form id="updateAliquotaIvaForm" class="needs-validation" novalidate>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="valore">Valore*</label>
+                <input type="number" class="form-control" id="valore" required step=".01" min="0">
+                <div class="invalid-feedback">
+                  Inserisci un valore
+                </div>
               </div>
             </div>
-          </div>
 
-          <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteAliquotaIvaModal" tabindex="-1" role="dialog" aria-labelledby="deleteAliquotaIvaModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteAliquotaIvaModalTitle">Conferma rimozione aliquota IVA</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  Sei sicuro di voler rimuovere l'aliquota IVA?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteAliquotaIva">Conferma</button>
-                </div>
-              </div>
-            </div>
-          </div>
+            <input type="hidden" id="hiddenIdAliquotaIva"/>
+            <button type="submit" class="btn btn-primary" id="updateAliquotaIvaButton">Salva</button>
+            <a href="aliquote-iva.html" class="btn btn-secondary">Annulla</a>
+          </form>
+
+          <script>
+            // Example starter JavaScript for disabling form submissions if there are invalid fields
+            (function() {
+              'use strict';
+              window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                  form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                  }, false);
+                });
+              }, false);
+            })();
+            </script>
 
         </div>
         <!-- /.container-fluid -->
@@ -130,14 +130,19 @@
     <i class="fas fa-angle-up"></i>
   </a>
 
+  <!-- Bootstrap core JavaScript-->
+  <script src="../vendor/jquery/jquery.js"></script>
+  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+  <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
   <!-- Custom scripts for all pages-->
   <script src="../js/sb-admin-2.min.js"></script>
 
   <!-- Page level plugins -->
   <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-  <script src="../js/aliquote-iva.js"></script>
 
 </body>
 
