@@ -37,7 +37,7 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "nome", "data": "nome"},
-			{"name": "listinoRiferimento", "data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
+			{"name": "listinoRiferimento", "data": null, "orderable":true, render: function ( data, type, row ) {
                 if(data.listinoRiferimento != null){
                     return data.listinoRiferimento.nome;
                 } else{
@@ -217,7 +217,7 @@ $.fn.getListino = function(idListino){
 			$('#hiddenIdListino').attr('value', result.id);
 			$('#nome').attr('value', result.nome);
             if(result.listinoRiferimento != null && result.listinoRiferimento != undefined){
-                $('#listinoRiferimento option[value="' + result.listinoRiferimento.id +'"]').attr('selected', true);
+                $('#listinoRiferimento option[value=' + result.listinoRiferimento.id +']').attr('selected', true);
             }
 
           } else{
