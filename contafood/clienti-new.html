@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fornitori Modifica</title>
+  <title>ContaFood - Clienti Nuovo</title>
 
   <!-- Custom fonts for this template -->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -30,16 +30,17 @@
 
   <script src="js/commons.js"></script>
 
-  <script src="js/fornitori.js"></script>
+  <script src="js/clienti.js"></script>
 
   <script>
-	var idFornitore = $.fn.extractIdFornitoreFromUrl();
-    $.fn.getFornitore(idFornitore);
+    $.fn.getProvince();
+    $.fn.getBanche();
+    $.fn.getAgenti();
+    $.fn.getTipiPagamento();
   </script>
-
 </head>
 
-<body id="page-top" class="fornitoreBody">
+<body id="page-top" class="clienteBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -59,33 +60,56 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerFornitori">
+        <div class="container-fluid" id="containerClienti">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Modifica fornitore</h1>
+          <h1 class="h3 mb-4 text-gray-800">Nuovo cliente</h1>
 
-          <div id="alertFornitore"></div>
+          <div id="alertCliente"></div>
 
-          <form id="updateFornitoreForm" class="needs-validation" novalidate>
+          <form id="newClienteForm" class="needs-validation" novalidate>
+            <!--
             <div class="form-row">
               <div class="form-group col-md-2">
                 <label for="codiceFornitore">Codice*</label>
-                <input type="text" class="form-control" id="codiceFornitore" placeholder="" required disabled>
+                <input type="text" class="form-control" id="codiceFornitore" placeholder="" required>
+                <div class="invalid-feedback">
+                  Inserisci un codice
+                </div>
               </div>
             </div>
+            -->
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="ragioneSociale">Ragione sociale*</label>
-                <input type="text" class="form-control" id="ragioneSociale" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci una ragione sociale
-                </div>
+                <label for="ragioneSociale">Ragione sociale</label>
+                <input type="text" class="form-control" id="ragioneSociale" placeholder="">
               </div>
               <div class="form-group col-md-3">
                 <label for="ragioneSociale2">Ragione sociale 2</label>
                 <input type="text" class="form-control" id="ragioneSociale2" placeholder="">
               </div>
             </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="dittaIndividuale">
+                  <label class="form-check-label" for="dittaIndividuale">
+                    Ditta individuale
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" placeholder="" disabled>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="nome">Cognome</label>
+                <input type="text" class="form-control" id="cognome" placeholder="" disabled>
+              </div>
+            </div>
+
             <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="indirizzo">Indirizzo</label>
@@ -98,16 +122,11 @@
               <div class="form-group col-md-2">
                 <label for="provincia">Provincia</label>
                 <select id="provincia" class="form-control">
-
                 </select>
               </div>
               <div class="form-group col-md-1">
                 <label for="cap">Cap</label>
                 <input type="text" class="form-control" id="cap" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="nazione">Nazione</label>
-                <input type="text" class="form-control" id="nazione" placeholder="">
               </div>
             </div>
             <div class="form-row">
@@ -127,20 +146,6 @@
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="telefono">Telefono</label>
-                <input type="text" class="form-control" id="telefono" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="telefono2">Telefono 2</label>
-                <input type="text" class="form-control" id="telefono2" placeholder="">
-              </div>
-              <div class="form-group col-md-2">
-                <label for="telefono3">Telefono 3</label>
-                <input type="text" class="form-control" id="telefono3" placeholder="">
-              </div>
-            </div>
-            <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="email">Email*</label>
                 <input type="email" class="form-control" id="email" placeholder="" required>
@@ -156,30 +161,89 @@
                 </div>
               </div>
               <div class="form-group col-md-2">
-                <label for="codiceUnivocoSdi">Codice univoco SDI</label>
-                <input type="text" class="form-control" id="codiceUnivocoSdi" placeholder="">
+                <label for="telefono">Telefono</label>
+                <input type="text" class="form-control" id="telefono" placeholder="">
               </div>
-            </diV>
+            </div>
             <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="iban">Iban</label>
-                <input type="text" class="form-control" id="iban" placeholder="">
+              <div class="form-group col-md-5">
+                <label for="banca">Banca</label>
+                <select id="banca" class="form-control">
+                </select>
               </div>
               <div class="form-group col-md-3">
-                <label for="pagamento">Pagamento</label>
-                <input type="text" class="form-control" id="pagamento" placeholder="">
+                <label for="contoCorrente">Conto corrente</label>
+                <input type="text" class="form-control" id="contoCorrente" placeholder="">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="tipoPagamento">Tipo pagamento*</label>
+                <select id="tipoPagamento" class="form-control">
+                </select>
+                <div class="invalid-feedback">
+                  Seleziona un tipo di pagamento
+                </div>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="iban">Note</label>
+                <label for="agente">Agente</label>
+                <select id="agente" class="form-control">
+                </select>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="estrazioneConad">Estrazione Conad</label>
+                <input type="text" class="form-control" id="estrazioneConad" placeholder="">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="bloccaDdt">
+                  <label class="form-check-label" for="bloccaDdt">
+                    Blocca DDT
+                  </label>
+                </div>
+              </div>
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="nascondiPrezzi">
+                  <label class="form-check-label" for="nascondiPrezzi">
+                    Nascondi prezzi
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="raggruppaRiba">
+                  <label class="form-check-label" for="raggruppaRiba">
+                    Raggruppa RiBa
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="nomeGruppoRiba">Nome gruppo RiBa</label>
+                <input type="text" class="form-control" id="nomeGruppoRiba" placeholder="" disabled>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="codiceUnivocoSdi">Codice univoco SDI</label>
+                <input type="text" class="form-control" id="codiceUnivocoSdi" placeholder="">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="note">Note</label>
                 <textarea class="form-control" id="note"></textarea>
               </div>
             </div>
 
-            <input type="hidden" id="hiddenIdFornitore"/>
-            <button type="submit" class="btn btn-primary" id="updateFornitoreButton">Salva</button>
-            <a href="fornitori.html" class="btn btn-secondary">Annulla</a>
+            <button type="submit" class="btn btn-primary" id="newClienteButton">Salva</button>
+            <a href="clienti.html" class="btn btn-secondary">Annulla</a>
           </form>
 
           <script>
