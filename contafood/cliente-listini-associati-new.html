@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Punti consegna cliente</title>
+  <title>ContaFood - Listini associati Cliente Nuovo</title>
 
   <!-- Custom fonts for this template -->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -31,19 +31,19 @@
   <script src="js/commons.js"></script>
 
   <script src="js/clienti.js"></script>
-  <script src="js/clienti-punti-consegna.js"></script>
+  <script src="js/clienti-listini-associati.js"></script>
 
   <script>
     var idCliente = $.fn.extractIdClienteFromUrl();
     if(idCliente != null && idCliente != undefined){
-      $.when($.fn.getClienteForPuntoConsegna(idCliente)).then(function(f1){
-        $.fn.getPuntiConsegna(idCliente);
+      $.when($.fn.getFornitori(), $.fn.getListini()).then(function(f1, f2){
+        $.fn.getClienteForListinoAssociato(idCliente);
       });
     }
   </script>
 </head>
 
-<body id="page-top">
+<body id="page-top" class="clienteListinoAssociatoBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -63,7 +63,7 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerClientePuntiConsegna">
+        <div class="container-fluid" id="containerClientiListinoAssociato">
 
           <!-- Page Heading -->
           <div class="row">
@@ -75,14 +75,14 @@
             <div class="col-md-10 table-responsive">
               <table class="table table-bordered table-sm text-center">
                 <thead class="table-success">
-                  <th scope="col">Codice</th>
-                  <th scope="col">Ragione sociale</th>
-                  <th scope="col">Indirizzo</th>
-                  <th scope="col">Citt&agrave;</th>
-                  <th scope="col">Provincia</th>
+                <th scope="col">Codice</th>
+                <th scope="col">Ragione sociale</th>
+                <th scope="col">Indirizzo</th>
+                <th scope="col">Citt&agrave;</th>
+                <th scope="col">Provincia</th>
                 </thead>
                 <tbody>
-                  <tr id="clienteRow" class="table-default"></tr>
+                <tr id="clienteRow" class="table-default"></tr>
                 </tbody>
               </table>
             </div>
@@ -90,55 +90,57 @@
 
           <div class="row">
             <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Punti Consegna</h1>
-            </div>
-            <div class="col-md-2">
-              <a id="nuovoLink" href="" class="btn btn-primary">Nuovo</a>
+              <h1 class="h3 mb-4 text-gray-800">Associa listino</h1>
             </div>
           </div>
 
-          <div id="alertClientePuntoConsegna"></div>
+          <div id="alertClienteListinoAssociato"></div>
 
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="clientiPuntiConsegnaMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="clientiPuntiConsegnaTable" width="100%" cellspacing="0">
-                  <thead>
-        		    <tr>
-        			  <th>Nome</th>
-                      <th>Indirizzo</th>
-                      <th>Localit&agrave;</th>
-                      <th>Cap</th>
-                      <th>Provincia</th>
-                      <th></th>
-                    </tr>
-        		  </thead>
-                </table>
+          <form id="newClienteListinoAssociatoForm" class="needs-validation" novalidate>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="fornitore">Fornitore*</label>
+                <select id="fornitore" class="form-control" required>
+                </select>
+                <div class="invalid-feedback">
+                  Seleziona un fornitore
+                </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteClientePuntoConsegnaModal" tabindex="-1" role="dialog" aria-labelledby="deleteClientePuntoConsegnaModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteClientePuntoConsegnaModalTitle">Conferma rimozione punto consegna</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  Sei sicuro di voler rimuovere il punto di consegna?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteClientePuntoConsegna">Conferma</button>
+              <div class="form-group col-md-3">
+                <label for="listino">Listino*</label>
+                <select id="listino" class="form-control" required>
+                </select>
+                <div class="invalid-feedback">
+                  Seleziona un listino
                 </div>
               </div>
             </div>
-          </div>
+
+            <input type="hidden" id="hiddenIdCliente"/>
+            <button type="submit" class="btn btn-primary" id="newClienteListinoAssociatoButton">Salva</button>
+            <a id="annullaClienteListinoAssociato" href="" class="btn btn-secondary">Annulla</a>
+          </form>
+
+          <script>
+            // Example starter JavaScript for disabling form submissions if there are invalid fields
+            (function() {
+              'use strict';
+              window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                  form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                  }, false);
+                });
+              }, false);
+            })();
+            </script>
 
         </div>
         <!-- /.container-fluid -->
