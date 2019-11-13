@@ -37,7 +37,10 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
-			{"name": "dataProduzione", "data": "dataProduzione"},
+			{"name": "dataProduzione", "data": null, render: function ( data, type, row ) {
+				var a = moment(data.dataProduzione);
+				return a.format('DD/MM/YYYY');
+			}},
 			{"name": "lotto", "data": "lotto"},
 			{"name": "scadenza", "data": "scadenza"},
 			{"name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
