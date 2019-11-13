@@ -186,9 +186,11 @@ $(document).ready(function() {
 			cliente.email = $('#email').val();
 			cliente.emailPec = $('#emailPec').val();
 			cliente.telefono = $('#telefono').val();
-			var banca = new Object();
-			banca.id = $('#banca option:selected').val();
-			cliente.banca = banca;
+			if($('#banca option:selected').val() != -1){
+			    var banca = new Object();
+                banca.id = $('#banca option:selected').val();
+                cliente.banca = banca;
+			}
 			cliente.contoCorrente = $('#contoCorrente').val();
 			var tipoPagamento = new Object();
 			tipoPagamento.id = $('#tipoPagamento option:selected').val();
@@ -263,9 +265,11 @@ $(document).ready(function() {
 			cliente.email = $('#email').val();
 			cliente.emailPec = $('#emailPec').val();
 			cliente.telefono = $('#telefono').val();
-			var banca = new Object();
-			banca.id = $('#banca option:selected').val();
-			cliente.banca = banca;
+			if($('#banca option:selected').val() != -1){
+                var banca = new Object();
+                banca.id = $('#banca option:selected').val();
+                cliente.banca = banca;
+            }
 			cliente.contoCorrente = $('#contoCorrente').val();
 			var tipoPagamento = new Object();
 			tipoPagamento.id = $('#tipoPagamento option:selected').val();
