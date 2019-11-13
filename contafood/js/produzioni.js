@@ -37,6 +37,7 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
+			{"name": "dataProduzione", "data": "dataProduzione"},
 			{"name": "lotto", "data": "lotto"},
 			{"name": "scadenza", "data": "scadenza"},
 			{"name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
@@ -98,8 +99,7 @@ $(document).ready(function() {
 				}}
 			]
 		});	
-		
-		
+
 	});
 
 	$(document).on('click','.deleteProduzione', function(){
@@ -152,7 +152,7 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var produzione = new Object();
-
+			produzione.dataProduzione = $('#dataProduzione').val();
 			var ricetta = new Object();
 			ricetta.id = $('#ricetta option:selected').val();
 			produzione.ricetta = ricetta;
@@ -181,12 +181,7 @@ $(document).ready(function() {
 			}
 			produzione.scadenza = $('#scadenza').val();
 			produzione.quantitaTotale = $('#quantitaTotale').val();
-			var generaLotto = $('input[name="generaLotto"]:checked').val();
-			if(generaLotto){
-				produzione.scopo = 'vendita';
-			} else {
-				produzione.scopo = 'campionatura';
-			}
+			produzione.scopo = $('input[name="generaLotto"]:checked').val();
 			
 			var confezioniLength = $('.confezioneRow').length;
 			produzione.numeroConfezioni = 0;
@@ -412,7 +407,7 @@ $.fn.getRicettaProduzione = function(idRicetta){
         dataType: 'json',
         success: function(result) {
           if(result != null && result != undefined && result != ''){
-
+			$('#dataProduzione').val(result.dataProduzione);
           	$('#ricetta option[value=' + idRicetta +']').attr('selected', true);
           	$('#categoria option[value="' + result.categoria.id +'"]').attr('selected', true);
 
