@@ -320,6 +320,7 @@ $.fn.getConfezioni = function(){
                     $('.confezioneDescr').append('<option value="'+item.id+'" data-peso="'+item.peso+'">'+item.tipo+' '+item.peso+' gr.</option>');
 				});
 			}
+			$('#dataProduzione').val(moment().format('YYYY-MM-DD'));
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
@@ -410,7 +411,6 @@ $.fn.getRicettaProduzione = function(idRicetta){
         dataType: 'json',
         success: function(result) {
           if(result != null && result != undefined && result != ''){
-			$('#dataProduzione').val(result.dataProduzione);
           	$('#ricetta option[value=' + idRicetta +']').attr('selected', true);
           	$('#categoria option[value="' + result.categoria.id +'"]').attr('selected', true);
 
