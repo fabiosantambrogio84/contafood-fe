@@ -3,16 +3,16 @@ $(document).ready(function() {
     var pageType = $('#accordionSidebar').attr('data-page-type');
     if(pageType != null && pageType != undefined){
         if(pageType == 'anagrafiche'){
-            $('.navbar').load('../resources/topbar.html');
-            $('#accordionSidebar').load('../resources/sidebar-anagrafiche.html');
+            $('.navbar').load('../commons/topbar.html');
+            $('#accordionSidebar').load('../commons/sidebar-anagrafiche.html');
         } else if(pageType == 'configurazione'){
-            $('.navbar').load('../resources/topbar.html');
-            $('#accordionSidebar').load('../resources/sidebar-configurazione.html');
+            $('.navbar').load('../commons/topbar.html');
+            $('#accordionSidebar').load('../commons/sidebar-configurazione.html');
         }
 
     } else{
-        $('.navbar').load('resources/topbar.html');
-        $('#accordionSidebar').load('resources/sidebar.html');
+        $('.navbar').load('commons/topbar.html');
+        $('#accordionSidebar').load('commons/sidebar.html');
 
     }
 });
