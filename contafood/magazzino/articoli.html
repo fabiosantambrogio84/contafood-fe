@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Listini associati cliente</title>
+  <title>ContaFood - Articoli</title>
 
   <!-- Custom fonts for this template -->
   <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -30,17 +30,6 @@
 
   <script src="js/commons.js"></script>
 
-  <script src="js/clienti.js"></script>
-  <script src="js/clienti-listini-associati.js"></script>
-
-  <script>
-    var idCliente = $.fn.extractIdClienteFromUrl();
-    if(idCliente != null && idCliente != undefined){
-      $.when($.fn.getClienteForListinoAssociato(idCliente)).then(function(f1){
-        $.fn.getListiniAssociati(idCliente);
-      });
-    }
-  </script>
 </head>
 
 <body id="page-top">
@@ -49,7 +38,7 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="anagrafiche"></ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="magazzino"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -63,51 +52,32 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerClienteListiniAssociati">
+        <div class="container-fluid" id="containerArticoli">
 
           <!-- Page Heading -->
           <div class="row">
             <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Cliente</h1>
-            </div>
-          </div>
-          <div class="row mb-4">
-            <div class="col-md-10 table-responsive">
-              <table class="table table-bordered table-sm text-center">
-                <thead class="table-success">
-                  <th scope="col">Codice</th>
-                  <th scope="col">Ragione sociale</th>
-                  <th scope="col">Indirizzo</th>
-                  <th scope="col">Citt&agrave;</th>
-                  <th scope="col">Provincia</th>
-                </thead>
-                <tbody>
-                  <tr id="clienteRow" class="table-default"></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="row">
-            <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Listini associati</h1>
+              <h1 class="h3 mb-4 text-gray-800">Elenco Articoli</h1>
             </div>
             <div class="col-md-2">
-              <a id="nuovoLink" href="" class="btn btn-primary">Nuovo</a>
+              <a href="articoli-new.html" class="btn btn-primary">Nuovo</a>
             </div>
           </div>
 
-          <div id="alertClienteListinoAssociato"></div>
+          <div id="alertArticolo"></div>
 
           <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="clientiListiniAssociatiMainDiv">
+          <div class="card shadow mb-4" id="articoliMainDiv">
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered" id="clientiListiniAssociatiTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="clientiTable" width="100%" cellspacing="0">
                   <thead>
         		    <tr>
-        			  <th>Fornitore</th>
-                      <th>Listino</th>
+        			  <th>Codice</th>
+        			  <th>Descrizione</th>
+                      <th>Categoria</th>
+                      <th>Fornitore</th>
+                      <th>Data</th>
                       <th></th>
                     </tr>
         		  </thead>
@@ -117,21 +87,21 @@
           </div>
 
           <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteClienteListinoAssociatoModal" tabindex="-1" role="dialog" aria-labelledby="deleteClienteListinoAssociatoModal" aria-hidden="true">
+          <div class="modal fade" id="deleteArticoloModal" tabindex="-1" role="dialog" aria-labelledby="deleteArticoloModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteClienteListinoAssociatoModalTitle">Conferma rimozione listino associato</h5>
+                  <h5 class="modal-title" id="deleteArticoloModalTitle">Conferma rimozione articolo</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  Sei sicuro di voler rimuovere il listino associato?
+                  Sei sicuro di voler rimuovere l articolo?
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteClienteListinoAssociato">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteArticolo">Conferma</button>
                 </div>
               </div>
             </div>
@@ -170,6 +140,8 @@
   <!-- Page level plugins -->
   <script src="vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+  <script src="js/articoli.js"></script>
 
 </body>
 
