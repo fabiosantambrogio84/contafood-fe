@@ -1,8 +1,8 @@
 <!-- Sidebar - Brand -->
-<a class="sidebar-brand d-flex align-items-center justify-content-center" href="../index.html">
+<a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
     <div class="sidebar-brand-icon">
         <!--<i class="fas fa-laugh-wink"></i>-->
-        <img src="../img/ui_avatar.png">
+        <img src="img/ui_avatar.png">
     </div>
 
     <div class="sidebar-brand-text mx-3">ContaFood</div>
@@ -11,52 +11,122 @@
 <!-- Divider -->
 <hr class="sidebar-divider my-0">
 
-<!-- Nav Items -->
 <li class="nav-item">
-    <a class="nav-link" href="../fornitori.html">
-        <i class="fas fa-fw fa-tachometer-alt"></i>
-        <span>Fornitori</span></a>
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProduzione" aria-expanded="true" aria-controls="collapseProduzione">
+        <i class="far fa-address-card"></i>
+        <span>Produzione</span>
+    </a>
+    <div id="collapseProduzione" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="../produzione/categorie-ricette.html">Categorie ricette</a>
+            <a class="collapse-item" href="../produzione/confezioni.html">Confezioni</a>
+            <a class="collapse-item" href="../produzione/ingredienti.html">Ingredienti</a>
+            <a class="collapse-item" href="../produzione/ricette.html">Ricette</a>
+            <a class="collapse-item" href="../produzione/produzioni.html">Produzioni</a>
+        </div>
+    </div>
 </li>
 
-<li class="nav-item">
-    <a class="nav-link" href="../clienti.html">
-        <i class="fas fa-fw fa-address-book"></i>
-        <span>Clienti</span></a>
-</li>
-
-<li class="nav-item">
-    <a class="nav-link" href="../ricette.html">
-        <i class="fas fa-fw fa-table"></i>
-        <span>Ricette</span></a>
-</li>
-<li class="nav-item">
-    <a class="nav-link" href="../produzioni.html">
-        <i class="fas fa-atom"></i>
-        <span>Produzioni</span></a>
-</li>
-
+<!-- Divider -->
 <hr class="sidebar-divider">
 
-<li class="nav-item active">
-    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseContabilita" aria-expanded="true" aria-controls="collapseContabilita">
+        <i class="far fa-address-card"></i>
+        <span>Contabilita</span>
+    </a>
+    <div id="collapseContabilita" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="#">DDT acquisto</a>
+            <a class="collapse-item" href="#">DDT vendita</a>
+            <a class="collapse-item" href="#">Fatture riepilogative</a>
+            <a class="collapse-item" href="#">Fatture accompagnatorie</a>
+            <a class="collapse-item" href="#">Note accredito</a>
+            <a class="collapse-item" href="#">Ricevute a privati</a>
+        </div>
+    </div>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOrdini" aria-expanded="true" aria-controls="collapseOrdini">
+        <i class="far fa-address-card"></i>
+        <span>Ordini</span>
+    </a>
+    <div id="collapseOrdini" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="#">Telefonate</a>
+            <a class="collapse-item" href="#">Ordini clienti</a>
+            <a class="collapse-item" href="#">Ordini fornitori</a>
+            <a class="collapse-item" href="#">Ordini autisti</a>
+        </div>
+    </div>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseMagazzino" aria-expanded="true" aria-controls="collapseMagazzino">
+        <i class="far fa-address-card"></i>
+        <span>Magazzino</span>
+    </a>
+    <div id="collapseMagazzino" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="../magazzino/categorie-articoli.html">Categorie articoli</a>
+            <a class="collapse-item" href="../magazzino/articoli.html">Articoli</a>
+            <a class="collapse-item" href="#">Giacenze</a>
+            <a class="collapse-item" href="../magazzino/listini.html">Listini</a>
+        </div>
+    </div>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<li class="nav-item">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAnagrafiche" aria-expanded="true" aria-controls="collapseAnagrafiche">
         <!--<i class="fas fa-fw fa-table"></i>-->
         <i class="far fa-address-card"></i>
         <span>Anagrafiche</span>
     </a>
-    <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+    <div id="collapseAnagrafiche" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
         <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="agenti.html">Agenti</a>
             <a class="collapse-item" href="aliquote-iva.html">Aliquote IVA</a>
             <a class="collapse-item" href="autisti.html">Autisti</a>
-            <a class="collapse-item" href="agenti.html">Agenti</a>
             <a class="collapse-item" href="banche.html">Banche</a>
-            <a class="collapse-item" href="categorie-ricette.html">Categorie ricette</a>
-            <a class="collapse-item" href="confezioni.html">Confezioni</a>
-            <a class="collapse-item" href="ingredienti.html">Ingredienti</a>
-            <a class="collapse-item" href="listini.html">Listini</a>
+            <a class="collapse-item" href="clienti.html">Clienti</a>
+            <a class="collapse-item" href="fornitori.html">Fornitori</a>
+            <a class="collapse-item" href="#">Sconti</a>
             <a class="collapse-item" href="tipi-pagamento.html">Tipi pagamento</a>
         </div>
     </div>
 </li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<!-- Nav Items -->
+<li class="nav-item">
+    <a class="nav-link" href="#">
+        <i class="fas fa-fw fa-tachometer-alt"></i>
+        <span>Ricerca lotti e statistiche</span></a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
+
+<li class="nav-item">
+    <a class="nav-link" href="#">
+        <i class="fas fa-fw fa-address-book"></i>
+        <span>Stampe</span></a>
+</li>
+
+<!-- Divider -->
+<hr class="sidebar-divider">
 
 <li class="nav-item">
     <a class="nav-link" href="../configurazione/parametri.html">

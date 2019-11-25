@@ -8,6 +8,12 @@ $(document).ready(function() {
         } else if(pageType == 'configurazione'){
             $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-configurazione.html');
+        } else if(pageType == 'produzione'){
+            $('.navbar').load('../commons/topbar.html');
+            $('#accordionSidebar').load('../commons/sidebar-produzione.html');
+        } else if(pageType == 'magazzino'){
+            $('.navbar').load('../commons/topbar.html');
+            $('#accordionSidebar').load('../commons/sidebar-magazzino.html');
         }
 
     } else{
