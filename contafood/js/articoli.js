@@ -45,10 +45,13 @@ $(document).ready(function() {
 			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
 				return data.fornitore.ragioneSociale;
 			}},
-			{"name": "data", "data": "data"},
+			{"name": "data", "data": null, render: function ( data, type, row ) {
+                var a = moment(data.data);
+                return a.format('DD/MM/YYYY');
+            }},
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="updateArticolo pr-2" data-id="'+data.id+'" href="articoli-edit.html?idArticolo=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
-				links = links + '<a class="manageArticoloImmagini pr-2" data-id="'+data.id+'" href="articolo-immagini.html?idArticolo=' + data.id + '"><i class="fas fa-truck-moving" title="Immagini"></i></a>';
+				links = links + '<a class="manageArticoloImmagini pr-2" data-id="'+data.id+'" href="articolo-immagini.html?idArticolo=' + data.id + '"><i class="fas fa-images" title="Immagini"></i></a>';
 				links = links + '<a class="deleteArticolo" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
 				return links;
 			}}
@@ -249,7 +252,7 @@ $.fn.getFornitori = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					$('#fornitore').append('<option value="'+item.id+'">'+item.codice+'</option>');
+					$('#fornitore').append('<option value="'+item.id+'">'+item.ragioneSociale+'</option>');
 				});
 			}
 		},

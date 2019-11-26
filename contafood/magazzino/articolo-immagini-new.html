@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Articoli</title>
+  <title>ContaFood - Immagini articolo Nuovo</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -30,9 +30,12 @@
 
   <script src="../js/commons.js"></script>
 
+  <script src="../js/articoli.js"></script>
+  <script src="../js/articoli-immagini.js"></script>
+
 </head>
 
-<body id="page-top">
+<body id="page-top" class="articoloBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -55,57 +58,52 @@
         <div class="container-fluid" id="containerArticoli">
 
           <!-- Page Heading -->
-          <div class="row">
-            <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Articoli</h1>
-            </div>
-            <div class="col-md-2">
-              <a href="articoli-new.html" class="btn btn-primary">Nuovo</a>
-            </div>
-          </div>
+          <h1 class="h3 mb-4 text-gray-800">Nuova immagine articolo</h1>
 
-          <div id="alertArticolo"></div>
+          <div id="alertArticoloImmagine"></div>
 
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="articoliMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="articoliTable" width="100%" cellspacing="0">
-                  <thead>
-        		    <tr>
-        			  <th>Codice</th>
-        			  <th>Descrizione</th>
-                      <th>Categoria</th>
-                      <th>Fornitore</th>
-                      <th>Data</th>
-                      <th></th>
-                    </tr>
-        		  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteArticoloModal" tabindex="-1" role="dialog" aria-labelledby="deleteArticoloModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteArticoloModalTitle">Conferma rimozione articolo</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  Sei sicuro di voler rimuovere l articolo?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteArticolo">Conferma</button>
+          <form id="newArticoloImmagineForm" class="needs-validation" novalidate>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="immagine">
+                  <label class="custom-file-label" for="immagine">Seleziona immagine</label>
                 </div>
               </div>
             </div>
-          </div>
+            <script>
+              // Add the following code if you want the name of the file appear on select
+              $(".custom-file-input").on("change", function() {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+              });
+            </script>
+
+            <input type="hidden" id="hiddenIdArticolo"/>
+            <button type="submit" class="btn btn-primary" id="newArticoloImmagineButton">Salva</button>
+            <a id="annullaArticoloImmagine" href="articolo-immagini.html" class="btn btn-secondary">Annulla</a>
+          </form>
+
+          <script>
+            // Example starter JavaScript for disabling form submissions if there are invalid fields
+            (function() {
+              'use strict';
+              window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                  form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                  }, false);
+                });
+              }, false);
+            })();
+            </script>
 
         </div>
         <!-- /.container-fluid -->
@@ -140,9 +138,11 @@
   <!-- Page level plugins -->
   <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-  <script src="../js/core/moment.js"></script>
 
-  <script src="../js/articoli.js"></script>
+  <script>
+    var idArticolo = $.fn.extractIdArticoloFromUrl();
+    $.fn.saveIdArticoloInPage(idArticolo);
+  </script>
 
 </body>
 

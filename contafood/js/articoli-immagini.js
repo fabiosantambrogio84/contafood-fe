@@ -34,39 +34,40 @@ $(document).ready(function() {
 		$(document).on('submit','#newArticoloImmagineForm', function(event){
 			event.preventDefault();
 
-			var puntoConsegna = new Object();
-			puntoConsegna.nome = $('#nome').val();
-			puntoConsegna.indirizzo = $('#indirizzo').val();
-			puntoConsegna.localita = $('#localita').val();
-			puntoConsegna.cap = $('#cap').val();
-			puntoConsegna.provincia = $('#provincia option:selected').text();
-			puntoConsegna.codiceConad = $('#codiceConad').val();
-			var cliente = new Object();
-			cliente.id = $('#hiddenIdCliente').val();
-			puntoConsegna.cliente = cliente;
+            var alertContent = '<div id="alertArticoloImmagineContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+            			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+            				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			var puntoConsegnaJson = JSON.stringify(puntoConsegna);
+            var idArticolo = $('#hiddenIdArticolo').val();
+            var immagine = $('#immagine')[0].files[0];
 
-			var alertContent = '<div id="alertClientePuntoConsegnaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+            var data = new FormData();
+            data.append('articoloId', idArticolo);
+            data.append('file', immagine);
 
-			$.ajax({
-				url: baseUrl + "punti-consegna",
-				type: 'POST',
-				contentType: "application/json",
-				dataType: 'json',
-				data: puntoConsegnaJson,
-				success: function(result) {
-					$('#alertClientePuntoConsegna').empty().append(alertContent.replace('@@alertText@@','Punto di consegna creato con successo').replace('@@alertResult@@', 'success'));
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertClientePuntoConsegna').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del punto di consegna').replace('@@alertResult@@', 'danger'));
-				}
-			});
+            $.ajax({
+            	url: baseUrl + "articoli-immagini",
+            	type: 'POST',
+            	data: data,
+                cache: false,
+                contentType: false,
+                processData: false,
+            	success: function(result) {
+            		$('#alertArticoloImmagine').empty().append(alertContent.replace('@@alertText@@','Immagine articolo caricata con successo').replace('@@alertResult@@', 'success'));
+            	},
+            	error: function(jqXHR, textStatus, errorThrown) {
+            		$('#alertArticoloImmagine').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dell immagine articolo').replace('@@alertResult@@', 'danger'));
+            	}
+            });
+
 		});
 	}
 });
+
+$.fn.saveIdArticoloInPage = function(idArticolo){
+    $('#hiddenIdArticolo').attr('value', idArticolo);
+    $('#annullaArticoloImmagine').attr('href','articolo-immagini.html?idArticolo='+idArticolo);
+}
 
 $.fn.getArticoloForImmagine = function(idArticolo){
 	var alertContent = '<div id="alertArticoloContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
@@ -79,12 +80,13 @@ $.fn.getArticoloForImmagine = function(idArticolo){
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != '') {
+                var data = moment(result.data);
 
 				var articoloRow = '<td>'+result.codice+'</td>';
 				articoloRow = articoloRow + '<td>'+result.descrizione+'</td>';
 				articoloRow = articoloRow + '<td>'+result.categoria.nome+'</td>';
 				articoloRow = articoloRow + '<td>'+result.fornitore.codice+'</td>';
-				articoloRow = articoloRow + '<td>'+result.data+'</td>';
+				articoloRow = articoloRow + '<td>'+data.format('DD/MM/YYYY')+'</td>';
 
 				$('#articoloRow').append(articoloRow);
 
@@ -104,7 +106,7 @@ $.fn.getImmagini = function(idArticolo){
 	var nuovoLink = 'articolo-immagini-new.html?idArticolo='+idArticolo;
 	$('#nuovoLink').attr('href', nuovoLink);
 
-	$('#articoloImmaginiTable').DataTable({
+	$('#articoliImmaginiTable').DataTable({
 		"ajax": {
 			"url": baseUrl + "articoli-immagini",
 			"type": "GET",
@@ -140,7 +142,7 @@ $.fn.getImmagini = function(idArticolo){
 		"columns": [
 			{"name": "fileName", "data": "fileName"},
 			{"name": "filePath", "data": null, render: function ( data, type, row ) {
-				var link = '<a class="articoloImmagineAnteprima" data-path="'+data.filePath+'" href="#">Anteprima</a>';
+				var link = '<a class="showArticoloImmagine" data-path="'+data.filePath+'" data-name="'+data.fileName+'" href="#"><i class="far fa-image"></i></a>';
 				return link;
 			}},
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
@@ -150,4 +152,16 @@ $.fn.getImmagini = function(idArticolo){
 		]
 	});
 }
+
+$(document).on('click','.showArticoloImmagine', function(){
+    var fileName = $(this).attr('data-name');
+    var filePath = $(this).attr('data-path');
+
+    var contentDetails = '<img src="'+filePath+'" alt="'+fileName+'"';
+
+    $('#showArticoloImmagineModalMainDiv').empty().append(contentDetails);
+
+    $('#showArticoloImmagineModal').modal('show');
+
+});
 

@@ -102,7 +102,7 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: unitaMisuraJson,
 				success: function(result) {
-					$('#alertUnitaMisura').empty().append(alertContent.replace('@@alertText@@','Untia di misura modificata con successo').replace('@@alertResult@@', 'success'));
+					$('#alertUnitaMisura').empty().append(alertContent.replace('@@alertText@@','Unita di misura modificata con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertUnitaMisura').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell unita di misura').replace('@@alertResult@@', 'danger'));
