@@ -85,7 +85,7 @@ $.fn.getArticoloForImmagine = function(idArticolo){
 				var articoloRow = '<td>'+result.codice+'</td>';
 				articoloRow = articoloRow + '<td>'+result.descrizione+'</td>';
 				articoloRow = articoloRow + '<td>'+result.categoria.nome+'</td>';
-				articoloRow = articoloRow + '<td>'+result.fornitore.codice+'</td>';
+				articoloRow = articoloRow + '<td>'+result.fornitore.ragioneSociale+'</td>';
 				articoloRow = articoloRow + '<td>'+data.format('DD/MM/YYYY')+'</td>';
 
 				$('#articoloRow').append(articoloRow);
@@ -157,7 +157,7 @@ $(document).on('click','.showArticoloImmagine', function(){
     var fileName = $(this).attr('data-name');
     var filePath = $(this).attr('data-path');
 
-    var contentDetails = '<img src="'+filePath+'" alt="'+fileName+'">';
+    var contentDetails = '<img class="imagePreview" src="'+filePath+'" alt="'+fileName+'">';
 
     $('#showArticoloImmagineModalMainDiv').empty().append(contentDetails);
 

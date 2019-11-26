@@ -38,16 +38,42 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "cliente", "data": null, render: function ( data, type, row ) {
-                return data.cliente.ragioneSociale;
+                if(data.cliente != null){
+					return data.cliente.ragioneSociale;
+				} else {
+                	return '';
+				}
             }},
             {"name": "fornitore", "data": null, render: function ( data, type, row ) {
-                return data.fornitore.ragioneSociale;
+                if(data.fornitore != null){
+					return data.fornitore.ragioneSociale;
+				} else {
+                	return '';
+				}
             }},
             {"name": "articolo", "data": null, render: function ( data, type, row ) {
-                return data.articolo.descrizione;
+                if(data.articolo != null){
+					return data.articolo.descrizione;
+				} else {
+                	return '';
+				}
             }},
-			{"name": "dataDal", "data": "dataDal"},
-			{"name": "dataAl", "data": "dataAl"},
+			{"name": "dataDal", "data": null, render: function ( data, type, row ) {
+				if(data.dataDal != null){
+					var a = moment(data.dataDal);
+					return a.format('DD/MM/YYYY');
+				} else {
+					return '';
+				}
+			}},
+			{"name": "dataAl", "data": null, render: function ( data, type, row ) {
+				if(data.dataAl != null){
+					var a = moment(data.dataAl);
+					return a.format('DD/MM/YYYY');
+				} else {
+					return '';
+				}
+			}},
 			{"name": "valore", "data": "valore"},
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="updateSconto pr-2" data-id="'+data.id+'" href="sconti-edit.html?idSconto=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
@@ -103,7 +129,7 @@ $(document).ready(function() {
             if($('#articolo option:selected').val() != -1){
                 var articolo = new Object();
                 articolo.id = $('#articolo option:selected').val();
-                articolo.fornitore = articolo;
+                sconto.articolo = articolo;
             };
 			sconto.dataDal = $('#dataDal').val();
 			sconto.dataAl = $('#dataAl').val();
@@ -149,7 +175,7 @@ $(document).ready(function() {
             if($('#articolo option:selected').val() != -1){
                 var articolo = new Object();
                 articolo.id = $('#articolo option:selected').val();
-                articolo.fornitore = articolo;
+                sconto.articolo = articolo;
             };
             sconto.dataDal = $('#dataDal').val();
             sconto.dataAl = $('#dataAl').val();

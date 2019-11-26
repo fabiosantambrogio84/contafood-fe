@@ -40,14 +40,26 @@ $(document).ready(function() {
 			{"name": "codice", "data": "codice"},
 			{"name": "descrizione", "data": "descrizione"},
 			{"name": "categoria", "data": null, render: function ( data, type, row ) {
-				return data.categoria.nome;
+				if(data.categoria != null){
+					return data.categoria.nome;
+				} else{
+					return '';
+				}
 			}},
 			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
-				return data.fornitore.ragioneSociale;
+				if (data.fornitore != null) {
+					return data.fornitore.ragioneSociale;
+				} else{
+					return '';
+				}
 			}},
 			{"name": "data", "data": null, render: function ( data, type, row ) {
-                var a = moment(data.data);
-                return a.format('DD/MM/YYYY');
+                if(data.data != null){
+					var a = moment(data.data);
+					return a.format('DD/MM/YYYY');
+				} else {
+                	return '';
+				}
             }},
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="updateArticolo pr-2" data-id="'+data.id+'" href="articoli-edit.html?idArticolo=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';

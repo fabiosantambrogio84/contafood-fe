@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Articoli Nuovo</title>
+  <title>ContaFood - Sconti Nuovo</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -30,23 +30,22 @@
 
   <script src="../js/commons.js"></script>
 
-  <script src="../js/articoli.js"></script>
+  <script src="../js/sconti.js"></script>
 
   <script>
-    $.fn.getCategorieArticoli();
+    $.fn.getClienti();
     $.fn.getFornitori();
-    $.fn.getAliquoteIva();
-    $.fn.getUnitaMisura();
+    $.fn.getArticoli();
   </script>
 </head>
 
-<body id="page-top" class="articoloBody">
+<body id="page-top" class="scontoBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="magazzino"></ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="anagrafiche"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -60,107 +59,59 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerArticoli">
+        <div class="container-fluid" id="containerSconti">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Nuovo articolo</h1>
+          <h1 class="h3 mb-4 text-gray-800">Nuovo sconto</h1>
 
-          <div id="alertArticolo"></div>
+          <div id="alertSconto"></div>
 
-          <form id="newArticoloForm" class="needs-validation" novalidate>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="codice">Codice*</label>
-                <input type="text" class="form-control" id="codice" placeholder="" required>
-              </div>
-            </div>
+          <form id="newScontoForm" class="needs-validation" novalidate>
             <div class="form-row">
               <div class="form-group col-md-4">
-                <label for="descrizione">Descrizione</label>
-                <input type="text" class="form-control" id="descrizione" placeholder="">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="categoriaArticolo">Categoria</label>
-                <select id="categoriaArticolo" class="form-control">
+                <label for="cliente">Cliente</label>
+                <select id="cliente" class="form-control">
                 </select>
               </div>
-              <div class="form-group col-md-3">
+              <div class="form-group col-md-4">
                 <label for="fornitore">Fornitore</label>
                 <select id="fornitore" class="form-control">
                 </select>
               </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="aliquotaIva">Aliquota IVA</label>
-                <select id="aliquotaIva" class="form-control">
-                </select>
-              </div>
-              <div class="form-group col-md-3">
-                <label for="unitaMisura">Unita di misura</label>
-                <select id="unitaMisura" class="form-control">
+              <div class="form-group col-md-4">
+                <label for="articolo">Articolo</label>
+                <select id="articolo" class="form-control">
                 </select>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="data">Data</label>
-                <input type="date" class="form-control" id="data" placeholder="">
+                <label for="dataDal">Data dal*</label>
+                <input type="date" class="form-control" id="dataDal" placeholder="" required>
+                <div class="invalid-feedback">
+                  Inserisci una data di inizio validita
+                </div>
               </div>
               <div class="form-group col-md-3">
-                <label for="quantitaPredefinita">Quantita predefinita</label>
-                <input type="number" class="form-control" id="quantitaPredefinita" step=".01" min="0">
-              </div>
-              <div class="form-group col-md-3">
-                <label for="prezzoAcquisto">Prezzo acquisto (&euro;)</label>
-                <input type="number" class="form-control" id="prezzoAcquisto" step=".01" min="0">
-              </div>
-              <div class="form-group col-md-3">
-                <label for="scadenzaGiorni">Scadenza giorni</label>
-                <input type="number" class="form-control" id="scadenzaGiorni" step="1" min="0">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-3">
-                <label for="barcode">Barcode</label>
-                <input type="text" class="form-control" id="barcode">
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="completeBarcode">
-                  <label class="form-check-label" for="completeBarcode">
-                    Barcode completo
-                  </label>
+                <label for="dataAl">Data al*</label>
+                <input type="date" class="form-control" id="dataAl" placeholder="" required>
+                <div class="invalid-feedback">
+                  Inserisci una data di fine validita
                 </div>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-2">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="sitoWeb">
-                  <label class="form-check-label" for="sitoWeb">
-                    Sito web
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-1">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox" id="attivo" checked>
-                  <label class="form-check-label" for="attivo">
-                    Attivo
-                  </label>
+                <label>Valore (%)*</label>
+                <input type="number" class="form-control" id="valore" step=".01" min="0" required>
+                <div class="invalid-feedback">
+                  Inserisci un valore
                 </div>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="newArticoloButton">Salva</button>
-            <a href="articoli.html" class="btn btn-secondary">Annulla</a>
+            <button type="submit" class="btn btn-primary" id="newScontoButton">Salva</button>
+            <a href="sconti.html" class="btn btn-secondary">Annulla</a>
           </form>
 
           <script>
