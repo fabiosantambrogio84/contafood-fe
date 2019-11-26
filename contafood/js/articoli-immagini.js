@@ -142,7 +142,7 @@ $.fn.getImmagini = function(idArticolo){
 		"columns": [
 			{"name": "fileName", "data": "fileName"},
 			{"name": "filePath", "data": null, render: function ( data, type, row ) {
-				var link = '<a class="showArticoloImmagine" data-path="'+data.filePath+'" data-name="'+data.fileName+'" href="#"><i class="far fa-image"></i></a>';
+				var link = '<a class="showArticoloImmagine" data-path="'+data.filePath+'" data-name="'+data.fileName+'" href="#"><i class="far fa-image fa-2x"></i></a>';
 				return link;
 			}},
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
@@ -157,7 +157,7 @@ $(document).on('click','.showArticoloImmagine', function(){
     var fileName = $(this).attr('data-name');
     var filePath = $(this).attr('data-path');
 
-    var contentDetails = '<img src="'+filePath+'" alt="'+fileName+'"';
+    var contentDetails = '<img src="'+filePath+'" alt="'+fileName+'">';
 
     $('#showArticoloImmagineModalMainDiv').empty().append(contentDetails);
 
