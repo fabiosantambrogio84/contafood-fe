@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Clienti</title>
+  <title>ContaFood - Sconti</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -52,32 +52,33 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerClienti">
+        <div class="container-fluid" id="containerSconti">
 
           <!-- Page Heading -->
           <div class="row">
             <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Clienti</h1>
+              <h1 class="h3 mb-4 text-gray-800">Elenco Sconti</h1>
             </div>
             <div class="col-md-2">
-              <a href="clienti-new.html" class="btn btn-primary">Nuovo</a>
+              <a href="sconti-new.html" class="btn btn-primary">Nuovo</a>
             </div>
           </div>
 
-          <div id="alertCliente"></div>
+          <div id="alertSconto"></div>
 
           <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="clientiMainDiv">
+          <div class="card shadow mb-4" id="scontiMainDiv">
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered" id="clientiTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="scontiTable" width="100%" cellspacing="0">
                   <thead>
         		    <tr>
-        			  <th>Codice</th>
-        			  <th>Ragione sociale</th>
-                      <th>Indirizzo</th>
-                      <th>Citt&agrave;</th>
-                      <th>Provincia</th>
+        			  <th>Cliente</th>
+        			  <th>Fornitore</th>
+                      <th>Articolo</th>
+                      <th>Dal</th>
+                      <th>Al</th>
+                      <th>Valore</th>
                       <th></th>
                     </tr>
         		  </thead>
@@ -87,40 +88,26 @@
           </div>
 
           <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteClienteModal" tabindex="-1" role="dialog" aria-labelledby="deleteClienteModal" aria-hidden="true">
+          <div class="modal fade" id="deleteScontoModal" tabindex="-1" role="dialog" aria-labelledby="deleteScontoModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteClienteModalTitle">Conferma rimozione cliente</h5>
+                  <h5 class="modal-title" id="deleteScontoModalTitle">Conferma rimozione sconto</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  Sei sicuro di voler rimuovere il cliente?
+                  Sei sicuro di voler rimuovere lo sconto?
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteCliente">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteSconto">Conferma</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Modal Details-->
-          <div class="modal fade" id="detailsClienteModal" tabindex="-1" role="dialog" aria-labelledby="detailsClienteModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="detailsClienteModalTitle">Dettagli cliente</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body" id="detailsClienteMainDiv"></div>
-              </div>
-            </div>
-          </div>
 
         </div>
         <!-- /.container-fluid -->
@@ -156,7 +143,7 @@
   <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
-  <script src="../js/clienti.js"></script>
+  <script src="../js/sconti.js"></script>
 
 </body>
 
