@@ -128,6 +128,7 @@ $(document).ready(function() {
 			articolo.data= $('#data').val();
 			articolo.quantitaPredefinita= $('#quantitaPredefinita').val();
 			articolo.prezzoAcquisto= $('#prezzoAcquisto').val();
+			articolo.prezzoListinoBase= $('#prezzoListinoBase').val();
 			articolo.scadenzaGiorni= $('#scadenzaGiorni').val();
 			articolo.barcode= $('#barcode').val();
 			if($('#completeBarcode').prop('checked') === true){
@@ -198,6 +199,7 @@ $(document).ready(function() {
 			articolo.data= $('#data').val();
 			articolo.quantitaPredefinita= $('#quantitaPredefinita').val();
 			articolo.prezzoAcquisto= $('#prezzoAcquisto').val();
+			articolo.prezzoListinoBase= $('#prezzoListinoBase').val();
 			articolo.scadenzaGiorni= $('#scadenzaGiorni').val();
 			articolo.barcode= $('#barcode').val();
 			if($('#completeBarcode').prop('checked') === true){
@@ -248,6 +250,7 @@ $.fn.getCategorieArticoli = function(){
 				$.each(result, function(i, item){
 					$('#categoriaArticolo').append('<option value="'+item.id+'">'+item.nome+'</option>');
 				});
+				$('#data').val(moment().format('YYYY-MM-DD'));
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -364,6 +367,7 @@ $.fn.getArticolo = function(idCliente){
 			$('#data').attr('value', result.data);
 			$('#quantitaPredefinita').attr('value', result.quantitaPredefinita);
 			$('#prezzoAcquisto').attr('value', result.prezzoAcquisto);
+			$('#prezzoListinoBase').attr('value', result.prezzoListinoBase);
 			$('#scadenzaGiorni').attr('value', result.scadenzaGiorni);
 			$('#barcode').attr('value', result.barcode);
 			if(result.completeBarcode === true){

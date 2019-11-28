@@ -33,10 +33,12 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'asc']
+			[0, 'asc'],
+            [1, 'asc']
 		],
 		"columns": [
-			{"name": "nome", "data": "nome"},
+            {"name": "tipologia", "data": "tipologia", "visible": false},
+		    {"name": "nome", "data": "nome"},
 			{"name": "listinoRiferimento", "data": null, "orderable":true, render: function ( data, type, row ) {
                 if(data.listinoRiferimento != null){
                     return data.listinoRiferimento.nome;
@@ -49,7 +51,10 @@ $(document).ready(function() {
 				links = links + '<a class="deleteListino" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+        "createdRow": function(row, data, dataIndex){
+            row.addClass("test")
+        }
 	});
 
 	$(document).on('click','.deleteListino', function(){
@@ -99,6 +104,7 @@ $(document).ready(function() {
                 listinoRiferimento.id = listinoRiferimentoId;
                 listino.listinoRiferimento = listinoRiferimento;
 			}
+            listino.tipologia = $('input[name="tipologia"]:checked').val();
 
 			var listinoJson = JSON.stringify(listino);
 
@@ -116,7 +122,12 @@ $(document).ready(function() {
 					$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino modificato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del listino').replace('@@alertResult@@', 'danger'));
+					var exceptionMessage = jqXHR.responseJSON.message;
+					var errorMessage = 'Errore nella modifica del listino';
+					if(exceptionMessage.indexOf("a listino with type") != -1){
+                        errorMessage += '. Esiste gia un listino base'
+                    }
+				    $('#alertListino').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -134,6 +145,7 @@ $(document).ready(function() {
                 listinoRiferimento.id = listinoRiferimentoId;
                 listino.listinoRiferimento = listinoRiferimento;
             }
+            listino.tipologia = $('input[name="tipologia"]:checked').val();
 
 			var listinoJson = JSON.stringify(listino);
 
@@ -218,6 +230,11 @@ $.fn.getListino = function(idListino){
 			$('#nome').attr('value', result.nome);
             if(result.listinoRiferimento != null && result.listinoRiferimento != undefined){
                 $('#listinoRiferimento option[value=' + result.listinoRiferimento.id +']').attr('selected', true);
+            }
+            if(result.tipologia == 'BASE'){
+                $('#tipologiaBase').attr('checked', true);
+            } else {
+                $('#tipologiaStandard').attr('checked', true);
             }
 
           } else{
