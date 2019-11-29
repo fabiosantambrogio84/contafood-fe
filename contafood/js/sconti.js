@@ -206,13 +206,20 @@ $(document).ready(function() {
 
 $.fn.getClienti = function(){
 	$.ajax({
-		url: baseUrl + "clienti",
+		url: baseUrl + "clienti?bloccaDdt=false",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					$('#cliente').append('<option value="'+item.id+'">'+item.ragioneSociale+'</option>');
+					var label = '';
+					if(item.dittaIndividuale){
+						label += item.cognome + ' - ' + item.nome;
+					} else {
+						label += item.ragioneSociale;
+					}
+					label += ' - ' + item.partitaIva + ' - ' + item.codiceFiscale;
+					$('#cliente').append('<option value="'+item.id+'">'+label+'</option>');
 				});
 			}
 		},
