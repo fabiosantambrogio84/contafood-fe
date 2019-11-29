@@ -3,6 +3,8 @@ var baseUrl = "/contafood-be/";
 $(document).ready(function() {
 
 	$('#listiniTable').DataTable({
+		"processing": true,
+        "serverSide": true,
 		"ajax": {
 			"url": baseUrl + "listini",
 			"type": "GET",
@@ -26,7 +28,8 @@ $(document).ready(function() {
 				"previous": "Prec."
 			},
 			"emptyTable": "Nessun listino disponibile",
-			"zeroRecords": "Nessun listino disponibile"
+			"zeroRecords": "Nessun listino disponibile",
+			"processing": "<i class='fas fa-spinner fa-spin'></i>"
 		},
 		"pageLength": 20,
 		"lengthChange": false,
@@ -53,7 +56,9 @@ $(document).ready(function() {
 			}}
 		],
         "createdRow": function(row, data, dataIndex){
-            row.addClass("test")
+            if(data.tipologia == 'BASE'){
+                $(row).addClass("listinoBaseRow");
+            }
         }
 	});
 
