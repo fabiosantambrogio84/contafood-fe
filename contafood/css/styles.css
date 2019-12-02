@@ -12071,3 +12071,13 @@ body.sidebar-toggled footer.sticky-footer {
 .imagePreview {
   width: 100%
 }
+
+/* Listino */
+.listinoBaseRow {
+    background-color: #b0db9c;
+    font-weight: bold;
+}
+
+.dataTables_processing {
+    background-color: #edf3f5 !important;
+}
