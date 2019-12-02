@@ -36,6 +36,7 @@
     $.fn.getClienti();
     $.fn.getFornitori();
     $.fn.getArticoli();
+    $.fn.getTipologieSconti();
   </script>
 </head>
 
@@ -68,19 +69,28 @@
 
           <form id="newScontoForm" class="needs-validation" novalidate>
             <div class="form-row">
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-8">
                 <label for="cliente">Cliente</label>
                 <select id="cliente" class="form-control">
                 </select>
               </div>
+            </div>
+            <div class="form-row">
               <div class="form-group col-md-4">
-                <label for="fornitore">Fornitore</label>
-                <select id="fornitore" class="form-control">
+                <label for="tipologia">Tipologia</label>
+                <select id="tipologia" class="form-control">
                 </select>
               </div>
-              <div class="form-group col-md-4">
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4 d-none" id="fornitoreDiv">
+                <label for="fornitore">Fornitore</label>
+                <select id="fornitore" class="form-control" multiple>
+                </select>
+              </div>
+              <div class="form-group col-md-4" id="articoloDiv">
                 <label for="articolo">Articolo</label>
-                <select id="articolo" class="form-control">
+                <select id="articolo" class="form-control" multiple>
                 </select>
               </div>
             </div>

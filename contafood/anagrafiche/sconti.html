@@ -57,7 +57,7 @@
           <!-- Page Heading -->
           <div class="row">
             <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Sconti</h1>
+              <h1 class="h3 mb-4 text-gray-800">Elenco Sconti Fornitore</h1>
             </div>
             <div class="col-md-2">
               <a href="sconti-new.html" class="btn btn-primary">Nuovo</a>
@@ -67,21 +67,46 @@
           <div id="alertSconto"></div>
 
           <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="scontiMainDiv">
+          <div class="card shadow mb-4" id="scontiFornitoriMainDiv">
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered" id="scontiTable" width="100%" cellspacing="0">
+                <table class="table table-bordered" id="scontiFornitoriTable" width="100%" cellspacing="0">
                   <thead>
         		    <tr>
         			  <th>Cliente</th>
-        			  <th>Fornitore</th>
-                      <th>Articolo</th>
+        			  <th>Tipologia</th>
+                      <th>Fornitore</th>
                       <th>Dal</th>
                       <th>Al</th>
                       <th>Valore (%)</th>
                       <th></th>
                     </tr>
         		  </thead>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-10">
+              <h1 class="h3 mb-4 text-gray-800">Elenco Sconti Articolo</h1>
+            </div>
+          </div>
+          <div class="card shadow mb-4" id="scontiArticoliMainDiv">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered" id="scontiArticoliTable" width="100%" cellspacing="0">
+                  <thead>
+                  <tr>
+                    <th>Cliente</th>
+                    <th>Tipologia</th>
+                    <th>Articolo</th>
+                    <th>Dal</th>
+                    <th>Al</th>
+                    <th>Valore (%)</th>
+                    <th></th>
+                  </tr>
+                  </thead>
                 </table>
               </div>
             </div>
