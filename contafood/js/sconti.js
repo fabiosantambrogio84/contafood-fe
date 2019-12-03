@@ -190,48 +190,30 @@ $(document).ready(function() {
 		$(document).on('submit','#updateScontoForm', function(event){
 			event.preventDefault();
 
-			var sconti = [];
 			var tipologia = $('#tipologia option:selected').val();
+
+			var sconto = new Object();
+			sconto.id = $('#hiddenIdSconto').val();
+			if($('#cliente option:selected').val() != -1){
+				var cliente = new Object();
+				cliente.id = $('#cliente option:selected').val();
+				sconto.cliente = cliente;
+			};
+			sconto.tipologia = tipologia;
+
+			sconto.dataDal = $('#dataDal').val();
+			sconto.dataAl = $('#dataAl').val();
+			sconto.valore = $('#valore').val();
+
+
 			if(tipologia == 'FORNITORE'){
-				$.each($('#fornitore option:selected').val(), function(i, item){
-					var sconto = new Object();
-					sconto.id = $('#hiddenIdSconto').val();
-					if($('#cliente option:selected').val() != -1){
-						var cliente = new Object();
-						cliente.id = $('#cliente option:selected').val();
-						sconto.cliente = cliente;
-					};
-					sconto.tipologia = tipologia;
-					var fornitore = new Object();
-					fornitore.id = item;
-					sconto.fornitore = fornitore;
-
-					sconto.dataDal = $('#dataDal').val();
-					sconto.dataAl = $('#dataAl').val();
-					sconto.valore = $('#valore').val();
-
-					sconti.push(sconto);
-				});
+				var fornitore = new Object();
+				fornitore.id = $('#fornitore option:selected').val();
+				sconto.fornitore = fornitore;
 			} else {
-				$.each($('#articolo option:selected').val(), function(i, item){
-					var sconto = new Object();
-					sconto.id = $('#hiddenIdSconto').val();
-					if($('#cliente option:selected').val() != -1){
-						var cliente = new Object();
-						cliente.id = $('#cliente option:selected').val();
-						sconto.cliente = cliente;
-					};
-					sconto.tipologia = tipologia;
-					var articolo = new Object();
-					articolo.id = item;
-					sconto.articolo = articolo;
-
-					sconto.dataDal = $('#dataDal').val();
-					sconto.dataAl = $('#dataAl').val();
-					sconto.valore = $('#valore').val();
-
-					sconti.push(sconto);
-				});
+				var articolo = new Object();
+				articolo.id = $('#articolo option:selected').val();
+				sconto.articolo = articolo;
 			}
 
 			var scontoJson = JSON.stringify(sconto);
@@ -257,8 +239,8 @@ $(document).ready(function() {
 	}
 
 	if($('#newScontoButton') != null && $('#newScontoButton') != undefined){
-		$('#articolo').selectpicker(); 
-		$('#fornitore').selectpicker();
+		//$('#articolo').selectpicker();
+		//$('#fornitore').selectpicker();
 
 		$(document).on('submit','#newScontoForm', function(event){
 			event.preventDefault();
@@ -441,8 +423,20 @@ $.fn.getSconto = function(idSconto){
 			if(result.cliente != null && result.cliente != undefined){
 				$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
             };
-			if(result.tipologia != null && result.tipologia != undefined){
-				$('#tipologia option[value="' + result.tipologia +'"]').attr('selected', true);
+			var tipologia = result.tipologia;
+			if(tipologia != null && tipologia != undefined){
+				$('#tipologia option[value="' + tipologia +'"]').attr('selected', true);
+			}
+			if(tipologia == 'ARTICOLO'){
+				$('#fornitoreDiv').addClass('d-none');
+			  	$('#articoloDiv').removeClass('d-none');
+			  	$('#tipologia option[value="ARTICOLO"]').attr('selected', true);
+			  	$('#tipologia option[value="FORNITORE"]').removeAttr('selected');
+			} else {
+			  	$('#fornitoreDiv').removeClass('d-none');
+			  	$('#articoloDiv').addClass('d-none');
+			  	$('#tipologia option[value="FORNITORE"]').attr('selected', true);
+			  	$('#tipologia option[value="ARTICOLO"]').removeAttr('selected');
 			}
 			if(result.fornitore != null && result.fornitore != undefined){
                   $('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
