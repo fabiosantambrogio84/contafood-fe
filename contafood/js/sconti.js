@@ -257,6 +257,9 @@ $(document).ready(function() {
 	}
 
 	if($('#newScontoButton') != null && $('#newScontoButton') != undefined){
+		$('#articolo').selectpicker(); 
+		$('#fornitore').selectpicker();
+
 		$(document).on('submit','#newScontoForm', function(event){
 			event.preventDefault();
 

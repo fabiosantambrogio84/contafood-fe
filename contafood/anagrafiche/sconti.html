@@ -21,6 +21,9 @@
   <!-- Custom styles for this page -->
   <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <!-- Bootstrap-select -->
+  <link rel="stylesheet" href="../css/bootstrap-select-1.13.12.css">
+
   <!-- Bootstrap core JavaScript-->
   <script src="../vendor/jquery/jquery.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -28,145 +31,149 @@
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
+  <!-- Bootstrap-select -->
+  <script src="../js/bootstrap-select/bootstrap-select-1.13.12.min.js"></script>
+  <script src="../js/bootstrap-select/i18n/defaults-it_IT.js"></script>
+
   <script src="../js/commons.js"></script>
 
 </head>
 
 <body id="page-top">
 
-  <!-- Page Wrapper -->
-  <div id="wrapper">
+<!-- Page Wrapper -->
+<div id="wrapper">
 
-    <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="anagrafiche"></ul>
-    <!-- End of Sidebar -->
+  <!-- Sidebar -->
+  <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="anagrafiche"></ul>
+  <!-- End of Sidebar -->
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+  <!-- Content Wrapper -->
+  <div id="content-wrapper" class="d-flex flex-column">
 
-      <!-- Main Content -->
-      <div id="content">
+    <!-- Main Content -->
+    <div id="content">
 
-        <!-- Topbar -->
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"></nav>
-        <!-- End of Topbar -->
+      <!-- Topbar -->
+      <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"></nav>
+      <!-- End of Topbar -->
 
-        <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerSconti">
+      <!-- Begin Page Content -->
+      <div class="container-fluid" id="containerSconti">
 
-          <!-- Page Heading -->
-          <div class="row">
-            <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Sconti Fornitore</h1>
-            </div>
-            <div class="col-md-2">
-              <a href="sconti-new.html" class="btn btn-primary">Nuovo</a>
-            </div>
+        <!-- Page Heading -->
+        <div class="row">
+          <div class="col-md-10">
+            <h1 class="h3 mb-4 text-gray-800">Elenco Sconti Fornitore</h1>
           </div>
-
-          <div id="alertSconto"></div>
-
-          <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="scontiFornitoriMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="scontiFornitoriTable" width="100%" cellspacing="0">
-                  <thead>
-        		    <tr>
-        			  <th>Cliente</th>
-        			  <th>Tipologia</th>
-                      <th>Fornitore</th>
-                      <th>Dal</th>
-                      <th>Al</th>
-                      <th>Valore (%)</th>
-                      <th></th>
-                    </tr>
-        		  </thead>
-                </table>
-              </div>
-            </div>
+          <div class="col-md-2">
+            <a href="sconti-new.html" class="btn btn-primary">Nuovo</a>
           </div>
-
-          <div class="row">
-            <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Sconti Articolo</h1>
-            </div>
-          </div>
-          <div class="card shadow mb-4" id="scontiArticoliMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="scontiArticoliTable" width="100%" cellspacing="0">
-                  <thead>
-                  <tr>
-                    <th>Cliente</th>
-                    <th>Tipologia</th>
-                    <th>Articolo</th>
-                    <th>Dal</th>
-                    <th>Al</th>
-                    <th>Valore (%)</th>
-                    <th></th>
-                  </tr>
-                  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteScontoModal" tabindex="-1" role="dialog" aria-labelledby="deleteScontoModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteScontoModalTitle">Conferma rimozione sconto</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  Sei sicuro di voler rimuovere lo sconto?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteSconto">Conferma</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
         </div>
-        <!-- /.container-fluid -->
+
+        <div id="alertSconto"></div>
+
+        <!-- DataTales Example -->
+        <div class="card shadow mb-4" id="scontiFornitoriMainDiv">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="scontiFornitoriTable" width="100%" cellspacing="0">
+                <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Tipologia</th>
+                  <th>Fornitore</th>
+                  <th>Dal</th>
+                  <th>Al</th>
+                  <th>Valore (%)</th>
+                  <th></th>
+                </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-10">
+            <h1 class="h3 mb-4 text-gray-800">Elenco Sconti Articolo</h1>
+          </div>
+        </div>
+        <div class="card shadow mb-4" id="scontiArticoliMainDiv">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered" id="scontiArticoliTable" width="100%" cellspacing="0">
+                <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Tipologia</th>
+                  <th>Articolo</th>
+                  <th>Dal</th>
+                  <th>Al</th>
+                  <th>Valore (%)</th>
+                  <th></th>
+                </tr>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Confirm Delete-->
+        <div class="modal fade" id="deleteScontoModal" tabindex="-1" role="dialog" aria-labelledby="deleteScontoModal" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="deleteScontoModalTitle">Conferma rimozione sconto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Sei sicuro di voler rimuovere lo sconto?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" id="confirmDeleteSconto">Conferma</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
       </div>
-      <!-- End of Main Content -->
-
-      <!-- Footer -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>v1.0 - Copyright &copy; Urbani Alimentari 2019</span>
-          </div>
-        </div>
-      </footer>
-      <!-- End of Footer -->
+      <!-- /.container-fluid -->
 
     </div>
-    <!-- End of Content Wrapper -->
+    <!-- End of Main Content -->
+
+    <!-- Footer -->
+    <footer class="sticky-footer bg-white">
+      <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+          <span>v1.0 - Copyright &copy; Urbani Alimentari 2019</span>
+        </div>
+      </div>
+    </footer>
+    <!-- End of Footer -->
 
   </div>
-  <!-- End of Page Wrapper -->
+  <!-- End of Content Wrapper -->
 
-  <!-- Scroll to Top Button-->
-  <a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-  </a>
+</div>
+<!-- End of Page Wrapper -->
 
-  <!-- Page level plugins -->
-  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-  <script src="../js/core/moment.js"></script>
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
 
-  <script src="../js/sconti.js"></script>
+<!-- Page level plugins -->
+<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+<script src="../js/core/moment.js"></script>
+
+<script src="../js/sconti.js"></script>
 
 </body>
 

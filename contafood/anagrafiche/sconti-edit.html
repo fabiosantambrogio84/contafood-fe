@@ -21,12 +21,19 @@
   <!-- Custom styles for this page -->
   <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <!-- Bootstrap-select -->
+  <link rel="stylesheet" href="../css/bootstrap-select-1.13.12.css">
+
   <!-- Bootstrap core JavaScript-->
   <script src="../vendor/jquery/jquery.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Bootstrap-select -->
+  <script src="../js/bootstrap-select/bootstrap-select-1.13.12.min.js"></script>
+  <script src="../js/bootstrap-select/i18n/defaults-it_IT.js"></script>
 
   <script src="../js/commons.js"></script>
 
@@ -35,7 +42,7 @@
   <script>
     var idSconto = $.fn.extractIdScontoFromUrl();
     if(idSconto != null && idSconto != undefined){
-      $.when($.fn.getClienti(), $.fn.getFornitori(), $.fn.getArticoli(), $.fn.getTipologieSconti()).then(function(f1,f2,f3,f4){
+      $.when($.fn.getClienti(), $.fn.getFornitori(), $.fn.getArticoli()).then(function(f1,f2,f3){
         $.fn.getSconto(idSconto);
       });
     }
@@ -71,26 +78,20 @@
 
           <form id="updateScontoForm" class="needs-validation" novalidate>
             <div class="form-row">
-              <div class="form-group col-md-8">
+              <div class="form-group col-md-4">
                 <label for="cliente">Cliente</label>
                 <select id="cliente" class="form-control">
                 </select>
+                <div class="invalid-feedback">
+                  Seleziona un cliente
+                </div>
               </div>
-            </div>
-            <div class="form-row">
               <div class="form-group col-md-4">
-                <label for="tipologia">Tipologia</label>
-                <select id="tipologia" class="form-control">
-                </select>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-4 d-none" id="fornitoreDiv">
                 <label for="fornitore">Fornitore</label>
                 <select id="fornitore" class="form-control">
                 </select>
               </div>
-              <div class="form-group col-md-4" id="articoloDiv">
+              <div class="form-group col-md-4">
                 <label for="articolo">Articolo</label>
                 <select id="articolo" class="form-control">
                 </select>
@@ -181,6 +182,7 @@
   <!-- Page level plugins -->
   <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
 
 </body>
 
