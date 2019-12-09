@@ -33,8 +33,12 @@
   <script src="../js/listini.js"></script>
 
   <script>
-	var idListino = $.fn.extractIdListinoFromUrl();
-    $.fn.getListino(idListino);
+    var idListino = $.fn.extractIdListinoFromUrl();
+    if(idListino != null && idListino != undefined){
+      $.when($.fn.getCategorieArticoli(), $.fn.getFornitori(), $.fn.getTipologieVariazioniPrezzo()).then(function(f1,f2,f3){
+        $.fn.getListino(idListino);
+      });
+    }
   </script>
 
 </head>
@@ -75,12 +79,6 @@
                   Inserisci un nome
                 </div>
               </div>
-              <div class="form-group col-md-4">
-                <label for="listinoRiferimento">Listino riferimento</label>
-                <select id="listinoRiferimento" class="form-control">
-                  <option value="-1"></option>
-                </select>
-              </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-3 mb-0">
@@ -97,6 +95,32 @@
                   <input class="form-check-input" type="radio" name="tipologia" id="tipologiaStandard" value="STANDARD">
                   <label class="form-check-label" for="tipologiaStandard">No</label>
                 </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="tipologiaVariazionePrezzo">Tipologia variazione prezzo</label>
+                <select id="tipologiaVariazionePrezzo" class="form-control">
+                  <option value="-1"></option>
+                </select>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="variazionePrezzo">Variazione prezzo</label>
+                <input type="number" class="form-control" id="variazionePrezzo" step=".01" min="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="categoriaArticoloVariazione">Variazione per categoria articolo</label>
+                <select id="categoriaArticoloVariazione" class="form-control">
+                  <option value="-1">Tutte le categorie</option>
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="fornitoreVariazione">Variazione per fornitore</label>
+                <select id="fornitoreVariazione" class="form-control">
+                  <option value="-1">Tutti i fornitori</option>
+                </select>
               </div>
             </div>
 
@@ -152,16 +176,6 @@
   <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
   </a>
-
-  <!-- Bootstrap core JavaScript-->
-  <script src="../vendor/jquery/jquery.js"></script>
-  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Core plugin JavaScript-->
-  <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
-
-  <!-- Custom scripts for all pages-->
-  <script src="../js/sb-admin-2.min.js"></script>
 
   <!-- Page level plugins -->
   <script src="../vendor/datatables/jquery.dataTables.min.js"></script>

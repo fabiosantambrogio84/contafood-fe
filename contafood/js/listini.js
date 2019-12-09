@@ -216,6 +216,43 @@ $(document).ready(function() {
 	}
 });
 
+$(document).on('change','input[name="tipologia"]', function(){
+	var tipologia = $('input[name="tipologia"]:checked').val();
+
+	if(tipologia == 'BASE'){
+		$('#tipologiaVariazionePrezzo').parent().addClass('d-none');
+		$('#variazionePrezzo').parent().addClass('d-none');
+		$('#categoriaArticoloVariazione').parent().addClass('d-none');
+		$('#fornitoreVariazione').parent().addClass('d-none');
+	} else {
+		$('#tipologiaVariazionePrezzo').parent().removeClass('d-none');
+		$('#variazionePrezzo').parent().removeClass('d-none');
+		$('#categoriaArticoloVariazione').parent().removeClass('d-none');
+		$('#fornitoreVariazione').parent().removeClass('d-none');
+
+	}
+	$('#tipologiaVariazionePrezzo option[value="-1"]').attr('selected',true);
+	$('#variazionePrezzo').val(null);
+	$('#categoriaArticoloVariazione option[value="-1"]').attr('selected',true);
+	$('#fornitoreVariazione option[value="-1"]').attr('selected',true);
+
+});
+
+$(document).on('change','#tipologiaVariazionePrezzo', function(){
+	var tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+	var label = $('label[for=variazionePrezzo]').text();
+	label = label.replace(' (€)', '');
+	label = label.replace(' (%)', '');
+	if(tipologiaVariazionePrezzo != '-1'){
+		if(tipologiaVariazionePrezzo == 'EURO'){
+			label += ' (€)';
+		} else {
+			label += ' (%)';
+		}
+	}
+	$('label[for=variazionePrezzo]').text(label);
+});
+
 $.fn.extractIdListinoFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -232,14 +269,65 @@ $.fn.extractIdListinoFromUrl = function(){
     }
 }
 
+$.fn.getTipologieVariazioniPrezzo = function(){
+	$.ajax({
+		url: baseUrl + "utils/tipologie-listini-prezzi-variazioni",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#tipologiaVariazionePrezzo').append('<option value="'+item+'">'+item+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getCategorieArticoli = function(){
+	$.ajax({
+		url: baseUrl + "categorie-articoli",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#categoriaArticoloVariazione').append('<option value="'+item.id+'">'+item.nome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getFornitori = function(){
+	$.ajax({
+		url: baseUrl + "fornitori",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#fornitoreVariazione').append('<option value="'+item.id+'">'+item.codice+' - '+item.ragioneSociale+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.getListino = function(idListino){
 
 	var alertContent = '<div id="alertListinoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 	alertContent = alertContent + '<strong>Errore nel recupero del listino.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-    // load listini riferimento
-    $.fn.getListiniRiferimento(idListino);
 
     $.ajax({
         url: baseUrl + "listini/" + idListino,
@@ -252,9 +340,36 @@ $.fn.getListino = function(idListino){
 			$('#nome').attr('value', result.nome);
             if(result.tipologia == 'BASE'){
                 $('#tipologiaBase').attr('checked', true);
+
+				$('#tipologiaVariazionePrezzo').parent().addClass('d-none');
+				$('#variazionePrezzo').parent().addClass('d-none');
+				$('#categoriaArticoloVariazione').parent().addClass('d-none');
+				$('#fornitoreVariazione').parent().addClass('d-none');
+
+				$('#tipologiaVariazionePrezzo option[value="-1"]').attr('selected',true);
+				$('#variazionePrezzo').val(null);
+				$('#categoriaArticoloVariazione option[value="-1"]').attr('selected',true);
+				$('#fornitoreVariazione option[value="-1"]').attr('selected',true);
             } else {
                 $('#tipologiaStandard').attr('checked', true);
-            }
+
+				if(result.tipologiaVariazionePrezzo != null){
+					$('#tipologiaVariazionePrezzo option[value="'+result.tipologiaVariazionePrezzo+'"]').attr('selected',true);
+				} else {
+					$('#tipologiaVariazionePrezzo option[value="-1"]').attr('selected',true);
+				}
+				$('#variazionePrezzo').attr('value',result.variazionePrezzo);
+				if(result.categoriaArticoloVariazione != null){
+					$('#categoriaArticoloVariazione option[value="'+result.categoriaArticoloVariazione+'"]').attr('selected',true);
+				} else {
+					$('#categoriaArticoloVariazione option[value="-1"]').attr('selected',true);
+				}
+				if(result.fornitoreVariazione != null){
+					$('#fornitoreVariazione option[value="'+result.fornitoreVariazione+'"]').attr('selected',true);
+				} else {
+					$('#fornitoreVariazione option[value="-1"]').attr('selected',true);
+				}
+			}
 
           } else{
             $('#alertListino').empty().append(alertContent);
