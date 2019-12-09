@@ -239,8 +239,8 @@ $(document).ready(function() {
 	}
 
 	if($('#newScontoButton') != null && $('#newScontoButton') != undefined){
-		//$('#articolo').selectpicker();
-		//$('#fornitore').selectpicker();
+		$('#articolo').selectpicker();
+		$('#fornitore').selectpicker();
 
 		$(document).on('submit','#newScontoForm', function(event){
 			event.preventDefault();
@@ -294,11 +294,15 @@ $(document).ready(function() {
 	$(document).on('change','#tipologia', function(){
 		var tipologia = $('#tipologia option:selected').val();
 		if(tipologia == 'ARTICOLO'){
+			$('#articolo').selectpicker();
+
 			$('#fornitoreDiv').addClass('d-none');
 			$('#articoloDiv').removeClass('d-none');
 			$('#tipologia option[value="ARTICOLO"]').attr('selected', true);
 			$('#tipologia option[value="FORNITORE"]').removeAttr('selected');
 		} else {
+			$('#fornitore').selectpicker();
+
 			$('#fornitoreDiv').removeClass('d-none');
 			$('#articoloDiv').addClass('d-none');
 			$('#tipologia option[value="FORNITORE"]').attr('selected', true);

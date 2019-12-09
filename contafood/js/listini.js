@@ -42,9 +42,10 @@ $(document).ready(function() {
 		"columns": [
             {"name": "tipologia", "data": "tipologia", "visible": false},
 		    {"name": "nome", "data": "nome"},
-			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
+			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="detailsListino pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links = links + '<a class="updateListino pr-2" data-id="'+data.id+'" href="listini-edit.html?idListino=' + data.id + '"><i class="far fa-edit"></i></a>';
+				links = links + '<a class="refreshListino pr-2" data-id="'+data.id+'" href="listini-refresh.html?idListino=' + data.id + '">aggiorna</a>';
 				links = links + '<a class="deleteListino" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -156,7 +157,38 @@ $(document).ready(function() {
 			var listino = new Object();
 			listino.id = $('#hiddenIdListino').val();
 			listino.nome = $('#nome').val();
-			listino.tipologia = $('input[name="tipologia"]:checked').val();
+			var tipologia = $('input[name="tipologia"]:checked').val();
+			listino.tipologia = tipologia;
+			if(tipologia != null && tipologia == 'STANDARD'){
+				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
+					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+					listino.variazionePrezzo = $('#variazionePrezzo').val();
+					if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
+						var categoriaArticoloVariazione = new Object();
+						categoriaArticoloVariazione.id = $('#categoriaArticoloVariazione option:selected').val();
+						listino.categoriaArticoloVariazione = categoriaArticoloVariazione;
+					} else {
+						listino.categoriaArticoloVariazione = null;
+					}
+					if($('#fornitoreVariazione option:selected').val() != '-1'){
+						var fornitoreVariazione = new Object();
+						fornitoreVariazione.id = $('#fornitoreVariazione option:selected').val();
+						listino.fornitoreVariazione = fornitoreVariazione;
+					} else {
+						listino.fornitoreVariazione = null;
+					}
+				} else {
+					listino.tipologiaVariazionePrezzo = null;
+					listino.variazionePrezzo = null;
+					listino.categoriaArticoloVariazione = null;
+					listino.fornitoreVariazione = null;
+				}
+			} else {
+				listino.tipologiaVariazionePrezzo = null;
+				listino.variazionePrezzo = null;
+				listino.categoriaArticoloVariazione = null;
+				listino.fornitoreVariazione = null;
+			}
 
 			var listinoJson = JSON.stringify(listino);
 
@@ -191,7 +223,24 @@ $(document).ready(function() {
 
 			var listino = new Object();
             listino.nome = $('#nome').val();
-            listino.tipologia = $('input[name="tipologia"]:checked').val();
+            var tipologia = $('input[name="tipologia"]:checked').val();
+            listino.tipologia = tipologia;
+			if(tipologia != null && tipologia == 'STANDARD'){
+				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
+					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+				}
+				listino.variazionePrezzo = $('#variazionePrezzo').val();
+				if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
+					var categoriaArticoloVariazione = new Object();
+					categoriaArticoloVariazione.id = $('#categoriaArticoloVariazione option:selected').val();
+					listino.categoriaArticoloVariazione = categoriaArticoloVariazione;
+				}
+				if($('#fornitoreVariazione option:selected').val() != '-1'){
+					var fornitoreVariazione = new Object();
+					fornitoreVariazione.id = $('#fornitoreVariazione option:selected').val();
+					listino.fornitoreVariazione = fornitoreVariazione;
+				}
+			}
 
 			var listinoJson = JSON.stringify(listino);
 
@@ -210,6 +259,73 @@ $(document).ready(function() {
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del listino').replace('@@alertResult@@', 'danger'));
+				}
+			});
+		});
+	}
+
+	if($('#refreshListinoButton') != null && $('#refreshListinoButton') != undefined){
+		$(document).on('submit','#refreshListinoForm', function(event){
+			event.preventDefault();
+
+			var listino = new Object();
+			listino.id = $('#hiddenIdListino').val();
+			listino.nome = $('#hiddenNomeListino').val();
+			var tipologia = $('#hiddenTipologiaListino').val();
+			listino.tipologia = tipologia;
+			if(tipologia != null && tipologia == 'STANDARD'){
+				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
+					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+					listino.variazionePrezzo = $('#variazionePrezzo').val();
+					if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
+						var categoriaArticoloVariazione = new Object();
+						categoriaArticoloVariazione.id = $('#categoriaArticoloVariazione option:selected').val();
+						listino.categoriaArticoloVariazione = categoriaArticoloVariazione;
+					} else {
+						listino.categoriaArticoloVariazione = null;
+					}
+					if($('#fornitoreVariazione option:selected').val() != '-1'){
+						var fornitoreVariazione = new Object();
+						fornitoreVariazione.id = $('#fornitoreVariazione option:selected').val();
+						listino.fornitoreVariazione = fornitoreVariazione;
+					} else {
+						listino.fornitoreVariazione = null;
+					}
+				} else {
+					listino.tipologiaVariazionePrezzo = null;
+					listino.variazionePrezzo = null;
+					listino.categoriaArticoloVariazione = null;
+					listino.fornitoreVariazione = null;
+				}
+			} else {
+				listino.tipologiaVariazionePrezzo = null;
+				listino.variazionePrezzo = null;
+				listino.categoriaArticoloVariazione = null;
+				listino.fornitoreVariazione = null;
+			}
+
+			var listinoJson = JSON.stringify(listino);
+
+			var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			$.ajax({
+				url: baseUrl + "listini/" + $('#hiddenIdListino').val(),
+				type: 'PUT',
+				contentType: "application/json",
+				dataType: 'json',
+				data: listinoJson,
+				success: function(result) {
+					$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino modificato con successo').replace('@@alertResult@@', 'success'));
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var exceptionMessage = jqXHR.responseJSON.message;
+					var errorMessage = 'Errore nella modifica del listino';
+					if(exceptionMessage.indexOf("a listino with type") != -1){
+						errorMessage += '. Esiste gia un listino base'
+					}
+					$('#alertListino').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -323,11 +439,35 @@ $.fn.getFornitori = function(){
 	});
 }
 
-$.fn.getListino = function(idListino){
+$.fn.getListino = function(idListino, withRecap){
 
 	var alertContent = '<div id="alertListinoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 	alertContent = alertContent + '<strong>Errore nel recupero del listino.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+	if(withRecap){
+		$.ajax({
+			url: baseUrl + "listini/" + idListino,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != '') {
+
+					var listinoRow = '<td>'+result.nome+'</td>';
+					listinoRow = listinoRow + '<td>'+result.tipologia+'</td>';
+
+					$('#listinoRow').append(listinoRow);
+
+					$('#hiddenNomeListino').attr('value', result.nome);
+					$('#hiddenTipologiaListino').attr('value', result.tipologia);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertListino').empty().append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+	}
 
     $.ajax({
         url: baseUrl + "listini/" + idListino,
@@ -360,12 +500,12 @@ $.fn.getListino = function(idListino){
 				}
 				$('#variazionePrezzo').attr('value',result.variazionePrezzo);
 				if(result.categoriaArticoloVariazione != null){
-					$('#categoriaArticoloVariazione option[value="'+result.categoriaArticoloVariazione+'"]').attr('selected',true);
+					$('#categoriaArticoloVariazione option[value="'+result.categoriaArticoloVariazione.id+'"]').attr('selected',true);
 				} else {
 					$('#categoriaArticoloVariazione option[value="-1"]').attr('selected',true);
 				}
 				if(result.fornitoreVariazione != null){
-					$('#fornitoreVariazione option[value="'+result.fornitoreVariazione+'"]').attr('selected',true);
+					$('#fornitoreVariazione option[value="'+result.fornitoreVariazione.id+'"]').attr('selected',true);
 				} else {
 					$('#fornitoreVariazione option[value="-1"]').attr('selected',true);
 				}

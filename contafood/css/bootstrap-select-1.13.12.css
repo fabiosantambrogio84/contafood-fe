@@ -56,6 +56,10 @@ select.selectpicker {
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
+  color: #6e707e;
+  background-color: #fff;
+  border: 1px solid #d1d3e2;
+  border-radius: 0.35rem;
 }
 .bootstrap-select > .dropdown-toggle:after {
   margin-top: -1px;
@@ -64,7 +68,11 @@ select.selectpicker {
 .bootstrap-select > .dropdown-toggle.bs-placeholder:hover,
 .bootstrap-select > .dropdown-toggle.bs-placeholder:focus,
 .bootstrap-select > .dropdown-toggle.bs-placeholder:active {
-  color: #999;
+  /*color: #999;*/
+  color: #6e707e;
+  background-color: #fff;
+  border: 1px solid #d1d3e2;
+  border-radius: 0.35rem;
 }
 .bootstrap-select > .dropdown-toggle.bs-placeholder.btn-primary,
 .bootstrap-select > .dropdown-toggle.bs-placeholder.btn-secondary,
