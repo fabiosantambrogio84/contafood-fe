@@ -74,6 +74,9 @@
               <div class="form-group col-md-2">
                 <label for="codice">Codice*</label>
                 <input type="text" class="form-control" id="codice" placeholder="" required oninput="this.value = this.value.toUpperCase()">
+                <div class="invalid-feedback">
+                  Inserisci un codice
+                </div>
               </div>
             </div>
             <div class="form-row">
@@ -84,26 +87,38 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="categoriaArticolo">Categoria</label>
-                <select id="categoriaArticolo" class="form-control">
+                <label for="categoriaArticolo">Categoria*</label>
+                <select id="categoriaArticolo" class="form-control" required>
                 </select>
+                <div class="invalid-feedback">
+                  Seleziona una categoria
+                </div>
               </div>
               <div class="form-group col-md-3">
-                <label for="fornitore">Fornitore</label>
-                <select id="fornitore" class="form-control">
+                <label for="fornitore">Fornitore*</label>
+                <select id="fornitore" class="form-control" required>
                 </select>
+                <div class="invalid-feedback">
+                  Seleziona un fornitore
+                </div>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-3">
-                <label for="aliquotaIva">Aliquota IVA</label>
-                <select id="aliquotaIva" class="form-control">
+                <label for="aliquotaIva">Aliquota IVA*</label>
+                <select id="aliquotaIva" class="form-control" required>
                 </select>
+                <div class="invalid-feedback">
+                  Seleziona un aliquota iva
+                </div>
               </div>
               <div class="form-group col-md-3">
-                <label for="unitaMisura">Unita di misura</label>
-                <select id="unitaMisura" class="form-control">
+                <label for="unitaMisura">Unita di misura*</label>
+                <select id="unitaMisura" class="form-control" required>
                 </select>
+                <div class="invalid-feedback">
+                  Seleziona un unita di misura
+                </div>
               </div>
             </div>
             <div class="form-row">
@@ -120,8 +135,11 @@
                 <input type="number" class="form-control" id="prezzoAcquisto" step=".01" min="0">
               </div>
               <div class="form-group col-md-3">
-                <label for="prezzoListinoBase">Prezzo listino base (&euro;)</label>
-                <input type="number" class="form-control" id="prezzoListinoBase" step=".01" min="0">
+                <label for="prezzoListinoBase">Prezzo listino base (&euro;)*</label>
+                <input type="number" class="form-control" id="prezzoListinoBase" step=".01" min="0.01">
+                <div class="invalid-feedback">
+                  Inserisci un prezzo per il listino base
+                </div>
               </div>
               <div class="form-group col-md-3">
                 <label for="scadenzaGiorni">Scadenza giorni</label>
