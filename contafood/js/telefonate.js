@@ -2,6 +2,8 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
+    $('[data-toggle="tooltip"]').tooltip();
+
 	$('#telefonateTable').DataTable({
 		"processing": true,
 		"ajax": {
@@ -53,7 +55,9 @@ $(document).ready(function() {
 			{"name": "giorno", "data": "giorno"},
 			{"name": "ora", "data": "ora"},
 			{"name": "note", "data": null, render: function ( data, type, row ) {
-
+                // <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
+                //     Tooltip on bottom
+                //   </button>
 			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="updateTelefonata pr-2" data-id="'+data.id+'" href="telefonata-edit.html?idTelefonata=' + data.id + '"><i class="far fa-edit"></i></a>';
