@@ -90,17 +90,13 @@ $(document).ready(function() {
 			{"name": "note", "data": null, render: function ( data, type, row ) {
                 var note = data.note;
                 var noteTrunc = note;
+                var noteHtml = '<div>'+noteTrunc+'</div>';
                 if(note.length > 30){
                     noteTrunc = note.substring(0, 30)+'...';
+                    noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
                 }
-                var noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
 
-                $('[data-toggle="tooltip"]').tooltip();
-			     //<button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Tooltip on bottom">
-                 //    Tooltip on bottom
-                 //  </button>
-
-					return noteHtml;
+				return noteHtml;
 			}},
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="detailsTelefonata pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
@@ -108,7 +104,10 @@ $(document).ready(function() {
 				links += '<a class="deleteTelefonata" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"initComplete": function( settings, json ) {
+            $('[data-toggle="tooltip"]').tooltip();
+         }
 	});
 
 	$(document).on('click','.detailsTelefonata', function(){
