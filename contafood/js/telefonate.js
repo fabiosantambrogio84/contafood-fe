@@ -100,7 +100,7 @@ $(document).ready(function() {
 			}},
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="detailsTelefonata pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-				links += '<a class="updateTelefonata pr-2" data-id="'+data.id+'" href="telefonata-edit.html?idTelefonata=' + data.id + '"><i class="far fa-edit"></i></a>';
+				links += '<a class="updateTelefonata pr-2" data-id="'+data.id+'" href="telefonate-edit.html?idTelefonata=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links += '<a class="deleteTelefonata" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -281,32 +281,61 @@ $(document).ready(function() {
 
     });
 
-	if($('#updateTipoPagamentoButton') != null && $('#updateTipoPagamentoButton') != undefined){
-		$(document).on('submit','#updateTipoPagamentoForm', function(event){
+	if($('#updateTelefonataButton') != null && $('#updateTelefonataButton') != undefined){
+		$(document).on('submit','#updateTelefonataForm', function(event){
 			event.preventDefault();
 
-			var tipoPagamento = new Object();
-			tipoPagamento.id = $('#hiddenIdTipoPagamento').val();
-			tipoPagamento.descrizione = $('#descrizione').val();
-			tipoPagamento.scadenzaGiorni = $('#scadenzaGiorni').val();
+			var telefonata = new Object();
+			telefonata.id = $('#hiddenIdTelefonata').val();
 
-			var tipoPagamentoJson = JSON.stringify(tipoPagamento);
+			var clienteId = $('#cliente option:selected').val();
+			if(clienteId != null && clienteId != ''){
+				var cliente = new Object();
+				cliente.id = clienteId;
+				telefonata.cliente = cliente;
+			}
+			var puntoConsegnaId = $('#puntoConsegna option:selected').val();
+			if(puntoConsegnaId != null && puntoConsegnaId != ''){
+				var puntoConsegna = new Object();
+				puntoConsegna.id = puntoConsegnaId;
+				telefonata.puntoConsegna = puntoConsegna;
+			}
+			telefonata.telefono = $('#telefono').val();
+			telefonata.telefonoTwo = $('#telefono2').val();
+			telefonata.telefonoThree = $('#telefono3').val();
+			telefonata.giorno = $('#giorno option:selected').text();
+			telefonata.giornoOrdinale = $('#giorno option:selected').val();
+
+			var ora = $('#ora').val();
+			if(ora != null && ora != ''){
+				var regex = /:/g;
+				var count = ora.match(regex);
+				count = (count) ? count.length : 0;
+				if(count == 1){
+					telefonata.ora = $('#ora').val() + ':00';
+				} else {
+					telefonata.ora = $('#ora').val();
+				}
+			}
+			telefonata.note = $('#note').val();
+
+			var telefonataJson = JSON.stringify(telefonata);
 
 			var alertContent = '<div id="alertTelefonataContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
-				url: baseUrl + "tipi-pagamento/" + $('#hiddenIdTipoPagamento').val(),
+				url: baseUrl + "telefonate/" + $('#hiddenIdTelefonata').val(),
 				type: 'PUT',
 				contentType: "application/json",
 				dataType: 'json',
-				data: tipoPagamentoJson,
+				data: telefonataJson,
 				success: function(result) {
-					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Tipo pagamento modificato con successo').replace('@@alertResult@@', 'success'));
+					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Telefonata modificata con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del tipo pagamento').replace('@@alertResult@@', 'danger'));
+					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della telefonata').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -337,15 +366,16 @@ $(document).ready(function() {
 			telefonata.giornoOrdinale = $('#giorno option:selected').val();
 
 			var ora = $('#ora').val();
-			var regex = /:/g;
-            var count = ora.match(regex);
-            count = (count) ? count.length : 0;
-            if(count == 1){
-                telefonata.ora = $('#ora').val() + ':00';
-            } else {
-                telefonata.ora = $('#ora').val();
-            }
-
+			if(ora != null && ora != ''){
+				var regex = /:/g;
+				var count = ora.match(regex);
+				count = (count) ? count.length : 0;
+				if(count == 1){
+					telefonata.ora = $('#ora').val() + ':00';
+				} else {
+					telefonata.ora = $('#ora').val();
+				}
+			}
 			telefonata.note = $('#note').val();
 
 			var telefonataJson = JSON.stringify(telefonata);
@@ -440,30 +470,59 @@ $.fn.getGiorniSettimana = function(){
 	});
 }
 
-$.fn.getTipoPagamento = function(idTipoPagamento){
+$.fn.getTelefonata = function(idTelefonata){
 
 	var alertContent = '<div id="alertTelefonataContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-	alertContent = alertContent + '<strong>Errore nel recupero del tipo pagamento.</strong>\n' +
+	alertContent = alertContent + '<strong>Errore nel recupero della telefonata.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
     $.ajax({
-        url: baseUrl + "tipi-pagamento/" + idTipoPagamento,
+        url: baseUrl + "telefonate/" + idTelefonata,
         type: 'GET',
         dataType: 'json',
         success: function(result) {
           if(result != null && result != undefined && result != ''){
 
-			$('#hiddenIdTipoPagamento').attr('value', result.id);
-			$('#descrizione').attr('value', result.descrizione);
-			$('#scadenzaGiorni').attr('value', result.scadenzaGiorni);
-
+			$('#hiddenIdTelefonata').attr('value', result.id);
+			$('#telefono').attr('value', result.telefono);
+			$('#telefono2').attr('value', result.telefonoTwo);
+			$('#telefono3').attr('value', result.telefonoThree);
+			$('#giorno option[value="' + result.giornoOrdinale +'"]').attr('selected', true);
+			$('#ora').attr('value', result.ora);
+			$('#note').val(result.note);
+			if(result.cliente != null){
+				$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
+				$.ajax({
+					url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
+					type: 'GET',
+					dataType: 'json',
+					success: function(result) {
+						if(result != null && result != undefined && result != ''){
+							$.each(result, function(i, item){
+								var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
+								var selected = '';
+								if(result.puntoConsegna != null){
+									if(result.puntoConsegna.id == item.id){
+										selected = 'selected';
+									}
+								}
+								$('#puntoConsegna').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
+							});
+						}
+						$('#puntoConsegna').removeAttr('disabled');
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
+					}
+				});
+			}
           } else{
             $('#alertTelefonata').empty().append(alertContent);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#alertTelefonata').empty().append(alertContent);
-            $('#updateTipoPagamentoButton').attr('disabled', true);
+            $('#updateTelefonataButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }
     });
