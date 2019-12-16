@@ -42,6 +42,7 @@
   <script>
     $.fn.getGiorniSettimana();
     $.fn.getClienti();
+    $.fn.getAutisti();
   </script>
 </head>
 
@@ -94,7 +95,14 @@
                   </div>
                   <div class="p-2 d-none" id="loadingDiv"><i class="fas fa-spinner fa-pulse"></i></div>
                 </div>
-
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="autista">Autista</label>
+                <select id="autista" class="form-control">
+                  <option value=""></option>
+                </select>
               </div>
             </div>
             <div class="form-row">

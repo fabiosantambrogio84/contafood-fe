@@ -36,9 +36,12 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[1, 'asc']
+			[0, 'asc'],
+			[5, 'asc'],
+			[7, 'asc']
 		],
 		"columns": [
+			{"name": "giornoOrdinale", "data": "giornoOrdinale", "visible": false},
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
 				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="deleteTelefonataCheckbox">';
 				return checkboxHtml;
@@ -52,7 +55,6 @@ $(document).ready(function() {
                     } else {
                         clienteHtml += data.cliente.ragioneSociale;
                     }
-                    clienteHtml += ' - ' + data.cliente.partitaIva;
                     return clienteHtml;
                 } else {
                     return '';
@@ -60,15 +62,12 @@ $(document).ready(function() {
 			}},
 			{"name": "puntoConsegna", "data": null, render: function ( data, type, row ) {
                 if(data.puntoConsegna != null){
-                    var puntoConsegnaHtml = data.puntoConsegna.nome;
+                    var puntoConsegnaHtml = '';
                     if(data.puntoConsegna.indirizzo != null && data.puntoConsegna.indirizzo != ''){
-                        puntoConsegnaHtml += ' - '+data.puntoConsegna.indirizzo;
+                        puntoConsegnaHtml += data.puntoConsegna.indirizzo;
                     }
                     if(data.puntoConsegna.localita != null && data.puntoConsegna.localita != ''){
                         puntoConsegnaHtml += ', '+data.puntoConsegna.localita;
-                    }
-                    if(data.puntoConsegna.provincia != null && data.puntoConsegna.provincia != ''){
-                        puntoConsegnaHtml += ' ('+data.puntoConsegna.provincia+')';
                     }
                     return puntoConsegnaHtml;
                 } else {
@@ -85,14 +84,31 @@ $(document).ready(function() {
                 }
                 return recapitoHtml;
 			}},
+			{"name": "autista", "data": null, render: function ( data, type, row ) {
+                var autistaHtml = '';
+                var concat = 'no';
+                if(data.autista != null){
+                    if(data.autista.cognome != null && data.autista.cognome != ''){
+                        autistaHtml += data.autista.cognome;
+                        concat = 'yes';
+                    }
+                    if(data.autista.nome != null && data.autista.nome != null){
+                        if(concat == 'yes'){
+                            autistaHtml += ' - ';
+                        }
+                        autistaHtml += data.autista.nome;
+                    }
+                }
+                return autistaHtml;
+            }},
 			{"name": "giorno", "data": "giorno"},
 			{"name": "ora", "data": "ora"},
-			{"name": "note", "data": null, render: function ( data, type, row ) {
+			{"name": "note", "data": null, "width": "25%", render: function ( data, type, row ) {
                 var note = data.note;
                 var noteTrunc = note;
                 var noteHtml = '<div>'+noteTrunc+'</div>';
-                if(note.length > 30){
-                    noteTrunc = note.substring(0, 30)+'...';
+                if(note.length > 100){
+                    noteTrunc = note.substring(0, 100)+'...';
                     noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
                 }
 
@@ -300,6 +316,12 @@ $(document).ready(function() {
 				puntoConsegna.id = puntoConsegnaId;
 				telefonata.puntoConsegna = puntoConsegna;
 			}
+			var autistaId = $('#autista option:selected').val();
+            if(autistaId |= null && autistaId != ''){
+                var autista = new Object();
+                autista.id = autistaId;
+                telefonata.autista = autista;
+            }
 			telefonata.telefono = $('#telefono').val();
 			telefonata.telefonoTwo = $('#telefono2').val();
 			telefonata.telefonoThree = $('#telefono3').val();
@@ -358,6 +380,12 @@ $(document).ready(function() {
 			    var puntoConsegna = new Object();
 			    puntoConsegna.id = puntoConsegnaId;
 			    telefonata.puntoConsegna = puntoConsegna;
+			}
+			var autistaId = $('#autista option:selected').val();
+			if(autistaId |= null && autistaId != ''){
+			    var autista = new Object();
+			    autista.id = autistaId;
+			    telefonata.autista = autista;
 			}
 			telefonata.telefono = $('#telefono').val();
 			telefonata.telefonoTwo = $('#telefono2').val();
@@ -449,6 +477,25 @@ $.fn.getClienti = function(){
 	});
 }
 
+$.fn.getAutisti = function(){
+	$.ajax({
+		url: baseUrl + "autisti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					var label = item.cognome + ' ' + item.nome;
+					$('#autista').append('<option value="'+item.id+'">'+label+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.getGiorniSettimana = function(){
 	$.ajax({
 		url: baseUrl + "utils/giorni-settimana",
@@ -484,6 +531,7 @@ $.fn.getTelefonata = function(idTelefonata){
           if(result != null && result != undefined && result != ''){
 
 			$('#hiddenIdTelefonata').attr('value', result.id);
+			$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
 			$('#telefono').attr('value', result.telefono);
 			$('#telefono2').attr('value', result.telefonoTwo);
 			$('#telefono3').attr('value', result.telefonoThree);
