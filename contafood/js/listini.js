@@ -164,6 +164,20 @@ $(document).ready(function() {
 			if(tipologia != null && tipologia == 'STANDARD'){
 				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
 					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+
+					var variazionePrezzo = $('#variazionePrezzo').val();
+					var fornitoreValue = $('#fornitoreVariazione option:selected').val();
+					var articoliValues = $('#articoloVariazione').val();
+					var listiniPrezziVariazioni = [];
+
+					if(articoliValues != null && articoliValues.length != 0 && !$.inArray('-1',articoliValues)){
+						// array multiple elements
+					} else {
+						// array single element
+						var listinoPrezzoVariazione = new Object();
+						listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
+					}
+
 					listino.variazionePrezzo = $('#variazionePrezzo').val();
 					if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
 						var categoriaArticoloVariazione = new Object();
@@ -232,20 +246,24 @@ $(document).ready(function() {
 			if(tipologia != null && tipologia == 'STANDARD'){
 				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
 					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+
+
 				}
-				listino.variazionePrezzo = $('#variazionePrezzo').val();
-				if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
-					var categoriaArticoloVariazione = new Object();
-					categoriaArticoloVariazione.id = $('#categoriaArticoloVariazione option:selected').val();
-					listino.categoriaArticoloVariazione = categoriaArticoloVariazione;
-				}
+
 				if($('#fornitoreVariazione option:selected').val() != '-1'){
 					var fornitoreVariazione = new Object();
 					fornitoreVariazione.id = $('#fornitoreVariazione option:selected').val();
 					listino.fornitoreVariazione = fornitoreVariazione;
 				}
+				if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
+					var categoriaArticoloVariazione = new Object();
+					categoriaArticoloVariazione.id = $('#categoriaArticoloVariazione option:selected').val();
+					listino.categoriaArticoloVariazione = categoriaArticoloVariazione;
+				}
+
 			}
 
+			/*
 			var listinoJson = JSON.stringify(listino);
 
 			var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
@@ -265,6 +283,7 @@ $(document).ready(function() {
 					$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del listino').replace('@@alertResult@@', 'danger'));
 				}
 			});
+			*/
 		});
 	}
 
@@ -282,6 +301,20 @@ $(document).ready(function() {
 			if(tipologia != null && tipologia == 'STANDARD'){
 				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
 					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+
+					var variazionePrezzo = $('#variazionePrezzo').val();
+					var fornitoreValue = $('#fornitoreVariazione option:selected').val();
+					var articoliValues = $('#articoloVariazione').val();
+					var listiniPrezziVariazioni = [];
+
+					if(articoliValues != null && articoliValues.length != 0 && !$.inArray('-1',articoliValues)){
+						// array multiple elements
+					} else {
+						// array single element
+						var listinoPrezzoVariazione = new Object();
+						listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
+					}
+
 					listino.variazionePrezzo = $('#variazionePrezzo').val();
 					if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
 						var categoriaArticoloVariazione = new Object();
@@ -344,18 +377,15 @@ $(document).on('change','input[name="tipologia"]', function(){
 	if(tipologia == 'BASE'){
 		$('#tipologiaVariazionePrezzo').parent().addClass('d-none');
 		$('#variazionePrezzo').parent().addClass('d-none');
-		$('#categoriaArticoloVariazione').parent().addClass('d-none');
-		$('#fornitoreVariazione').parent().addClass('d-none');
+		$('#variazioneRow').addClass('d-none');
 	} else {
 		$('#tipologiaVariazionePrezzo').parent().removeClass('d-none');
 		$('#variazionePrezzo').parent().removeClass('d-none');
-		$('#categoriaArticoloVariazione').parent().removeClass('d-none');
-		$('#fornitoreVariazione').parent().removeClass('d-none');
-
+		$('#variazioneRow').removeClass('d-none');
 	}
 	$('#tipologiaVariazionePrezzo option[value="-1"]').attr('selected',true);
 	$('#variazionePrezzo').val(null);
-	$('#categoriaArticoloVariazione option[value="-1"]').attr('selected',true);
+	$('#articoloVariazione option[value="-1"]').attr('selected',true);
 	$('#fornitoreVariazione option[value="-1"]').attr('selected',true);
 
 });
@@ -378,7 +408,7 @@ $(document).on('change','#tipologiaVariazionePrezzo', function(){
 $(document).on('change','#fornitoreVariazione', function(){
     $('#loadingDiv').removeClass('d-none');
     var fornitore = $('#fornitoreVariazione option:selected').val();
-    if(fornitore != null && fornitore != ''){
+    if(fornitore != null && fornitore != '' && fornitore != '-1'){
         $.ajax({
             url: baseUrl + "fornitori/"+fornitore+"/articoli",
             type: 'GET',
@@ -389,7 +419,10 @@ $(document).on('change','#fornitoreVariazione', function(){
                         var label = item.codice+'-'+item.descrizione;
                         $('#articoloVariazione').append('<option value="'+item.id+'">'+label+'</option>');
                     });
-                }
+                } else {
+					$('#articoloVariazione').empty();
+					$('#articoloVariazione').append('<option value=-1>Tutti gli articoli</option>');
+				}
                 $('#articoloVariazione option[value="-1"]').attr('selected', true);
                 $('#articoloVariazione').selectpicker('refresh');
                 $('#loadingDiv').addClass('d-none');
@@ -401,8 +434,8 @@ $(document).on('change','#fornitoreVariazione', function(){
 
     } else {
         $('#articoloVariazione').empty();
-        $('#articoloVariazione').append('<option value="-1">Tutti gli articoli</option>');
-        $('#articoloVariazione').attr('disabled', true);
+        $('#articoloVariazione').append('<option value="-1" selected>Tutti gli articoli</option>');
+		$('#articoloVariazione').selectpicker('refresh');
         $('#loadingDiv').addClass('d-none');
     }
 
@@ -522,12 +555,11 @@ $.fn.getListino = function(idListino, withRecap){
 
 				$('#tipologiaVariazionePrezzo').parent().addClass('d-none');
 				$('#variazionePrezzo').parent().addClass('d-none');
-				$('#categoriaArticoloVariazione').parent().addClass('d-none');
-				$('#fornitoreVariazione').parent().addClass('d-none');
+				$('#variazioneRow').addClass('d-none');
 
 				$('#tipologiaVariazionePrezzo option[value="-1"]').attr('selected',true);
 				$('#variazionePrezzo').val(null);
-				$('#categoriaArticoloVariazione option[value="-1"]').attr('selected',true);
+				$('#articoloVariazione option[value="-1"]').attr('selected',true);
 				$('#fornitoreVariazione option[value="-1"]').attr('selected',true);
             } else {
                 $('#tipologiaStandard').attr('checked', true);
