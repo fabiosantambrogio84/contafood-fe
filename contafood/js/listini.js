@@ -390,7 +390,8 @@ $(document).on('change','#fornitoreVariazione', function(){
                         $('#articoloVariazione').append('<option value="'+item.id+'">'+label+'</option>');
                     });
                 }
-                $('#articoloVariazione').removeAttr('disabled');
+                $('#articoloVariazione option[value="-1"]').attr('selected', true);
+                $('#articoloVariazione').selectpicker('refresh');
                 $('#loadingDiv').addClass('d-none');
             },
             error: function(jqXHR, textStatus, errorThrown) {
