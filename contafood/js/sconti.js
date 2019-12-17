@@ -127,27 +127,27 @@ $(document).ready(function() {
 				}
 			}},
 			{"name": "dataDal", "data": null, render: function ( data, type, row ) {
-					if(data.dataDal != null){
-						var a = moment(data.dataDal);
-						return a.format('DD/MM/YYYY');
-					} else {
-						return '';
-					}
-				}},
+                if(data.dataDal != null){
+                    var a = moment(data.dataDal);
+                    return a.format('DD/MM/YYYY');
+                } else {
+                    return '';
+                }
+            }},
 			{"name": "dataAl", "data": null, render: function ( data, type, row ) {
-					if(data.dataAl != null){
-						var a = moment(data.dataAl);
-						return a.format('DD/MM/YYYY');
-					} else {
-						return '';
-					}
-				}},
+                if(data.dataAl != null){
+                    var a = moment(data.dataAl);
+                    return a.format('DD/MM/YYYY');
+                } else {
+                    return '';
+                }
+            }},
 			{"name": "valore", "data": "valore"},
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
-					var links = '<a class="updateSconto pr-2" data-id="'+data.id+'" href="sconti-edit.html?idSconto=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
-					links = links + '<a class="deleteSconto" data-id="'+data.id+'" data-tipologia="'+data.tipologia+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
-					return links;
-				}}
+                var links = '<a class="updateSconto pr-2" data-id="'+data.id+'" href="sconti-edit.html?idSconto=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
+                links = links + '<a class="deleteSconto" data-id="'+data.id+'" data-tipologia="'+data.tipologia+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
+                return links;
+            }}
 		]
 	});
 

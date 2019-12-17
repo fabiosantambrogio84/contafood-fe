@@ -28,6 +28,10 @@
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
+  <!-- Bootstrap-select -->
+  <script src="../js/bootstrap-select/bootstrap-select-1.13.12.js"></script>
+  <script src="../js/bootstrap-select/i18n/defaults-it_IT.js"></script>
+
   <script src="../js/commons.js"></script>
 
   <script src="../js/listini.js"></script>
@@ -35,7 +39,7 @@
   <script>
     var idListino = $.fn.extractIdListinoFromUrl();
     if(idListino != null && idListino != undefined){
-      $.when($.fn.getCategorieArticoli(), $.fn.getFornitori(), $.fn.getTipologieVariazioniPrezzo()).then(function(f1,f2,f3){
+      $.when($.fn.getFornitori(), $.fn.getTipologieVariazioniPrezzo()).then(function(f1,f2){
         $.fn.getListino(idListino, false);
       });
     }
@@ -111,16 +115,21 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-4">
-                <label for="categoriaArticoloVariazione">Variazione per categoria articolo</label>
-                <select id="categoriaArticoloVariazione" class="form-control">
-                  <option value="-1">Tutte le categorie</option>
-                </select>
-              </div>
-              <div class="form-group col-md-4">
                 <label for="fornitoreVariazione">Variazione per fornitore</label>
                 <select id="fornitoreVariazione" class="form-control">
                   <option value="-1">Tutti i fornitori</option>
                 </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="articoloVariazione">Variazione per articoli</label>
+                <div class="d-flex flex-row">
+                  <div class="p-2">
+                    <select id="articoloVariazione" class="form-control" multiple="multiple">
+                      <option value="-1">Tutti gli articoli</option>
+                    </select>
+                  </div>
+                  <div class="p-2 d-none" id="loadingDiv"><i class="fas fa-spinner fa-pulse"></i></div>
+                </div>
               </div>
             </div>
 

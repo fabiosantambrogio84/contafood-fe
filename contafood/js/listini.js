@@ -151,6 +151,8 @@ $(document).ready(function() {
     	});
 
 	if($('#updateListinoButton') != null && $('#updateListinoButton') != undefined){
+		$('#articoloVariazione').selectpicker();
+
 		$(document).on('submit','#updateListinoForm', function(event){
 			event.preventDefault();
 
@@ -218,6 +220,8 @@ $(document).ready(function() {
 	}
 
 	if($('#newListinoButton') != null && $('#newListinoButton') != undefined){
+		$('#articoloVariazione').selectpicker();
+
 		$(document).on('submit','#newListinoForm', function(event){
 			event.preventDefault();
 
@@ -265,6 +269,8 @@ $(document).ready(function() {
 	}
 
 	if($('#refreshListinoButton') != null && $('#refreshListinoButton') != undefined){
+		$('#articoloVariazione').selectpicker();
+
 		$(document).on('submit','#refreshListinoForm', function(event){
 			event.preventDefault();
 
@@ -369,6 +375,38 @@ $(document).on('change','#tipologiaVariazionePrezzo', function(){
 	$('label[for=variazionePrezzo]').text(label);
 });
 
+$(document).on('change','#fornitoreVariazione', function(){
+    $('#loadingDiv').removeClass('d-none');
+    var fornitore = $('#fornitoreVariazione option:selected').val();
+    if(fornitore != null && fornitore != ''){
+        $.ajax({
+            url: baseUrl + "fornitori/"+fornitore+"/articoli",
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+                if(result != null && result != undefined && result != ''){
+                    $.each(result, function(i, item){
+                        var label = item.codice+'-'+item.descrizione;
+                        $('#articoloVariazione').append('<option value="'+item.id+'">'+label+'</option>');
+                    });
+                }
+                $('#articoloVariazione').removeAttr('disabled');
+                $('#loadingDiv').addClass('d-none');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento degli articoli').replace('@@alertResult@@', 'danger'));
+            }
+        });
+
+    } else {
+        $('#articoloVariazione').empty();
+        $('#articoloVariazione').append('<option value="-1">Tutti gli articoli</option>');
+        $('#articoloVariazione').attr('disabled', true);
+        $('#loadingDiv').addClass('d-none');
+    }
+
+});
+
 $.fn.extractIdListinoFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -403,15 +441,15 @@ $.fn.getTipologieVariazioniPrezzo = function(){
 	});
 }
 
-$.fn.getCategorieArticoli = function(){
+$.fn.getArticoli = function(){
 	$.ajax({
-		url: baseUrl + "categorie-articoli",
+		url: baseUrl + "articoli",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					$('#categoriaArticoloVariazione').append('<option value="'+item.id+'">'+item.nome+'</option>');
+					$('#articoloVariazione').append('<option value="'+item.id+'">'+item.codice+' '+item.descrizione+'</option>');
 				});
 			}
 		},
