@@ -239,51 +239,105 @@ $(document).ready(function() {
 		$(document).on('submit','#newListinoForm', function(event){
 			event.preventDefault();
 
+            var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+                alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
 			var listino = new Object();
             listino.nome = $('#nome').val();
             var tipologia = $('input[name="tipologia"]:checked').val();
             listino.tipologia = tipologia;
-			if(tipologia != null && tipologia == 'STANDARD'){
-				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
-					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
 
+            var createListiniPrezziVariazioni = false;
+            var variazionePrezzo = $('#variazionePrezzo').val();
+            if(tipologia != null && tipologia == 'STANDARD'){
+                if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
+                    if(variazionePrezzo == null || variazionePrezzo == ''){
+                        $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del listino: specificare un prezzo per la variazione').replace('@@alertResult@@', 'danger'));
+                        return;
+                    }
+                    listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
+                    createListiniPrezziVariazioni = true;
+                }
+            }
 
-				}
+            var listinoJson = JSON.stringify(listino);
+            $.ajax({
+                url: baseUrl + "listini",
+                type: 'POST',
+                contentType: "application/json",
+                dataType: 'json',
+                data: listinoJson,
+                success: function(result) {
+                    var idListino = result.id;
 
-				if($('#fornitoreVariazione option:selected').val() != '-1'){
-					var fornitoreVariazione = new Object();
-					fornitoreVariazione.id = $('#fornitoreVariazione option:selected').val();
-					listino.fornitoreVariazione = fornitoreVariazione;
-				}
-				if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
-					var categoriaArticoloVariazione = new Object();
-					categoriaArticoloVariazione.id = $('#categoriaArticoloVariazione option:selected').val();
-					listino.categoriaArticoloVariazione = categoriaArticoloVariazione;
-				}
+                    // create listiniVariazioniPrezzi if tipologiaVariazionePrezzo was specified
+                    if(createListiniPrezziVariazioni){
+                        var listiniPrezziVariazioni = [];
 
-			}
+                        var fornitoreSelected = $('#fornitoreVariazione option:selected').val();
+                        var articoliSelected = $('#articoloVariazione').val();
 
-			/*
-			var listinoJson = JSON.stringify(listino);
+                        if(articoliSelected != null && articoliSelected.length != 0 && articoliSelected.indexOf('-1') == -1){
+                            // loop
+                            $.each(articoliSelected, function(i, item){
+                                var listinoPrezzoVariazione = new Object();
+                                listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
 
-			var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+                                var listino = new Object();
+                                listino.id = idListino;
+                                listinoPrezzoVariazione.listino = listino;
 
-			$.ajax({
-				url: baseUrl + "listini",
-				type: 'POST',
-				contentType: "application/json",
-				dataType: 'json',
-				data: listinoJson,
-				success: function(result) {
-					$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino creato con successo').replace('@@alertResult@@', 'success'));
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del listino').replace('@@alertResult@@', 'danger'));
-				}
-			});
-			*/
+                                var articolo = new Object();
+                                articolo.id = item;
+                                listinoPrezzoVariazione.articolo = articolo;
+
+                                if(fornitoreSelected != null && fornitoreSelected != '-1'){
+                                    var fornitore = new Object();
+                                    fornitore.id = fornitoreSelected;
+                                    listinoPrezzoVariazione.fornitore = fornitore;
+                                }
+                                listiniPrezziVariazioni.push(listinoPrezzoVariazione);
+                            });
+
+                        } else {
+                            // single
+                            var listinoPrezzoVariazione = new Object();
+                            listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
+
+                            var listino = new Object();
+                            listino.id = idListino;
+                            listinoPrezzoVariazione.listino = listino;
+
+                            if(fornitoreSelected != null && fornitoreSelected != '-1'){
+                                var fornitore = new Object();
+                                fornitore.id = fornitoreSelected;
+                                listinoPrezzoVariazione.fornitore = fornitore;
+                            }
+                            listiniPrezziVariazioni.push(listinoPrezzoVariazione);
+                        }
+                        var listiniPrezziVariazioniJson = JSON.stringify(listiniPrezziVariazioni);
+
+                        $.ajax({
+                            url: baseUrl + "listini/"+idListino+"/listini-prezzi-variazioni",
+                            type: 'POST',
+                            contentType: "application/json",
+                            dataType: 'text',
+                            data: listiniPrezziVariazioniJson,
+                            success: function(result) {
+                                $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino creato con successo e prezzi salvati correttamente').replace('@@alertResult@@', 'success'));
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino creato con successo ma errore nel salvataggio dei prezzi').replace('@@alertResult@@', 'danger'));
+                            }
+                        });
+
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del listino').replace('@@alertResult@@', 'danger'));
+                }
+            });
 		});
 	}
 
@@ -415,6 +469,8 @@ $(document).on('change','#fornitoreVariazione', function(){
             dataType: 'json',
             success: function(result) {
                 if(result != null && result != undefined && result != ''){
+                    $('#articoloVariazione').empty();
+                    $('#articoloVariazione').append('<option value=-1>Tutti gli articoli</option>');
                     $.each(result, function(i, item){
                         var label = item.codice+'-'+item.descrizione;
                         $('#articoloVariazione').append('<option value="'+item.id+'">'+label+'</option>');
@@ -422,6 +478,7 @@ $(document).on('change','#fornitoreVariazione', function(){
                 } else {
 					$('#articoloVariazione').empty();
 					$('#articoloVariazione').append('<option value=-1>Tutti gli articoli</option>');
+					$.fn.getArticoli();
 				}
                 $('#articoloVariazione option[value="-1"]').attr('selected', true);
                 $('#articoloVariazione').selectpicker('refresh');
