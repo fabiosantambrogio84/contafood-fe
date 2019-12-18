@@ -156,61 +156,82 @@ $(document).ready(function() {
 		$(document).on('submit','#updateListinoForm', function(event){
 			event.preventDefault();
 
+			var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
 			var listino = new Object();
-			listino.id = $('#hiddenIdListino').val();
+			var idListino = $('#hiddenIdListino').val();
+			listino.id = idListino;
 			listino.nome = $('#nome').val();
 			var tipologia = $('input[name="tipologia"]:checked').val();
 			listino.tipologia = tipologia;
+			var variazionePrezzo = $('#variazionePrezzo').val();
 			if(tipologia != null && tipologia == 'STANDARD'){
 				if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
+					if(variazionePrezzo == null || variazionePrezzo == ''){
+						$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del listino: specificare un prezzo per la variazione').replace('@@alertResult@@', 'danger'));
+						return;
+					}
 					listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
 
-					var variazionePrezzo = $('#variazionePrezzo').val();
-					var fornitoreValue = $('#fornitoreVariazione option:selected').val();
-					var articoliValues = $('#articoloVariazione').val();
+					// create listiniVariazioniPrezzi
 					var listiniPrezziVariazioni = [];
 
-					if(articoliValues != null && articoliValues.length != 0 && !$.inArray('-1',articoliValues)){
-						// array multiple elements
+					var fornitoreSelected = $('#fornitoreVariazione option:selected').val();
+					var articoliSelected = $('#articoloVariazione').val();
+
+					if(articoliSelected != null && articoliSelected.length != 0 && articoliSelected.indexOf('-1') == -1){
+						// loop
+						$.each(articoliSelected, function(i, item){
+							var listinoPrezzoVariazione = new Object();
+							listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
+
+							var listino = new Object();
+							listino.id = idListino;
+							listinoPrezzoVariazione.listino = listino;
+
+							var articolo = new Object();
+							articolo.id = item;
+							listinoPrezzoVariazione.articolo = articolo;
+
+							if(fornitoreSelected != null && fornitoreSelected != '-1'){
+								var fornitore = new Object();
+								fornitore.id = fornitoreSelected;
+								listinoPrezzoVariazione.fornitore = fornitore;
+							}
+							listiniPrezziVariazioni.push(listinoPrezzoVariazione);
+						});
+
 					} else {
-						// array single element
+						// single
 						var listinoPrezzoVariazione = new Object();
 						listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
-					}
 
-					listino.variazionePrezzo = $('#variazionePrezzo').val();
-					if($('#categoriaArticoloVariazione option:selected').val() != '-1'){
-						var categoriaArticoloVariazione = new Object();
-						categoriaArticoloVariazione.id = $('#categoriaArticoloVariazione option:selected').val();
-						listino.categoriaArticoloVariazione = categoriaArticoloVariazione;
-					} else {
-						listino.categoriaArticoloVariazione = null;
+						var listino = new Object();
+						listino.id = idListino;
+						listinoPrezzoVariazione.listino = listino;
+
+						if(fornitoreSelected != null && fornitoreSelected != '-1'){
+							var fornitore = new Object();
+							fornitore.id = fornitoreSelected;
+							listinoPrezzoVariazione.fornitore = fornitore;
+						}
+						listiniPrezziVariazioni.push(listinoPrezzoVariazione);
 					}
-					if($('#fornitoreVariazione option:selected').val() != '-1'){
-						var fornitoreVariazione = new Object();
-						fornitoreVariazione.id = $('#fornitoreVariazione option:selected').val();
-						listino.fornitoreVariazione = fornitoreVariazione;
-					} else {
-						listino.fornitoreVariazione = null;
-					}
+					listino.listiniPrezziVariazioni = listiniPrezziVariazioni;
 				} else {
 					listino.tipologiaVariazionePrezzo = null;
-					listino.variazionePrezzo = null;
-					listino.categoriaArticoloVariazione = null;
-					listino.fornitoreVariazione = null;
+					listino.listiniPrezziVariazioni = null;
 				}
 			} else {
 				listino.tipologiaVariazionePrezzo = null;
-				listino.variazionePrezzo = null;
-				listino.categoriaArticoloVariazione = null;
-				listino.fornitoreVariazione = null;
+				listino.listiniPrezziVariazioni = null;
 			}
 
 			var listinoJson = JSON.stringify(listino);
 
-			var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
 
 			$.ajax({
 				url: baseUrl + "listini/" + $('#hiddenIdListino').val(),
@@ -248,7 +269,6 @@ $(document).ready(function() {
             var tipologia = $('input[name="tipologia"]:checked').val();
             listino.tipologia = tipologia;
 
-            var createListiniPrezziVariazioni = false;
             var variazionePrezzo = $('#variazionePrezzo').val();
             if(tipologia != null && tipologia == 'STANDARD'){
                 if($('#tipologiaVariazionePrezzo option:selected').val() != '-1'){
@@ -257,7 +277,6 @@ $(document).ready(function() {
                         return;
                     }
                     listino.tipologiaVariazionePrezzo = $('#tipologiaVariazionePrezzo option:selected').val();
-                    createListiniPrezziVariazioni = true;
                 }
             }
 
@@ -271,68 +290,70 @@ $(document).ready(function() {
                 success: function(result) {
                     var idListino = result.id;
 
-                    // create listiniVariazioniPrezzi if tipologiaVariazionePrezzo was specified
-                    if(createListiniPrezziVariazioni){
-                        var listiniPrezziVariazioni = [];
+                    if(variazionePrezzo == '-1'){
+                    	variazionePrezzo = null;
+					}
 
-                        var fornitoreSelected = $('#fornitoreVariazione option:selected').val();
-                        var articoliSelected = $('#articoloVariazione').val();
+                    // create listiniVariazioniPrezzi
+					var listiniPrezziVariazioni = [];
 
-                        if(articoliSelected != null && articoliSelected.length != 0 && articoliSelected.indexOf('-1') == -1){
-                            // loop
-                            $.each(articoliSelected, function(i, item){
-                                var listinoPrezzoVariazione = new Object();
-                                listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
+					var fornitoreSelected = $('#fornitoreVariazione option:selected').val();
+					var articoliSelected = $('#articoloVariazione').val();
 
-                                var listino = new Object();
-                                listino.id = idListino;
-                                listinoPrezzoVariazione.listino = listino;
+					if(articoliSelected != null && articoliSelected.length != 0 && articoliSelected.indexOf('-1') == -1){
+						// loop
+						$.each(articoliSelected, function(i, item){
+							var listinoPrezzoVariazione = new Object();
+							listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
 
-                                var articolo = new Object();
-                                articolo.id = item;
-                                listinoPrezzoVariazione.articolo = articolo;
+							var listino = new Object();
+							listino.id = idListino;
+							listinoPrezzoVariazione.listino = listino;
 
-                                if(fornitoreSelected != null && fornitoreSelected != '-1'){
-                                    var fornitore = new Object();
-                                    fornitore.id = fornitoreSelected;
-                                    listinoPrezzoVariazione.fornitore = fornitore;
-                                }
-                                listiniPrezziVariazioni.push(listinoPrezzoVariazione);
-                            });
+							var articolo = new Object();
+							articolo.id = item;
+							listinoPrezzoVariazione.articolo = articolo;
 
-                        } else {
-                            // single
-                            var listinoPrezzoVariazione = new Object();
-                            listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
+							if(fornitoreSelected != null && fornitoreSelected != '-1'){
+								var fornitore = new Object();
+								fornitore.id = fornitoreSelected;
+								listinoPrezzoVariazione.fornitore = fornitore;
+							}
+							listiniPrezziVariazioni.push(listinoPrezzoVariazione);
+						});
 
-                            var listino = new Object();
-                            listino.id = idListino;
-                            listinoPrezzoVariazione.listino = listino;
+					} else {
+						// single
+						var listinoPrezzoVariazione = new Object();
+						listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
 
-                            if(fornitoreSelected != null && fornitoreSelected != '-1'){
-                                var fornitore = new Object();
-                                fornitore.id = fornitoreSelected;
-                                listinoPrezzoVariazione.fornitore = fornitore;
-                            }
-                            listiniPrezziVariazioni.push(listinoPrezzoVariazione);
-                        }
-                        var listiniPrezziVariazioniJson = JSON.stringify(listiniPrezziVariazioni);
+						var listino = new Object();
+						listino.id = idListino;
+						listinoPrezzoVariazione.listino = listino;
 
-                        $.ajax({
-                            url: baseUrl + "listini/"+idListino+"/listini-prezzi-variazioni",
-                            type: 'POST',
-                            contentType: "application/json",
-                            dataType: 'text',
-                            data: listiniPrezziVariazioniJson,
-                            success: function(result) {
-                                $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino creato con successo e prezzi salvati correttamente').replace('@@alertResult@@', 'success'));
-                            },
-                            error: function(jqXHR, textStatus, errorThrown) {
-                                $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino creato con successo ma errore nel salvataggio dei prezzi').replace('@@alertResult@@', 'danger'));
-                            }
-                        });
+						if(fornitoreSelected != null && fornitoreSelected != '-1'){
+							var fornitore = new Object();
+							fornitore.id = fornitoreSelected;
+							listinoPrezzoVariazione.fornitore = fornitore;
+						}
+						listiniPrezziVariazioni.push(listinoPrezzoVariazione);
+					}
+					var listiniPrezziVariazioniJson = JSON.stringify(listiniPrezziVariazioni);
 
-                    }
+					$.ajax({
+						url: baseUrl + "listini/"+idListino+"/listini-prezzi-variazioni",
+						type: 'POST',
+						contentType: "application/json",
+						dataType: 'text',
+						data: listiniPrezziVariazioniJson,
+						success: function(result) {
+							$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino creato con successo e prezzi salvati correttamente').replace('@@alertResult@@', 'success'));
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$('#alertListino').empty().append(alertContent.replace('@@alertText@@','Listino creato con successo ma errore nel salvataggio dei prezzi').replace('@@alertResult@@', 'danger'));
+						}
+					});
+
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     $('#alertListino').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del listino').replace('@@alertResult@@', 'danger'));
@@ -460,6 +481,10 @@ $(document).on('change','#tipologiaVariazionePrezzo', function(){
 });
 
 $(document).on('change','#fornitoreVariazione', function(){
+	var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
     $('#loadingDiv').removeClass('d-none');
     var fornitore = $('#fornitoreVariazione option:selected').val();
     if(fornitore != null && fornitore != '' && fornitore != '-1'){
@@ -570,9 +595,9 @@ $.fn.getFornitori = function(){
 
 $.fn.getListino = function(idListino, withRecap){
 
-	var alertContent = '<div id="alertListinoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-	alertContent = alertContent + '<strong>Errore nel recupero del listino.</strong>\n' +
-    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+	var alertContent = '<div id="alertListinoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 	if(withRecap){
 		$.ajax({
@@ -581,7 +606,6 @@ $.fn.getListino = function(idListino, withRecap){
 			dataType: 'json',
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
-
 					var listinoRow = '<td>'+result.nome+'</td>';
 					listinoRow = listinoRow + '<td>'+result.tipologia+'</td>';
 
@@ -592,7 +616,7 @@ $.fn.getListino = function(idListino, withRecap){
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				$('#alertListino').empty().append(alertContent);
+				$('#alertListino').empty().append(alertContent.replace('@@alertText@@',"Errore nel recupero del listino").replace('@@alertResult@@', 'danger'));
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		});
@@ -626,25 +650,49 @@ $.fn.getListino = function(idListino, withRecap){
 				} else {
 					$('#tipologiaVariazionePrezzo option[value="-1"]').attr('selected',true);
 				}
-				$('#variazionePrezzo').attr('value',result.variazionePrezzo);
-				if(result.categoriaArticoloVariazione != null){
-					$('#categoriaArticoloVariazione option[value="'+result.categoriaArticoloVariazione.id+'"]').attr('selected',true);
-				} else {
-					$('#categoriaArticoloVariazione option[value="-1"]').attr('selected',true);
-				}
-				if(result.fornitoreVariazione != null){
-					$('#fornitoreVariazione option[value="'+result.fornitoreVariazione.id+'"]').attr('selected',true);
-				} else {
-					$('#fornitoreVariazione option[value="-1"]').attr('selected',true);
-				}
+
+				$.ajax({
+					url: baseUrl + "listini/"+idListino+"/listini-prezzi-variazioni",
+					type: 'GET',
+					dataType: 'json',
+					success: function(result) {
+						var variazionePrezzo = null;
+						var idFornitore = '-1';
+						var idsArticoli = [];
+
+						if(result != null && result != undefined && result != ''){
+							$.each(result, function(i, item){
+								variazionePrezzo = item.variazionePrezzo;
+								if(item.fornitore != null){
+									idFornitore = item.fornitore.id;
+								}
+								if(item.articolo != null){
+									idsArticoli.push(item.articolo.id);
+								}
+							});
+							$('#variazionePrezzo').attr('value', variazionePrezzo);
+							$('#fornitoreVariazione option[value="'+idFornitore+'"]').attr('selected',true);
+							if(idsArticoli != null && idsArticoli.length != 0){
+								$('#articoloVariazione').val(idsArticoli)
+							} else {
+								$('#articoloVariazione').val(["-1"]);
+							}
+							$('#articoloVariazione').selectpicker('refresh');
+						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						console.log('Response text: ' + jqXHR.responseText);
+						$('#alertListino').empty().append(alertContent.replace('@@alertText@@',"Errore nel recupero delle variazioni dei prezzi. E' comunque possibile proseguire con la modifica").replace('@@alertResult@@', 'warning'));
+					}
+				});
 			}
 
           } else{
-            $('#alertListino').empty().append(alertContent);
+			  $('#alertListino').empty().append(alertContent.replace('@@alertText@@',"Errore nel recupero del listino").replace('@@alertResult@@', 'danger'));
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertListino').empty().append(alertContent);
+			$('#alertListino').empty().append(alertContent.replace('@@alertText@@',"Errore nel recupero del listino").replace('@@alertResult@@', 'danger'));
             $('#updateListinoButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }
