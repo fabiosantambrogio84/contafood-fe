@@ -205,7 +205,6 @@ $(document).ready(function() {
 			sconto.dataAl = $('#dataAl').val();
 			sconto.valore = $('#valore').val();
 
-
 			if(tipologia == 'FORNITORE'){
 				var fornitore = new Object();
 				fornitore.id = $('#fornitore option:selected').val();
@@ -245,47 +244,79 @@ $(document).ready(function() {
 		$(document).on('submit','#newScontoForm', function(event){
 			event.preventDefault();
 
-			var sconto = new Object();
-            if($('#cliente option:selected').val() != -1){
-                var cliente = new Object();
-                cliente.id = $('#cliente option:selected').val();
-                sconto.cliente = cliente;
-            };
-            sconto.tipologia = $('#tipologia option:selected').val();
-            if(sconto.tipologia == 'FORNITORE'){
-				if($('#fornitore option:selected').val() != -1){
-					var fornitore = new Object();
-					fornitore.id = $('#fornitore option:selected').val();
-					sconto.fornitore = fornitore;
-				};
-			} else {
-				if($('#articolo option:selected').val() != -1){
-					var articolo = new Object();
-					articolo.id = $('#articolo option:selected').val();
-					sconto.articolo = articolo;
-				};
-			}
-            sconto.dataDal = $('#dataDal').val();
-            sconto.dataAl = $('#dataAl').val();
-            sconto.valore = $('#valore').val();
+            var alertContent = '<div id="alertScontoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+            			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+            				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-            var scontoJson = JSON.stringify(sconto);
+            var sconti = [];
+            var dataDal = $('#dataDal').val();
+            var dataAl = $('#dataAl').val();
+            var valore = $('#valore').val();
+            var tipologia = $('#tipologia option:selected').val();
 
-			var alertContent = '<div id="alertScontoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+            if(tipologia == 'FORNITORE'){
+                var fornitori = $('#fornitore').val();
+                if(fornitori != null && fornitore.length != 0){
+                    $.each(fornitori, function(i, item){
+                        var sconto = new Object();
+                        sconto.tipologia = tipologia;
+
+                        if($('#cliente option:selected').val() != -1){
+                            var cliente = new Object();
+                            cliente.id = $('#cliente option:selected').val();
+                            sconto.cliente = cliente;
+                        };
+
+                        var fornitore = new Object();
+                        fornitore.id = item;
+                        sconto.fornitore = fornitore;
+
+                        sconto.dataDal = dataDal;
+                        sconto.dataAl = dataAl;
+                        sconto.valore = valore;
+
+                        sconti.push(sconto);
+                    })
+                }
+            } else {
+                var articoli = $('#articolo').val();
+                if(articoli != null && articoli.length != 0){
+                    $.each(articoli, function(i, item){
+                        var sconto = new Object();
+                        sconto.tipologia = tipologia;
+
+                        if($('#cliente option:selected').val() != -1){
+                            var cliente = new Object();
+                            cliente.id = $('#cliente option:selected').val();
+                            sconto.cliente = cliente;
+                        };
+
+                        var articolo = new Object();
+                        articolo.id = item;
+                        sconto.articolo = articolo;
+
+                        sconto.dataDal = dataDal;
+                        sconto.dataAl = dataAl;
+                        sconto.valore = valore;
+
+                        sconti.push(sconto);
+                    })
+                }
+            }
+
+            var scontiJson = JSON.stringify(sconti);
 
 			$.ajax({
 				url: baseUrl + "sconti",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: scontoJson,
+				data: scontiJson,
 				success: function(result) {
-					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Sconto creato con successo').replace('@@alertResult@@', 'success'));
+					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Sconti creati con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dello sconto').replace('@@alertResult@@', 'danger'));
+					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione degli sconti').replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -294,19 +325,25 @@ $(document).ready(function() {
 	$(document).on('change','#tipologia', function(){
 		var tipologia = $('#tipologia option:selected').val();
 		if(tipologia == 'ARTICOLO'){
-			$('#articolo').selectpicker();
+			$('#articolo').selectpicker('refresh');
 
 			$('#fornitoreDiv').addClass('d-none');
 			$('#articoloDiv').removeClass('d-none');
 			$('#tipologia option[value="ARTICOLO"]').attr('selected', true);
 			$('#tipologia option[value="FORNITORE"]').removeAttr('selected');
+
+			$('#articolo').attr('required', true);
+			$('#fornitore').removeAttr('required');
 		} else {
-			$('#fornitore').selectpicker();
+			$('#fornitore').selectpicker('refresh');
 
 			$('#fornitoreDiv').removeClass('d-none');
 			$('#articoloDiv').addClass('d-none');
 			$('#tipologia option[value="FORNITORE"]').attr('selected', true);
 			$('#tipologia option[value="ARTICOLO"]').removeAttr('selected');
+
+			$('#fornitore').attr('required', true);
+            $('#articolo').removeAttr('required');
 		}
 	});
 });
@@ -325,7 +362,12 @@ $.fn.getClienti = function(){
 					} else {
 						label += item.ragioneSociale;
 					}
-					label += ' - ' + item.partitaIva + ' - ' + item.codiceFiscale;
+					if(item.partitaIva != null && item.partitaIva != ''){
+					    label += ' - ' + item.partitaIva;
+					}
+					if(item.codiceFiscale != null && item.codiceFiscale != ''){
+					    label += ' - ' + item.codiceFiscale;
+					}
 					$('#cliente').append('<option value="'+item.id+'">'+label+'</option>');
 				});
 			}
@@ -347,6 +389,7 @@ $.fn.getFornitori = function(){
 					$('#fornitore').append('<option value="'+item.id+'">'+item.ragioneSociale+'</option>');
 				});
 			}
+			$('#fornitore').selectpicker('refresh');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
@@ -365,6 +408,7 @@ $.fn.getArticoli = function(){
 					$('#articolo').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
 				});
 			}
+			$('#articolo').selectpicker('refresh');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
