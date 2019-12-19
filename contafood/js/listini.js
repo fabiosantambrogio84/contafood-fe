@@ -94,7 +94,7 @@ $(document).ready(function() {
     $(document).on('click','.detailsListino', function(){
         var idListino = $(this).attr('data-id');
 
-        var alertContent = '<div id="alertFornitoreContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+        var alertContent = '<div id="alertListinoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
         alertContent = alertContent + '<strong>Errore nel recupero del listino.</strong></div>';
 
         $('#detailsListinoModal').modal('show');
@@ -120,10 +120,18 @@ $(document).ready(function() {
             "info": false,
             "order": [
                 [0,'asc'],
-                [1,'asc']
+                [1,'asc'],
+                [2,'asc']
             ],
             "autoWidth": false,
             "columns": [
+                {"name": "listino", "data": null, render: function ( data, type, row ) {
+                    var result = '';
+                    if(data.listino != null){
+                        result = data.listino.nome;
+                    }
+                    return result;
+                }},
                 {"name": "articolo", "data": null, render: function ( data, type, row ) {
                     var result = '';
                     if(data.articolo != null){
@@ -140,7 +148,18 @@ $(document).ready(function() {
                     }
                     return result;
                 }},
-                {"name": "prezzo", "data": "prezzo"}
+                {"name": "prezzo", "data": null,  render: function ( data, type, row ) {
+                    var result = '';
+                    if(data.prezzo != null){
+                        var prezzo = data.prezzo;
+                        if(!(prezzo.toString()).includes(".")){
+                            result = prezzo + ".00";
+                        } else {
+                            result = prezzo;
+                        }
+                    }
+                    return result;
+                }}
             ]
         });
     });
@@ -504,7 +523,7 @@ $(document).on('change','#fornitoreVariazione', function(){
     var fornitore = $('#fornitoreVariazione option:selected').val();
     if(fornitore != null && fornitore != '' && fornitore != '-1'){
         $.ajax({
-            url: baseUrl + "fornitori/"+fornitore+"/articoli",
+            url: baseUrl + "fornitori/"+fornitore+"/articoli?attivo=true",
             type: 'GET',
             dataType: 'json',
             success: function(result) {
@@ -574,7 +593,7 @@ $.fn.getTipologieVariazioniPrezzo = function(){
 
 $.fn.getArticoli = function(){
 	$.ajax({
-		url: baseUrl + "articoli",
+		url: baseUrl + "articoli?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
