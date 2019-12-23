@@ -114,7 +114,7 @@ $(document).ready(function() {
 
 				return noteHtml;
 			}},
-			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
+			{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
 				var links = '<a class="detailsTelefonata pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 				links += '<a class="updateTelefonata pr-2" data-id="'+data.id+'" href="telefonate-edit.html?idTelefonata=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links += '<a class="deleteTelefonata" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
@@ -574,4 +574,5 @@ $.fn.getTelefonata = function(idTelefonata){
             console.log('Response text: ' + jqXHR.responseText);
         }
     });
+
 }

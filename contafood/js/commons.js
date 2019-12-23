@@ -22,6 +22,15 @@ $(document).ready(function() {
     } else{
         $('.navbar').load('commons/topbar.html');
         $('#accordionSidebar').load('commons/sidebar.html');
-
     }
+
+    // Toggle the side navigation
+    $(document).on('click','#sidebarToggle, #sidebarToggleTop', function(){
+        $("body").toggleClass("sidebar-toggled");
+        $(".sidebar").toggleClass("toggled");
+        if ($(".sidebar").hasClass("toggled")) {
+          $('.sidebar .collapse').collapse('hide');
+        };
+    });
+
 });

@@ -184,7 +184,7 @@ $.fn.getPuntiConsegna = function(idCliente){
 
 	$('#clientiPuntiConsegnaTable').DataTable({
 		"ajax": {
-			"url": baseUrl + "punti-consegna",
+			"url": baseUrl + "clienti/"+idCliente+"/punti-consegna",
 			"type": "GET",
 			"content-type": "json",
 			"cache": false,

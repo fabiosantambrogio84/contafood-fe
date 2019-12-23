@@ -12081,3 +12081,9 @@ body.sidebar-toggled footer.sticky-footer {
 .dataTables_processing {
     background-color: #edf3f5 !important;
 }
+
+/* Telefonate */
+.telefonateTable {
+    font-size: 14px !important;
+    white-space: nowrap;
+}
