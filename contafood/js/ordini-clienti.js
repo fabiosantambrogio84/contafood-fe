@@ -701,6 +701,7 @@ $.fn.getClienti = function(){
 					$('#cliente').append('<option value="'+item.id+'">'+label+'</option>');
 				});
 			}
+			$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);

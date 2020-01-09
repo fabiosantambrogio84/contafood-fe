@@ -1,0 +1,126 @@
+var baseUrl = "/contafood-be/";
+
+$(document).ready(function() {
+
+	if($('#searchOrdineAutistaButton') != null && $('#searchOrdineAutistaButton') != undefined){
+		$(document).on('submit','#searchOrdineAutistaForm', function(event){
+			event.preventDefault();
+
+			$('#ordiniAutistiTable').DataTable().destroy();
+			$('#ordiniAutistiMainDiv').removeClass('d-none');
+
+			var alertContent = '<div id="alertOrdineAutistaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var idAutista = $('#autista option:selected').val();
+			var dataConsegna = $('#dataConsegna').val();
+
+			$('#ordiniAutistiTable').DataTable({
+				"ajax": {
+					"url": baseUrl + "ordini-clienti?idAutista="+idAutista+"&dataConsegna="+dataConsegna,
+					"type": "GET",
+					"content-type": "json",
+					"cache": false,
+					"dataSrc": "",
+					"error": function(jqXHR, textStatus, errorThrown) {
+						console.log('Response text: ' + jqXHR.responseText);
+						var alertContent = '<div id="alertOrdineAutistaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+						alertContent = alertContent + '<strong>Errore nel recupero degli ordini</strong>\n' +
+							'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+						$('#alertOrdineAutista').empty().append(alertContent);
+					}
+				},
+				"language": {
+					"search": "Cerca",
+					"paginate": {
+						"first": "Inizio",
+						"last": "Fine",
+						"next": "Succ.",
+						"previous": "Prec."
+					},
+					"emptyTable": "Nessun ordine disponibile",
+					"zeroRecords": "Nessun ordine disponibile"
+				},
+				"pageLength": 20,
+				"lengthChange": false,
+				"info": false,
+				"autoWidth": false,
+				"order": [
+					[0, 'desc']
+				],
+				"columns": [
+					{"name": "codice", "data": "codice"},
+					{"name":"cliente", "data": null, render: function ( data, type, row ) {
+						if(data.cliente != null){
+							var clienteHtml = '';
+
+							if(data.cliente.dittaIndividuale){
+								clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
+							} else {
+								clienteHtml += data.cliente.ragioneSociale;
+							}
+							return clienteHtml;
+						} else {
+							return '';
+						}
+					}},
+					{"name": "dataInserimento", "data": null, render: function ( data, type, row ) {
+						if(data.dataInserimento != null){
+							var a = moment(data.dataInserimento);
+							return a.format('DD/MM/YYYY');
+						} else {
+							return '';
+						}
+					}},
+					{"name": "dataConsegna", "data": null, render: function ( data, type, row ) {
+						if(data.dataConsegna != null){
+							var a = moment(data.dataConsegna);
+							return a.format('DD/MM/YYYY');
+						} else {
+							return '';
+						}
+					}},
+					{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
+						var links = '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
+						return links;
+					}}
+				]
+			});
+
+		});
+	}
+
+	/*
+	$(document).on('click','#emptyOrdineAutisti', function(event){
+		event.preventDefault();
+
+		$('#ordiniAutistiTable').DataTable().destroy();
+		$('#ordiniAutistiMainDiv').addClass('d-none');
+
+		$('#autista option[value=""]').attr('selected', true);
+		$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
+	});
+	*/
+});
+
+
+$.fn.getAutisti = function(){
+	$.ajax({
+		url: baseUrl + "autisti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					var label = item.cognome + ' ' + item.nome;
+					$('#autista').append('<option value="'+item.id+'">'+label+'</option>');
+				});
+			}
+			$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
