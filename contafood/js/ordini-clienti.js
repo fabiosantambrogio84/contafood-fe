@@ -667,6 +667,22 @@ $.fn.extractIdOrdineClienteFromUrl = function(){
 	}
 }
 
+$.fn.extractIdTelefonataFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idTelefonata') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
 $.fn.getClienti = function(){
 	$.ajax({
 		url: baseUrl + "clienti",
@@ -836,4 +852,55 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
     });
 }
 
+$.fn.getTelefonata = function(idTelefonata){
+	var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>Errore nel recupero della telefonata.</strong>\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+	$.ajax({
+		url: baseUrl + "telefonate/" + idTelefonata,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+
+				if(result.autista != null){
+					$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
+				}
+				if(result.cliente != null){
+					$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
+					$.ajax({
+						url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
+						type: 'GET',
+						dataType: 'json',
+						success: function(result) {
+							if(result != null && result != undefined && result != ''){
+								$.each(result, function(i, item){
+									var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
+									var selected = '';
+									if(result.puntoConsegna != null){
+										if(result.puntoConsegna.id == item.id){
+											selected = 'selected';
+										}
+									}
+									$('#puntoConsegna').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
+								});
+							}
+							$('#puntoConsegna').removeAttr('disabled');
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
+						}
+					});
+				}
+
+			} else{
+				$('#alertOrdineCliente').empty().append(alertContent);
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$('#alertOrdineCliente').empty().append(alertContent);
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}

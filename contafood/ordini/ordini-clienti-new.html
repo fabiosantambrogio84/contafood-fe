@@ -33,9 +33,16 @@
   <script src="../js/ordini-clienti.js"></script>
 
   <script>
-    $.fn.getClienti();
-    $.fn.getAutisti();
-    $.fn.getAgenti();
+    var idTelefonata = $.fn.extractIdTelefonataFromUrl();
+    if(idTelefonata != null && idTelefonata != undefined){
+      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti()).then(function(f1,f2,f3){
+        $.fn.getTelefonata(idTelefonata);
+      });
+    } else {
+      $.fn.getClienti();
+      $.fn.getAutisti();
+      $.fn.getAgenti();
+    }
   </script>
 </head>
 
