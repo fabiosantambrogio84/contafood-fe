@@ -276,7 +276,8 @@ $(document).ready(function() {
                 dataType: 'json',
                 success: function(result) {
                     if(result != null && result != undefined && result != ''){
-                        $.each(result, function(i, item){
+						$('#puntoConsegna').empty();
+                    	$.each(result, function(i, item){
                             var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
                             $('#puntoConsegna').append('<option value="'+item.id+'">'+label+'</option>');
                         });
@@ -531,7 +532,9 @@ $.fn.getTelefonata = function(idTelefonata){
           if(result != null && result != undefined && result != ''){
 
 			$('#hiddenIdTelefonata').attr('value', result.id);
-			$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
+			if(result.autista != null){
+				$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
+			}
 			$('#telefono').attr('value', result.telefono);
 			$('#telefono2').attr('value', result.telefonoTwo);
 			$('#telefono3').attr('value', result.telefonoThree);

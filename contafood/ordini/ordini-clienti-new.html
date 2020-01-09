@@ -71,6 +71,7 @@
               <div class="form-group col-md-4">
                 <label for="cliente">Cliente*</label>
                 <select id="cliente" class="form-control" required>
+                  <option value=""></option>
                 </select>
                 <div class="invalid-feedback">
                   Seleziona un cliente
@@ -79,7 +80,7 @@
             </div>
             <div class="form-row">
               <div class="form-group col-md-4">
-                <label for="puntoConsegna">Punto consegna</label>
+                <label for="puntoConsegna">Punto consegna*</label>
                 <div class="d-flex flex-row">
                   <div class="p-2">
                     <select id="puntoConsegna" class="form-control" disabled required>
@@ -91,6 +92,8 @@
                   <div class="p-2 d-none" id="loadingDiv"><i class="fas fa-spinner fa-pulse"></i></div>
                 </div>
               </div>
+            </div>
+            <div class="form-row">
               <div class="form-group col-md-2">
                 <label for="dataConsegna">Data consegna*</label>
                 <input type="date" class="form-control" id="dataConsegna" placeholder="" required>
@@ -103,6 +106,7 @@
               <div class="form-group col-md-2">
                 <label for="autista">Autista*</label>
                 <select id="autista" class="form-control" required>
+                  <option value=""></option>
                 </select>
                 <div class="invalid-feedback">
                   Seleziona un autista
@@ -110,8 +114,8 @@
               </div>
               <div class="form-group col-md-2">
                 <label for="agente">Agente</label>
-                <select id="agente" class="form-control" required>
-                  <option value="-1"> - </option>
+                <select id="agente" class="form-control">
+                  <option value=""></option>
                 </select>
               </div>
             </div>

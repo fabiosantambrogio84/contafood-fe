@@ -120,15 +120,44 @@
 
         <!-- Modal Details-->
         <div class="modal fade" id="detailsOrdineClienteModal" tabindex="-1" role="dialog" aria-labelledby="detailsOrdineClienteModal" aria-hidden="true">
-          <div class="modal-dialog" role="document">
+          <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
               <div class="modal-header">
                 <h5 class="modal-title" id="detailsOrdineClienteModalTitle">Dettagli ordine cliente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close closeOrdineCliente" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
               </div>
-              <div class="modal-body" id="detailsOrdineClienteMainDiv"></div>
+              <div class="modal-body" id="detailsOrdineClienteMainDiv">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-sm text-center" id="detailsOrdineClienteModalTable">
+                    <thead class="table-success">
+                      <th scope="col">Codice</th>
+                      <th scope="col">Cliente</th>
+                      <th scope="col">Punto consegna</th>
+                      <th scope="col">Data consegna</th>
+                      <th scope="col">Autista</th>
+                      <th scope="col">Agente</th>
+                      <th scope="col">Note</th>
+                    </thead>
+                    <tbody>
+                      <tr id="ordineClienteRow" class="table-default"></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="table-responsive mt-4">
+                  <table class="table table-bordered" id="detailsOrdineClienteArticoliModalTable">
+                    <thead>
+                      <th>Articolo</th>
+                      <th>Prezzo listino base (€)</th>
+                      <th>Pezzi ordinati</th>
+                      <th>Pezzi da evadere</th>
+                    </thead>
+                  </table>
+                </div>
+
+              </div>
             </div>
           </div>
         </div>
