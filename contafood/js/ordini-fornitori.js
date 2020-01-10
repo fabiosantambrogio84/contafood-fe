@@ -111,7 +111,7 @@ $(document).ready(function() {
 							"info": false,
 							"order": [
 								[0, 'asc'],
-								[2, 'asc']
+								[1, 'asc']
 							],
 							"autoWidth": false,
 							"columns": [
@@ -206,7 +206,7 @@ $(document).ready(function() {
 					ordineFornitoreArticolo.id = ordineFornitoreArticoloId;
 					ordineFornitoreArticolo.numeroPezziOrdinati = $('#pezziArticolo_'+articoloId).val();
 
-					ordineFornitoreArticoli.push(ordineClienteArticolo);
+					ordineFornitoreArticoli.push(ordineFornitoreArticolo);
 				});
 				ordineFornitore.ordineFornitoreArticoli = ordineFornitoreArticoli;
 			}
@@ -255,7 +255,7 @@ $(document).ready(function() {
 					var ordineFornitoreArticoloId = new Object();
 					var articoloId = item.id.replace('formRowArticolo_','');
 					ordineFornitoreArticoloId.articoloId = articoloId;
-					ordineFornitoreArticolo.id = ordineClienteArticoloId;
+					ordineFornitoreArticolo.id = ordineFornitoreArticoloId;
 					ordineFornitoreArticolo.numeroPezziOrdinati = $('#pezziArticolo_'+articoloId).val();
 
 					ordineFornitoreArticoli.push(ordineFornitoreArticolo);
@@ -357,7 +357,7 @@ $(document).ready(function() {
 				} else{
 					var descrizione = $('#'+item.id).attr('data-descrizione');
 
-					var rowHtml = '<div class="form-row formRowArticolo" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
+					var rowHtml = '<div class="form-row formRowArticolo col-md-8" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
 						'<div class="form-group col-md-2">';
 
 					if(i == 0 && alreadyAddedRows == 0){
@@ -500,7 +500,7 @@ $.fn.getOrdineFornitore = function(idOrdineFornitore){
 					var descrizione = item.articolo.descrizione;
 					var pezzi = item.numeroPezziOrdinati;
 
-					var rowHtml = '<div class="form-row formRowArticolo" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
+					var rowHtml = '<div class="form-row formRowArticolo col-md-8" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
 						'<div class="form-group col-md-2">';
 
 					if(i == 0){
