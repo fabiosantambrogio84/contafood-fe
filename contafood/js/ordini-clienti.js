@@ -36,7 +36,9 @@ $(document).ready(function() {
 			[0, 'desc']
 		],
 		"columns": [
-			{"name": "codice", "data": "codice"},
+            {"name":"codice", "data": null, render: function ( data, type, row ) {
+                return data.progressivo + '/' + data.annoContabile;
+            }},
 			{"name":"cliente", "data": null, render: function ( data, type, row ) {
 				if(data.cliente != null){
 					var clienteHtml = '';
@@ -104,6 +106,19 @@ $(document).ready(function() {
 					return '';
 				}
 			}},
+			{"name":"statoOrdine", "data": null, render: function ( data, type, row ) {
+				if(data.statoOrdine != null){
+					var statoOrdineHtml = '';
+
+					if(data.statoOrdine.descrizione){
+						statoOrdineHtml += data.statoOrdine.descrizione;
+					}
+
+					return statoOrdineHtml;
+				} else {
+					return '';
+				}
+			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="detailsOrdineCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 				links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
@@ -126,7 +141,7 @@ $(document).ready(function() {
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
 
-					var ordineClienteRow = '<td>' + result.codice + '</td>';
+					var ordineClienteRow = '<td>' + result.progressivo + '/' + result.annoContabile + '</td>';
 					if (result.cliente != null) {
 						var clienteHtml = '';
 						if (result.cliente.dittaIndividuale) {
@@ -183,6 +198,16 @@ $(document).ready(function() {
 						}
 
 						ordineClienteRow += '<td>' + $.fn.printVariable(agenteHtml) + '</td>';
+					} else {
+						ordineClienteRow += '<td></td>';
+					}
+					if (result.statoOrdine != null) {
+						var statoOrdineHtml = '';
+						if (result.statoOrdine.descrizione != null) {
+							statoOrdineHtml += result.statoOrdine.descrizione;
+						}
+
+						ordineClienteRow += '<td>' + $.fn.printVariable(statoOrdineHtml) + '</td>';
 					} else {
 						ordineClienteRow += '<td></td>';
 					}
@@ -315,7 +340,12 @@ $(document).ready(function() {
 
 			var ordineCliente = new Object();
 			ordineCliente.id = $('#hiddenIdOrdineCliente').val();
-			ordineCliente.codice =$('#hiddenCodiceOrdineCliente').val();
+			ordineCliente.progressivo = $('#hiddenProgressivoOrdineCliente').val();
+            ordineCliente.annoContabile = $('#hiddenAnnoContabileOrdineCliente').val();
+
+			var statoOrdine = new Object();
+			statoOrdine.id = $('#hiddenStatoOrdineCliente').val();
+			ordineCliente.statoOrdine = statoOrdine;
 
 			var clienteId = $('#cliente option:selected').val();
 			if(clienteId != null && clienteId != ''){
@@ -762,7 +792,9 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
           if(result != null && result != undefined && result != ''){
 
 			$('#hiddenIdOrdineCliente').attr('value', result.id);
-			$('#hiddenCodiceOrdineCliente').attr('value', result.codice);
+			$('#hiddenProgressivoOrdineCliente').attr('value', result.progressivo);
+            $('#hiddenAnnoContabileOrdineCliente').attr('value', result.annoContabile);
+			$('#hiddenStatoOrdineCliente').attr('value', result.statoOrdine.id);
 
 			if(result.cliente != null && result.cliente != undefined){
 				$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);

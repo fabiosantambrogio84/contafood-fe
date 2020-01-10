@@ -81,6 +81,19 @@ $(document).ready(function() {
 							return '';
 						}
 					}},
+					{"name":"statoOrdine", "data": null, render: function ( data, type, row ) {
+						if(data.statoOrdine != null){
+							var statoOrdineHtml = '';
+
+							if(data.statoOrdine.descrizione){
+								statoOrdineHtml += data.statoOrdine.descrizione;
+							}
+
+							return statoOrdineHtml;
+						} else {
+							return '';
+						}
+					}},
 					{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
 						var links = '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
 						return links;

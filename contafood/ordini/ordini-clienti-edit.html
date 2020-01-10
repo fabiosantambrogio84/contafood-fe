@@ -28,6 +28,7 @@
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
+  <script src="../js/core/moment.js"></script>
   <script src="../js/commons.js"></script>
 
   <script src="../js/ordini-clienti.js"></script>
@@ -142,7 +143,9 @@
             </div>
 
             <input type="hidden" id="hiddenIdOrdineCliente"/>
-            <input type="hidden" id="hiddenCodiceOrdineCliente"/>
+            <input type="hidden" id="hiddenProgressivoOrdineCliente"/>
+            <input type="hidden" id="hiddenAnnoContabileOrdineCliente"/>
+            <input type="hidden" id="hiddenStatoOrdineCliente"/>
             <button type="submit" class="btn btn-primary" id="updateOrdineClienteButton">Salva</button>
             <a href="ordini-clienti.html" class="btn btn-secondary">Annulla</a>
           </form>
