@@ -503,7 +503,7 @@ $(document).ready(function() {
 					var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 					alertContent = alertContent + '<strong>Errore nel recupero degli articoli</strong>\n' +
 						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-					$('#alertOrdineClienteAddIngrediente').empty().append(alertContent);
+					$('#alertOrdineClienteAddArticolo').empty().append(alertContent);
 				}
 			},
 			"language": {

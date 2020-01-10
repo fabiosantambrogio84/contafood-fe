@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Ordine Cliente Nuovo</title>
+  <title>ContaFood - Ordine Fornitore Modifica</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -31,23 +31,20 @@
   <script src="../js/core/moment.js"></script>
   <script src="../js/commons.js"></script>
 
-  <script src="../js/ordini-clienti.js"></script>
+  <script src="../js/ordini-fornitori.js"></script>
 
   <script>
-    var idTelefonata = $.fn.extractIdTelefonataFromUrl();
-    if(idTelefonata != null && idTelefonata != undefined){
-      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti()).then(function(f1,f2,f3){
-        $.fn.getTelefonata(idTelefonata);
+	var idOrdineFornitore = $.fn.extractIdOrdineFornitoreFromUrl();
+    if(idOrdineFornitore != null && idOrdineFornitore != undefined){
+      $.when($.fn.getFornitori()).then(function(f1){
+        $.fn.getOrdineFornitore(idOrdineFornitore);
       });
-    } else {
-      $.fn.getClienti();
-      $.fn.getAutisti();
-      $.fn.getAgenti();
     }
   </script>
+
 </head>
 
-<body id="page-top" class="ordineClienteBody">
+<body id="page-top" class="ordineFornitoreBody">
 
   <!-- Page Wrapper -->
   <div id="wrapper">
@@ -67,66 +64,27 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerOrdineCliente">
+        <div class="container-fluid" id="containerOrdineFornitore">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Nuovo ordine cliente</h1>
+          <h1 class="h3 mb-4 text-gray-800">Modifica ordine fornitore</h1>
 
-          <div id="alertOrdineCliente"></div>
+          <div id="alertOrdineFornitore"></div>
 
-          <form id="newOrdineClienteForm" class="needs-validation" novalidate>
+          <form id="updateOrdineFornitoreForm" class="needs-validation" novalidate>
+
             <div class="form-row">
               <div class="form-group col-md-4">
-                <label for="cliente">Cliente*</label>
-                <select id="cliente" class="form-control" required>
+                <label for="fornitore">Fornitore*</label>
+                <select id="fornitore" class="form-control" required>
                   <option value=""></option>
                 </select>
                 <div class="invalid-feedback">
-                  Seleziona un cliente
+                  Seleziona un fornitore
                 </div>
               </div>
             </div>
-            <div class="form-row">
-              <div class="form-group col-md-4">
-                <label for="puntoConsegna">Punto consegna*</label>
-                <div class="d-flex flex-row">
-                  <div class="p-2">
-                    <select id="puntoConsegna" class="form-control" disabled required>
-                    </select>
-                    <div class="invalid-feedback">
-                      Seleziona un punto di consegna
-                    </div>
-                  </div>
-                  <div class="p-2 d-none" id="loadingDiv"><i class="fas fa-spinner fa-pulse"></i></div>
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="dataConsegna">Data consegna*</label>
-                <input type="date" class="form-control" id="dataConsegna" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci una data di consegna
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="autista">Autista*</label>
-                <select id="autista" class="form-control" required>
-                  <option value=""></option>
-                </select>
-                <div class="invalid-feedback">
-                  Seleziona un autista
-                </div>
-              </div>
-              <div class="form-group col-md-2">
-                <label for="agente">Agente</label>
-                <select id="agente" class="form-control">
-                  <option value=""></option>
-                </select>
-              </div>
-            </div>
+
 
             <div class="form-row" id="formRowArticoli">
               <div class="form-group col-md-12" id="formRowArticoliBody">
@@ -136,6 +94,7 @@
                 </div>
               </div>
             </div>
+
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="note">Note</label>
@@ -143,8 +102,11 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" id="newOrdineClienteButton">Salva</button>
-            <a href="ordini-clienti.html" class="btn btn-secondary">Annulla</a>
+            <input type="hidden" id="hiddenIdOrdineFornitore"/>
+            <input type="hidden" id="hiddenProgressivoOrdineFornitore"/>
+            <input type="hidden" id="hiddenAnnoContabileOrdineFornitore"/>
+            <button type="submit" class="btn btn-primary" id="updateOrdineFornitoreButton">Salva</button>
+            <a href="ordini-fornitori.html" class="btn btn-secondary">Annulla</a>
           </form>
 
           <script>
@@ -174,7 +136,6 @@
       </div>
       <!-- End of Main Content -->
 
-      <!-- Modal aggiungi articolo -->
       <div id="addArticoloModal" class="modal fade addArticoloModal" tabindex="-1" role="dialog" aria-labelledby="addArticoloModal" aria-hidden="true">
         <div class="modal-dialog modal-xl">
           <div class="modal-content">
@@ -185,7 +146,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <div id="alertOrdineClienteAddArticolo"></div>
+              <div id="alertOrdineFornitoreAddArticolo"></div>
               <div class="table-responsive">
                 <table class="table table-bordered" id="addArticoloModalTable" width="100%" cellspacing="0">
                   <thead>
@@ -193,7 +154,6 @@
                     <th></th>
                     <th>Codice</th>
                     <th>Descrizione</th>
-                    <th>Prezzo listino base (&euro;)</th>
                   </tr>
                   </thead>
                 </table>
