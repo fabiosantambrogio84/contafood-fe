@@ -2,6 +2,8 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
+    $('[data-toggle="tooltip"]').tooltip();
+
 	$('#listiniTable').DataTable({
 		"processing": true,
         //"serverSide": true,
@@ -42,6 +44,21 @@ $(document).ready(function() {
 		"columns": [
             {"name": "tipologia", "data": "tipologia", "visible": false},
 		    {"name": "nome", "data": "nome"},
+            {"name": "note", "data": null, "width": "25%", render: function ( data, type, row ) {
+                var note = data.note;
+                if(note != null && note != ''){
+                    var noteTrunc = note;
+                    var noteHtml = '<div>'+noteTrunc+'</div>';
+                    if(note.length > 100){
+                        noteTrunc = note.substring(0, 100)+'...';
+                        noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
+                    }
+
+                    return noteHtml;
+                } else {
+                    return '';
+                }
+            }},
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="detailsListino pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links = links + '<a class="updateListino pr-2" data-id="'+data.id+'" href="listini-edit.html?idListino=' + data.id + '"><i class="far fa-edit"></i></a>';
@@ -54,6 +71,9 @@ $(document).ready(function() {
             if(data.tipologia == 'BASE'){
                 $(row).addClass("listinoBaseRow");
             }
+        },
+        "initComplete": function( settings, json ) {
+            $('[data-toggle="tooltip"]').tooltip();
         }
 	});
 
@@ -199,6 +219,7 @@ $(document).ready(function() {
                     }
                 }
             }
+            listino.note = $('#note').val();
 
             var listinoJson = JSON.stringify(listino);
             $.ajax({
@@ -307,6 +328,7 @@ $(document).ready(function() {
                     }
                 }
             }
+            listino.note = $('#note').val();
 
             var listinoJson = JSON.stringify(listino);
             $.ajax({
@@ -642,6 +664,7 @@ $.fn.getListino = function(idListino, withRecap){
 				if(result != null && result != undefined && result != '') {
 					var listinoRow = '<td>'+result.nome+'</td>';
 					listinoRow = listinoRow + '<td>'+result.tipologia+'</td>';
+                    listinoRow = listinoRow + '<td>'+result.note+'</td>';
 
 					$('#listinoRow').append(listinoRow);
 
@@ -665,6 +688,8 @@ $.fn.getListino = function(idListino, withRecap){
 
 			$('#hiddenIdListino').attr('value', result.id);
 			$('#nome').attr('value', result.nome);
+			$('#note').val(result.note);
+
             if(result.tipologia == 'BASE'){
                 $('#tipologiaBase').attr('checked', true);
 
