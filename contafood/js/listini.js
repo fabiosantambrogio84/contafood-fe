@@ -62,7 +62,7 @@ $(document).ready(function() {
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="detailsListino pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links = links + '<a class="updateListino pr-2" data-id="'+data.id+'" href="listini-edit.html?idListino=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links = links + '<a class="refreshListino pr-2" data-id="'+data.id+'" href="listini-refresh.html?idListino=' + data.id + '"><i class="fas fa-sync"></i></a>';
+				links = links + '<a class="refreshListino pr-2" data-id="'+data.id+'" href="listini-refresh.html?idListino=' + data.id + '" title="Aggiorna prezzi"><i class="fas fa-sync"></i></a>';
 				links = links + '<a class="deleteListino" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -469,8 +469,8 @@ $(document).ready(function() {
             } else {
                 // single
                 var listinoPrezzoVariazione = new Object();
-                listino.tipologiaVariazionePrezzo = tipologiaVariazionePrezzo;
                 listinoPrezzoVariazione.variazionePrezzo = variazionePrezzo;
+                listinoPrezzoVariazione.tipologiaVariazionePrezzo = tipologiaVariazionePrezzo;
 
                 var listino = new Object();
                 listino.id = idListino;

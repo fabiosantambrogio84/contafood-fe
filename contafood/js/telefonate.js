@@ -174,8 +174,10 @@ $(document).ready(function() {
 					contentDetails += '<p><strong>Telefono: </strong>'+$.fn.printVariable(result.telefono)+'</p>';
 					contentDetails += '<p><strong>Telefono 2: </strong>'+$.fn.printVariable(result.telefonoTwo)+'</p>';
 					contentDetails += '<p><strong>Telefono 3: </strong>'+$.fn.printVariable(result.telefonoThree)+'</p>';
-					contentDetails += '<p><strong>Giorno </strong>'+$.fn.printVariable(result.giorno)+'</p>';
+					contentDetails += '<p><strong>Giorno: </strong>'+$.fn.printVariable(result.giorno)+'</p>';
 					contentDetails += '<p><strong>Ora: </strong>'+$.fn.printVariable(result.ora)+'</p>';
+					contentDetails += '<p><strong>Giorno consegna: </strong>'+$.fn.printVariable(result.giornoConsegna)+'</p>';
+					contentDetails += '<p><strong>Ora consegna: </strong>'+$.fn.printVariable(result.oraConsegna)+'</p>';
 					contentDetails += '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
 
 					$('#detailsTelefonataMainDiv').empty().append(contentDetails);
@@ -330,10 +332,12 @@ $(document).ready(function() {
 			telefonata.telefonoThree = $('#telefono3').val();
 			telefonata.giorno = $('#giorno option:selected').text();
 			telefonata.giornoOrdinale = $('#giorno option:selected').val();
+			telefonata.giornoConsegna = $('#giornoConsegna option:selected').text();
+			telefonata.giornoConsegnaOrdinale = $('#giornoConsegna option:selected').val();
 
+			var regex = /:/g;
 			var ora = $('#ora').val();
 			if(ora != null && ora != ''){
-				var regex = /:/g;
 				var count = ora.match(regex);
 				count = (count) ? count.length : 0;
 				if(count == 1){
@@ -342,6 +346,18 @@ $(document).ready(function() {
 					telefonata.ora = $('#ora').val();
 				}
 			}
+			var oraConsegna = $('#oraConsegna').val();
+			if(oraConsegna != null && oraConsegna != ''){
+
+				var count = oraConsegna.match(regex);
+				count = (count) ? count.length : 0;
+				if(count == 1){
+					telefonata.oraConsegna = $('#oraConsegna').val() + ':00';
+				} else {
+					telefonata.oraConsegna = $('#oraConsegna').val();
+				}
+			}
+
 			telefonata.note = $('#note').val();
 
 			var telefonataJson = JSON.stringify(telefonata);
@@ -395,10 +411,12 @@ $(document).ready(function() {
 			telefonata.telefonoThree = $('#telefono3').val();
 			telefonata.giorno = $('#giorno option:selected').text();
 			telefonata.giornoOrdinale = $('#giorno option:selected').val();
+			telefonata.giornoConsegna = $('#giornoConsegna option:selected').text();
+			telefonata.giornoConsegnaOrdinale = $('#giornoConsegna option:selected').val();
 
+			var regex = /:/g;
 			var ora = $('#ora').val();
 			if(ora != null && ora != ''){
-				var regex = /:/g;
 				var count = ora.match(regex);
 				count = (count) ? count.length : 0;
 				if(count == 1){
@@ -407,6 +425,18 @@ $(document).ready(function() {
 					telefonata.ora = $('#ora').val();
 				}
 			}
+			var oraConsegna = $('#oraConsegna').val();
+			if(oraConsegna != null && oraConsegna != ''){
+
+				var count = oraConsegna.match(regex);
+				count = (count) ? count.length : 0;
+				if(count == 1){
+					telefonata.oraConsegna = $('#oraConsegna').val() + ':00';
+				} else {
+					telefonata.oraConsegna = $('#oraConsegna').val();
+				}
+			}
+
 			telefonata.note = $('#note').val();
 
 			var telefonataJson = JSON.stringify(telefonata);
@@ -509,6 +539,7 @@ $.fn.getGiorniSettimana = function(){
 				$.each(result, function(i, item){
 					$.each(item, function(key, value){
                         $('#giorno').append('<option value="'+key+'">'+value+'</option>');
+						$('#giornoConsegna').append('<option value="'+key+'">'+value+'</option>');
                     });
 
 				});
@@ -542,6 +573,8 @@ $.fn.getTelefonata = function(idTelefonata){
 			$('#telefono3').attr('value', result.telefonoThree);
 			$('#giorno option[value="' + result.giornoOrdinale +'"]').attr('selected', true);
 			$('#ora').attr('value', result.ora);
+			$('#giornoConsegna option[value="' + result.giornoConsegnaOrdinale +'"]').attr('selected', true);
+			$('#oraConsegna').attr('value', result.oraConsegna);
 			$('#note').val(result.note);
 			if(result.cliente != null){
 				$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);

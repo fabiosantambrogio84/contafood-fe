@@ -50,7 +50,24 @@ $(document).ready(function() {
 					[0, 'desc']
 				],
 				"columns": [
-					{"name": "codice", "data": "codice"},
+					{"name":"codice", "data": null, render: function ( data, type, row ) {
+						return data.progressivo + '/' + data.annoContabile;
+					}},
+					{"name":"autista", "data": null, render: function ( data, type, row ) {
+						if(data.autista != null){
+							var autistaHtml = '';
+
+							if(data.autista.nome){
+								autistaHtml += data.autista.nome;
+							}
+							if(data.autista.cognome){
+								autistaHtml += ' ' + data.autista.cognome;
+							}
+							return autistaHtml;
+						} else {
+							return '';
+						}
+					}},
 					{"name":"cliente", "data": null, render: function ( data, type, row ) {
 						if(data.cliente != null){
 							var clienteHtml = '';
@@ -65,10 +82,17 @@ $(document).ready(function() {
 							return '';
 						}
 					}},
-					{"name": "dataInserimento", "data": null, render: function ( data, type, row ) {
-						if(data.dataInserimento != null){
-							var a = moment(data.dataInserimento);
-							return a.format('DD/MM/YYYY');
+					{"name":"puntoConsegna", "data": null, render: function ( data, type, row ) {
+						if(data.puntoConsegna != null){
+							var puntoConsegnaHtml = '';
+
+							if(data.puntoConsegna.indirizzo != null){
+								puntoConsegnaHtml += data.puntoConsegna.indirizzo;
+							}
+							if(data.puntoConsegna.localita != null){
+								puntoConsegnaHtml += ' ' + data.puntoConsegna.localita;
+							}
+							return puntoConsegnaHtml;
 						} else {
 							return '';
 						}

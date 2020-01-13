@@ -643,7 +643,10 @@ $(document).ready(function() {
 
 	$(document).on('change','#cliente', function(){
 		$('#loadingDiv').removeClass('d-none');
+		$('#loadingAgenteDiv').removeClass('d-none');
+
 		var cliente = $('#cliente option:selected').val();
+		var idAgente = $('#cliente option:selected').attr('data-id-agente');
 		if(cliente != null && cliente != ''){
 			$.ajax({
 				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
@@ -659,6 +662,11 @@ $(document).ready(function() {
 					}
 					$('#puntoConsegna').removeAttr('disabled');
 					$('#loadingDiv').addClass('d-none');
+
+					$('#agente option').removeAttr('selected');
+					if(idAgente != null && idAgente != '-1'){
+						$('#agente option[value="' + idAgente +'"]').attr('selected', true);
+					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
@@ -666,6 +674,8 @@ $(document).ready(function() {
 			});
 
 		} else {
+			$('#agente option').removeAttr('selected');
+
 			$('#puntoConsegna').empty();
 			$('#puntoConsegna').attr('disabled', true);
 			$('#loadingDiv').addClass('d-none');
@@ -728,7 +738,13 @@ $.fn.getClienti = function(){
 						label += item.ragioneSociale;
 					}
 					label += ' - ' + item.partitaIva + ' - ' + item.codiceFiscale;
-					$('#cliente').append('<option value="'+item.id+'">'+label+'</option>');
+
+					var agente = item.agente;
+					var idAgente = '-1';
+					if(agente != null) {
+						idAgente = agente.id;
+					}
+					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'">'+label+'</option>');
 				});
 			}
 			$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
