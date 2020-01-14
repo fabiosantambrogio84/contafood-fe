@@ -2,130 +2,231 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
-	$('#ordiniClientiTable').DataTable({
-		"ajax": {
-			"url": baseUrl + "ordini-clienti",
-			"type": "GET",
-			"content-type": "json",
-			"cache": false,
-			"dataSrc": "",
-			"error": function(jqXHR, textStatus, errorThrown) {
+	if($('#ordiniClientiTable') != null && $('#ordiniClientiTable') != undefined && $('#ordiniClientiTable').length > 0){
+
+		var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
+			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		$.ajax({
+			url: baseUrl + "autisti",
+			type: 'GET',
+			dataType: 'json',
+			success: function(autistiResult) {
+
+				$('#ordiniClientiTable').DataTable({
+					"ajax": {
+						"url": baseUrl + "ordini-clienti",
+						"type": "GET",
+						"content-type": "json",
+						"cache": false,
+						"dataSrc": "",
+						"error": function(jqXHR, textStatus, errorThrown) {
+							console.log('Response text: ' + jqXHR.responseText);
+							var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+							alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
+								'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+							$('#alertOrdineCliente').empty().append(alertContent);
+						}
+					},
+					"language": {
+						"search": "Cerca",
+						"paginate": {
+							"first": "Inizio",
+							"last": "Fine",
+							"next": "Succ.",
+							"previous": "Prec."
+						},
+						"emptyTable": "Nessun ordine cliente disponibile",
+						"zeroRecords": "Nessun ordine cliente disponibile"
+					},
+					"pageLength": 20,
+					"lengthChange": false,
+					"info": false,
+					"autoWidth": false,
+					"order": [
+						[0, 'desc']
+					],
+					"columns": [
+						{"name":"codice", "data": null, render: function ( data, type, row ) {
+							return data.progressivo + '/' + data.annoContabile;
+						}},
+						{"name":"cliente", "data": null, render: function ( data, type, row ) {
+							if(data.cliente != null){
+								var clienteHtml = '';
+
+								if(data.cliente.dittaIndividuale){
+									clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
+								} else {
+									clienteHtml += data.cliente.ragioneSociale;
+								}
+								return clienteHtml;
+							} else {
+								return '';
+							}
+						}},
+						{"name":"puntoConsegna", "data": null, render: function ( data, type, row ) {
+							if(data.puntoConsegna != null){
+								var puntoConsegnaHtml = '';
+
+								if(data.puntoConsegna.indirizzo != null){
+									puntoConsegnaHtml += data.puntoConsegna.indirizzo;
+								}
+								if(data.puntoConsegna.localita != null){
+									puntoConsegnaHtml += ' ' + data.puntoConsegna.localita;
+								}
+								return puntoConsegnaHtml;
+							} else {
+								return '';
+							}
+						}},
+						{"name": "dataConsegna", "data": null, render: function ( data, type, row ) {
+							var ordineClienteId = data.id;
+							var inputId = "dataConsegna_" + ordineClienteId;
+							var dataConsegnaInput = '<input type="date" class="form-control dataConsegnaOrdineCliente" id="'+inputId+'" data-id="'+ordineClienteId+'"';
+
+							if(data.dataConsegna != null){
+								var dataConsegnaFormatted = moment(data.dataConsegna).format('YYYY-MM-DD');
+								dataConsegnaInput += ' value="'+dataConsegnaFormatted+'"';
+							}
+							dataConsegnaInput += '>';
+							return dataConsegnaInput;
+						}},
+						{"name":"autista", "data": null, render: function ( data, type, row ) {
+							var ordineClienteId = data.id;
+							var selectId = "autista_" + ordineClienteId;
+
+							var autistaId = null;
+							if(data.autista != null){
+								autistaId = data.autista.id;
+							}
+
+							var autistaSelect = '<select id="'+selectId+'" class="form-control autistaOrdineCliente" data-id="'+ordineClienteId+'">';
+							if(autistiResult != null && autistiResult != undefined && autistiResult != ''){
+								$.each(autistiResult, function(i, item){
+									var label = item.cognome + ' ' + item.nome;
+									var optionHtml = '<option value="'+item.id+'"';
+									if(autistaId != null && autistaId != undefined){
+										if(autistaId == item.id){
+											optionHtml += ' selected';
+										}
+									}
+									optionHtml += '>'+label+'</option>';
+									autistaSelect += optionHtml;
+								});
+							}
+							autistaSelect += '</select';
+							return autistaSelect;
+
+						}},
+						{"name":"agente", "data": null, render: function ( data, type, row ) {
+							if(data.agente != null){
+								var agenteHtml = '';
+
+								if(data.agente.nome){
+									agenteHtml += data.agente.nome;
+								}
+								if(data.agente.cognome){
+									agenteHtml += ' ' + data.agente.cognome;
+								}
+								return agenteHtml;
+							} else {
+								return '';
+							}
+						}},
+						{"name":"statoOrdine", "data": null, render: function ( data, type, row ) {
+							if(data.statoOrdine != null){
+								var statoOrdineHtml = '';
+
+								if(data.statoOrdine.descrizione){
+									statoOrdineHtml += data.statoOrdine.descrizione;
+								}
+
+								return statoOrdineHtml;
+							} else {
+								return '';
+							}
+						}},
+						{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
+							var links = '<a class="detailsOrdineCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+							links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
+							links += '<a class="deleteOrdineCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+							return links;
+						}}
+					]
+				});
+
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertOrdineCliente').empty().append(alertContent);
 			}
-		},
-		"language": {
-			"search": "Cerca",
-			"paginate": {
-				"first": "Inizio",
-				"last": "Fine",
-				"next": "Succ.",
-				"previous": "Prec."
+		});
+
+	}
+
+	$(document).on('change','.dataConsegnaOrdineCliente', function(){
+		var dataConsegna = $(this).val();
+		var ordineClienteId = $(this).attr("data-id");
+
+		var ordineClientePatched = new Object();
+		ordineClientePatched.id = parseInt(ordineClienteId);
+		ordineClientePatched.dataConsegna = dataConsegna;
+
+		var ordineClientePatchedJson = JSON.stringify(ordineClientePatched);
+
+		var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		$.ajax({
+			url: baseUrl + "ordini-clienti/" + ordineClienteId,
+			type: 'PATCH',
+			contentType: "application/json",
+			dataType: 'json',
+			data: ordineClientePatchedJson,
+			success: function(result) {
+				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Data consegna modificata con successo').replace('@@alertResult@@', 'success'));
+				$('#ordiniClientiTable').DataTable().ajax.reload();
 			},
-			"emptyTable": "Nessun ordine cliente disponibile",
-			"zeroRecords": "Nessun ordine cliente disponibile"
-		},
-		"pageLength": 20,
-		"lengthChange": false,
-		"info": false,
-		"autoWidth": false,
-		"order": [
-			[0, 'desc']
-		],
-		"columns": [
-            {"name":"codice", "data": null, render: function ( data, type, row ) {
-                return data.progressivo + '/' + data.annoContabile;
-            }},
-			{"name":"cliente", "data": null, render: function ( data, type, row ) {
-				if(data.cliente != null){
-					var clienteHtml = '';
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della data di consegna').replace('@@alertResult@@', 'danger'));
+				$('#ordiniClientiTable').DataTable().ajax.reload();
+			}
+		});
 
-					if(data.cliente.dittaIndividuale){
-						clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
-					} else {
-						clienteHtml += data.cliente.ragioneSociale;
-					}
-					return clienteHtml;
-				} else {
-					return '';
-				}
-			}},
-			{"name":"puntoConsegna", "data": null, render: function ( data, type, row ) {
-				if(data.puntoConsegna != null){
-					var puntoConsegnaHtml = '';
+	});
 
-					if(data.puntoConsegna.indirizzo != null){
-						puntoConsegnaHtml += data.puntoConsegna.indirizzo;
-					}
-					if(data.puntoConsegna.localita != null){
-						puntoConsegnaHtml += ' ' + data.puntoConsegna.localita;
-					}
-					return puntoConsegnaHtml;
-				} else {
-					return '';
-				}
-			}},
-			{"name": "dataConsegna", "data": null, render: function ( data, type, row ) {
-				if(data.dataConsegna != null){
-					var a = moment(data.dataConsegna);
-					return a.format('DD/MM/YYYY');
-				} else {
-					return '';
-				}
-			}},
-			{"name":"autista", "data": null, render: function ( data, type, row ) {
-				if(data.autista != null){
-					var autistaHtml = '';
+	$(document).on('change','.autistaOrdineCliente', function(){
+		var idAutista = $(this).val();
+		var ordineClienteId = $(this).attr("data-id");
 
-					if(data.autista.nome){
-						autistaHtml += data.autista.nome;
-					}
-					if(data.autista.cognome){
-						autistaHtml += ' ' + data.autista.cognome;
-					}
-					return autistaHtml;
-				} else {
-					return '';
-				}
-			}},
-			{"name":"agente", "data": null, render: function ( data, type, row ) {
-				if(data.agente != null){
-					var agenteHtml = '';
+		var ordineClientePatched = new Object();
+		ordineClientePatched.id = parseInt(ordineClienteId);
+		ordineClientePatched.idAutista = parseInt(idAutista);
 
-					if(data.agente.nome){
-						agenteHtml += data.agente.nome;
-					}
-					if(data.agente.cognome){
-						agenteHtml += ' ' + data.agente.cognome;
-					}
-					return agenteHtml;
-				} else {
-					return '';
-				}
-			}},
-			{"name":"statoOrdine", "data": null, render: function ( data, type, row ) {
-				if(data.statoOrdine != null){
-					var statoOrdineHtml = '';
+		var ordineClientePatchedJson = JSON.stringify(ordineClientePatched);
 
-					if(data.statoOrdine.descrizione){
-						statoOrdineHtml += data.statoOrdine.descrizione;
-					}
+		var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-					return statoOrdineHtml;
-				} else {
-					return '';
-				}
-			}},
-			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="detailsOrdineCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-				links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links += '<a class="deleteOrdineCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-				return links;
-			}}
-		]
+		$.ajax({
+			url: baseUrl + "ordini-clienti/" + ordineClienteId,
+			type: 'PATCH',
+			contentType: "application/json",
+			dataType: 'json',
+			data: ordineClientePatchedJson,
+			success: function(result) {
+				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Autista modificato con successo').replace('@@alertResult@@', 'success'));
+				$('#ordiniClientiTable').DataTable().ajax.reload();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell autista').replace('@@alertResult@@', 'danger'));
+				$('#ordiniClientiTable').DataTable().ajax.reload();
+			}
+		});
+
 	});
 
 	$(document).on('click','.detailsOrdineCliente', function(){
@@ -481,6 +582,21 @@ $(document).ready(function() {
 				data: ordineClienteJson,
 				success: function(result) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Ordine cliente creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Svuoto tutti i campi in modo da poter creare immediatamente un nuovo ordine
+                    $('#cliente option').removeAttr('selected');
+                    $('#cliente option[value=""]').attr('selected',true);
+                    $('#puntoConsegna').empty();
+                    $('#puntoConsegna').attr('disabled', true);
+                    $('#loadingDiv').addClass('d-none');
+                    $('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
+                    $('#agente option').removeAttr('selected');
+                    $('#agente option[value=""]').attr('selected',true);
+                    $('#autista option').removeAttr('selected');
+                    $('#autista option[value=""]').attr('selected',true);
+                    $('#note').val(null);
+                    $('.formRowArticolo').remove();
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ordine cliente').replace('@@alertResult@@', 'danger'));
