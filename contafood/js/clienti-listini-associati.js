@@ -68,22 +68,59 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#newClienteListinoAssociatoButton') != null && $('#newClienteListinoAssociatoButton') != undefined){
+	if($('#newClienteListinoAssociatoButton') != null && $('#newClienteListinoAssociatoButton') != undefined && $('#newClienteListinoAssociatoButton').length > 0){
+		$('#fornitore').selectpicker();
+
 		$(document).on('submit','#newClienteListinoAssociatoForm', function(event){
 			event.preventDefault();
 
-			var listinoAssociato = new Object();
 			var cliente = new Object();
 			cliente.id = $('#hiddenIdCliente').val();
-			listinoAssociato.cliente = cliente;
-			var fornitore = new Object();
-			fornitore.id = $('#fornitore option:selected').val();
-			listinoAssociato.fornitore = fornitore;
+
 			var listino = new Object();
 			listino.id = $('#listino option:selected').val();
-			listinoAssociato.listino = listino;
 
-			var listinoAssociatoJson = JSON.stringify(listinoAssociato);
+			var listiniAssociati = [];
+			var fornitoriSelected = $('#fornitore').val();
+
+			if(fornitoriSelected != null && fornitoriSelected.length != 0 && fornitoriSelected.indexOf('-1') == -1){
+				// Ho selezionato alcuni fornitori escludendo l'opzione "Tutti i fornitori"
+				$.each(fornitoriSelected, function(i, item){
+					var listinoAssociato = new Object();
+					listinoAssociato.cliente = cliente;
+					listinoAssociato.listino = listino;
+
+					var fornitore = new Object();
+					fornitore.id = item;
+					listinoAssociato.fornitore = fornitore;
+
+					listiniAssociati.push(listinoAssociato);
+				});
+
+			} else {
+				// Ho selezionato alcuni fornitori compresa l'opzione "Tutti i fornitori"
+				var fornitori = [];
+				$("#fornitore option").each(function(i, item){
+					var idFornitore = item.value;
+					if(idFornitore != '-1'){
+						fornitori.push(idFornitore);
+					}
+				});
+				$.each(fornitori, function(i, item){
+					var listinoAssociato = new Object();
+					listinoAssociato.cliente = cliente;
+					listinoAssociato.listino = listino;
+
+					var fornitore = new Object();
+					fornitore.id = item;
+					listinoAssociato.fornitore = fornitore;
+
+					listiniAssociati.push(listinoAssociato);
+				});
+
+			}
+
+			var listiniAssociatiJson = JSON.stringify(listiniAssociati);
 
 			var alertContent = '<div id="alertClienteListinoAssociatoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
@@ -94,14 +131,15 @@ $(document).ready(function() {
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: listinoAssociatoJson,
+				data: listiniAssociatiJson,
 				success: function(result) {
-					$('#alertClienteListinoAssociato').empty().append(alertContent.replace('@@alertText@@','Listino associato con successo').replace('@@alertResult@@', 'success'));
+					$('#alertClienteListinoAssociato').empty().append(alertContent.replace('@@alertText@@','Listini associati con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertClienteListinoAssociato').empty().append(alertContent.replace('@@alertText@@','Errore nell associazione del listino').replace('@@alertResult@@', 'danger'));
+					$('#alertClienteListinoAssociato').empty().append(alertContent.replace('@@alertText@@','Errore nell associazione dei listini').replace('@@alertResult@@', 'danger'));
 				}
 			});
+
 		});
 	}
 });
