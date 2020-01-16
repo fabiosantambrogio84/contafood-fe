@@ -583,8 +583,16 @@ $(document).ready(function() {
 				success: function(result) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Ordine cliente creato con successo').replace('@@alertResult@@', 'success'));
 
-					// Svuoto tutti i campi in modo da poter creare immediatamente un nuovo ordine
-                    $('#cliente option').removeAttr('selected');
+					$('#newOrdineClienteButton').attr("disabled", true);
+
+					// Returns to the page with the list of OrdineCliente
+					setTimeout(function() {
+						window.location.href = "ordini-clienti.html";
+					}, 2000);
+
+					// Empty all fields in order to immediately create a new OrdineCliente
+                    /*
+					$('#cliente option').removeAttr('selected');
                     $('#cliente option[value=""]').attr('selected',true);
                     $('#puntoConsegna').empty();
                     $('#puntoConsegna').attr('disabled', true);
@@ -596,7 +604,7 @@ $(document).ready(function() {
                     $('#autista option[value=""]').attr('selected',true);
                     $('#note').val(null);
                     $('.formRowArticolo').remove();
-
+					*/
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ordine cliente').replace('@@alertResult@@', 'danger'));

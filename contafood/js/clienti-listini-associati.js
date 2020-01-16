@@ -74,8 +74,10 @@ $(document).ready(function() {
 		$(document).on('submit','#newClienteListinoAssociatoForm', function(event){
 			event.preventDefault();
 
+			var idCliente = $('#hiddenIdCliente').val();
+
 			var cliente = new Object();
-			cliente.id = $('#hiddenIdCliente').val();
+			cliente.id = idCliente;
 
 			var listino = new Object();
 			listino.id = $('#listino option:selected').val();
@@ -134,14 +136,44 @@ $(document).ready(function() {
 				data: listiniAssociatiJson,
 				success: function(result) {
 					$('#alertClienteListinoAssociato').empty().append(alertContent.replace('@@alertText@@','Listini associati con successo').replace('@@alertResult@@', 'success'));
+
+					$('#newClienteListinoAssociatoButton').attr("disabled", true);
+
+					// Returns to the page with the list
+					setTimeout(function() {
+						window.location.href = "cliente-listini-associati.html?idCliente="+idCliente;
+					}, 2000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertClienteListinoAssociato').empty().append(alertContent.replace('@@alertText@@','Errore nell associazione dei listini').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nell associazione dei listini';
+					if(jqXHR != null && jqXHR.responseJSON != null){
+						var message = jqXHR.responseJSON.message;
+						if(message.indexOf('associato al fornitore') != -1){
+							errorMessage = message;
+						}
+					}
+					$('#alertClienteListinoAssociato').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 
 		});
 	}
+
+	$(document).on('change','#fornitore', function(){
+		var fornitoriSelected = $(this).val();
+		if(fornitoriSelected != null && fornitoriSelected.length != 0){
+
+			if(fornitoriSelected.indexOf('-1') != -1){
+				// Ho selezionato l'opzione "Tutti i fornitori"
+				$('#fornitore option[value != "-1"]').attr('disabled', true);
+			}
+		} else {
+			// Non ho selezionato niente
+			$('#fornitore option').removeAttr('disabled');
+			$('#fornitore option').removeAttr('selected');
+		}
+		$('#fornitore').selectpicker('refresh');
+	});
 });
 
 $.fn.getFornitori = function(){
@@ -154,6 +186,10 @@ $.fn.getFornitori = function(){
 				$.each(result, function(i, item){
 					$('#fornitore').append('<option value="'+item.id+'">'+item.ragioneSociale+'</option>');
 				});
+				var multipleAttr = $('#fornitore').attr('multiple');
+				if(multipleAttr != null && multipleAttr != ''){
+					$('#fornitore option[value != "-1"]').attr('disabled', true);
+				}
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
