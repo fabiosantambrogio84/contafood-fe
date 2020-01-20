@@ -36,14 +36,63 @@ $(document).ready(function() {
 			[0, 'asc']
 		],
 		"columns": [
+			{"name": "codice", "data": "codice"},
 			{"name": "tipo", "data": "tipo"},
 			{"name": "peso", "data": "peso"},
+			{"name": "prezzo", "data": "prezzo"},
+			{"name": "fornitore", "data": null, "orderable":true, render: function ( data, type, row ) {
+				var fornitore = data.fornitore;
+				if(fornitore != null && fornitore != undefined){
+					return fornitore.ragioneSociale;
+				}
+				return '';
+			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="updateConfezione pr-2" data-id="'+data.id+'" href="confezioni-edit.html?idConfezione=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links = links + '<a class="deleteConfezione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+				var links = '<a class="detailsConfezione pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
+				links += '<a class="updateConfezione pr-2" data-id="'+data.id+'" href="confezioni-edit.html?idConfezione=' + data.id + '"><i class="far fa-edit"></i></a>';
+				links += '<a class="deleteConfezione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		]
+	});
+
+	$(document).on('click','.detailsConfezione', function(){
+		var idConfezione = $(this).attr('data-id');
+
+		var alertContent = '<div id="alertConfezioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della confezione.</strong></div>';
+
+		$.ajax({
+			url: baseUrl + "confezioni/" + idConfezione,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					var contentDetails = '<p><strong>Codice: </strong>'+$.fn.printVariable(result.codice)+'</p>';
+					contentDetails += '<p><strong>Tipo: </strong>'+$.fn.printVariable(result.tipo)+'</p>';
+					contentDetails += '<p><strong>Peso: </strong>'+$.fn.printVariable(result.peso)+'</p>';
+					contentDetails += '<p><strong>Prezzo: </strong>'+$.fn.printVariable(result.prezzo)+'</p>';
+					var fornitore = result.fornitore;
+					if(fornitore != null && fornitore != undefined){
+						contentDetails += '<p><strong>Fornitore: </strong>'+$.fn.printVariable(fornitore.ragioneSociale)+'</p>';
+					} else {
+						contentDetails += '<p><strong>Fornitore: </strong></p>';
+					}
+					contentDetails += '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
+
+					$('#detailsConfezioneMainDiv').empty().append(contentDetails);
+
+				} else{
+					$('#detailsConfezioneMainDiv').empty().append(alertContent);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#detailsConfezioneMainDiv').append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+
+		$('#detailsConfezioneModal').modal('show');
 	});
 
 	$(document).on('click','.deleteConfezione', function(){
@@ -86,8 +135,16 @@ $(document).ready(function() {
 
 			var confezione = new Object();
 			confezione.id = $('#hiddenIdConfezione').val();
+			confezione.codice = $('#codice').val();
 			confezione.tipo = $('#tipo').val();
 			confezione.peso = $('#peso').val();
+			confezione.prezzo = $('#prezzo').val();
+			if($('#fornitore option:selected').val() != null && $('#fornitore option:selected').val() != ''){
+				var fornitore = new Object();
+				fornitore.id = $('#fornitore option:selected').val();
+				confezione.fornitore = fornitore;
+			}
+			confezione.note = $('#note').val();
 
 			var confezioneJson = JSON.stringify(confezione);
 
@@ -116,8 +173,16 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var confezione = new Object();
+			confezione.codice = $('#codice').val();
 			confezione.tipo = $('#tipo').val();
 			confezione.peso = $('#peso').val();
+			confezione.prezzo = $('#prezzo').val();
+			if($('#fornitore option:selected').val() != null && $('#fornitore option:selected').val() != ''){
+				var fornitore = new Object();
+				fornitore.id = $('#fornitore option:selected').val();
+				confezione.fornitore = fornitore;
+			}
+			confezione.note = $('#note').val();
 
 			var confezioneJson = JSON.stringify(confezione);
 
@@ -141,6 +206,31 @@ $(document).ready(function() {
 		});
 	}
 });
+
+$.fn.printVariable = function(variable){
+	if(variable != null && variable != undefined && variable != ""){
+		return variable;
+	}
+	return "";
+}
+
+$.fn.getFornitori = function(){
+	$.ajax({
+		url: baseUrl + "fornitori",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#fornitore').append('<option value="'+item.id+'">'+item.ragioneSociale+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
 
 $.fn.extractIdConfezioneFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
@@ -172,8 +262,14 @@ $.fn.getConfezione = function(idConfezione){
           if(result != null && result != undefined && result != ''){
 
 			$('#hiddenIdConfezione').attr('value', result.id);
+			$('#codice').attr('value', result.codice);
 			$('#tipo').attr('value', result.tipo);
             $('#peso').attr('value', result.peso);
+            $('#prezzo').attr('value', result.prezzo);
+            if(result.fornitore != null && result.fornitore != undefined){
+            	$('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
+            }
+            $('#note').val(result.note);
 
           } else{
             $('#alertConfezione').empty().append(alertContent);

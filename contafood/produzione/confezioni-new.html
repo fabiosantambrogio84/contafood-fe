@@ -32,6 +32,9 @@
 
   <script src="../js/confezioni.js"></script>
 
+  <script>
+    $.fn.getFornitori();
+  </script>
 </head>
 
 <body id="page-top" class="agenteBody">
@@ -64,6 +67,15 @@
           <form id="newConfezioneForm" class="needs-validation" novalidate>
             <div class="form-row">
               <div class="form-group col-md-3">
+                <label for="codice">Codice*</label>
+                <input type="text" class="form-control" id="codice" placeholder="" required>
+                <div class="invalid-feedback">
+                  Inserisci un codice
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
                 <label for="tipo">Tipo*</label>
                 <input type="text" class="form-control" id="tipo" placeholder="" required>
                 <div class="invalid-feedback">
@@ -72,10 +84,31 @@
               </div>
               <div class="form-group col-md-3">
                 <label for="peso">Peso (gr)*</label>
-                <input type="text" class="form-control" id="peso" placeholder="" required>
+                <input type="number" class="form-control" id="peso" step=".01" min="0" required>
                 <div class="invalid-feedback">
                   Inserisci un peso
                 </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="prezzo">Prezzo (€)*</label>
+                <input type="number" class="form-control" id="prezzo" step=".01" min="0" required>
+                <div class="invalid-feedback">
+                  Inserisci un prezzo
+                </div>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="fornitore">Fornitore</label>
+                <select id="fornitore" class="form-control">
+                  <option value=""> - </option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-3">
+                <label for="note">Note</label>
+                <textarea class="form-control" id="note"></textarea>
               </div>
             </div>
 

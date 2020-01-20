@@ -317,7 +317,7 @@ $.fn.getConfezioni = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 			    $.each(result, function(i, item){
-                    $('.confezioneDescr').append('<option value="'+item.id+'" data-peso="'+item.peso+'">'+item.tipo+' '+item.peso+' gr.</option>');
+                    $('.confezioneDescr').append('<option value="'+item.id+'" data-peso="'+item.peso+'">'+item.codice+' '+item.tipo+' '+item.peso+' gr.</option>');
 				});
 			}
 			$('#dataProduzione').val(moment().format('YYYY-MM-DD'));
