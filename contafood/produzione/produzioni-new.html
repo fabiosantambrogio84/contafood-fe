@@ -35,14 +35,15 @@
   <script src="../js/produzioni.js"></script>
 
   <script>
-    $.fn.getCategorieRicette();
-    $.fn.getConfezioni();
-    $.fn.getRicette('ricetta');
 	var idRicetta = $.fn.extractIdRicettaFromUrl();
     if(idRicetta != null && idRicetta != undefined){
-      $.when($.fn.getCategorieRicette(), $.fn.getConfezioni(), $.fn.getRicette()).then(function(f1,f2,f3){
+      $.when($.fn.getCategorieRicette(), $.fn.getConfezioni(), $.fn.getRicette('ricetta')).then(function(f1,f2,f3){
         $.fn.getRicettaProduzione(idRicetta);
       });
+    } else {
+      $.fn.getCategorieRicette();
+      $.fn.getConfezioni();
+      $.fn.getRicette('ricetta');
     }
   </script>
 
@@ -130,6 +131,10 @@
               <input type="number" class="form-control confezionePeso" step=".01" min="0" disabled>
             </div>
             <div class="form-group col-md-2">
+              <label>Lotto</label>
+              <input type="text" class="form-control confezioneLotto">
+            </div>
+            <div class="form-group col-md-2">
               <label>Numero</label>
               <div class="input-group">
                 <input type="number" class="form-control confezioneNum" step="1" min="0">
@@ -139,7 +144,6 @@
               </div>
             </div>
           </div>
-          
 
           <div class="form-row">
             <div class="form-group col-md-3">
@@ -154,6 +158,17 @@
           <div class="form-row" id="formRowIngredienti">
             <div class="form-group col-md-12" id="formRowIngredientiBody">
               <label class="font-weight-bold">Ingredienti</label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-2">
+              <label for="filmChiusura">Film chiusura</label>
+              <input type="text" class="form-control" id="filmChiusura" value="Copertura">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="lottoFilmChiusura">Lotto film chiusura</label>
+              <input type="text" class="form-control" id="lottoFilmChiusura">
             </div>
           </div>
 

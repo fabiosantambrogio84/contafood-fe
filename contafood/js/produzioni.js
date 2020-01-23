@@ -185,6 +185,8 @@ $(document).ready(function() {
 			produzione.scadenza = $('#scadenza').val();
 			produzione.quantitaTotale = $('#quantitaTotale').val();
 			produzione.scopo = $('input[name="generaLotto"]:checked').val();
+			produzione.filmChiusura = $('#filmChiusura').val();
+			produzione.lottoFilmChiusura = $('#lottoFilmChiusura').val();
 			
 			var confezioniLength = $('.confezioneRow').length;
 			produzione.numeroConfezioni = 0;
@@ -197,8 +199,8 @@ $(document).ready(function() {
 					var confezioneId = $(this).find('select option:selected').val();
 					produzioneConfezioneId.confezioneId = confezioneId;
 					produzioneConfezione.id = produzioneConfezioneId;
-
 					produzioneConfezione.numConfezioni = $(this).find('.confezioneNum').val();
+					produzioneConfezione.lotto = $(this).find('.confezioneLotto').val();
 
 					produzioneConfezioni.push(produzioneConfezione);
 				});
@@ -233,7 +235,7 @@ $(document).ready(function() {
 			if(idConfezione != '-1'){
 				var peso = $(this).find(':selected').attr('data-peso');
 				$(this).parent().next().find('input').val(peso);
-				$(this).parent().next().next().find('input').val(1);
+				$(this).parent().next().next().next().find('input').val(1);
 			}
 			$.fn.computeQuantitaTotale();
 			$.fn.computeQuantitaIngredienti();
@@ -247,6 +249,9 @@ $(document).ready(function() {
 			});
 			newConfezioneRow.find('.confezionePeso').each(function( index ) {
 			  $(this).val(null);
+			});
+			newConfezioneRow.find('.confezioneLotto').each(function( index ) {
+				$(this).val(null);
 			});
 			newConfezioneRow.find('.confezioneNum').each(function( index ) {
 			  $(this).val(null);
@@ -431,7 +436,7 @@ $.fn.computeQuantitaTotale = function() {
 	var quantitaTotale;
 	$('.confezioneNum').each(function(i, item){
 		var numeroConfezioni = $(this).val();
-		var peso = $(this).parent().parent().prev().find('input').val();
+		var peso = $(this).parent().parent().prev().prev().find('input').val();
 		if(numeroConfezioni != undefined && peso != undefined){
 			var pesoConfezione = parseFloat(numeroConfezioni)*parseFloat(peso);
 			if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
