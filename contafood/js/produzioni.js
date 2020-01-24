@@ -61,8 +61,6 @@ $(document).ready(function() {
 
 		var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>Errore nel recupero della produzione.</strong></div>';
-		
-		$('#detailsProduzioneModal').modal('show');
 
 		$('#detailsProduzioneModalTable').DataTable({
 			"ajax": {
@@ -101,8 +99,13 @@ $(document).ready(function() {
 					return data.numConfezioni;
 				}}
 			]
-		});	
+		});
+		$('#detailsProduzioneModal').modal('show');
+	});
 
+	$(document).on('click','.closeProduzione', function(){
+		$('#detailsProduzioneModalTable').DataTable().destroy();
+		$('#detailsProduzioneModal').modal('hide');
 	});
 
 	$(document).on('click','.deleteProduzione', function(){
@@ -221,6 +224,13 @@ $(document).ready(function() {
 				data: produzioneJson,
 				success: function(result) {
 					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Produzione creata con successo').replace('@@alertResult@@', 'success'));
+
+					$('#newProduzioneButton').attr("disabled", true);
+
+					// Returns to the page with the list of Produzione
+					setTimeout(function() {
+						window.location.href = "produzioni.html";
+					}, 2000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della produzione').replace('@@alertResult@@', 'danger'));

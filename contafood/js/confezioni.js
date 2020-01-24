@@ -2,6 +2,8 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
+	$('[data-toggle="tooltip"]').tooltip();
+
 	$('#confezioniTable').DataTable({
 		"ajax": {
 			"url": baseUrl + "confezioni",
@@ -47,13 +49,27 @@ $(document).ready(function() {
 				}
 				return '';
 			}},
+			{"name": "note", "data": null, "width": "25%", render: function ( data, type, row ) {
+				var note = data.note;
+				var noteTrunc = note;
+				var noteHtml = '<div>'+noteTrunc+'</div>';
+				if(note.length > 100){
+					noteTrunc = note.substring(0, 100)+'...';
+					noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
+				}
+
+				return noteHtml;
+			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="detailsConfezione pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links += '<a class="updateConfezione pr-2" data-id="'+data.id+'" href="confezioni-edit.html?idConfezione=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links += '<a class="deleteConfezione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"initComplete": function( settings, json ) {
+			$('[data-toggle="tooltip"]').tooltip();
+		}
 	});
 
 	$(document).on('click','.detailsConfezione', function(){
@@ -198,6 +214,13 @@ $(document).ready(function() {
 				data: confezioneJson,
 				success: function(result) {
 					$('#alertConfezione').empty().append(alertContent.replace('@@alertText@@','Confezione creata con successo').replace('@@alertResult@@', 'success'));
+
+					$('#newConfezioneButton').attr("disabled", true);
+
+					// Returns to the page with the list of Confezioni
+					setTimeout(function() {
+						window.location.href = "confezioni.html";
+					}, 2000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertConfezione').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della confezione').replace('@@alertResult@@', 'danger'));
@@ -259,21 +282,21 @@ $.fn.getConfezione = function(idConfezione){
         type: 'GET',
         dataType: 'json',
         success: function(result) {
-          if(result != null && result != undefined && result != ''){
+			if(result != null && result != undefined && result != ''){
 
-			$('#hiddenIdConfezione').attr('value', result.id);
-			$('#codice').attr('value', result.codice);
-			$('#tipo').attr('value', result.tipo);
-            $('#peso').attr('value', result.peso);
-            $('#prezzo').attr('value', result.prezzo);
-            if(result.fornitore != null && result.fornitore != undefined){
-            	$('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
-            }
-            $('#note').val(result.note);
+				$('#hiddenIdConfezione').attr('value', result.id);
+				$('#codice').attr('value', result.codice);
+				$('#tipo').attr('value', result.tipo);
+				$('#peso').attr('value', result.peso);
+				$('#prezzo').attr('value', result.prezzo);
+				if(result.fornitore != null && result.fornitore != undefined){
+					$('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
+				}
+				$('#note').val(result.note);
 
-          } else{
-            $('#alertConfezione').empty().append(alertContent);
-          }
+			} else{
+				$('#alertConfezione').empty().append(alertContent);
+			}
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $('#alertConfezione').empty().append(alertContent);

@@ -124,8 +124,8 @@ $(document).ready(function() {
 			}}
 		],
 		"initComplete": function( settings, json ) {
-            $('[data-toggle="tooltip"]').tooltip();
-         }
+        	$('[data-toggle="tooltip"]').tooltip();
+		}
 	});
 
 	$(document).on('click','.detailsTelefonata', function(){
