@@ -51,13 +51,15 @@ $(document).ready(function() {
 			}},
 			{"name": "note", "data": null, "width": "25%", render: function ( data, type, row ) {
 				var note = data.note;
+				if(note == null || note == undefined){
+					note = '';
+				}
 				var noteTrunc = note;
 				var noteHtml = '<div>'+noteTrunc+'</div>';
-				if(note.length > 100){
+				if(note != null && note != undefined && note != '' && note.length > 100){
 					noteTrunc = note.substring(0, 100)+'...';
 					noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
 				}
-
 				return noteHtml;
 			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
@@ -176,6 +178,13 @@ $(document).ready(function() {
 				data: confezioneJson,
 				success: function(result) {
 					$('#alertConfezione').empty().append(alertContent.replace('@@alertText@@','Confezione modificata con successo').replace('@@alertResult@@', 'success'));
+
+					$('#updateConfezioneButton').attr("disabled", true);
+
+					// Returns to the page with the list of Confezioni
+					setTimeout(function() {
+						window.location.href = "confezioni.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertConfezione').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della confezione').replace('@@alertResult@@', 'danger'));
@@ -220,7 +229,7 @@ $(document).ready(function() {
 					// Returns to the page with the list of Confezioni
 					setTimeout(function() {
 						window.location.href = "confezioni.html";
-					}, 2000);
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertConfezione').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della confezione').replace('@@alertResult@@', 'danger'));

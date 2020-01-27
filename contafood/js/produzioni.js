@@ -230,7 +230,7 @@ $(document).ready(function() {
 					// Returns to the page with the list of Produzione
 					setTimeout(function() {
 						window.location.href = "produzioni.html";
-					}, 2000);
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della produzione').replace('@@alertResult@@', 'danger'));
@@ -388,13 +388,13 @@ $.fn.loadIngredienti = function(idRicetta){
 						if (i == 0) {
 							rowHtml = rowHtml + '<label for="scadenzaIngrediente">Scadenza</label>';
 						}
-						rowHtml = rowHtml + '<input type="date" class="form-control scadenzaIngrediente" id="scadenzaIngrediente_' + id + '"></div>';
+						rowHtml = rowHtml + '<input type="date" class="form-control scadenzaIngrediente" id="scadenzaIngrediente_' + id + '" style="font-size: smaller;"></div>';
 						rowHtml = rowHtml + '<div class="form-group col-md-2">';
 
 						if (i == 0) {
 							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
 						}
-						rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" disabled></div>';
+						rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" disabled style="text-align: right;"></div>';
 
 						rowHtml = rowHtml + '</div></div>';
 						rowHtml = rowHtml + '</div>';
