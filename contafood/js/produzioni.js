@@ -36,18 +36,21 @@ $(document).ready(function() {
 			[0, 'desc']
 		],
 		"columns": [
-			{"name": "codice", "data": "codice"},
-			{"name": "dataProduzione", "data": null, render: function ( data, type, row ) {
+			{"name": "codice", "data": "codice", "width":"10%"},
+			{"name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var a = moment(data.dataProduzione);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"name": "lotto", "data": "lotto"},
-			{"name": "scadenza", "data": "scadenza"},
+			{"name": "lotto", "data": "lotto", "width":"10%"},
+			{"name": "scadenza", "data": null, "width":"10%", render: function ( data, type, row ) {
+				var a = moment(data.scadenza);
+				return a.format('DD/MM/YYYY');
+			}},
 			{"name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
 				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
 				return ricettaResult;
 			}},
-			{"name": "numeroConfezioni", "data": "numeroConfezioni"},
+			{"name": "numeroConfezioni", "data": "numeroConfezioni", "width":"8%", "className": "tdAlignRight" },
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="detailsProduzione pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links = links + '<a class="deleteProduzione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';

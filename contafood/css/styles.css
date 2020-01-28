@@ -12087,3 +12087,8 @@ body.sidebar-toggled footer.sticky-footer {
     font-size: 14px !important;
     white-space: nowrap;
 }
+
+/* Table column align*/
+.tdAlignRight {
+    text-align: right;
+}

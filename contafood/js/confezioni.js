@@ -38,18 +38,18 @@ $(document).ready(function() {
 			[0, 'asc']
 		],
 		"columns": [
-			{"name": "codice", "data": "codice"},
-			{"name": "tipo", "data": "tipo"},
-			{"name": "peso", "data": "peso"},
-			{"name": "prezzo", "data": "prezzo"},
-			{"name": "fornitore", "data": null, "orderable":true, render: function ( data, type, row ) {
+			{"name": "codice", "data": "codice", "width":"10%"},
+			{"name": "tipo", "data": "tipo", "width":"12%"},
+			{"name": "peso", "data": "peso", "width":"8%"},
+			{"name": "prezzo", "data": "prezzo", "width":"8%"},
+			{"name": "fornitore", "data": null, "width":"15%", "orderable":true, render: function ( data, type, row ) {
 				var fornitore = data.fornitore;
 				if(fornitore != null && fornitore != undefined){
 					return fornitore.ragioneSociale;
 				}
 				return '';
 			}},
-			{"name": "note", "data": null, "width": "25%", render: function ( data, type, row ) {
+			{"name": "note", "data": null, render: function ( data, type, row ) {
 				var note = data.note;
 				if(note == null || note == undefined){
 					note = '';
@@ -62,7 +62,7 @@ $(document).ready(function() {
 				}
 				return noteHtml;
 			}},
-			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
+			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="detailsConfezione pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links += '<a class="updateConfezione pr-2" data-id="'+data.id+'" href="confezioni-edit.html?idConfezione=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links += '<a class="deleteConfezione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
