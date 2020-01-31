@@ -17,6 +17,9 @@ $(document).ready(function() {
         } else if(pageType == 'ordini'){
             $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-ordini.html');
+        } else if(pageType == 'contabilita'){
+            $('.navbar').load('../commons/topbar.html');
+            $('#accordionSidebar').load('../commons/sidebar-contabilita.html');
         }
 
     } else{
