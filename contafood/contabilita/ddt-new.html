@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Produzioni Nuovo</title>
+  <title>ContaFood - DDT Nuovo</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -31,31 +31,24 @@
   <script src="../js/commons.js"></script>
   <script src="../js/core/moment.js"></script>
 
-  <script src="../js/ricette.js"></script>
-  <script src="../js/produzioni.js"></script>
+  <script src="../js/ddt.js"></script>
 
   <script>
-	var idRicetta = $.fn.extractIdRicettaFromUrl();
-    if(idRicetta != null && idRicetta != undefined){
-      $.when($.fn.getCategorieRicette(), $.fn.getConfezioni(), $.fn.getRicette('ricetta')).then(function(f1,f2,f3){
-        $.fn.getRicettaProduzione(idRicetta);
-      });
-    } else {
-      $.fn.getCategorieRicette();
-      $.fn.getConfezioni();
-      $.fn.getRicette('ricetta');
-    }
+    $.fn.preloadFields();
+    $.fn.getClienti();
+    $.fn.getArticoli();
+    $.fn.getTipologieTrasporto();
   </script>
 
 </head>
 
-<body id="page-top" class="produzioneBody">
+<body id="page-top" class="ddtBody">
 
 <!-- Page Wrapper -->
 <div id="wrapper">
 
   <!-- Sidebar -->
-  <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="produzione"></ul>
+  <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="contabilita"></ul>
   <!-- End of Sidebar -->
 
   <!-- Content Wrapper -->
@@ -69,131 +62,153 @@
       <!-- End of Topbar -->
 
       <!-- Begin Page Content -->
-      <div class="container-fluid" id="containerProduzioni">
+      <div class="container-fluid" id="containerDdt">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800">Nuova produzione</h1>
+        <h1 class="h3 mb-4 text-gray-800">Nuovo DDT</h1>
 
-        <div id="alertProduzione"></div>
+        <div id="alertDdt"></div>
 
-        <form id="newProduzioneForm" class="needs-validation" novalidate>
+        <form id="newDdtForm" class="needs-validation" novalidate>
           <div class="form-row">
-            <div class="form-group col-md-3">
-              <label for="dataProduzione">Data*</label>
-              <input type="date" class="form-control" id="dataProduzione" placeholder="" required>
-              <div class="invalid-feedback">
-                Inserisci una data di produzione
+            <div class="form-group col-md-2 mb-0">
+              <label for="progressivo" class="mb-0">Progressivo</label>
+              <div class="input-group input-group-sm mb-2">
+                <input type="number" class="form-control form-control-sm text-right" id="progressivo" step="1" min="0">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">/</div>
+                </div>
+                <input type="number" class="form-control form-control-sm text-right" id="annoContabile" step="1" min="0">
               </div>
             </div>
-            <div class="form-group col-md-4">
-              <label for="ricetta">Ricetta*</label>
-              <select id="ricetta" class="form-control" required>
-                <option value="-1" data-id-categoria="-1" data-num-giorni-scadenza="-1" selected>-</option>
-              </select>
+            <div class="form-group col-md-2 mb-0">
+              <label for="data" class="mb-0">Data*</label>
+              <input type="date" class="form-control form-control-sm" id="data" placeholder="" required>
               <div class="invalid-feedback">
-                Seleziona una ricetta
-              </div>
-            </div>
-            <div class="form-group col-md-4">
-              <label for="categoria">Categoria*</label>
-              <select id="categoria" class="form-control" required disabled>
-                <option value="-1" selected>-</option>
-              </select>
-              <div class="invalid-feedback">
-                Seleziona una categoria
+                Inserisci una data
               </div>
             </div>
           </div>
           <div class="form-row">
-            <div class="form-group col-md-3">
-              <label for="scadenza">Scadenza*</label>
-              <input type="date" class="form-control" id="scadenza" placeholder="" required>
+            <div class="form-group col-md-6 mb-0">
+              <label for="cliente" class="mb-0">Cliente*</label>
+              <select id="cliente" class="form-control form-control-sm" required>
+                <option value=""></option>
+              </select>
               <div class="invalid-feedback">
-                Inserisci una data di scadenza
+                Seleziona un cliente
+              </div>
+            </div>
+            <div class="form-group col-md-6 mb-0">
+              <label for="puntoConsegna" class="mb-0">Punto consegna*</label>
+              <select id="puntoConsegna" class="form-control form-control-sm" disabled required>
+              </select>
+              <div class="invalid-feedback">
+                Seleziona un punto di consegna
               </div>
             </div>
           </div>
 
-          <div class="form-row" id="formRowConfezioni">
-            <div class="form-group col-md-12" id="formRowConfezioniBody">
-              <label class="font-weight-bold">Confezioni</label>
+          <div class="form-row mt-2 pt-2" style="background-color: #bff0de;">
+            <div class="form-group col-md-12 mb-0">
+              <h6 class="text-center font-weight-bold">Aggiungi articolo</h6>
             </div>
           </div>
-          <div class="form-row confezioneRow">
-            <div class="form-group col-md-3">
-              <label>Confezione</label>
-              <select class="form-control confezioneDescr" required>
-                <option value="-1" selected data-peso="-1">-</option>
+          <div class="form-row mt-2">
+            <div class="form-group col-md-4">
+              <label for="articolo" class="mb-0">Articolo</label>
+              <select id="articolo" class="form-control form-control-sm" >
+                <option value=""></option>
               </select>
             </div>
-			<div class="form-group col-md-2">
-              <label>Peso (gr.)</label>
-              <input type="number" class="form-control confezionePeso" step=".01" min="0" disabled>
+            <div class="form-group col-md-1">
+              <label for="udm" class="mb-0">UdM</label>
+              <input type="text" class="form-control form-control-sm text-right" id="udm" disabled>
+            </div>
+            <div class="form-group col-md-1">
+              <label for="iva" class="mb-0">Iva (%)</label>
+              <input type="number" class="form-control form-control-sm text-right" id="iva" disabled>
             </div>
             <div class="form-group col-md-2">
-              <label>Lotto</label>
-              <input type="text" class="form-control confezioneLotto">
+              <label for="lotto" class="mb-0">Lotto</label>
+              <input type="text" class="form-control form-control-sm text-right" id="lotto">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-1 mb-0">
+              <label for="quantita" class="mb-0">Quantita</label>
+              <input type="number" class="form-control form-control-sm text-right" id="quantita" step=".01" min="0">
+            </div>
+            <div class="form-group col-md-1 mb-0">
+              <label for="pezzi" class="mb-0">Pezzi</label>
+              <input type="number" class="form-control form-control-sm text-right" id="pezzi" step="1" min="0">
+            </div>
+            <div class="form-group col-md-1 mb-0">
+              <label for="prezzo" class="mb-0">Prezzo (€)</label>
+              <input type="number" class="form-control form-control-sm text-right" id="prezzo" step=".01" min="0">
+            </div>
+            <div class="form-group col-md-1 mb-0">
+              <label for="sconto" class="mb-0">Sconto (€)</label>
+              <input type="number" class="form-control form-control-sm text-right" id="sconto" step=".01" min="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-2">
+              <button type="submit" class="btn btn-primary btn-sm mt-2" id="addArticolo">Aggiungi</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              TABELLA ARTICOLI
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-1">
+              <label for="colli" class="mb-0">Num. colli</label>
+              <input type="number" class="form-control form-control-sm text-right" id="colli" step="1" min="0">
             </div>
             <div class="form-group col-md-2">
-              <label>Numero</label>
-              <div class="input-group">
-                <input type="number" class="form-control confezioneNum" step="1" min="0">
-                <div class="input-group-append ml-1 mt-1 linkConfezione">
-                  <a href="#" class="addConfezione"><i class="fas fa-plus"></i></a>
+              <label for="dataTrasporto" class="mb-0">Data trasporto</label>
+              <input type="data" class="form-control form-control-sm text-right" id="dataTrasporto">
+            </div>
+            <div class="form-group col-md-1">
+              <label for="oraTrasporto" class="mb-0">Ora trasporto</label>
+              <input type="time" class="form-control form-control-sm text-right" id="oraTrasporto">
+            </div>
+            <div class="form-group col-md-2">
+              <label for="tipoTrasporto" class="mb-0">Trasporto a cura del</label>
+              <select id="tipoTrasporto" class="form-control form-control-sm" >
+              </select>
+            </div>
+            <div class="form-group col-md-2">
+              <label for="trasportatore" class="mb-0">Trasportatore</label>
+              <input type="text" class="form-control form-control-sm text-right" id="trasportatore">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label for="note">Note</label>
+              <textarea class="form-control" id="note"></textarea>
+            </div>
+          </div>
+
+          <!--
+          <div class="card mt-2">
+            <h6 class="card-header text-center font-weight-bold">Aggiungi articolo</h6>
+            <div class="card-body">
+              <div class="form-row">
+                <div class="form-group col-md-3 mb-0">
+                  <label for="articolo" class="mb-0">Articolo</label>
+                  <select id="articolo" class="form-control form-control-sm" >
+                  </select>
                 </div>
               </div>
             </div>
           </div>
+          -->
 
-          <div class="form-row">
-            <div class="form-group col-md-3">
-              <label for="quantitaTotale">Quantita totale (Kg)*</label>
-              <input type="number" class="form-control" id="quantitaTotale" placeholder="" required step=".01" min="0" disabled>
-              <div class="invalid-feedback">
-                Inserisci la quantita totale
-              </div>
-            </div>
-          </div>
-
-          <div class="form-row" id="formRowIngredienti">
-            <div class="form-group col-md-12" id="formRowIngredientiBody">
-              <label class="font-weight-bold">Ingredienti</label>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-md-2">
-              <label for="filmChiusura">Film chiusura</label>
-              <input type="text" class="form-control" id="filmChiusura" value="Copertura">
-            </div>
-            <div class="form-group col-md-2">
-              <label for="lottoFilmChiusura">Lotto film chiusura</label>
-              <input type="text" class="form-control" id="lottoFilmChiusura">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-md-3 mb-0">
-              <label>Genera lotto</label>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-3">
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="generaLotto" id="generaLottoSi" value="vendita" checked>
-                <label class="form-check-label" for="generaLottoSi">Si</label>
-              </div>
-              <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="generaLotto" id="generaLottoNo" value="campionatura">
-                <label class="form-check-label" for="generaLottoNo">No</label>
-              </div>
-            </div>
-          </div>
-
-
-          <input type="hidden" id="hiddenIdRicetta"/>
-          <button type="submit" class="btn btn-primary" id="newProduzioneButton">Salva</button>
-          <a href="produzioni.html" class="btn btn-secondary">Annulla</a>
+          <button type="submit" class="btn btn-primary mt-4" id="newDdtButton">Salva</button>
+          <a href="ddt.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 
         <script>
