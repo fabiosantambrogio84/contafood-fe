@@ -2,60 +2,25 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
-	$('#produzioniTable').DataTable({
-		"ajax": {
-			"url": baseUrl + "produzioni",
-			"type": "GET",
-			"content-type": "json",
-			"cache": false,
-			"dataSrc": "",
-			"error": function(jqXHR, textStatus, errorThrown) {
-				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero delle produzioni</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertProduzione').empty().append(alertContent);
-			}
-		},
+	$('#ddtArticoliTable').DataTable({
+		"searching": false,
 		"language": {
-			"search": "Cerca per codice, ricetta, confezione",
 			"paginate": {
 				"first": "Inizio",
 				"last": "Fine",
 				"next": "Succ.",
+				//"previous": "<i class=\"fa fa-backward\" aria-hidden=\"true\"></i>"
 				"previous": "Prec."
 			},
-			"emptyTable": "Nessuna produzione disponibile",
-			"zeroRecords": "Nessuna produzione disponibile"
+			"emptyTable": "",
+			"zeroRecords": ""
 		},
-		"pageLength": 20,
+		"pageLength": 10,
 		"lengthChange": false,
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'desc']
-		],
-		"columns": [
-			{"name": "codice", "data": "codice", "width":"10%"},
-			{"name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
-				var a = moment(data.dataProduzione);
-				return a.format('DD/MM/YYYY');
-			}},
-			{"name": "lotto", "data": "lotto", "width":"10%"},
-			{"name": "scadenza", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var a = moment(data.scadenza);
-				return a.format('DD/MM/YYYY');
-			}},
-			{"name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
-				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
-				return ricettaResult;
-			}},
-			{"name": "numeroConfezioni", "data": "numeroConfezioni", "width":"8%", "className": "tdAlignRight" },
-			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
-				var links = '<a class="detailsProduzione pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
-				links = links + '<a class="deleteProduzione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-				return links;
-			}}
+			[0, 'asc']
 		]
 	});
 
@@ -295,6 +260,56 @@ $(document).ready(function() {
 		}
 	});
 
+	$(document).on('click','#addArticolo', function(event){
+		event.preventDefault();
+
+		var articoloId = $('#articolo option:selected').val();
+
+		if(articoloId == null || articoloId == undefined || articoloId == ''){
+			$('#addDdtArticoloAlert').removeClass("d-none");
+			return;
+		} else {
+			$('#addDdtArticoloAlert').addClass("d-none");
+		}
+
+		var articolo = $('#articolo option:selected').text();
+		var udm = $('#udm').val();
+		var iva = $('#iva').val();
+		var lotto = $('#lotto').val();
+		var quantita = $('#quantita').val();
+		var pezzi = $('#pezzi').val();
+		var prezzo = $('#prezzo').val();
+		var sconto = $('#sconto').val();
+		var iva = $('#iva').val();
+
+		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+		var table = $('#ddtArticoliTable').DataTable();
+		var rowNode = table.row.add( [
+			articolo,
+			lotto,
+			quantita,
+			pezzi,
+			prezzo,
+			sconto,
+			iva,
+			deleteLink
+		] ).draw( false ).node();
+		$(rowNode).css('text-align', 'center');
+		$(rowNode).addClass('rowArticolo');
+
+		$.fn.computeTotale();
+	});
+
+	$(document).on('click','.deleteDdtArticolo', function(){
+		var elem = $(this);
+		elem.parent().parent().remove();
+
+		$('#ddtArticoliTable').focus();
+
+		$.fn.computeTotale();
+	});
+
 });
 
 $.fn.preloadFields = function(){
@@ -417,25 +432,6 @@ $.fn.extractIdRicettaFromUrl = function(){
     }
 }
 
-$.fn.getConfezioni = function(){
-	$.ajax({
-		url: baseUrl + "confezioni",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-			    $.each(result, function(i, item){
-                    $('.confezioneDescr').append('<option value="'+item.id+'" data-peso="'+item.peso+'">'+item.codice+' '+item.tipo+' '+item.peso+' gr.</option>');
-				});
-			}
-			$('#dataProduzione').val(moment().format('YYYY-MM-DD'));
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
-}
-
 $.fn.loadIngredienti = function(idRicetta){
 
 	$.ajax({
@@ -535,33 +531,50 @@ $.fn.getRicettaProduzione = function(idRicetta){
     });
 }
 
-$.fn.computeQuantitaTotale = function() {
-	var quantitaTotale;
-	$('.confezioneNum').each(function(i, item){
-		var numeroConfezioni = $(this).val();
-		var peso = $(this).parent().parent().prev().prev().find('input').val();
-		if(numeroConfezioni != undefined && peso != undefined){
-			var pesoConfezione = parseFloat(numeroConfezioni)*parseFloat(peso);
-			if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
-				quantitaTotale = parseFloat(quantitaTotale) + parseFloat(pesoConfezione);
-			} else {
-				quantitaTotale = parseFloat(pesoConfezione);
-			}
+$.fn.parseValue = function(value, resultType){
+	if(value != null && value != undefined && value != ''){
+		if(resultType == 'float'){
+			return parseFloat(value);
+		} else if(resultType == 'int'){
+			return parseInt(value);
+		} else {
+			return value;
 		}
-	});
-	if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
-		quantitaTotale = parseFloat(quantitaTotale)/1000;
+	} else {
+		if(resultType == 'float'){
+			return 0.0;
+		} else {
+			return 0;
+		}
 	}
-	$('#quantitaTotale').val(quantitaTotale);	
 }
 
-$.fn.computeQuantitaIngredienti = function() {
-	var quantitaTotale = $('#quantitaTotale').val();
-	if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
-		$('.formRowIngrediente').each(function(i, item){
-			var percentuale = $(this).attr('data-percentuale');
-			var quantitaIngrediente = parseFloat((parseFloat(percentuale)*parseFloat(quantitaTotale))/100);
-			$(this).find('.quantitaIngrediente').val(quantitaIngrediente.toFixed(3));
-		});
+$.fn.computeTotale = function() {
+	var totale;
+	$('.rowArticolo').each(function(i, item){
+		var quantita = $(this).children().eq(2).text();
+		quantita = $.fn.parseValue(quantita, 'float');
+		var pezzi = $(this).children().eq(3).text();
+		pezzi = $.fn.parseValue(pezzi, 'int');
+		var prezzo = $(this).children().eq(4).text();
+		prezzo = $.fn.parseValue(prezzo, 'float');
+		var sconto = $(this).children().eq(5).text();
+		sconto = $.fn.parseValue(sconto, 'float');
+		var iva = $(this).children().eq(6).text();
+		iva = $.fn.parseValue(iva, 'int');
+
+		var quantitaPerPrezzo = (quantita * prezzo);
+		var totaleConIva = quantitaPerPrezzo + (quantitaPerPrezzo * (iva/100));
+
+		if(totale == null || totale == undefined || totale == ''){
+			totale = 0;
+		}
+		totale += (totaleConIva - sconto);
+	});
+
+	if(totale != null && totale != undefined && totale != ""){
+		totale = parseFloat(totale);
 	}
+	$('#totale').val(totale);
 }
+
