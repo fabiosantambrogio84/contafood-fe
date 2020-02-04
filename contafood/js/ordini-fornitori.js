@@ -157,7 +157,7 @@ $(document).ready(function() {
 	});
 
 	$(document).on('click','#confirmDeleteOrdineFornitore', function(){
-		$('#deleteOrdineFornitoerModal').modal('hide');
+		$('#deleteOrdineFornitoreModal').modal('hide');
 		var idOrdineFornitore = $(this).attr('data-id');
 
 		$.ajax({

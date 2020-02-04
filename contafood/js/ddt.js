@@ -2,6 +2,90 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
+	$('#ddtTable').DataTable({
+		"ajax": {
+			"url": baseUrl + "ddts",
+			"type": "GET",
+			"content-type": "json",
+			"cache": false,
+			"dataSrc": "",
+			"error": function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero dei DDT</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertDdt').empty().append(alertContent);
+			}
+		},
+		"language": {
+			"search": "Cerca",
+			"paginate": {
+				"first": "Inizio",
+				"last": "Fine",
+				"next": "Succ.",
+				"previous": "Prec."
+			},
+			"emptyTable": "Nessun DDT disponibile",
+			"zeroRecords": "Nessun DDT disponibile"
+		},
+		"pageLength": 20,
+		"lengthChange": false,
+		"info": false,
+		"autoWidth": false,
+		"order": [
+			[0, 'desc']
+		],
+		"columns": [
+			{"name": "numero", "data": "progressivo", "width":"5%"},
+			{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
+				var a = moment(data.data);
+				return a.format('DD/MM/YYYY');
+			}},
+			{"name": "fatturato", "data": null, "width":"5%", render: function ( data, type, row ) {
+				if(data.fatturato){
+					return 'Si';
+				} else {
+					return 'No';
+				}
+			}},
+			{"name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
+				var cliente = data.cliente;
+				if(cliente != null){
+					return cliente.ragioneSociale;
+				}
+				return '';
+			}},
+			{"name": "agente", "data": null, "width":"10%", render: function ( data, type, row ) {
+				var cliente = data.cliente;
+				if(cliente != null){
+					var agente = cliente.agente;
+					if(agente != null){
+						return agente.nome + ' ' + agente.cognome;
+					}
+				}
+				return '';
+			}},
+			{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
+				return '';
+			}},
+			{"name": "importo", "data": "totale", "width":"8%"},
+			{"name": "imponibile", "data": "totaleImponibile", "width":"10%"},
+			{"name": "costo", "data": "totaleCosto", "width":"8%"},
+			{"name": "guadagno", "data": null, "width":"10%", render: function ( data, type, row ) {
+				var guadagno = data.totaleImponibile - data.totaleCosto;
+				return Number(Math.round(guadagno+'e2')+'e-2');
+			}},
+			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
+				var links = '<a class="detailsDdt pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
+				links = links + '<a class="deleteDdt" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+				return links;
+			}}
+		],
+		"createdRow": function(row, data, dataIndex){
+			$(row).css('font-size', '14px');;
+		}
+	});
+
 	$('#ddtArticoliTable').DataTable({
 		"searching": false,
 		"language": {
@@ -57,11 +141,11 @@ $(document).ready(function() {
 			"columns": [
 				{"data": null, "orderable":false, render: function ( data, type, row ) {
 					return data.confezione.tipo;
-					
+
 				}},
 				{"data": null, "orderable":false, render: function ( data, type, row ) {
 					return data.confezione.peso;
-					
+
 				}},
 				{"data": null, "orderable":false, render: function ( data, type, row ) {
 					return data.numConfezioni;
@@ -103,107 +187,98 @@ $(document).ready(function() {
 		});
 	});
 
-	if($('#newProduzioneForm') != null && $('#newProduzioneForm') != undefined){
-		$(document).on('change','#ricetta', function(){
-			var idRicetta = $('#ricetta option:selected').val();
-			var idCategoria = $('#ricetta option:selected').attr('data-id-categoria');
-			var numGiorniScadenza = $('#ricetta option:selected').attr('data-num-giorni-scadenza');
-			if(idCategoria != '-1'){
-				$('#categoria option').attr('selected', false);
-				$('#categoria option[value="' + idCategoria +'"]').attr('selected', true);
-			}
-			if(numGiorniScadenza != '-1'){
-				var scadenza = moment().add(numGiorniScadenza, 'days').format('YYYY-MM-DD');
-				//scadenza.setDate(scadenza.getDate() + parseInt(numGiorniScadenza));
-				$('#scadenza').val(scadenza);
-			}
-			$.fn.loadIngredienti(idRicetta);
-		});
-	}
-
-	if($('#newProduzioneButton') != null && $('#newProduzioneButton') != undefined){
-		$(document).on('submit','#newProduzioneForm', function(event){
+	if($('#newDdtButton') != null && $('#newDdtButton') != undefined){
+		$(document).on('submit','#newDdtForm', function(event){
 			event.preventDefault();
 
-			var produzione = new Object();
-			produzione.dataProduzione = $('#dataProduzione').val();
-			var ricetta = new Object();
-			ricetta.id = $('#ricetta option:selected').val();
-			produzione.ricetta = ricetta;
+			var ddt = new Object();
+			ddt.progressivo = $('#progressivo').val();
+			ddt.annoContabile = $('#annoContabile').val();
+			ddt.data = $('#data').val();
 
-			var categoria = new Object();
-			categoria.id = $('#categoria option:selected').val();
-			produzione.categoria = categoria;
+			var cliente = new Object();
+			cliente.id = $('#cliente option:selected').val();
+			ddt.cliente = cliente;
 
-			var ingredientiLength = $('.formRowIngrediente').length;
-			if(ingredientiLength != null && ingredientiLength != undefined && ingredientiLength != 0){
-				var produzioneIngredienti = [];
-				$('.formRowIngrediente').each(function(i, item){
-					var produzioneIngrediente = {};
-					var produzioneIngredienteId = new Object();
-					var ingredienteId = item.id.replace('formRowIngrediente_','');
-					produzioneIngredienteId.ingredienteId = ingredienteId;
-					produzioneIngrediente.id = produzioneIngredienteId;
+			var puntoConsegna = new Object();
+			puntoConsegna.id = $('#puntoConsegna option:selected').val();
+			ddt.puntoConsegna = puntoConsegna;
 
-					produzioneIngrediente.lotto = $('#lottoIngrediente_'+ingredienteId).val();
-					produzioneIngrediente.scadenza = $('#scadenzaIngrediente_'+ingredienteId).val();
-					produzioneIngrediente.quantita = $('#quantitaIngrediente_'+ingredienteId).val();
+			var ddtArticoliLength = $('.rowArticolo').length;
+			if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
+				var ddtArticoli = [];
+				$('.rowArticolo').each(function(i, item){
+					var articoloId = $(this).attr('data-id');
 
-					produzioneIngredienti.push(produzioneIngrediente);
+					var ddtArticolo = {};
+					var ddtArticoloId = new Object();
+					ddtArticoloId.articoloId = articoloId;
+					ddtArticolo.id = ddtArticoloId;
+
+					ddtArticolo.quantita = $(this).children().eq(3).text();
+					ddtArticolo.numeroPezzi = $(this).children().eq(4).text();
+					ddtArticolo.prezzo = $(this).children().eq(5).text();
+					ddtArticolo.sconto = $(this).children().eq(6).text();
+
+					ddtArticoli.push(ddtArticolo);
 				});
-				produzione.produzioneIngredienti = produzioneIngredienti;
+				ddt.ddtArticoli = ddtArticoli;
 			}
-			produzione.scadenza = $('#scadenza').val();
-			produzione.quantitaTotale = $('#quantitaTotale').val();
-			produzione.scopo = $('input[name="generaLotto"]:checked').val();
-			produzione.filmChiusura = $('#filmChiusura').val();
-			produzione.lottoFilmChiusura = $('#lottoFilmChiusura').val();
-			
-			var confezioniLength = $('.confezioneRow').length;
-			produzione.numeroConfezioni = 0;
-			if(confezioniLength != null && confezioniLength != undefined && confezioniLength != 0){
-				produzione.numeroConfezioni = confezioniLength;
-				var produzioneConfezioni = [];
-				$('.confezioneRow').each(function(i, item){
-					var produzioneConfezione = {};
-					var produzioneConfezioneId = new Object();
-					var confezioneId = $(this).find('select option:selected').val();
-					produzioneConfezioneId.confezioneId = confezioneId;
-					produzioneConfezione.id = produzioneConfezioneId;
-					produzioneConfezione.numConfezioni = $(this).find('.confezioneNum').val();
-					produzioneConfezione.lotto = $(this).find('.confezioneLotto').val();
+			ddt.numeroColli = $('#colli').val();
+			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();;
+			ddt.dataTrasporto = $('#dataTrasporto').val();
 
-					produzioneConfezioni.push(produzioneConfezione);
-				});
-				produzione.produzioneConfezioni = produzioneConfezioni;
+			var regex = /:/g;
+			var oraTrasporto = $('#oraTrasporto').val();
+			if(oraTrasporto != null && oraTrasporto != ''){
+				var count = oraTrasporto.match(regex);
+				count = (count) ? count.length : 0;
+				if(count == 1){
+					ddt.oraTrasporto = $('#oraTrasporto').val() + ':00';
+				} else {
+					ddt.oraTrasporto = $('#oraTrasporto').val();
+				}
 			}
+			ddt.trasportatore = $('#trasportatore').val();
+			ddt.note = $('#note').val();
 
-			var produzioneJson = JSON.stringify(produzione);
+			var ddtJson = JSON.stringify(ddt);
 
-			var alertContent = '<div id="alertProduzioneContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
-				url: baseUrl + "produzioni",
+				url: baseUrl + "ddts",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: produzioneJson,
+				data: ddtJson,
 				success: function(result) {
-					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Produzione creata con successo').replace('@@alertResult@@', 'success'));
+					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo').replace('@@alertResult@@', 'success'));
 
-					$('#newProduzioneButton').attr("disabled", true);
+					$('#newDdtButton').attr("disabled", true);
 
-					// Returns to the page with the list of Produzione
+					// Returns to the page with the list of DDTs
 					setTimeout(function() {
-						window.location.href = "produzioni.html";
+						window.location.href = "ddt.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della produzione').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nella creazione del DDT';
+					if(jqXHR != null && jqXHR != undefined){
+						var jqXHRResponseJson = jqXHR.responseJSON;
+						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+								errorMessage = jqXHRResponseJsonMessage;
+							}
+						}
+					}
+					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
+
 		});
 	}
 
@@ -274,7 +349,6 @@ $(document).ready(function() {
 
 		var articolo = $('#articolo option:selected').text();
 		var udm = $('#udm').val();
-		var iva = $('#iva').val();
 		var lotto = $('#lotto').val();
 		var quantita = $('#quantita').val();
 		var pezzi = $('#pezzi').val();
@@ -282,21 +356,30 @@ $(document).ready(function() {
 		var sconto = $('#sconto').val();
 		var iva = $('#iva').val();
 
+		var totale = 0;
+		quantita = $.fn.parseValue(quantita, 'float');
+		prezzo = $.fn.parseValue(prezzo, 'float');
+		sconto = $.fn.parseValue(sconto, 'float');
+		totale = (quantita * prezzo) - sconto;
+
 		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 		var table = $('#ddtArticoliTable').DataTable();
 		var rowNode = table.row.add( [
 			articolo,
 			lotto,
+			udm,
 			quantita,
 			pezzi,
 			prezzo,
 			sconto,
+			totale,
 			iva,
 			deleteLink
 		] ).draw( false ).node();
 		$(rowNode).css('text-align', 'center');
 		$(rowNode).addClass('rowArticolo');
+		$(rowNode).attr('data-id', articoloId);
 
 		$.fn.computeTotale();
 	});
@@ -415,7 +498,7 @@ $.fn.getTipologieTrasporto = function(){
 		}
 	});
 }
-
+/*
 $.fn.extractIdRicettaFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -431,7 +514,8 @@ $.fn.extractIdRicettaFromUrl = function(){
         }
     }
 }
-
+*/
+/*
 $.fn.loadIngredienti = function(idRicetta){
 
 	$.ajax({
@@ -502,7 +586,8 @@ $.fn.loadIngredienti = function(idRicetta){
 		}
 	});
 }
-
+*/
+/*
 $.fn.getRicettaProduzione = function(idRicetta){
 
 	var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
@@ -530,6 +615,7 @@ $.fn.getRicettaProduzione = function(idRicetta){
         }
     });
 }
+*/
 
 $.fn.parseValue = function(value, resultType){
 	if(value != null && value != undefined && value != ''){
@@ -550,31 +636,43 @@ $.fn.parseValue = function(value, resultType){
 }
 
 $.fn.computeTotale = function() {
-	var totale;
+	var ivaMap = new Map();
+	var totaleDocumento = 0;
+
 	$('.rowArticolo').each(function(i, item){
-		var quantita = $(this).children().eq(2).text();
+		var quantita = $(this).children().eq(3).text();
 		quantita = $.fn.parseValue(quantita, 'float');
-		var pezzi = $(this).children().eq(3).text();
+		var pezzi = $(this).children().eq(4).text();
 		pezzi = $.fn.parseValue(pezzi, 'int');
-		var prezzo = $(this).children().eq(4).text();
+		var prezzo = $(this).children().eq(5).text();
 		prezzo = $.fn.parseValue(prezzo, 'float');
-		var sconto = $(this).children().eq(5).text();
+		var sconto = $(this).children().eq(6).text();
 		sconto = $.fn.parseValue(sconto, 'float');
-		var iva = $(this).children().eq(6).text();
+		var totale = $(this).children().eq(7).text();
+		totale = $.fn.parseValue(totale, 'float');
+		var iva = $(this).children().eq(8).text();
 		iva = $.fn.parseValue(iva, 'int');
 
-		var quantitaPerPrezzo = (quantita * prezzo);
-		var totaleConIva = quantitaPerPrezzo + (quantitaPerPrezzo * (iva/100));
-
-		if(totale == null || totale == undefined || totale == ''){
-			totale = 0;
+		var totaliIva;
+		if(ivaMap.has(iva)){
+			totaliIva = ivaMap.get(iva);
+		} else {
+			totaliIva = [];
 		}
-		totale += (totaleConIva - sconto);
+		totaliIva.push(totale);
+		ivaMap.set(iva, totaliIva);
+
+	});
+	ivaMap.forEach( (value, key, map) => {
+		var totalePerIva = value.reduce((a, b) => a + b, 0);
+		var totaleConIva = totalePerIva + (totalePerIva * key/100);
+
+		totaleDocumento += totaleConIva;
 	});
 
-	if(totale != null && totale != undefined && totale != ""){
-		totale = parseFloat(totale);
+	if(totaleDocumento != null && totaleDocumento != undefined && totaleDocumento != ""){
+		totaleDocumento = parseFloat(totaleDocumento);
 	}
-	$('#totale').val(totale);
+	$('#totale').val(totaleDocumento);
 }
 

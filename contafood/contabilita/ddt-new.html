@@ -169,10 +169,12 @@
                     <tr>
                       <th>Articolo</th>
                       <th>Lotto</th>
+                      <th>UdM</th>
                       <th>Quantita</th>
                       <th>Pezzi</th>
                       <th>Prezzo (€)</th>
                       <th>Sconto (€)</th>
+                      <th>Totale (€)</th>
                       <th>Iva (%)</th>
                       <th></th>
                     </tr>
@@ -189,58 +191,6 @@
 
             </div>
           </div>
-
-          <!--
-          <div class="form-row mt-2 pt-2" style="background-color: #bff0de;">
-            <div class="form-group col-md-12 mb-0">
-              <h6 class="text-center font-weight-bold">Aggiungi articolo</h6>
-            </div>
-          </div>
-          <div class="form-row mt-2">
-            <div class="form-group col-md-4">
-              <label for="articolo" class="mb-0">Articolo</label>
-              <select id="articolo" class="form-control form-control-sm" >
-                <option value=""></option>
-              </select>
-            </div>
-            <div class="form-group col-md-1">
-              <label for="udm" class="mb-0">UdM</label>
-              <input type="text" class="form-control form-control-sm text-right" id="udm" disabled>
-            </div>
-            <div class="form-group col-md-1">
-              <label for="iva" class="mb-0">Iva (%)</label>
-              <input type="number" class="form-control form-control-sm text-right" id="iva" disabled>
-            </div>
-            <div class="form-group col-md-2">
-              <label for="lotto" class="mb-0">Lotto</label>
-              <input type="text" class="form-control form-control-sm text-right" id="lotto">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-1 mb-0">
-              <label for="quantita" class="mb-0">Quantita</label>
-              <input type="number" class="form-control form-control-sm text-right" id="quantita" step=".01" min="0">
-            </div>
-            <div class="form-group col-md-1 mb-0">
-              <label for="pezzi" class="mb-0">Pezzi</label>
-              <input type="number" class="form-control form-control-sm text-right" id="pezzi" step="1" min="0">
-            </div>
-            <div class="form-group col-md-1 mb-0">
-              <label for="prezzo" class="mb-0">Prezzo (€)</label>
-              <input type="number" class="form-control form-control-sm text-right" id="prezzo" step=".01" min="0">
-            </div>
-            <div class="form-group col-md-1 mb-0">
-              <label for="sconto" class="mb-0">Sconto (€)</label>
-              <input type="number" class="form-control form-control-sm text-right" id="sconto" step=".01" min="0">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-2">
-              <button type="submit" class="btn btn-primary btn-sm mt-2" id="addArticolo">Aggiungi</button>
-            </div>
-          </div>
-          -->
-
           <div class="form-row mt-2">
             <div class="form-group col-md-1">
               <label for="colli" class="mb-0">Num. colli</label>
@@ -248,7 +198,7 @@
             </div>
             <div class="form-group col-md-2">
               <label for="dataTrasporto" class="mb-0">Data trasporto</label>
-              <input type="data" class="form-control form-control-sm text-right" id="dataTrasporto">
+              <input type="date" class="form-control form-control-sm text-right" id="dataTrasporto">
             </div>
             <div class="form-group col-md-1">
               <label for="oraTrasporto" class="mb-0">Ora trasporto</label>
@@ -259,7 +209,7 @@
               <select id="tipoTrasporto" class="form-control form-control-sm" >
               </select>
             </div>
-            <div class="form-group col-md-2">
+            <div class="form-group col-md-4">
               <label for="trasportatore" class="mb-0">Trasportatore</label>
               <input type="text" class="form-control form-control-sm text-right" id="trasportatore">
             </div>
