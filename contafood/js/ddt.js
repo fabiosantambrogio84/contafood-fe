@@ -2,89 +2,141 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
-	$('#ddtTable').DataTable({
-		"ajax": {
-			"url": baseUrl + "ddts",
-			"type": "GET",
-			"content-type": "json",
-			"cache": false,
-			"dataSrc": "",
-			"error": function(jqXHR, textStatus, errorThrown) {
-				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero dei DDT</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertDdt').empty().append(alertContent);
-			}
-		},
-		"language": {
-			"search": "Cerca",
-			"paginate": {
-				"first": "Inizio",
-				"last": "Fine",
-				"next": "Succ.",
-				"previous": "Prec."
-			},
-			"emptyTable": "Nessun DDT disponibile",
-			"zeroRecords": "Nessun DDT disponibile"
-		},
-		"pageLength": 20,
-		"lengthChange": false,
-		"info": false,
-		"autoWidth": false,
-		"order": [
-			[0, 'desc']
-		],
-		"columns": [
-			{"name": "numero", "data": "progressivo", "width":"5%"},
-			{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var a = moment(data.data);
-				return a.format('DD/MM/YYYY');
-			}},
-			{"name": "fatturato", "data": null, "width":"5%", render: function ( data, type, row ) {
-				if(data.fatturato){
-					return 'Si';
-				} else {
-					return 'No';
-				}
-			}},
-			{"name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					return cliente.ragioneSociale;
-				}
-				return '';
-			}},
-			{"name": "agente", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					var agente = cliente.agente;
-					if(agente != null){
-						return agente.nome + ' ' + agente.cognome;
+	$.ajax({
+		url: baseUrl + "autisti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(autistiResult) {
+
+			$('#ddtTable').DataTable({
+				"ajax": {
+					"url": baseUrl + "ddts",
+					"type": "GET",
+					"content-type": "json",
+					"cache": false,
+					"dataSrc": "",
+					"error": function(jqXHR, textStatus, errorThrown) {
+						console.log('Response text: ' + jqXHR.responseText);
+						var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+						alertContent = alertContent + '<strong>Errore nel recupero dei DDT</strong>\n' +
+							'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+						$('#alertDdt').empty().append(alertContent);
+					}
+				},
+				"language": {
+					"search": "Cerca",
+					"paginate": {
+						"first": "Inizio",
+						"last": "Fine",
+						"next": "Succ.",
+						"previous": "Prec."
+					},
+					"emptyTable": "Nessun DDT disponibile",
+					"zeroRecords": "Nessun DDT disponibile"
+				},
+				"pageLength": 20,
+				"lengthChange": false,
+				"info": false,
+				"autoWidth": false,
+				"order": [
+					[0, 'desc']
+				],
+				"columns": [
+					{"name": "numero", "data": "progressivo", "width":"5%"},
+					{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
+						var a = moment(data.data);
+						return a.format('DD/MM/YYYY');
+					}},
+					{"name": "fatturato", "data": null, "width":"5%", render: function ( data, type, row ) {
+						if(data.fatturato){
+							return 'Si';
+						} else {
+							return 'No';
+						}
+					}},
+					{"name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
+						var cliente = data.cliente;
+						if(cliente != null){
+							return cliente.ragioneSociale;
+						}
+						return '';
+					}},
+					{"name": "agente", "data": null, "width":"10%", render: function ( data, type, row ) {
+						var cliente = data.cliente;
+						if(cliente != null){
+							var agente = cliente.agente;
+							if(agente != null){
+								return agente.nome + ' ' + agente.cognome;
+							}
+						}
+						return '';
+					}},
+					{"name":"autista", "data": null, "width":"13%", render: function ( data, type, row ) {
+						var ddtId = data.id;
+						var selectId = "autista_" + ddtId;
+
+						var autistaId = null;
+						if(data.autista != null){
+							autistaId = data.autista.id;
+						}
+
+						var autistaSelect = '<select id="'+selectId+'" class="form-control form-control-sm autistaDdt" data-id="'+ddtId+'">';
+						autistaSelect += '<option value=""> - </option>';
+						if(autistiResult != null && autistiResult != undefined && autistiResult != ''){
+							$.each(autistiResult, function(i, item){
+								var label = item.nome + ' ' + item.cognome;
+								var optionHtml = '<option value="'+item.id+'"';
+								if(autistaId != null && autistaId != undefined){
+									if(autistaId == item.id){
+										optionHtml += ' selected';
+									}
+								}
+								optionHtml += '>'+label+'</option>';
+								autistaSelect += optionHtml;
+							});
+						}
+						autistaSelect += '</select';
+						return autistaSelect;
+					}},
+					{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
+						return '';
+					}},
+					{"name": "importo", "data": "totale", "width":"8%"},
+					{"name": "imponibile", "data": "totaleImponibile", "width":"8%"},
+					{"name": "costo", "data": "totaleCosto", "width":"6%"},
+					{"name": "guadagno", "data": null, "width":"8%", render: function ( data, type, row ) {
+						var guadagno = data.totaleImponibile - data.totaleCosto;
+						return Number(Math.round(guadagno+'e2')+'e-2');
+					}},
+					{"data": null, "orderable":false, "width":"17%", render: function ( data, type, row ) {
+						var links = '<a class="detailsDdt pr-2" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+						if(!data.fatturato){
+							links += '<a class="updateDdt pr-2" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+						}
+						links += '<a class="payDdt pr-2" data-id="'+data.id+'" href="pagamento-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+						links += '<a class="emailDdt pr-2" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
+						links += '<a class="printDdt pr-2" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+						links += '<a class="deleteDdt" data-id="'+data.id+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+						return links;
+					}}
+				],
+				"createdRow": function(row, data, dataIndex){
+					$(row).css('font-size', '14px');
+					if(data.statoDdt != null){
+						var backgroundColor = '';
+						if(data.statoDdt.codice == 'DA_PAGARE'){
+							backgroundColor = '#f7f25c';
+						} else if(data.statoDdt.codice == 'PARZIALMENTE_PAGATO'){
+							backgroundColor = '#f5f1a4';
+						} else {
+							backgroundColor = 'trasparent';
+						}
+						$(row).css('background-color', backgroundColor);
 					}
 				}
-				return '';
-			}},
-			{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
-				return '';
-			}},
-			{"name": "importo", "data": "totale", "width":"8%"},
-			{"name": "imponibile", "data": "totaleImponibile", "width":"10%"},
-			{"name": "costo", "data": "totaleCosto", "width":"8%"},
-			{"name": "guadagno", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var guadagno = data.totaleImponibile - data.totaleCosto;
-				return Number(Math.round(guadagno+'e2')+'e-2');
-			}},
-			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="detailsDdt pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
-				links = links + '<a class="deleteDdt" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-				return links;
-			}}
-		],
-		"createdRow": function(row, data, dataIndex){
-			$(row).css('font-size', '14px');;
+			});
 		}
-	});
+	})
 
 	$('#ddtArticoliTable').DataTable({
 		"searching": false,
@@ -107,7 +159,7 @@ $(document).ready(function() {
 			[0, 'asc']
 		]
 	});
-
+	/*
 	$(document).on('click','.detailsProduzione', function(){
 		var idProduzione = $(this).attr('data-id');
 
@@ -186,6 +238,7 @@ $(document).ready(function() {
 			}
 		});
 	});
+	*/
 
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined){
 		$(document).on('submit','#newDdtForm', function(event){
@@ -224,6 +277,7 @@ $(document).ready(function() {
 				});
 				ddt.ddtArticoli = ddtArticoli;
 			}
+			ddt.fatturato = false;
 			ddt.numeroColli = $('#colli').val();
 			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();;
 			ddt.dataTrasporto = $('#dataTrasporto').val();
@@ -282,6 +336,42 @@ $(document).ready(function() {
 		});
 	}
 
+	$(document).on('change','.autistaDdt', function(){
+		var idAutista = $(this).val();
+		var ddtId = $(this).attr("data-id");
+
+		var ddtPatched = new Object();
+		ddtPatched.id = parseInt(ddtId);
+		if(idAutista != null && idAutista != undefined && idAutista != ''){
+			ddtPatched.idAutista = parseInt(idAutista);
+		} else {
+			ddtPatched.idAutista = null;
+		}
+
+		var ddtPatchedJson = JSON.stringify(ddtPatched);
+
+		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		$.ajax({
+			url: baseUrl + "ddts/" + ddtId,
+			type: 'PATCH',
+			contentType: "application/json",
+			dataType: 'json',
+			data: ddtPatchedJson,
+			success: function(result) {
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Autista modificato con successo').replace('@@alertResult@@', 'success'));
+				$('#ddtTable').DataTable().ajax.reload();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell autista').replace('@@alertResult@@', 'danger'));
+				$('#ddtTable').DataTable().ajax.reload();
+			}
+		});
+
+	});
+
 	$(document).on('change','#cliente', function(){
 		var cliente = $('#cliente option:selected').val();
 		if(cliente != null && cliente != ''){
@@ -319,19 +409,21 @@ $(document).ready(function() {
 			var quantita = $('#articolo option:selected').attr('data-qta');
 			var prezzoBase = $('#articolo option:selected').attr('data-prezzo-base');
 
-			$('#udm').attr('value', udm);
-			$('#iva').attr('value', iva);
-			$('#quantita').attr('value', quantita);
-			$('#prezzo').attr('value', prezzoBase);
-
+			$('#udm').val(udm);
+			$('#iva').val(iva);
+			$('#lotto').val('');
+			$('#quantita').val(quantita);
+			$('#pezzi').val('');
+			$('#prezzo').val(prezzoBase);
+			$('#sconto').val('');
 		} else {
-			$('#udm').attr('value', null);
-			$('#iva').attr('value', null);
-			$('#lotto').attr('value', null);
-			$('#quantita').attr('value', null);
-			$('#pezzi').attr('value', null);
-			$('#prezzo').attr('value', null);
-			$('#sconto').attr('value', null);
+			$('#udm').val('');
+			$('#iva').val('');
+			$('#lotto').val('');
+			$('#quantita').val('');
+			$('#pezzi').val('');
+			$('#prezzo').val('');
+			$('#sconto').val('');
 		}
 	});
 
@@ -360,7 +452,7 @@ $(document).ready(function() {
 		quantita = $.fn.parseValue(quantita, 'float');
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		sconto = $.fn.parseValue(sconto, 'float');
-		totale = (quantita * prezzo) - sconto;
+		totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
 
 		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
@@ -385,9 +477,9 @@ $(document).ready(function() {
 	});
 
 	$(document).on('click','.deleteDdtArticolo', function(){
-		var elem = $(this);
-		elem.parent().parent().remove();
-
+		$('#ddtArticoliTable').DataTable().row( $(this).parent().parent() )
+			.remove()
+			.draw();
 		$('#ddtArticoliTable').focus();
 
 		$.fn.computeTotale();
@@ -673,6 +765,6 @@ $.fn.computeTotale = function() {
 	if(totaleDocumento != null && totaleDocumento != undefined && totaleDocumento != ""){
 		totaleDocumento = parseFloat(totaleDocumento);
 	}
-	$('#totale').val(totaleDocumento);
+	$('#totale').val(Number(Math.round(totaleDocumento+'e2')+'e-2'));
 }
 
