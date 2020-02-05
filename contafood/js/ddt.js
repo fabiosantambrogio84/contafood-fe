@@ -98,9 +98,7 @@ $(document).ready(function() {
 						autistaSelect += '</select';
 						return autistaSelect;
 					}},
-					{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
-						return '';
-					}},
+					{"name": "acconto", "data": "totaleAcconto", "width":"8%"},
 					{"name": "importo", "data": "totale", "width":"8%"},
 					{"name": "imponibile", "data": "totaleImponibile", "width":"8%"},
 					{"name": "costo", "data": "totaleCosto", "width":"6%"},
@@ -109,11 +107,22 @@ $(document).ready(function() {
 						return Number(Math.round(guadagno+'e2')+'e-2');
 					}},
 					{"data": null, "orderable":false, "width":"17%", render: function ( data, type, row ) {
+						var acconto = data.totaleAcconto;
+						if(acconto == null || acconto == undefined || acconto == ''){
+							acconto = 0;
+						}
+						var totale = data.totale;
+						if(totale == null || totale == undefined || totale == ''){
+							totale = 0;
+						}
+
 						var links = '<a class="detailsDdt pr-2" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
 						if(!data.fatturato){
 							links += '<a class="updateDdt pr-2" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 						}
-						links += '<a class="payDdt pr-2" data-id="'+data.id+'" href="pagamento-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+						if((totale - acconto) != 0){
+							links += '<a class="payDdt pr-2" data-id="'+data.id+'" href="pagamento-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+						}
 						links += '<a class="emailDdt pr-2" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 						links += '<a class="printDdt pr-2" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 						links += '<a class="deleteDdt" data-id="'+data.id+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
