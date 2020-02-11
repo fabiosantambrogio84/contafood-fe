@@ -276,46 +276,6 @@ $(document).ready(function() {
 			}
 		})
 
-		/*
-		$('#detailsProduzioneModalTable').DataTable({
-			"ajax": {
-				"url": baseUrl + "produzioni/" + idProduzione + "/confezioni",
-				"type": "GET",
-				"content-type": "json",
-				"cache": false,
-				"dataSrc": "",
-				"error": function(jqXHR, textStatus, errorThrown) {
-					console.log('Response text: ' + jqXHR.responseText);
-					$('#alertProduzione').append(alertContent);
-				}
-			},
-			"language": {
-				"search": "Cerca",
-				"emptyTable": "Nessuna confezione disponibile",
-				"zeroRecords": "Nessuna confezione disponibile"
-			},
-			"paging": false,
-			"lengthChange": false,
-			"info": false,
-			"order": [
-				[0,'desc']
-			],
-			"autoWidth": false,
-			"columns": [
-				{"data": null, "orderable":false, render: function ( data, type, row ) {
-					return data.confezione.tipo;
-
-				}},
-				{"data": null, "orderable":false, render: function ( data, type, row ) {
-					return data.confezione.peso;
-
-				}},
-				{"data": null, "orderable":false, render: function ( data, type, row ) {
-					return data.numConfezioni;
-				}}
-			]
-		});
-		*/
 		$('#detailsDdtModal').modal('show');
 	});
 
@@ -379,6 +339,7 @@ $(document).ready(function() {
 					ddtArticoloId.articoloId = articoloId;
 					ddtArticolo.id = ddtArticoloId;
 
+					ddtArticolo.lotto = $(this).children().eq(1).text();
 					ddtArticolo.quantita = $(this).children().eq(3).text();
 					ddtArticolo.numeroPezzi = $(this).children().eq(4).text();
 					ddtArticolo.prezzo = $(this).children().eq(5).text();
@@ -444,6 +405,103 @@ $(document).ready(function() {
 				}
 			});
 
+		});
+	}
+
+	if($('#updateDdtButton') != null && $('#updateDdtButton') != undefined){
+		$(document).on('submit','#updateDdtForm', function(event){
+			event.preventDefault();
+
+			var ddt = new Object();
+			ddt.id = $('#hiddenIdDdt').val();
+			ddt.progressivo = $('#progressivo').val();
+			ddt.annoContabile = $('#annoContabile').val();
+			ddt.data = $('#data').val();
+
+			var cliente = new Object();
+			cliente.id = $('#cliente option:selected').val();
+			ddt.cliente = cliente;
+
+			var puntoConsegna = new Object();
+			puntoConsegna.id = $('#puntoConsegna option:selected').val();
+			ddt.puntoConsegna = puntoConsegna;
+
+			var ddtArticoliLength = $('.rowArticolo').length;
+			if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
+				var ddtArticoli = [];
+				$('.rowArticolo').each(function(i, item){
+					var articoloId = $(this).attr('data-id');
+
+					var ddtArticolo = {};
+					var ddtArticoloId = new Object();
+					ddtArticoloId.articoloId = articoloId;
+					ddtArticolo.id = ddtArticoloId;
+
+					ddtArticolo.lotto = $(this).children().eq(1).text();
+					ddtArticolo.quantita = $(this).children().eq(3).text();
+					ddtArticolo.numeroPezzi = $(this).children().eq(4).text();
+					ddtArticolo.prezzo = $(this).children().eq(5).text();
+					ddtArticolo.sconto = $(this).children().eq(6).text();
+
+					ddtArticoli.push(ddtArticolo);
+				});
+				ddt.ddtArticoli = ddtArticoli;
+			}
+			ddt.fatturato = false;
+			ddt.numeroColli = $('#colli').val();
+			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();
+			ddt.dataTrasporto = $('#dataTrasporto').val();
+
+			var regex = /:/g;
+			var oraTrasporto = $('#oraTrasporto').val();
+			if(oraTrasporto != null && oraTrasporto != ''){
+				var count = oraTrasporto.match(regex);
+				count = (count) ? count.length : 0;
+				if(count == 1){
+					ddt.oraTrasporto = $('#oraTrasporto').val() + ':00';
+				} else {
+					ddt.oraTrasporto = $('#oraTrasporto').val();
+				}
+			}
+			ddt.trasportatore = $('#trasportatore').val();
+			ddt.note = $('#note').val();
+
+			var ddtJson = JSON.stringify(ddt);
+
+			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			$.ajax({
+				url: baseUrl + "ddts",
+				type: 'PUT',
+				contentType: "application/json",
+				dataType: 'json',
+				data: ddtJson,
+				success: function(result) {
+					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT aggiornato con successo').replace('@@alertResult@@', 'success'));
+
+					$('#newDdtButton').attr("disabled", true);
+
+					// Returns to the page with the list of DDTs
+					setTimeout(function() {
+						window.location.href = "ddt.html";
+					}, 1000);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var errorMessage = 'Errore nell aggiornamento del DDT';
+					if(jqXHR != null && jqXHR != undefined){
+						var jqXHRResponseJson = jqXHR.responseJSON;
+						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+								errorMessage = jqXHRResponseJsonMessage;
+							}
+						}
+					}
+					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+				}
+			});
 		});
 	}
 
@@ -559,6 +617,17 @@ $(document).ready(function() {
 		var sconto = $('#sconto').val();
 		var iva = $('#iva').val();
 
+		if(lotto != null && lotto != undefined && lotto != ''){
+			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'">';
+		} else {
+			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="">';
+		}
+
+		var quantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
+		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale" value="'+pezzi+'">';
+		var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
+		var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+sconto+'">';
+
 		var totale = 0;
 		quantita = $.fn.parseValue(quantita, 'float');
 		prezzo = $.fn.parseValue(prezzo, 'float');
@@ -570,12 +639,12 @@ $(document).ready(function() {
 		var table = $('#ddtArticoliTable').DataTable();
 		var rowNode = table.row.add( [
 			articolo,
-			lotto,
+			lottoHtml,
 			udm,
-			quantita,
-			pezzi,
-			prezzo,
-			sconto,
+			quantitaHtml,
+			pezziHtml,
+			prezzoHtml,
+			scontoHtml,
 			totale,
 			iva,
 			deleteLink
@@ -592,6 +661,20 @@ $(document).ready(function() {
 			.remove()
 			.draw();
 		$('#ddtArticoliTable').focus();
+
+		$.fn.computeTotale();
+	});
+
+	$(document).on('change','.compute-totale', function(){
+		$.row = $(this).parent().parent();
+		var quantita = $.row.children().eq(3).children().eq(0).val();
+		quantita = $.fn.parseValue(quantita, 'float');
+		var prezzo = $.row.children().eq(5).children().eq(0).val();
+		prezzo = $.fn.parseValue(prezzo, 'float');
+		var sconto = $.row.children().eq(6).children().eq(0).val();
+		sconto = $.fn.parseValue(sconto, 'float');
+		var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
+		$.row.children().eq(7).text(totale);
 
 		$.fn.computeTotale();
 	});
@@ -647,7 +730,7 @@ $.fn.getClienti = function(){
 	});
 }
 
-$.fn.getArticoli = function(){
+$.fn.getTipologieTrasporto = function(){
 	$.ajax({
 		url: baseUrl + "utils/tipologie-trasporto-ddt",
 		type: 'GET',
@@ -671,7 +754,7 @@ $.fn.getArticoli = function(){
 	});
 }
 
-$.fn.getTipologieTrasporto = function(){
+$.fn.getArticoli = function(){
 	$.ajax({
 		url: baseUrl + "articoli?attivo=true",
 		type: 'GET',
@@ -701,8 +784,8 @@ $.fn.getTipologieTrasporto = function(){
 		}
 	});
 }
-/*
-$.fn.extractIdRicettaFromUrl = function(){
+
+$.fn.extractIdDdtFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
 	var urlVariables = pageUrl.split('&'),
@@ -712,113 +795,128 @@ $.fn.extractIdRicettaFromUrl = function(){
     for (i = 0; i < urlVariables.length; i++) {
         paramNames = urlVariables[i].split('=');
 
-        if (paramNames[0] === 'idRicetta') {
+        if (paramNames[0] === 'idDdt') {
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
 }
-*/
-/*
-$.fn.loadIngredienti = function(idRicetta){
+
+
+$.fn.getDdt = function(idDdt){
+
+	var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent +  '<strong>Errore nel recupero del DDT</strong>\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 	$.ajax({
-		url: baseUrl + "ricette/" + idRicetta,
+		url: baseUrl + "ddts/" + idDdt,
 		type: 'GET',
 		dataType: 'json',
-		success: function (result) {
-			if (result != null && result != undefined && result != '') {
-				var labelHtml = '<div class="form-group col-md-12" id="formRowIngredientiBody"><label class="font-weight-bold">Ingredienti</label></div>';
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
 
-				$('#formRowIngredienti').empty().append(labelHtml);
+				$('#hiddenIdDdt').attr('value', result.id);
+				$('#progressivo').attr('value', result.progressivo);
+				$('#annoContabile').attr('value', result.annoContabile);
+				$('#data').attr('value', result.data);
+				if(result.cliente != null && result.cliente != undefined){
+					$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
 
-				if (result.ricettaIngredienti != null && result.ricettaIngredienti != undefined && result.ricettaIngredienti.length != 0) {
-					result.ricettaIngredienti.forEach(function (item, i) {
-						var id = item.id.ingredienteId;
-						var codice = item.ingrediente.codice;
-						var descrizione = item.ingrediente.descrizione;
-						var prezzo = item.ingrediente.prezzo;
-						var quantita = item.quantita;
-						var percentuale = item.percentuale;
-
-						var rowHtml = '<div class="form-row formRowIngrediente" data-id="' + id + '" id="formRowIngrediente_' + id + '" data-percentuale="'+percentuale+'">' +
-							'<div class="form-group col-md-2">';
-
-						if (i == 0) {
-							rowHtml = rowHtml + '<label for="codiceIngrediente">Codice</label>';
+					$.ajax({
+						url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
+						type: 'GET',
+						dataType: 'json',
+						success: function(result) {
+							if(result != null && result != undefined && result != ''){
+								$.each(result, function(i, item){
+									var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
+									var selected = '';
+									if(result.puntoConsegna != null){
+										if(result.puntoConsegna.id == item.id){
+											selected = 'selected';
+										}
+									}
+									$('#puntoConsegna').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
+								});
+							}
+							$('#puntoConsegna').removeAttr('disabled');
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 						}
-						rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceIngrediente_' + id + '" disabled value="' + codice + '"></div>';
-						rowHtml = rowHtml + '<div class="form-group col-md-4">';
-
-						if (i == 0) {
-							rowHtml = rowHtml + '<label for="descrizioneIngrediente">Descrizione</label>';
-						}
-						rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneIngrediente_' + id + '" disabled value="' + descrizione + '"></div>';
-						rowHtml = rowHtml + '<div class="form-group col-md-2">';
-
-						if (i == 0) {
-							rowHtml = rowHtml + '<label for="lottoIngrediente">Lotto</label>';
-						}
-						rowHtml = rowHtml + '<input type="text" class="form-control lottoIngrediente" id="lottoIngrediente_' + id + '"></div>';
-						rowHtml = rowHtml + '<div class="form-group col-md-2">';
-
-						if (i == 0) {
-							rowHtml = rowHtml + '<label for="scadenzaIngrediente">Scadenza</label>';
-						}
-						rowHtml = rowHtml + '<input type="date" class="form-control scadenzaIngrediente" id="scadenzaIngrediente_' + id + '" style="font-size: smaller;"></div>';
-						rowHtml = rowHtml + '<div class="form-group col-md-2">';
-
-						if (i == 0) {
-							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
-						}
-						rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" disabled style="text-align: right;"></div>';
-
-						rowHtml = rowHtml + '</div></div>';
-						rowHtml = rowHtml + '</div>';
-
-						$('#formRowIngredienti').append(rowHtml);
 					});
-					$.fn.computeQuantitaIngredienti();
 				}
-			} else {
-				$('#alertProduzione').empty().append(alertContent);
+				$('#colli').attr('value', result.numeroColli);
+				$('#dataTrasporto').attr('value', result.dataTrasporto);
+				$('#oraTrasporto').attr('value', result.oraTrasporto);
+				$('#tipoTrasporto option[value="' + result.tipoTrasporto +'"]').attr('selected', true);
+				$('#trasportatore').attr('value', result.trasportatore);
+				$('#note').val(result.note);
+
+				if(result.ddtArticoli != null && result.ddtArticoli != undefined && result.ddtArticoli.length != 0){
+					result.ddtArticoli.forEach(function(item, i){
+						var articolo = item.articolo;
+						var articoloId = item.id.articoloId;
+						var articoloDesc = articolo.codice+' '+articolo.descrizione;
+						var udm = articolo.unitaMisura.etichetta;
+						var iva = articolo.aliquotaIva.valore;
+						var pezzi = item.numeroPezzi;
+						var quantita = item.quantita;
+						var prezzo = item.prezzo;
+						var sconto = item.sconto;
+						var lotto = item.lotto;
+						if(lotto != null && lotto != undefined && lotto != ''){
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'">';
+						} else {
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="">';
+						}
+
+						var quantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
+						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale" value="'+pezzi+'">';
+						var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
+						var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+sconto+'">';
+
+						var totale = 0;
+						quantita = $.fn.parseValue(quantita, 'float');
+						prezzo = $.fn.parseValue(prezzo, 'float');
+						sconto = $.fn.parseValue(sconto, 'float');
+						totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
+
+						var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+						var table = $('#ddtArticoliTable').DataTable();
+						var rowNode = table.row.add( [
+							articoloDesc,
+							lottoHtml,
+							udm,
+							quantitaHtml,
+							pezziHtml,
+							prezzoHtml,
+							scontoHtml,
+							totale,
+							iva,
+							deleteLink
+						] ).draw( false ).node();
+						$(rowNode).css('text-align', 'center');
+						$(rowNode).addClass('rowArticolo');
+						$(rowNode).attr('data-id', articoloId);
+
+						$.fn.computeTotale();
+
+					});
+				}
+			} else{
+				$('#alertDdt').empty().append(alertContent);
 			}
 		},
-		error: function (jqXHR, textStatus, errorThrown) {
-			$('#alertProduzione').append(alertContent);
+		error: function(jqXHR, textStatus, errorThrown) {
+			$('#alertDdt').append(alertContent);
+			$('#updateDdtButton').attr('disabled', true);
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
 }
-*/
-/*
-$.fn.getRicettaProduzione = function(idRicetta){
 
-	var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-	alertContent = alertContent +  '<strong>Errore nel recupero della ricetta.</strong>\n' +
-    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-	$.ajax({
-        url: baseUrl + "ricette/" + idRicetta,
-        type: 'GET',
-        dataType: 'json',
-        success: function(result) {
-          if(result != null && result != undefined && result != ''){
-          	$('#ricetta option[value=' + idRicetta +']').attr('selected', true);
-          	$('#categoria option[value="' + result.categoria.id +'"]').attr('selected', true);
-
-			$.fn.loadIngredienti(idRicetta);
-
-          } else{
-            $('#alertProduzione').empty().append(alertContent);
-          }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertProduzione').append(alertContent);
-            console.log('Response text: ' + jqXHR.responseText);
-        }
-    });
-}
-*/
 
 $.fn.parseValue = function(value, resultType){
 	if(value != null && value != undefined && value != ''){
