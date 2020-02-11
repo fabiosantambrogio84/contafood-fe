@@ -121,7 +121,7 @@ $(document).ready(function() {
 							links += '<a class="updateDdt pr-2" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 						}
 						if((totale - acconto) != 0){
-							links += '<a class="payDdt pr-2" data-id="'+data.id+'" href="pagamento-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+							links += '<a class="payDdt pr-2" data-id="'+data.id+'" href="pagamenti-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 						}
 						links += '<a class="emailDdt pr-2" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 						links += '<a class="printDdt pr-2" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
@@ -168,13 +168,115 @@ $(document).ready(function() {
 			[0, 'asc']
 		]
 	});
-	/*
-	$(document).on('click','.detailsProduzione', function(){
-		var idProduzione = $(this).attr('data-id');
 
-		var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-		alertContent = alertContent + '<strong>Errore nel recupero della produzione.</strong></div>';
+	$(document).on('click','.detailsDdt', function(){
+		var idDdt = $(this).attr('data-id');
 
+		var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero del DDT.</strong></div>';
+
+		$.ajax({
+			url: baseUrl + "ddts/" + idDdt,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != '') {
+					$('#numero').text(result.progressivo);
+					$('#data').text(moment(result.data).format('DD/MM/YYYY'));
+					var cliente = result.cliente;
+					if(cliente != null && cliente != undefined && cliente != ''){
+						if(cliente.dittaIndividuale){
+							$('#cliente').text(cliente.nome + ' - ' + cliente.cognome);
+						} else {
+							$('#cliente').text(cliente.ragioneSociale);
+						}
+					}
+					var puntoConsegna = result.puntoConsegna;
+					if(puntoConsegna != null && puntoConsegna != undefined && puntoConsegna != ''){
+						$('#puntoConsegna').text(puntoConsegna.nome);
+					}
+					var autista = result.autista;
+					if(autista != null && autista != undefined && autista != ''){
+						$('#autista').text(autista.nome+' - '+autista.cognome);
+					}
+					var stato = result.statoDdt;
+					if(stato != null && stato != undefined && stato != ''){
+						$('#stato').text(stato.descrizione);
+					}
+					$('#tipoTrasporto').text(result.tipoTrasporto);
+					$('#dataTrasporto').text(moment(result.dataTrasporto).format('DD/MM/YYYY'));
+					$('#oraTrasporto').text(result.oraTrasporto);
+					$('#trasportatore').text(result.trasportatore);
+					$('#colli').text(result.numeroColli);
+					$('#totaleImponibile').text(result.totaleImponibile);
+					$('#totaleIva').text(result.totaleIva);
+					$('#totaleCosto').text(result.totaleCosto);
+					$('#totaleAcconto').text(result.totaleAcconto);
+					$('#totale').text(result.totale);
+					if(result.fatturato){
+						$('#fatturato').text("Si");
+					} else {
+						$('#fatturato').text("No");
+					}
+					$('#note').text(result.note);
+					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
+					var dataAggiornamento = result.dataAggiornamento;
+					if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
+						$('#dataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
+					}
+
+					if(result.ddtArticoli != null && result.ddtArticoli != undefined){
+						$('#detailsDdtArticoliModalTable').DataTable({
+							"data": result.ddtArticoli,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun articolo presente",
+								"zeroRecords": "Nessun articolo presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'asc'],
+								[1, 'desc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "articolo", "data": null, render: function (data, type, row) {
+									var result = '';
+									if (data.articolo != null) {
+										result = data.articolo.codice+' - '+data.articolo.descrizione;
+									}
+									return result;
+								}},
+								{"name": "quantita", "data": "quantita"},
+								{"name": "pezzi", "data": "numeroPezzi"},
+								{"name": "prezzo", "data": "prezzo"},
+								{"name": "sconto", "data": "sconto"},
+								{"name": "imponibile", "data": "imponibile"},
+								{"name": "costo", "data": "costo"}
+							]
+						});
+					}
+
+
+				} else{
+					$('#detailsDdtMainDiv').empty().append(alertContent);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#detailsDdtMainDiv').empty().append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		})
+
+		/*
 		$('#detailsProduzioneModalTable').DataTable({
 			"ajax": {
 				"url": baseUrl + "produzioni/" + idProduzione + "/confezioni",
@@ -213,41 +315,41 @@ $(document).ready(function() {
 				}}
 			]
 		});
-		$('#detailsProduzioneModal').modal('show');
+		*/
+		$('#detailsDdtModal').modal('show');
 	});
 
-	$(document).on('click','.closeProduzione', function(){
-		$('#detailsProduzioneModalTable').DataTable().destroy();
-		$('#detailsProduzioneModal').modal('hide');
+	$(document).on('click','.closeDdt', function(){
+		$('#detailsDdtModalTable').DataTable().destroy();
+		$('#detailsDdtModal').modal('hide');
 	});
 
-	$(document).on('click','.deleteProduzione', function(){
-		var idProduzione = $(this).attr('data-id');
-		$('#confirmDeleteProduzione').attr('data-id', idProduzione);
-		$('#deleteProduzioneModal').modal('show');
+	$(document).on('click','.deleteDdt', function(){
+		var idDdt = $(this).attr('data-id');
+		$('#confirmDeleteDdt').attr('data-id', idDdt);
+		$('#deleteDdtModal').modal('show');
 	});
 
-	$(document).on('click','#confirmDeleteProduzione', function(){
-		$('#deleteProduzioneModal').modal('hide');
-		var idProduzione = $(this).attr('data-id');
+	$(document).on('click','#confirmDeleteddt', function(){
+		$('#deleteDdtModal').modal('hide');
+		var idDdt = $(this).attr('data-id');
 
 		$.ajax({
-			url: baseUrl + "produzioni/" + idProduzione,
+			url: baseUrl + "ddts/" + idDdt,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertProduzioneContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Produzione</strong> cancellata con successo.\n' +
+				var alertContent = '<div id="alertDdtContent" class="alert alert-success alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>DDT</strong> cancellato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertProduzione').empty().append(alertContent);
+				$('#alertDdt').empty().append(alertContent);
 
-				$('#produzioniTable').DataTable().ajax.reload();
+				$('#ddtTable').DataTable().ajax.reload();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		});
 	});
-	*/
 
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined){
 		$(document).on('submit','#newDdtForm', function(event){
@@ -288,7 +390,7 @@ $(document).ready(function() {
 			}
 			ddt.fatturato = false;
 			ddt.numeroColli = $('#colli').val();
-			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();;
+			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();
 			ddt.dataTrasporto = $('#dataTrasporto').val();
 
 			var regex = /:/g;

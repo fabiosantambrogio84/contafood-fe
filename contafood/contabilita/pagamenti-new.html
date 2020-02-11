@@ -75,35 +75,35 @@
 
         <form id="newPagamentoForm" class="needs-validation" novalidate>
           <div class="form-row">
-            <div class="form-group col-md-2 mb-0">
-              <label for="data" class="mb-0">Data*</label>
-              <input type="date" class="form-control form-control-sm" id="data" placeholder="" required>
+            <div class="form-group col-md-3">
+              <label for="data" class="">Data*</label>
+              <input type="date" class="form-control" id="data" placeholder="" required>
               <div class="invalid-feedback">
                 Inserisci una data
               </div>
             </div>
           </div>
           <div class="form-row">
-            <div class="form-group col-md-3 mb-0">
-              <label for="descrizione" class="mb-0">Descrizione*</label>
-              <input type="text" class="form-control form-control-sm" id="descrizione" placeholder="" required>
+            <div class="form-group col-md-4">
+              <label for="descrizione" class="">Descrizione*</label>
+              <input type="text" class="form-control" id="descrizione" placeholder="" required disabled>
               <div class="invalid-feedback">
                 Inserisci una descrizione
               </div>
             </div>
           </div>
           <div class="form-row">
-            <div class="form-group col-md-3 mb-0">
-              <label for="tipoPagamento" class="mb-0">Tipo pagamento*</label>
-              <select id="tipoPagamento" class="form-control form-control-sm" required>
+            <div class="form-group col-md-2">
+              <label for="tipoPagamento" class="">Tipo pagamento*</label>
+              <select id="tipoPagamento" class="form-control" required>
               </select>
               <div class="invalid-feedback">
                 Seleziona un tipo di pagamento
               </div>
             </div>
-            <div class="form-group col-md-2 mb-0">
-              <label for="importo" class="mb-0">Importo (€)*</label>
-              <input type="number" class="form-control form-control-sm" id="importo" step=".01" min="0" required>
+            <div class="form-group col-md-2">
+              <label for="importo" class="">Importo (€)*</label>
+              <input type="number" class="form-control" id="importo" step=".01" min="0" required>
               <div class="invalid-feedback">
                 Inserisci un importo
               </div>
@@ -116,8 +116,9 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary mt-4" id="newPagamentoButton">Salva</button>
-          <a href="ddt.html" class="btn btn-secondary mt-4">Annulla</a>
+          <input type="hidden" id="hiddenIdDdt"/>
+          <button type="submit" class="btn btn-primary" id="newPagamentoButton">Salva</button>
+          <a href="ddt.html" class="btn btn-secondary">Annulla</a>
         </form>
 
         <script>

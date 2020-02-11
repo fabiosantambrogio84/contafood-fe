@@ -2,19 +2,21 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
+	$('[data-toggle="tooltip"]').tooltip();
+
 	$('#pagamentiTable').DataTable({
 		"ajax": {
-			"url": baseUrl + "pagamenti",
+			"url": baseUrl + "ddts/pagamenti",
 			"type": "GET",
 			"content-type": "json",
 			"cache": false,
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertTipoPagamentoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero dei tipi di pagamento</strong>\n' +
+				var alertContent = '<div id="alertPagamentoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero dei pagamenti</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertTipoPagamento').empty().append(alertContent);
+				$('#alertPagamento').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -25,8 +27,8 @@ $(document).ready(function() {
 				"next": "Succ.",
 				"previous": "Prec."
 			},
-			"emptyTable": "Nessun tipo di pagamento disponibile",
-			"zeroRecords": "Nessun tipo di pagamento disponibile"
+			"emptyTable": "Nessun pagamento disponibile",
+			"zeroRecords": "Nessun pagamento disponibile"
 		},
 		"pageLength": 20,
 		"lengthChange": false,
@@ -36,14 +38,53 @@ $(document).ready(function() {
 			[0, 'asc']
 		],
 		"columns": [
-			{"name": "descrizione", "data": "descrizione"},
-			{"name": "scadenzaGiorni", "data": "scadenzaGiorni"},
-			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="updateTipoPagamento pr-2" data-id="'+data.id+'" href="tipi-pagamento-edit.html?idTipoPagamento=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links = links + '<a class="deleteTipoPagamento" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+			{"name": "data", "data": null, "width":"5%", render: function ( data, type, row ) {
+				var a = moment(data.data);
+				return a.format('DD/MM/YYYY');
+			}},
+			{"name": "cliente", "data": null, "width":"8%", render: function ( data, type, row ) {
+				var clienteHtml = '';
+				var ddt = data.ddt;
+				if(ddt != null && ddt != undefined && ddt != ''){
+					var cliente = ddt.cliente;
+					if(cliente != null && cliente != undefined && cliente != ''){
+						if(cliente.dittaIndividuale){
+							clienteHtml += cliente.nome + ' - ' + cliente.cognome;
+						} else {
+							clienteHtml += cliente.ragioneSociale;
+						}
+					}
+				}
+				return clienteHtml;
+			}},
+			{"name": "descrizione", "data": "descrizione", "width":"12%"},
+			{"name": "importo", "data": "importo", "width":"5%"},
+			{"name": "tipoPagamento", "data": null, "width":"5%", render: function ( data, type, row ) {
+				var tipoPagamento = data.tipoPagamento;
+				if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+					return tipoPagamento.descrizione;
+				}
+				return '';
+			}},
+			{"name": "note", "data": null, "width": "12%", render: function ( data, type, row ) {
+				var note = data.note;
+				var noteTrunc = note;
+				var noteHtml = '<div>'+noteTrunc+'</div>';
+				if(note.length > 100){
+					noteTrunc = note.substring(0, 100)+'...';
+					noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
+				}
+
+				return noteHtml;
+			}},
+			{"data": null, "orderable":false, "width":"2%", render: function ( data, type, row ) {
+				var links = '<a class="deletePagamento" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"initComplete": function( settings, json ) {
+			$('[data-toggle="tooltip"]').tooltip();
+		}
 	});
 
 	$(document).on('click','.deletePagamento', function(){
@@ -57,7 +98,7 @@ $(document).ready(function() {
 		var idPagamento = $(this).attr('data-id');
 
 		$.ajax({
-			url: baseUrl + "pagamenti/" + idPagamento,
+			url: baseUrl + "ddts/pagamenti/" + idPagamento,
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<div id="alertPagamentoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
@@ -81,30 +122,60 @@ $(document).ready(function() {
 	});
 
 	if($('#newPagamentoButton') != null && $('#newPagamentoButton') != undefined){
-		$(document).on('submit','#newTipoPagamentoForm', function(event){
+		$(document).on('submit','#newPagamentoForm', function(event){
 			event.preventDefault();
 
+			var idDdt = $('#hiddenIdDdt').val();
+
+			var pagamento = new Object();
+			pagamento.data = $('#data').val();
+			pagamento.descrizione = $('#descrizione').val();
+
 			var tipoPagamento = new Object();
-			tipoPagamento.descrizione = $('#descrizione').val();
-			tipoPagamento.scadenzaGiorni = $('#scadenzaGiorni').val();
+			tipoPagamento.id = $('#tipoPagamento option:selected').val();
+			pagamento.tipoPagamento = tipoPagamento;
 
-			var tipoPagamentoJson = JSON.stringify(tipoPagamento);
+			var ddt = new Object();
+			ddt.id = idDdt;
+			pagamento.ddt = ddt;
 
-			var alertContent = '<div id="alertTipoPagamentoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			pagamento.importo = $('#importo').val();
+			pagamento.note = $('#note').val();
+
+			var pagamentoJson = JSON.stringify(pagamento);
+
+			var alertContent = '<div id="alertPagamentoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
-				url: baseUrl + "tipi-pagamento",
+				url: baseUrl + "ddts/"+idDdt+"/pagamenti",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: tipoPagamentoJson,
+				data: pagamentoJson,
 				success: function(result) {
-					$('#alertTipoPagamento').empty().append(alertContent.replace('@@alertText@@','Tipo pagamento creato con successo').replace('@@alertResult@@', 'success'));
+					$('#alertPagamento').empty().append(alertContent.replace('@@alertText@@','Pagamento creato con successo').replace('@@alertResult@@', 'success'));
+
+					$('#newPagamentoButton').attr("disabled", true);
+
+					// Returns to the page with the list of DDTs
+					setTimeout(function() {
+						window.location.href = "pagamenti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertTipoPagamento').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del tipo pagamento').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nella creazione del pagamento';
+					if(jqXHR != null && jqXHR != undefined){
+						var jqXHRResponseJson = jqXHR.responseJSON;
+						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('importo del pagamento') != -1){
+								errorMessage = jqXHRResponseJsonMessage;
+							}
+						}
+					}
+					$('#alertPagamento').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -169,13 +240,18 @@ $.fn.getDdt = function(idDdt){
 				var importo = (totale - totaleAcconto);
 				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
 
-				var cliente = ddt.cliente;
+				var cliente = result.cliente;
 				if(cliente != null && cliente != undefined && cliente != ''){
 					var clienteTipoPagamento = cliente.tipoPagamento;
-					if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
-						$('#tipoPagamento option[value="' + tipoPagamento.id +'"]').attr('selected', true);
+					if(clienteTipoPagamento != null && clienteTipoPagamento != undefined && clienteTipoPagamento != ''){
+						$('#tipoPagamento option[value="' + clienteTipoPagamento.id +'"]').attr('selected', true);
 					}
 				}
+
+				var descrizione = "Pagamento DDT n. "+result.progressivo+" del "+moment(result.data).format('DD/MM/YYYY');
+				$('#descrizione').val(descrizione);
+
+				$('#hiddenIdDdt').val(result.id);
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
