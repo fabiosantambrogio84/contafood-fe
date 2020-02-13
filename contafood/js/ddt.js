@@ -24,7 +24,7 @@ $(document).ready(function() {
 					}
 				},
 				"language": {
-					"search": "Cerca",
+					// "search": "Cerca",
 					"paginate": {
 						"first": "Inizio",
 						"last": "Fine",
@@ -34,6 +34,7 @@ $(document).ready(function() {
 					"emptyTable": "Nessun DDT disponibile",
 					"zeroRecords": "Nessun DDT disponibile"
 				},
+				"searching": false,
 				"pageLength": 20,
 				"lengthChange": false,
 				"info": false,
@@ -169,6 +170,12 @@ $(document).ready(function() {
 		]
 	});
 
+	$(document).on('click','#resetSearchDdtButton', function(){
+		$('#searchDdtForm :input').val(null);
+		$('#searchDdtForm select option[value=""]').attr('selected', true);
+
+	});
+
 	$(document).on('click','.detailsDdt', function(){
 		var idDdt = $(this).attr('data-id');
 
@@ -290,7 +297,7 @@ $(document).ready(function() {
 		$('#deleteDdtModal').modal('show');
 	});
 
-	$(document).on('click','#confirmDeleteddt', function(){
+	$(document).on('click','#confirmDeleteDdt', function(){
 		$('#deleteDdtModal').modal('hide');
 		var idDdt = $(this).attr('data-id');
 
@@ -310,6 +317,27 @@ $(document).ready(function() {
 			}
 		});
 	});
+
+	if($('#searchDdtButton') != null && $('#searchDdtButton') != undefined) {
+		$(document).on('submit', '#searchDdtForm', function (event) {
+			event.preventDefault();
+
+			var dataDa = $('#searchDataFrom').val();
+			var dataA = $('#searchDataTo').val();
+			var progressivo = $('#searchProgressivo').val();
+			var importo = $('#searchImporto').val();
+			var tipoPagamento = $('#searchTipoPagamento option:selected').val();
+			var cliente = $('#searchCliente').val();
+			var agente = $('#searchAgente option:selected').val();
+			var autista = $('#searchAutista option:selected').val();
+			var articolo = $('#searchArticolo option:selected').val();
+
+			var params = { dataDa:dataDa, dataA:dataA, progressivo:progressivo, importo:importo, tipoPagamento:tipoPagamento, cliente:cliente, agente:agente, autista:autista, articolo:articolo };
+
+			var url = baseUrl + "ddts?" + $.param( params );
+			console.log(url);
+		});
+	}
 
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined){
 		$(document).on('submit','#newDdtForm', function(event){
@@ -339,11 +367,11 @@ $(document).ready(function() {
 					ddtArticoloId.articoloId = articoloId;
 					ddtArticolo.id = ddtArticoloId;
 
-					ddtArticolo.lotto = $(this).children().eq(1).text();
-					ddtArticolo.quantita = $(this).children().eq(3).text();
-					ddtArticolo.numeroPezzi = $(this).children().eq(4).text();
-					ddtArticolo.prezzo = $(this).children().eq(5).text();
-					ddtArticolo.sconto = $(this).children().eq(6).text();
+					ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
+					ddtArticolo.quantita = $(this).children().eq(3).children().eq(0).val();
+					ddtArticolo.numeroPezzi = $(this).children().eq(4).children().eq(0).val();
+					ddtArticolo.prezzo = $(this).children().eq(5).children().eq(0).val();
+					ddtArticolo.sconto = $(this).children().eq(6).children().eq(0).val();
 
 					ddtArticoli.push(ddtArticolo);
 				});
@@ -437,11 +465,11 @@ $(document).ready(function() {
 					ddtArticoloId.articoloId = articoloId;
 					ddtArticolo.id = ddtArticoloId;
 
-					ddtArticolo.lotto = $(this).children().eq(1).text();
-					ddtArticolo.quantita = $(this).children().eq(3).text();
-					ddtArticolo.numeroPezzi = $(this).children().eq(4).text();
-					ddtArticolo.prezzo = $(this).children().eq(5).text();
-					ddtArticolo.sconto = $(this).children().eq(6).text();
+					ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
+					ddtArticolo.quantita = $(this).children().eq(3).children().eq(0).val();
+					ddtArticolo.numeroPezzi = $(this).children().eq(4).children().eq(0).val();
+					ddtArticolo.prezzo = $(this).children().eq(5).children().eq(0).val();
+					ddtArticolo.sconto = $(this).children().eq(6).children().eq(0).val();
 
 					ddtArticoli.push(ddtArticolo);
 				});
@@ -632,7 +660,10 @@ $(document).ready(function() {
 		quantita = $.fn.parseValue(quantita, 'float');
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		sconto = $.fn.parseValue(sconto, 'float');
-		totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
+
+		var quantitaPerPrezzo = (quantita * prezzo);
+		var scontoValue = (sconto/100)*quantitaPerPrezzo;
+		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
@@ -654,6 +685,15 @@ $(document).ready(function() {
 		$(rowNode).attr('data-id', articoloId);
 
 		$.fn.computeTotale();
+
+		$('#articolo option[value=""]').attr('selected',true);
+		$('#udm').val('');
+		$('#iva').val('');
+		$('#lotto').val('');
+		$('#quantita').val('');
+		$('#pezzi').val('');
+		$('#prezzo').val('');
+		$('#sconto').val('');
 	});
 
 	$(document).on('click','.deleteDdtArticolo', function(){
@@ -681,6 +721,72 @@ $(document).ready(function() {
 
 });
 
+$.fn.preloadSearchFields = function(){
+	$.ajax({
+		url: baseUrl + "tipi-pagamento",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchTipoPagamento').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "agenti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchAgente').append('<option value="'+item.id+'" >'+item.nome+' '+item.cognome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "autisti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchAutista').append('<option value="'+item.id+'" >'+item.nome+' '+item.cognome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "articoli?attivo=true",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchArticolo').append('<option value="'+item.id+'" >'+item.codice+' '+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.preloadFields = function(){
 	$.ajax({
 		url: baseUrl + "ddts/progressivo",
@@ -690,7 +796,10 @@ $.fn.preloadFields = function(){
 			if(result != null && result != undefined && result != ''){
 				$('#progressivo').attr('value', result.progressivo);
 				$('#annoContabile').attr('value', result.annoContabile);
+				$('#colli').attr('value', 1);
 				$('#data').val(moment().format('YYYY-MM-DD'));
+				$('#dataTrasporto').val(moment().format('YYYY-MM-DD'));
+				$('#oraTrasporto').val(moment().format('HH:mm'));
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {

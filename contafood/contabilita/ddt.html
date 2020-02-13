@@ -12,24 +12,30 @@
   <title>ContaFood - DDT</title>
 
   <!-- Custom fonts for this template -->
-    <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+  <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
-    <!-- Custom styles for this template -->
-    <link href="../css/styles.css" rel="stylesheet">
+  <!-- Custom styles for this template -->
+  <link href="../css/styles.css" rel="stylesheet">
 
-    <!-- Custom styles for this page -->
-    <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+  <!-- Custom styles for this page -->
+  <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
-    <!-- Bootstrap core JavaScript-->
-    <script src="../vendor/jquery/jquery.js"></script>
-    <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap core JavaScript-->
+  <script src="../vendor/jquery/jquery.js"></script>
+  <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Core plugin JavaScript-->
-    <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+  <!-- Core plugin JavaScript-->
+  <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
-    <script src="../js/commons.js"></script>
+  <script src="../js/commons.js"></script>
+  <script src="../js/core/moment.js"></script>
 
+  <script src="../js/ddt.js"></script>
+
+  <script>
+    $.fn.preloadSearchFields();
+  </script>
 </head>
 
 <body id="page-top">
@@ -69,6 +75,62 @@
           <!-- DataTales Example -->
           <div class="card shadow mb-4" id="ddtMainDiv">
             <div class="card-body">
+              <form id="searchDdtForm">
+                <div class="form-row">
+                  <div class="form-group col-md-2">
+                    <label for="searchDataFrom" class="mb-0">Data da</label>
+                    <input type="date" class="form-control form-control-sm" id="searchDataFrom">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="searchDataTo" class="mb-0">Data a</label>
+                    <input type="date" class="form-control form-control-sm" id="searchDataTo">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="searchProgressivo" class="mb-0">Progressivo</label>
+                    <input type="number" class="form-control form-control-sm" id="searchProgressivo" step="1" min="0">
+                  </div>
+                  <div class="form-group col-md-2">
+                    <label for="searchImporto" class="mb-0">Importo</label>
+                    <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="searchTipoPagamento" class="mb-0">Tipo pagamento</label>
+                    <select id="searchTipoPagamento" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-2">
+                    <label for="searchCliente" class="mb-0">Cliente</label>
+                    <input type="text" class="form-control form-control-sm" id="searchCliente">
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="searchAgente" class="mb-0">Agente</label>
+                    <select id="searchAgente" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="searchAutista" class="mb-0">Autista</label>
+                    <select id="searchAutista" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="searchArticolo" class="mb-0">Articolo</label>
+                    <select id="searchArticolo" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-0" id="searchDdtButton">Cerca</button>
+                <a href="#" id="resetSearchDdtButton" class="btn btn-secondary mt-0">Svuota</a>
+              </form>
+            </div>
+
+            <div class="card-body" style="font-size: 0.9rem;">
               <div class="table-responsive">
                 <table class="table table-bordered" id="ddtTable" width="100%" cellspacing="0">
                   <thead>
@@ -354,9 +416,6 @@
   <!-- Page level plugins -->
   <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-  <script src="../js/core/moment.js"></script>
-
-  <script src="../js/ddt.js"></script>
 
 </body>
 

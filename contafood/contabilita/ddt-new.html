@@ -112,7 +112,7 @@
 
           <div class="card mt-2">
             <h6 class="card-header text-center font-weight-bold" style="background-color: #baddf5;">Aggiungi articolo</h6>
-            <div class="card-body">
+            <div class="card-body" style="font-size: 0.9rem;">
               <div class="form-row">
                 <div class="form-group col-md-4">
                   <label for="articolo" class="mb-0">Articolo</label>
@@ -147,7 +147,7 @@
                   <input type="number" class="form-control form-control-sm text-right" id="prezzo" step=".01" min="0">
                 </div>
                 <div class="form-group col-md-1 mb-0">
-                  <label for="sconto" class="mb-0">Sconto (€)</label>
+                  <label for="sconto" class="mb-0">Sconto (%)</label>
                   <input type="number" class="form-control form-control-sm text-right" id="sconto" step=".01" min="0">
                 </div>
               </div>
@@ -173,7 +173,7 @@
                       <th>Quantita</th>
                       <th>Pezzi</th>
                       <th>Prezzo (€)</th>
-                      <th>Sconto (€)</th>
+                      <th>Sconto (%)</th>
                       <th>Totale (€)</th>
                       <th>Iva (%)</th>
                       <th></th>
@@ -213,15 +213,16 @@
           <div class="form-row">
             <div class="form-group col-md-4">
               <label for="trasportatore">Trasportatore</label>
-              <textarea class="form-control" id="trasportatore"></textarea>
+              <textarea class="form-control" id="trasportatore" rows="4"></textarea>
             </div>
             <div class="form-group col-md-4">
               <label for="note">Note</label>
-              <textarea class="form-control" id="note"></textarea>
+              <textarea class="form-control" id="note" rows="4"></textarea>
             </div>
           </div>
 
           <button type="submit" class="btn btn-primary mt-4" id="newDdtButton">Salva</button>
+          <button type="submit" class="btn btn-primary mt-4" id="newAndPrintDdtButton" disabled>Salva e Stampa</button>
           <a href="ddt.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 
