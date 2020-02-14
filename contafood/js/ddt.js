@@ -1,16 +1,14 @@
 var baseUrl = "/contafood-be/";
 
-$(document).ready(function() {
-
+$.fn.loadDdtTable = function(url) {
 	$.ajax({
 		url: baseUrl + "autisti",
 		type: 'GET',
 		dataType: 'json',
 		success: function(autistiResult) {
-
 			$('#ddtTable').DataTable({
 				"ajax": {
-					"url": baseUrl + "ddts",
+					"url": url,
 					"type": "GET",
 					"content-type": "json",
 					"cache": false,
@@ -35,6 +33,7 @@ $(document).ready(function() {
 					"zeroRecords": "Nessun DDT disponibile"
 				},
 				"searching": false,
+				"responsive":true,
 				"pageLength": 20,
 				"lengthChange": false,
 				"info": false,
@@ -117,21 +116,21 @@ $(document).ready(function() {
 							totale = 0;
 						}
 
-						var links = '<a class="detailsDdt pr-2" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+						var links = '<a class="detailsDdt pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
 						if(!data.fatturato){
-							links += '<a class="updateDdt pr-2" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+							links += '<a class="updateDdt pr-1" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 						}
 						if((totale - acconto) != 0){
-							links += '<a class="payDdt pr-2" data-id="'+data.id+'" href="pagamenti-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+							links += '<a class="payDdt pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 						}
-						links += '<a class="emailDdt pr-2" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
-						links += '<a class="printDdt pr-2" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+						links += '<a class="emailDdt pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
+						links += '<a class="printDdt pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 						links += '<a class="deleteDdt" data-id="'+data.id+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 						return links;
 					}}
 				],
-				"createdRow": function(row, data, dataIndex){
-					$(row).css('font-size', '14px');
+				"createdRow": function(row, data, dataIndex,cells){
+					$(row).css('font-size', '12px');
 					if(data.statoDdt != null){
 						var backgroundColor = '';
 						if(data.statoDdt.codice == 'DA_PAGARE'){
@@ -143,10 +142,16 @@ $(document).ready(function() {
 						}
 						$(row).css('background-color', backgroundColor);
 					}
+					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
 				}
 			});
 		}
-	})
+	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadDdtTable(baseUrl + "ddts");
 
 	$('#ddtArticoliTable').DataTable({
 		"searching": false,
@@ -174,6 +179,8 @@ $(document).ready(function() {
 		$('#searchDdtForm :input').val(null);
 		$('#searchDdtForm select option[value=""]').attr('selected', true);
 
+		$('#ddtTable').DataTable().destroy();
+		$.fn.loadDdtTable(baseUrl + "ddts");
 	});
 
 	$(document).on('click','.detailsDdt', function(){
@@ -331,11 +338,44 @@ $(document).ready(function() {
 			var agente = $('#searchAgente option:selected').val();
 			var autista = $('#searchAutista option:selected').val();
 			var articolo = $('#searchArticolo option:selected').val();
+			var stato = $('#searchStato option:selected').val();
 
-			var params = { dataDa:dataDa, dataA:dataA, progressivo:progressivo, importo:importo, tipoPagamento:tipoPagamento, cliente:cliente, agente:agente, autista:autista, articolo:articolo };
-
+			var params = {};
+			if(dataDa != null && dataDa != undefined && dataDa != ''){
+				params.dataDa = dataDa;
+			}
+			if(dataA != null && dataA != undefined && dataA != ''){
+				params.dataA = dataA;
+			}
+			if(progressivo != null && progressivo != undefined && progressivo != ''){
+				params.progressivo = progressivo;
+			}
+			if(importo != null && importo != undefined && importo != ''){
+				params.importo = importo;
+			}
+			if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+				params.tipoPagamento = tipoPagamento;
+			}
+			if(cliente != null && cliente != undefined && cliente != ''){
+				params.cliente = cliente;
+			}
+			if(agente != null && agente != undefined && agente != ''){
+				params.agente = agente;
+			}
+			if(autista != null && autista != undefined && autista != ''){
+				params.autista = autista;
+			}
+			if(articolo != null && articolo != undefined && articolo != ''){
+				params.articolo = articolo;
+			}
+			if(stato != null && stato != undefined && stato != ''){
+				params.stato = stato;
+			}
 			var url = baseUrl + "ddts?" + $.param( params );
-			console.log(url);
+
+			$('#ddtTable').DataTable().destroy();
+			$.fn.loadDdtTable(url);
+
 		});
 	}
 
@@ -413,9 +453,9 @@ $(document).ready(function() {
 
 					$('#newDdtButton').attr("disabled", true);
 
-					// Returns to the page with the list of DDTs
+					// Returns to the same page
 					setTimeout(function() {
-						window.location.href = "ddt.html";
+						window.location.href = "ddt-new.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -778,6 +818,22 @@ $.fn.preloadSearchFields = function(){
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
 					$('#searchArticolo').append('<option value="'+item.id+'" >'+item.codice+' '+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "stati-ddt",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchStato').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
 				});
 			}
 		},
