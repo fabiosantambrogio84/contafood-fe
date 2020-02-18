@@ -115,9 +115,10 @@ $.fn.loadDdtTable = function(url) {
 						if(totale == null || totale == undefined || totale == ''){
 							totale = 0;
 						}
+						var stato = data.statoDdt;
 
 						var links = '<a class="detailsDdt pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-						if(!data.fatturato){
+						if(!data.fatturato || (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')){
 							links += '<a class="updateDdt pr-1" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 						}
 						if((totale - acconto) != 0){
@@ -125,7 +126,9 @@ $.fn.loadDdtTable = function(url) {
 						}
 						links += '<a class="emailDdt pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 						links += '<a class="printDdt pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-						links += '<a class="deleteDdt" data-id="'+data.id+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+						if(!data.fatturato || (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')) {
+							links += '<a class="deleteDdt" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+						}
 						return links;
 					}}
 				],
@@ -143,6 +146,7 @@ $.fn.loadDdtTable = function(url) {
 						$(row).css('background-color', backgroundColor);
 					}
 					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
+					$(cells[7]).css('font-weight','bold');
 				}
 			});
 		}
@@ -294,7 +298,7 @@ $(document).ready(function() {
 	});
 
 	$(document).on('click','.closeDdt', function(){
-		$('#detailsDdtModalTable').DataTable().destroy();
+		$('#detailsDdtArticoliModalTable').DataTable().destroy();
 		$('#detailsDdtModal').modal('hide');
 	});
 
@@ -455,7 +459,7 @@ $(document).ready(function() {
 
 					// Returns to the same page
 					setTimeout(function() {
-						window.location.href = "ddt-new.html";
+						window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -541,7 +545,7 @@ $(document).ready(function() {
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
-				url: baseUrl + "ddts",
+				url: baseUrl + "ddts/"+ddt.id,
 				type: 'PUT',
 				contentType: "application/json",
 				dataType: 'json',
@@ -549,7 +553,7 @@ $(document).ready(function() {
 				success: function(result) {
 					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT aggiornato con successo').replace('@@alertResult@@', 'success'));
 
-					$('#newDdtButton').attr("disabled", true);
+					$('#updateDdtButton').attr("disabled", true);
 
 					// Returns to the page with the list of DDTs
 					setTimeout(function() {
@@ -557,7 +561,7 @@ $(document).ready(function() {
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nell aggiornamento del DDT';
+					var errorMessage = 'Errore nella modifica del DDT';
 					if(jqXHR != null && jqXHR != undefined){
 						var jqXHRResponseJson = jqXHR.responseJSON;
 						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
@@ -696,37 +700,79 @@ $(document).ready(function() {
 		var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
 		var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+sconto+'">';
 
+		// check if a same articolo was already added
+		var found = 0;
+		var currentRowIndex;
+		var currentIdArticolo;
+		var currentLotto;
+		var currentPrezzo;
+		var currentSconto;
+		var currentQuantita = 0;
+
+		var ddtArticoliLength = $('.rowArticolo').length;
+		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
+			$('.rowArticolo').each(function(i, item){
+
+				if(found != 1){
+					currentRowIndex = $(this).attr('data-row-index');
+					currentIdArticolo = $(this).attr('data-id');
+					currentLotto = $(this).children().eq(1).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(5).children().eq(0).val();
+					currentSconto = $(this).children().eq(6).children().eq(0).val();
+					currentQuantita = $(this).children().eq(3).children().eq(0).val();
+
+					if(currentIdArticolo == articoloId && currentLotto == lotto && currentPrezzo == prezzo && currentSconto == sconto){
+						found = 1;
+					}
+				}
+			});
+		}
+
 		var totale = 0;
 		quantita = $.fn.parseValue(quantita, 'float');
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		sconto = $.fn.parseValue(sconto, 'float');
 
-		var quantitaPerPrezzo = (quantita * prezzo);
+		var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
-
 		var table = $('#ddtArticoliTable').DataTable();
-		var rowNode = table.row.add( [
-			articolo,
-			lottoHtml,
-			udm,
-			quantitaHtml,
-			pezziHtml,
-			prezzoHtml,
-			scontoHtml,
-			totale,
-			iva,
-			deleteLink
-		] ).draw( false ).node();
-		$(rowNode).css('text-align', 'center');
-		$(rowNode).addClass('rowArticolo');
-		$(rowNode).attr('data-id', articoloId);
+		if(found == 1){
+			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(3).children().eq(0).val(quantita + $.fn.parseValue(currentQuantita,'float'));
+			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(7).text(totale);
 
+			var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
+
+			var rowData = table.row(currentRowIndex).data();
+			rowData[3] = newQuantitaHtml;
+			rowData[7] = totale;
+			table.row(currentRowIndex).data(rowData).draw();
+			//$('#ddtArticoliTable').DataTable().row(currentRowIndex)
+
+		} else {
+			var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+			var rowNode = table.row.add( [
+				articolo,
+				lottoHtml,
+				udm,
+				quantitaHtml,
+				pezziHtml,
+				prezzoHtml,
+				scontoHtml,
+				totale,
+				iva,
+				deleteLink
+			] ).draw( false ).node();
+			$(rowNode).css('text-align', 'center');
+			$(rowNode).addClass('rowArticolo');
+			$(rowNode).attr('data-id', articoloId);
+			$(rowNode).attr('data-row-index', $(rowNode).index());
+		}
 		$.fn.computeTotale();
 
-		$('#articolo option[value=""]').attr('selected',true);
+		$('#articolo option[value=""]').prop('selected',true);
 		$('#udm').val('');
 		$('#iva').val('');
 		$('#lotto').val('');
@@ -734,6 +780,8 @@ $(document).ready(function() {
 		$('#pezzi').val('');
 		$('#prezzo').val('');
 		$('#sconto').val('');
+
+		$('#articolo').focus();
 	});
 
 	$(document).on('click','.deleteDdtArticolo', function(){
@@ -753,7 +801,12 @@ $(document).ready(function() {
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		var sconto = $.row.children().eq(6).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
-		var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
+
+		var quantitaPerPrezzo = (quantita * prezzo);
+		var scontoValue = (sconto/100)*quantitaPerPrezzo;
+		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+		//var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
 		$.row.children().eq(7).text(totale);
 
 		$.fn.computeTotale();
@@ -843,7 +896,7 @@ $.fn.preloadSearchFields = function(){
 	});
 }
 
-$.fn.preloadFields = function(){
+$.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 	$.ajax({
 		url: baseUrl + "ddts/progressivo",
 		type: 'GET',
@@ -854,8 +907,26 @@ $.fn.preloadFields = function(){
 				$('#annoContabile').attr('value', result.annoContabile);
 				$('#colli').attr('value', 1);
 				$('#data').val(moment().format('YYYY-MM-DD'));
-				$('#dataTrasporto').val(moment().format('YYYY-MM-DD'));
-				$('#oraTrasporto').val(moment().format('HH:mm'));
+
+				if(dataTrasporto != null && dataTrasporto != undefined && dataTrasporto != ''){
+					$('#dataTrasporto').val(dataTrasporto);
+				} else {
+					$('#dataTrasporto').val(moment().format('YYYY-MM-DD'));
+				}
+
+				if(oraTrasporto != null && oraTrasporto != undefined && oraTrasporto != ''){
+					$('#oraTrasporto').val(oraTrasporto);
+				} else {
+					$('#oraTrasporto').val(moment().format('HH:mm'));
+				}
+
+				$('#cliente').focus();
+
+				var uri = window.location.toString();
+				if (uri.indexOf("?") > 0) {
+					var clean_uri = uri.substring(0, uri.indexOf("?"));
+					window.history.replaceState({}, document.title, clean_uri);
+				}
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -964,6 +1035,38 @@ $.fn.extractIdDdtFromUrl = function(){
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
+}
+
+$.fn.extractDataTrasportoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'dt') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
+$.fn.extractOraTrasportoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'ot') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
 }
 
 

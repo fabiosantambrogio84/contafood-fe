@@ -82,6 +82,9 @@ $.fn.loadPagamentiTable = function(url) {
 		],
 		"initComplete": function( settings, json ) {
 			$('[data-toggle="tooltip"]').tooltip();
+		},
+		"createdRow": function(row, data, dataIndex,cells){
+			$(row).css('font-size', '12px');
 		}
 	});
 }
@@ -203,7 +206,7 @@ $(document).ready(function() {
 
 					// Returns to the page with the list of DDTs
 					setTimeout(function() {
-						window.location.href = "pagamenti.html";
+						window.location.href = "ddt.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {

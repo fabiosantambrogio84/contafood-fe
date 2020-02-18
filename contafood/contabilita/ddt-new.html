@@ -34,7 +34,9 @@
   <script src="../js/ddt.js"></script>
 
   <script>
-    $.fn.preloadFields();
+    var dataTrasporto = $.fn.extractDataTrasportoFromUrl();
+    var oraTrasporto = $.fn.extractOraTrasportoFromUrl();
+    $.fn.preloadFields(dataTrasporto, oraTrasporto);
     $.fn.getClienti();
     $.fn.getArticoli();
     $.fn.getTipologieTrasporto();
@@ -42,7 +44,7 @@
 
 </head>
 
-<body id="page-top" class="ddtBody">
+<body id="page-top" class="">
 
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -183,7 +185,7 @@
                 </div>
               </div>
               <div class="form-row">
-                <div class="form-group col-md-1 mb-0">
+                <div class="form-group col-md-2 mb-0">
                   <label for="totale" class="mb-0">Totale (€)</label>
                   <input type="number" class="form-control form-control-sm text-right" id="totale" step=".01" min="0" disabled>
                 </div>
