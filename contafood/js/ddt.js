@@ -98,13 +98,21 @@ $.fn.loadDdtTable = function(url) {
 						autistaSelect += '</select';
 						return autistaSelect;
 					}},
-					{"name": "acconto", "data": "totaleAcconto", "width":"8%"},
-					{"name": "importo", "data": "totale", "width":"8%"},
-					{"name": "imponibile", "data": "totaleImponibile", "width":"8%"},
-					{"name": "costo", "data": "totaleCosto", "width":"6%"},
+					{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleAcconto);
+					}},
+					{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totale);
+					}},
+					{"name": "imponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleImponibile);
+					}},
+					{"name": "costo", "data": null, "width":"6%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleCosto);
+					}},
 					{"name": "guadagno", "data": null, "width":"8%", render: function ( data, type, row ) {
 						var guadagno = data.totaleImponibile - data.totaleCosto;
-						return Number(Math.round(guadagno+'e2')+'e-2');
+						return $.fn.formatNumber(guadagno);
 					}},
 					{"data": null, "orderable":false, "width":"17%", render: function ( data, type, row ) {
 						var acconto = data.totaleAcconto;
@@ -118,7 +126,7 @@ $.fn.loadDdtTable = function(url) {
 						var stato = data.statoDdt;
 
 						var links = '<a class="detailsDdt pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-						if(!data.fatturato || (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')){
+						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')){
 							links += '<a class="updateDdt pr-1" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 						}
 						if((totale - acconto) != 0){
@@ -126,7 +134,7 @@ $.fn.loadDdtTable = function(url) {
 						}
 						links += '<a class="emailDdt pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 						links += '<a class="printDdt pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-						if(!data.fatturato || (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')) {
+						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')) {
 							links += '<a class="deleteDdt" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 						}
 						return links;
@@ -137,16 +145,20 @@ $.fn.loadDdtTable = function(url) {
 					if(data.statoDdt != null){
 						var backgroundColor = '';
 						if(data.statoDdt.codice == 'DA_PAGARE'){
-							backgroundColor = '#f7f25c';
+							backgroundColor = '#fcf456';
 						} else if(data.statoDdt.codice == 'PARZIALMENTE_PAGATO'){
-							backgroundColor = '#f5f1a4';
+							backgroundColor = '#fcc08b';
 						} else {
 							backgroundColor = 'trasparent';
 						}
 						$(row).css('background-color', backgroundColor);
 					}
 					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
-					$(cells[7]).css('font-weight','bold');
+					$(cells[6]).css('text-align','right');
+					$(cells[7]).css('font-weight','bold').css('text-align','right');
+					$(cells[8]).css('text-align','right');
+					$(cells[9]).css('text-align','right');
+					$(cells[10]).css('text-align','right');
 				}
 			});
 		}
@@ -719,10 +731,10 @@ $(document).ready(function() {
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentPrezzo = $(this).children().eq(5).children().eq(0).val();
 					currentSconto = $(this).children().eq(6).children().eq(0).val();
-					currentQuantita = $(this).children().eq(3).children().eq(0).val();
 
 					if(currentIdArticolo == articoloId && currentLotto == lotto && currentPrezzo == prezzo && currentSconto == sconto){
 						found = 1;
+						currentQuantita = $(this).children().eq(3).children().eq(0).val();
 					}
 				}
 			});
@@ -1202,6 +1214,10 @@ $.fn.parseValue = function(value, resultType){
 			return 0;
 		}
 	}
+}
+
+$.fn.formatNumber = function(value){
+	return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
 }
 
 $.fn.computeTotale = function() {

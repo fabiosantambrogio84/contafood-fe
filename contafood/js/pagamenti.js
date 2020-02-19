@@ -33,58 +33,61 @@ $.fn.loadPagamentiTable = function(url) {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'asc']
+			[0, 'desc']
 		],
 		"columns": [
 			{"name": "data", "data": null, "width":"5%", render: function ( data, type, row ) {
-					var a = moment(data.data);
-					return a.format('DD/MM/YYYY');
-				}},
+				var a = moment(data.data);
+				return a.format('DD/MM/YYYY');
+			}},
 			{"name": "cliente", "data": null, "width":"8%", render: function ( data, type, row ) {
-					var clienteHtml = '';
-					var ddt = data.ddt;
-					if(ddt != null && ddt != undefined && ddt != ''){
-						var cliente = ddt.cliente;
-						if(cliente != null && cliente != undefined && cliente != ''){
-							if(cliente.dittaIndividuale){
-								clienteHtml += cliente.nome + ' - ' + cliente.cognome;
-							} else {
-								clienteHtml += cliente.ragioneSociale;
-							}
+				var clienteHtml = '';
+				var ddt = data.ddt;
+				if(ddt != null && ddt != undefined && ddt != ''){
+					var cliente = ddt.cliente;
+					if(cliente != null && cliente != undefined && cliente != ''){
+						if(cliente.dittaIndividuale){
+							clienteHtml += cliente.nome + ' - ' + cliente.cognome;
+						} else {
+							clienteHtml += cliente.ragioneSociale;
 						}
 					}
-					return clienteHtml;
-				}},
+				}
+				return clienteHtml;
+			}},
 			{"name": "descrizione", "data": "descrizione", "width":"12%"},
-			{"name": "importo", "data": "importo", "width":"5%"},
+			{"name": "importo", "data": null, "width":"5%", render: function ( data, type, row ) {
+				return $.fn.formatNumber(data.importo);
+			}},
 			{"name": "tipoPagamento", "data": null, "width":"5%", render: function ( data, type, row ) {
-					var tipoPagamento = data.tipoPagamento;
-					if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
-						return tipoPagamento.descrizione;
-					}
-					return '';
-				}},
+				var tipoPagamento = data.tipoPagamento;
+				if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+					return tipoPagamento.descrizione;
+				}
+				return '';
+			}},
 			{"name": "note", "data": null, "width": "12%", render: function ( data, type, row ) {
-					var note = data.note;
-					var noteTrunc = note;
-					var noteHtml = '<div>'+noteTrunc+'</div>';
-					if(note.length > 100){
-						noteTrunc = note.substring(0, 100)+'...';
-						noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
-					}
+				var note = data.note;
+				var noteTrunc = note;
+				var noteHtml = '<div>'+noteTrunc+'</div>';
+				if(note.length > 100){
+					noteTrunc = note.substring(0, 100)+'...';
+					noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
+				}
 
-					return noteHtml;
-				}},
+				return noteHtml;
+			}},
 			{"data": null, "orderable":false, "width":"2%", render: function ( data, type, row ) {
-					var links = '<a class="deletePagamento" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-					return links;
-				}}
+				var links = '<a class="deletePagamento" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+				return links;
+			}}
 		],
 		"initComplete": function( settings, json ) {
 			$('[data-toggle="tooltip"]').tooltip();
 		},
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
+			$(cells[3]).css('text-align','right');
 		}
 	});
 }
@@ -303,4 +306,8 @@ $.fn.getDdt = function(idDdt){
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
+}
+
+$.fn.formatNumber = function(value){
+	return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
 }
