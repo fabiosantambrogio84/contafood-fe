@@ -80,10 +80,22 @@ $(document).ready(function() {
 				  contentDetails = contentDetails + '<p><strong>Email: </strong>'+$.fn.printVariable(result.email)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Email PEC: </strong>'+$.fn.printVariable(result.emailPec)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Telefono: </strong>'+$.fn.printVariable(result.telefono)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Banca: </strong>'+$.fn.printVariable(result.banca.nome)+'</p>';
+				  if(result.banca != null && result.banca != undefined){
+					  contentDetails = contentDetails + '<p><strong>Banca: </strong>'+$.fn.printVariable(result.banca.nome)+'</p>';
+				  } else {
+					  contentDetails = contentDetails + '<p><strong>Banca: </strong></p>';
+				  }
 				  contentDetails = contentDetails + '<p><strong>Conto corrente: </strong>'+$.fn.printVariable(result.contoCorrente)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Tipo pagamento: </strong>'+$.fn.printVariable(result.tipoPagamento.descrizione)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Agente: </strong>'+$.fn.printVariable(result.agente.nome)+' '+$.fn.printVariable(result.agente.cognome)+'</p>';
+				  if(result.tipoPagamento != null && result.tipoPagamento != undefined){
+					  contentDetails = contentDetails + '<p><strong>Tipo pagamento: </strong>'+$.fn.printVariable(result.tipoPagamento.descrizione)+'</p>';
+				  } else {
+					  contentDetails = contentDetails + '<p><strong>Tipo pagamento: </strong></p>';
+				  }
+				  if(result.agente != null && result.agente != undefined){
+					  contentDetails = contentDetails + '<p><strong>Agente: </strong>'+$.fn.printVariable(result.agente.nome)+' '+$.fn.printVariable(result.agente.cognome)+'</p>';
+				  } else {
+					  contentDetails = contentDetails + '<p><strong>Agente: </strong></p>';
+				  }
                   contentDetails = contentDetails + '<p><strong>Estrazione Conad: </strong>'+$.fn.printVariable(result.estrazioneConad)+'</p>';
                   contentDetails = contentDetails + '<p><strong>Blocca DDT: </strong>'+$.fn.printVariable(result.bloccaDdt)+'</p>';
                   contentDetails = contentDetails + '<p><strong>Nascondi prezzi: </strong>'+$.fn.printVariable(result.nascondiPrezzi)+'</p>';

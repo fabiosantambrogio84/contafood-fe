@@ -86,6 +86,10 @@
                     <input type="date" class="form-control form-control-sm" id="searchDataTo">
                   </div>
                   <div class="form-group col-md-2">
+                    <label for="searchCliente" class="mb-0">Cliente</label>
+                    <input type="text" class="form-control form-control-sm" id="searchCliente">
+                  </div>
+                  <div class="form-group col-md-2">
                     <label for="searchProgressivo" class="mb-0">Progressivo</label>
                     <input type="number" class="form-control form-control-sm" id="searchProgressivo" step="1" min="0">
                   </div>
@@ -93,12 +97,7 @@
                     <label for="searchImporto" class="mb-0">Importo</label>
                     <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
                   </div>
-                  <div class="form-group col-md-3">
-                    <label for="searchTipoPagamento" class="mb-0">Tipo pagamento</label>
-                    <select id="searchTipoPagamento" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
+
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-2">
@@ -108,8 +107,10 @@
                     </select>
                   </div>
                   <div class="form-group col-md-2">
-                    <label for="searchCliente" class="mb-0">Cliente</label>
-                    <input type="text" class="form-control form-control-sm" id="searchCliente">
+                    <label for="searchTipoPagamento" class="mb-0">Tipo pagamento</label>
+                    <select id="searchTipoPagamento" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
                   </div>
                   <div class="form-group col-md-2">
                     <label for="searchAgente" class="mb-0">Agente</label>
@@ -215,6 +216,41 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data inserimento</h6>
+                            <p class="card-text" id="dataInserimento"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data aggiornamento</h6>
+                            <p class="card-text" id="dataAggiornamento"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Fatturato</h6>
+                            <p class="card-text" id="fatturato"></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Stato</h6>
+                            <p class="card-text" id="stato"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
                             <h6 class="card-title mb-0 font-weight-bold">Cliente</h6>
                             <p class="card-text" id="cliente"></p>
                           </div>
@@ -236,16 +272,18 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Stato</h6>
-                            <p class="card-text" id="stato"></p>
+                            <h6 class="card-title mb-0 font-weight-bold">Agente</h6>
+                            <p class="card-text" id="agente"></p>
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    <div class="row">
+
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -278,8 +316,6 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -288,6 +324,9 @@
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -320,8 +359,6 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -330,14 +367,9 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Fatturato</h6>
-                            <p class="card-text" id="fatturato"></p>
-                          </div>
-                        </div>
-                      </div>
+                    </div>
+
+                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -346,24 +378,14 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Data inserimento</h6>
-                            <p class="card-text" id="dataInserimento"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Data aggiornamento</h6>
-                            <p class="card-text" id="dataAggiornamento"></p>
-                          </div>
-                        </div>
-                      </div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
                     </div>
                   </div>
+
+                  <hr class="my-4">
 
                   <div class="table-responsive mt-4">
                     <table class="table table-bordered" id="detailsDdtArticoliModalTable">
@@ -375,6 +397,20 @@
                         <th>Sconto (€)</th>
                         <th>Imponibile (€)</th>
                         <th>Costo (€)</th>
+                      </thead>
+                    </table>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="table-responsive mt-4">
+                    <table class="table table-bordered" id="detailsDdtPagamentiModalTable">
+                      <thead>
+                      <th>Data</th>
+                      <th>Descrizione</th>
+                      <th>Importo (€)</th>
+                      <th>Pagamento</th>
+                      <th>Note</th>
                       </thead>
                     </table>
                   </div>

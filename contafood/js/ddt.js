@@ -216,9 +216,13 @@ $(document).ready(function() {
 					var cliente = result.cliente;
 					if(cliente != null && cliente != undefined && cliente != ''){
 						if(cliente.dittaIndividuale){
-							$('#cliente').text(cliente.nome + ' - ' + cliente.cognome);
+							$('#cliente').text(cliente.nome + ' ' + cliente.cognome);
 						} else {
 							$('#cliente').text(cliente.ragioneSociale);
+						}
+						var agente = cliente.agente;
+						if(agente != null){
+							$('#agente').text(agente.nome + ' ' + agente.cognome);
 						}
 					}
 					var puntoConsegna = result.puntoConsegna;
@@ -227,7 +231,7 @@ $(document).ready(function() {
 					}
 					var autista = result.autista;
 					if(autista != null && autista != undefined && autista != ''){
-						$('#autista').text(autista.nome+' - '+autista.cognome);
+						$('#autista').text(autista.nome+' '+autista.cognome);
 					}
 					var stato = result.statoDdt;
 					if(stato != null && stato != undefined && stato != ''){
@@ -295,6 +299,58 @@ $(document).ready(function() {
 						});
 					}
 
+					if(result.ddtPagamenti != null && result.ddtPagamenti != undefined){
+						$('#detailsDdtPagamentiModalTable').DataTable({
+							"data": result.ddtPagamenti,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun pagamento presente",
+								"zeroRecords": "Nessun pagamento presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'desc'],
+								[1, 'asc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "data", "data": null, "width":"8%", render: function (data, type, row) {
+									var a = moment(data.data);
+									return a.format('DD/MM/YYYY');
+								}},
+								{"name": "descrizione", "data": "descrizione", "width":"15%"},
+								{"name": "importo", "data": null, "width":"8%", render: function ( data, type, row ) {
+									return $.fn.formatNumber(data.importo);
+								}},
+								{"name": "tipoPagamento", "data": null, "width":"12%", render: function ( data, type, row ) {
+									var tipoPagamento = data.tipoPagamento;
+									if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+										return tipoPagamento.descrizione;
+									}
+									return '';
+								}},
+								{"name": "note", "data": null, "width":"15%", render: function ( data, type, row ) {
+									var note = data.note;
+									var noteTrunc = note;
+									var noteHtml = '<div>'+noteTrunc+'</div>';
+									if(note.length > 100){
+										noteTrunc = note.substring(0, 100)+'...';
+										noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
+									}
+
+									return noteHtml;
+								}}
+							]
+						});
+					}
 
 				} else{
 					$('#detailsDdtMainDiv').empty().append(alertContent);
@@ -311,6 +367,7 @@ $(document).ready(function() {
 
 	$(document).on('click','.closeDdt', function(){
 		$('#detailsDdtArticoliModalTable').DataTable().destroy();
+		$('#detailsDdtPagamentiModalTable').DataTable().destroy();
 		$('#detailsDdtModal').modal('hide');
 	});
 
