@@ -71,9 +71,9 @@
 
           <form id="updateScontoForm" class="needs-validation" novalidate>
             <div class="form-row">
-              <div class="form-group col-md-8">
+              <div class="form-group col-md-8" id="clienteDiv">
                 <label for="cliente">Cliente*</label>
-                <select id="cliente" class="form-control">
+                <select id="cliente" class="form-control" multiple="multiple">
                 </select>
                 <div class="invalid-feedback">
                   Seleziona un cliente
@@ -109,10 +109,7 @@
               </div>
               <div class="form-group col-md-3">
                 <label for="dataAl">Data al*</label>
-                <input type="date" class="form-control" id="dataAl" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci una data di fine validita
-                </div>
+                <input type="date" class="form-control" id="dataAl" placeholder="">
               </div>
             </div>
             <div class="form-row">

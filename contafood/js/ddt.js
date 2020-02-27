@@ -683,7 +683,17 @@ $(document).ready(function() {
 	});
 
 	$(document).on('change','#cliente', function(){
+		$('#articolo option[value=""]').prop('selected', true);
+		$('#udm').val('');
+		$('#iva').val('');
+		$('#lotto').val('');
+		$('#quantita').val('');
+		$('#pezzi').val('');
+		$('#prezzo').val('');
+		$('#sconto').val('');
+
 		var cliente = $('#cliente option:selected').val();
+		var idListino = $('#cliente option:selected').attr('data-id-listino');
 		if(cliente != null && cliente != ''){
 			$.ajax({
 				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
@@ -696,9 +706,39 @@ $(document).ready(function() {
 							var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+' ('+item.provincia+')';
 							$('#puntoConsegna').append('<option value="'+item.id+'">'+label+'</option>');
 						});
+					} else {
+						$('#puntoConsegna').empty();
 					}
 					$('#puntoConsegna').removeAttr('disabled');
 
+					// load the prices of the Listino associated to the Cliente
+					if(idListino != null && idListino != undefined && idListino != '-1'){
+						$.ajax({
+							url: baseUrl + "listini/"+idListino+"/listini-prezzi",
+							type: 'GET',
+							dataType: 'json',
+							success: function(result) {
+								$.each(result, function(i, item){
+									var articoloId = item.articolo.id;
+									var prezzoListino = item.prezzo;
+									$("#articolo option").each(function(i){
+										var articoloOptionId = $(this).val();
+										if(articoloOptionId == articoloId){
+											$(this).attr('data-prezzo-listino', prezzoListino);
+										}
+									});
+								});
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
+							}
+						});
+					} else {
+						$("#articolo option").each(function(i){
+							var prezzoBase = $(this).attr('data-prezzo-base');
+							$(this).attr('data-prezzo-listino', prezzoBase);
+						});
+					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
@@ -718,13 +758,20 @@ $(document).ready(function() {
 			var iva = $('#articolo option:selected').attr('data-iva');
 			var quantita = $('#articolo option:selected').attr('data-qta');
 			var prezzoBase = $('#articolo option:selected').attr('data-prezzo-base');
+			var prezzoListino = $('#articolo option:selected').attr('data-prezzo-listino');
+			var prezzo;
+			if(prezzoListino != null && prezzoListino != undefined && prezzoListino != ''){
+				prezzo = prezzoListino;
+			} else {
+				prezzo = prezzoBase;
+			}
 
 			$('#udm').val(udm);
 			$('#iva').val(iva);
 			$('#lotto').val('');
 			$('#quantita').val(quantita);
 			$('#pezzi').val('');
-			$('#prezzo').val(prezzoBase);
+			$('#prezzo').val(prezzo);
 			$('#sconto').val('');
 		} else {
 			$('#udm').val('');
@@ -1022,10 +1069,15 @@ $.fn.getClienti = function(){
 
 					var agente = item.agente;
 					var idAgente = '-1';
-					if(agente != null) {
+					if(agente != null && agente != undefined) {
 						idAgente = agente.id;
 					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'">'+label+'</option>');
+					var listino = item.listino;
+					var idListino = '-1';
+					if(listino != null && listino != undefined){
+						idListino = listino.id;
+					}
+					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
 				});
 			}
 		},

@@ -34,7 +34,7 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'asc']
+			[0, 'desc']
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
@@ -42,11 +42,11 @@ $(document).ready(function() {
 			{"name": "indirizzo", "data": "indirizzo"},
 			{"name": "citta", "data": "citta"},
 			{"name": "provincia", "data": "provincia"},
-			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
+			{"data": null, "orderable":false, "width":"12%", render: function ( data, type, row ) {
 				var links = '<a class="detailsCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 				links = links + '<a class="updateCliente pr-2" data-id="'+data.id+'" href="clienti-edit.html?idCliente=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
 				links = links + '<a class="manageClientePuntiConsegna pr-2" data-id="'+data.id+'" href="cliente-punti-consegna.html?idCliente=' + data.id + '"><i class="fas fa-truck-moving" title="Punti di consegna"></i></a>';
-				links = links + '<a class="manageClienteListini pr-2" data-id="'+data.id+'" href="cliente-listini-associati.html?idCliente=' + data.id + '"><i class="fas fa-list-ul" title="Listini"></i></a>';
+				//links = links + '<a class="manageClienteListini pr-2" data-id="'+data.id+'" href="cliente-listini-associati.html?idCliente=' + data.id + '"><i class="fas fa-list-ul" title="Listini"></i></a>';
 				links = links + '<a class="deleteCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
 				return links;
 			}}
@@ -93,6 +93,11 @@ $(document).ready(function() {
 				  }
 				  if(result.agente != null && result.agente != undefined){
 					  contentDetails = contentDetails + '<p><strong>Agente: </strong>'+$.fn.printVariable(result.agente.nome)+' '+$.fn.printVariable(result.agente.cognome)+'</p>';
+				  } else {
+					  contentDetails = contentDetails + '<p><strong>Agente: </strong></p>';
+				  }
+				  if(result.listino != null && result.listino != undefined){
+					  contentDetails = contentDetails + '<p><strong>Listino: </strong>'+$.fn.printVariable(result.listino.nome)+'</p>';
 				  } else {
 					  contentDetails = contentDetails + '<p><strong>Agente: </strong></p>';
 				  }
@@ -212,6 +217,11 @@ $(document).ready(function() {
                 agente.id = $('#agente option:selected').val();
                 cliente.agente = agente;
 			}
+			if($('#listinoApplicato option:selected').val() != -1){
+				var listino = new Object();
+				listino.id = $('#listinoApplicato option:selected').val();
+				cliente.listino = listino;
+			}
 			cliente.estrazioneConad = $('#estrazioneConad').val();
 			if($('#bloccaDdt').prop('checked') === true){
 				cliente.bloccaDdt = true;
@@ -291,6 +301,11 @@ $(document).ready(function() {
                 agente.id = $('#agente option:selected').val();
                 cliente.agente = agente;
             }
+			if($('#listinoAssociato option:selected').val() != -1){
+				var listino = new Object();
+				listino.id = $('#listinoAssociato option:selected').val();
+				cliente.listino = listino;
+			}
 			cliente.estrazioneConad = $('#estrazioneConad').val();
 			if($('#bloccaDdt').prop('checked') === true){
 				cliente.bloccaDdt = true;
@@ -406,6 +421,31 @@ $.fn.getTipiPagamento = function(){
 	});
 }
 
+$.fn.getListini = function(newListino){
+	$.ajax({
+		url: baseUrl + "listini",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					var option = '<option value="'+item.id+'" data-tipologia="'+item.tipologia+'" ';
+					if(newListino){
+						if(item.tipologia ==  'BASE'){
+							option += 'selected';
+						}
+					}
+					option += '>'+item.nome+'</option>';
+					$('#listinoApplicato').append(option);
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.extractIdClienteFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -471,6 +511,9 @@ $.fn.getCliente = function(idCliente){
 			}
 			if(result.agente != null && result.agente != undefined){
 				$('#agente option[value="' + result.agente.id +'"]').attr('selected', true);
+			}
+			if(result.listino != null && result.listino != undefined){
+				$('#listinoApplicato option[value="' + result.listino.id +'"]').attr('selected', true);
 			}
 			$('#estrazioneConad').attr('value', result.estrazioneConad);
 			if(result.bloccaDdt === true){

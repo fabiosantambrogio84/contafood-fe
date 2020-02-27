@@ -229,6 +229,11 @@ $(document).ready(function() {
 				data: scontoJson,
 				success: function(result) {
 					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Sconto modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the Sconto list page
+					setTimeout(function() {
+						window.location.href = "sconti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dello sconto').replace('@@alertResult@@', 'danger'));
@@ -238,6 +243,7 @@ $(document).ready(function() {
 	}
 
 	if($('#newScontoButton') != null && $('#newScontoButton') != undefined){
+		$('#cliente').selectpicker();
 		$('#articolo').selectpicker();
 		$('#fornitore').selectpicker();
 
@@ -314,6 +320,11 @@ $(document).ready(function() {
 				data: scontiJson,
 				success: function(result) {
 					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Sconti creati con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the Sconto list page
+					setTimeout(function() {
+						window.location.href = "sconti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertSconto').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione degli sconti').replace('@@alertResult@@', 'danger'));
@@ -371,6 +382,7 @@ $.fn.getClienti = function(){
 					$('#cliente').append('<option value="'+item.id+'">'+label+'</option>');
 				});
 			}
+			$('#cliente').selectpicker('refresh');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);

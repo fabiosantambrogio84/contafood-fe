@@ -37,6 +37,7 @@
     $.fn.getBanche();
     $.fn.getAgenti();
     $.fn.getTipiPagamento();
+    $.fn.getListini(true);
   </script>
 </head>
 
@@ -143,6 +144,12 @@
                 <div class="invalid-feedback">
                   Inserisci un codice fiscale
                 </div>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="listinoApplicato">Listino applicato</label>
+                <select id="listinoApplicato" class="form-control">
+                  <option value="-1"> - </option>
+                </select>
               </div>
             </div>
             <div class="form-row">

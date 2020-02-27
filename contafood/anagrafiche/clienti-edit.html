@@ -35,7 +35,7 @@
   <script>
     var idCliente = $.fn.extractIdClienteFromUrl();
     if(idCliente != null && idCliente != undefined){
-      $.when($.fn.getProvince(), $.fn.getBanche(), $.fn.getAgenti(), $.fn.getTipiPagamento()).then(function(f1,f2,f3,f4){
+      $.when($.fn.getProvince(), $.fn.getBanche(), $.fn.getAgenti(), $.fn.getTipiPagamento(), $.fn.getListini(false)).then(function(f1,f2,f3,f4,f5){
         $.fn.getCliente(idCliente);
       });
     }
@@ -140,6 +140,12 @@
                 <div class="invalid-feedback">
                   Inserisci un codice fiscale
                 </div>
+              </div>
+              <div class="form-group col-md-3">
+                <label for="listinoApplicato">Listino applicato</label>
+                <select id="listinoApplicato" class="form-control">
+                  <option value="-1"> - </option>
+                </select>
               </div>
             </div>
             <div class="form-row">
