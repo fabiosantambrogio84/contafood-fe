@@ -95,7 +95,7 @@ $(document).ready(function() {
 					
 				}},
 				{"data": null, "orderable":false, render: function ( data, type, row ) {
-					return data.confezione.peso;
+					return data.peso;
 					
 				}},
 				{"data": null, "orderable":false, render: function ( data, type, row ) {
@@ -213,7 +213,6 @@ $(document).ready(function() {
 				return;
 			}
 
-			/*
 			var produzione = new Object();
 			produzione.dataProduzione = $('#dataProduzione').val();
 			var ricetta = new Object();
@@ -230,13 +229,20 @@ $(document).ready(function() {
 				$('.formRowIngrediente').each(function(i, item){
 					var produzioneIngrediente = {};
 					var produzioneIngredienteId = new Object();
-					var ingredienteId = item.id.replace('formRowIngrediente_','');
+					//var ingredienteId = item.id.replace('formRowIngrediente_','');
+					var ingredienteId = $(this).attr('data-id');
 					produzioneIngredienteId.ingredienteId = ingredienteId;
 					produzioneIngrediente.id = produzioneIngredienteId;
 
-					produzioneIngrediente.lotto = $('#lottoIngrediente_'+ingredienteId).val();
-					produzioneIngrediente.scadenza = $('#scadenzaIngrediente_'+ingredienteId).val();
-					produzioneIngrediente.quantita = $('#quantitaIngrediente_'+ingredienteId).val();
+					$(this).find('.lottoIngrediente').each(function( index ) {
+						produzioneIngrediente.lotto = $(this).val();
+					});
+					$(this).find('.scadenzaIngrediente').each(function( index ) {
+						produzioneIngrediente.scadenza = $(this).val();
+					});
+					$(this).find('.quantitaIngrediente').each(function( index ) {
+						produzioneIngrediente.quantita = $(this).val();
+					});
 
 					produzioneIngredienti.push(produzioneIngrediente);
 				});
@@ -261,6 +267,7 @@ $(document).ready(function() {
 					produzioneConfezione.id = produzioneConfezioneId;
 					produzioneConfezione.numConfezioni = $(this).find('.confezioneNum').val();
 					produzioneConfezione.lotto = $(this).find('.confezioneLotto').val();
+					produzioneConfezione.peso = $(this).find('.confezionePesoFinale').val();
 
 					produzioneConfezioni.push(produzioneConfezione);
 				});
@@ -293,7 +300,7 @@ $(document).ready(function() {
 					$('#alertProduzione').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della produzione').replace('@@alertResult@@', 'danger'));
 				}
 			});
-			*/
+
 		});
 	}
 
@@ -304,6 +311,7 @@ $(document).ready(function() {
 				var peso = $(this).find(':selected').attr('data-peso');
 				$(this).parent().next().find('input').val(peso);
 				$(this).parent().next().next().next().find('input').val(1);
+				$(this).parent().next().next().next().next().find('input').val(peso);
 			}
 			$.fn.computeQuantitaTotale();
 			$.fn.computeQuantitaIngredienti();
@@ -358,7 +366,7 @@ $(document).ready(function() {
 		$('.formRowIngrediente[data-id="'+dataId+'"]').find('.quantitaIngrediente').each(function( index ) {
 			quantita = quantita + parseFloat($(this).val());
 		});
-		newQuantita = quantitaTotale - quantita;
+		newQuantita = (quantitaTotale - quantita).toFixed(3);
 
 		var newingredienteRow = ingredienteRow.clone();
 		newingredienteRow.removeAttr('id');
@@ -368,17 +376,6 @@ $(document).ready(function() {
 		newingredienteRow.find('.quantitaIngrediente').each(function( index ) {
 			$(this).val(newQuantita);
 		});
-		/*
-		newingredienteRow.find('.confezionePeso').each(function( index ) {
-			$(this).val(null);
-		});
-		newingredienteRow.find('.confezioneLotto').each(function( index ) {
-			$(this).val(null);
-		});
-		newingredienteRow.find('.confezioneNum').each(function( index ) {
-			$(this).val(null);
-		});
-		*/
 		newingredienteRow.find('.addIngrediente').each(function( index ) {
 			$(this).remove();
 		});
@@ -396,11 +393,6 @@ $(document).ready(function() {
 			quantita = parseFloat($(this).val());
 		});
 		ingredienteRow.remove();
-
-		//$('.formRowIngrediente[data-id="'+dataId+'"]').last().find('.quantitaIngrediente').each(function( index ) {
-			//var currentQuantita = $(this).val();
-			//$(this).val(parseFloat(currentQuantita) + quantita);
-		//});
 
 		$.fn.computeQuantitaTotale();
 		$.fn.computeQuantitaIngredienti();
@@ -515,18 +507,12 @@ $.fn.loadIngredienti = function(idRicetta){
 							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
 						}
 						rowHtml += '<div class="input-group input-group-sm mb-2">';
-						rowHtml += '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" style="text-align: right;">';
+						rowHtml += '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".001" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" style="text-align: right;">';
 						rowHtml += '<div class="input-group-prepend"><div class="input-group-text">di</div></div>';
-						rowHtml += '<input type="number" class="form-control quantitaTotaleIngrediente" id="quantitaTotaleIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" disabled style="text-align: right;">';
-						/*
-							<div class="input-group-append ml-1 mt-1 linkConfezione">
-							  <a href="#" class="addConfezione"><i class="fas fa-plus"></i></a>
-							</div>
+						rowHtml += '<input type="number" class="form-control quantitaTotaleIngrediente" id="quantitaTotaleIngrediente_' + id + '" step=".001" min="0" value="' + quantita + '" disabled style="text-align: right;">';
 
-						 */
 						rowHtml += '<div class="input-group-append ml-1 mt-1 linkIngrediente"><a href="#" class="addIngrediente"><i class="fas fa-plus"></i></a></div>';
 						rowHtml += '</div></div>';
-						//rowHtml = rowHtml + '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".01" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" disabled style="text-align: right;"></div>';
 
 						rowHtml = rowHtml + '</div></div>';
 						rowHtml = rowHtml + '</div>';
