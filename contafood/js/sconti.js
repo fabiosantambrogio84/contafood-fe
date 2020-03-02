@@ -255,59 +255,68 @@ $(document).ready(function() {
             				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
             var sconti = [];
+			var clienti = $('#cliente').val();
             var dataDal = $('#dataDal').val();
             var dataAl = $('#dataAl').val();
             var valore = $('#valore').val();
             var tipologia = $('#tipologia option:selected').val();
 
             if(tipologia == 'FORNITORE'){
-                var fornitori = $('#fornitore').val();
-                if(fornitori != null && fornitore.length != 0){
-                    $.each(fornitori, function(i, item){
-                        var sconto = new Object();
-                        sconto.tipologia = tipologia;
+				var fornitori = $('#fornitore').val();
+				if(clienti != null && clienti.length != 0){
+					$.each(clienti, function(i, item){
+						var cliente = new Object();
+						cliente.id = item;
 
-                        if($('#cliente option:selected').val() != -1){
-                            var cliente = new Object();
-                            cliente.id = $('#cliente option:selected').val();
-                            sconto.cliente = cliente;
-                        };
+						if(fornitori != null && fornitore.length != 0){
+							$.each(fornitori, function(i, item){
+								var sconto = new Object();
+								sconto.tipologia = tipologia;
 
-                        var fornitore = new Object();
-                        fornitore.id = item;
-                        sconto.fornitore = fornitore;
+								sconto.cliente = cliente;
 
-                        sconto.dataDal = dataDal;
-                        sconto.dataAl = dataAl;
-                        sconto.valore = valore;
+								var fornitore = new Object();
+								fornitore.id = item;
+								sconto.fornitore = fornitore;
 
-                        sconti.push(sconto);
-                    })
-                }
+								sconto.dataDal = dataDal;
+								sconto.dataAl = dataAl;
+								sconto.valore = valore;
+
+								sconti.push(sconto);
+							})
+						}
+					})
+				}
             } else {
                 var articoli = $('#articolo').val();
-                if(articoli != null && articoli.length != 0){
-                    $.each(articoli, function(i, item){
-                        var sconto = new Object();
-                        sconto.tipologia = tipologia;
 
-                        if($('#cliente option:selected').val() != -1){
-                            var cliente = new Object();
-                            cliente.id = $('#cliente option:selected').val();
-                            sconto.cliente = cliente;
-                        };
+				if(clienti != null && clienti.length != 0){
+					$.each(clienti, function(i, item){
+						var cliente = new Object();
+						cliente.id = item;
 
-                        var articolo = new Object();
-                        articolo.id = item;
-                        sconto.articolo = articolo;
+						if(articoli != null && articoli.length != 0){
+							$.each(articoli, function(i, item){
+								var sconto = new Object();
+								sconto.tipologia = tipologia;
 
-                        sconto.dataDal = dataDal;
-                        sconto.dataAl = dataAl;
-                        sconto.valore = valore;
+								sconto.cliente = cliente;
 
-                        sconti.push(sconto);
-                    })
-                }
+								var articolo = new Object();
+								articolo.id = item;
+								sconto.articolo = articolo;
+
+								sconto.dataDal = dataDal;
+								sconto.dataAl = dataAl;
+								sconto.valore = valore;
+
+								sconti.push(sconto);
+							})
+						}
+
+					})
+				}
             }
 
             var scontiJson = JSON.stringify(sconti);

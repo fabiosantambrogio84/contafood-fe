@@ -739,6 +739,12 @@ $(document).ready(function() {
 							$(this).attr('data-prezzo-listino', prezzoBase);
 						});
 					}
+
+					// load Sconti associated to the Cliente
+					var data = $('#data').val();
+					if(data != null && data != undefined && data != ''){
+						$.fn.loadScontiArticoli(data, cliente);
+					}
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
@@ -750,6 +756,37 @@ $(document).ready(function() {
 			$('#puntoConsegna').attr('disabled', true);
 		}
 	});
+
+	$(document).on('change','#data', function(){
+		var data = $(this).val();
+		var cliente = $('#cliente option:selected').val();
+		if(data != null && data != undefined && data != '' && cliente != null && cliente != undefined && cliente != ''){
+			$.fn.loadScontiArticoli(data, cliente);
+		}
+	});
+
+	$.fn.loadScontiArticoli = function(data, cliente){
+		$.ajax({
+			url: baseUrl + "sconti?tipologia=ARTICOLO&idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				$.each(result, function(i, item){
+					var articoloId = item.articolo.id;
+					var valore = item.valore;
+					$("#articolo option").each(function(i){
+						var articoloOptionId = $(this).val();
+						if(articoloOptionId == articoloId){
+							$(this).attr('data-sconto', valore);
+						}
+					});
+				});
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
+			}
+		});
+	}
 
 	$(document).on('change','#articolo', function(){
 		var articolo = $('#articolo option:selected').val();
@@ -765,6 +802,7 @@ $(document).ready(function() {
 			} else {
 				prezzo = prezzoBase;
 			}
+			var sconto = $('#articolo option:selected').attr('data-sconto');
 
 			$('#udm').val(udm);
 			$('#iva').val(iva);
@@ -772,7 +810,7 @@ $(document).ready(function() {
 			$('#quantita').val(quantita);
 			$('#pezzi').val('');
 			$('#prezzo').val(prezzo);
-			$('#sconto').val('');
+			$('#sconto').val(sconto);
 		} else {
 			$('#udm').val('');
 			$('#iva').val('');
