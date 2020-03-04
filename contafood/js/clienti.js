@@ -256,6 +256,10 @@ $(document).ready(function() {
 				data: clienteJson,
 				success: function(result) {
 					$('#alertCliente').empty().append(alertContent.replace('@@alertText@@','Cliente modificato con successo').replace('@@alertResult@@', 'success'));
+
+					setTimeout(function() {
+						window.location.href = "clienti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del cliente').replace('@@alertResult@@', 'danger'));
@@ -301,9 +305,9 @@ $(document).ready(function() {
                 agente.id = $('#agente option:selected').val();
                 cliente.agente = agente;
             }
-			if($('#listinoAssociato option:selected').val() != -1){
+			if($('#listinoApplicato option:selected').val() != -1){
 				var listino = new Object();
-				listino.id = $('#listinoAssociato option:selected').val();
+				listino.id = $('#listinoApplicato option:selected').val();
 				cliente.listino = listino;
 			}
 			cliente.estrazioneConad = $('#estrazioneConad').val();
@@ -340,6 +344,10 @@ $(document).ready(function() {
 				data: clienteJson,
 				success: function(result) {
 					$('#alertCliente').empty().append(alertContent.replace('@@alertText@@','Cliente creato con successo').replace('@@alertResult@@', 'success'));
+
+					setTimeout(function() {
+						window.location.href = "clienti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del cliente').replace('@@alertResult@@', 'danger'));
