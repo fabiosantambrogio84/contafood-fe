@@ -767,7 +767,7 @@ $(document).ready(function() {
 
 	$.fn.loadScontiArticoli = function(data, cliente){
 		$.ajax({
-			url: baseUrl + "sconti?tipologia=ARTICOLO&idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
+			url: baseUrl + "sconti?idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
 			type: 'GET',
 			dataType: 'json',
 			success: function(result) {

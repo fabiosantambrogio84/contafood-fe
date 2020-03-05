@@ -587,6 +587,7 @@ $.fn.computeQuantitaIngredienti = function() {
 			var percentuale = $(this).attr('data-percentuale');
 			var quantitaIngrediente = parseFloat((parseFloat(percentuale)*parseFloat(quantitaTotale))/100);
 			$(this).find('.quantitaTotaleIngrediente').val(quantitaIngrediente.toFixed(3));
+			$(this).find('.quantitaIngrediente').val(quantitaIngrediente.toFixed(3));
 		});
 	}
 }
