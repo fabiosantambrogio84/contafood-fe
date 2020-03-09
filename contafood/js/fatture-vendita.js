@@ -80,20 +80,17 @@ $.fn.loadFattureVenditaTable = function(url) {
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
-			/*
-			$(row).css('font-size', '12px');
-			if(data.statoDdt != null){
+			if(data.statoFattura != null){
 				var backgroundColor = '';
-				if(data.statoDdt.codice == 'DA_PAGARE'){
+				if(data.statoFattura.codice == 'DA_PAGARE'){
 					backgroundColor = '#fcf456';
-				} else if(data.statoDdt.codice == 'PARZIALMENTE_PAGATO'){
+				} else if(data.statoFattura.codice == 'PARZIALMENTE_PAGATA'){
 					backgroundColor = '#fcc08b';
 				} else {
 					backgroundColor = 'trasparent';
 				}
 				$(row).css('background-color', backgroundColor);
-			}*/
-			//$(cells[11]).css('padding-right','0px').css('padding-left','3px');
+			}
 			$(cells[3]).css('text-align','left');
 			$(cells[4]).css('text-align','left');
 			$(cells[5]).css('text-align','right');
@@ -434,104 +431,37 @@ $(document).ready(function() {
 		});
 	}
 
-	/*
-	if($('#updateDdtButton') != null && $('#updateDdtButton') != undefined){
-		$(document).on('submit','#updateDdtForm', function(event){
-			event.preventDefault();
+	$(document).on('click','#resetSearchFattureVenditaButton', function(){
+		event.preventDefault();
 
-			var ddt = new Object();
-			ddt.id = $('#hiddenIdDdt').val();
-			ddt.progressivo = $('#progressivo').val();
-			ddt.annoContabile = $('#annoContabile').val();
-			ddt.data = $('#data').val();
+		var alertContent = '<div id="alertFattureVenditaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			var cliente = new Object();
-			cliente.id = $('#cliente option:selected').val();
-			ddt.cliente = cliente;
+		$.ajax({
+			url: baseUrl + "fatture-vendita/creazione-automatica",
+			type: 'POST',
+			contentType: "application/json",
+			dataType: 'json',
+			success: function(result) {
+				$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@','Fatture vendite create con successo').replace('@@alertResult@@', 'success'));
 
-			var puntoConsegna = new Object();
-			puntoConsegna.id = $('#puntoConsegna option:selected').val();
-			ddt.puntoConsegna = puntoConsegna;
-
-			var ddtArticoliLength = $('.rowArticolo').length;
-			if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
-				var ddtArticoli = [];
-				$('.rowArticolo').each(function(i, item){
-					var articoloId = $(this).attr('data-id');
-
-					var ddtArticolo = {};
-					var ddtArticoloId = new Object();
-					ddtArticoloId.articoloId = articoloId;
-					ddtArticolo.id = ddtArticoloId;
-
-					ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-					ddtArticolo.quantita = $(this).children().eq(3).children().eq(0).val();
-					ddtArticolo.numeroPezzi = $(this).children().eq(4).children().eq(0).val();
-					ddtArticolo.prezzo = $(this).children().eq(5).children().eq(0).val();
-					ddtArticolo.sconto = $(this).children().eq(6).children().eq(0).val();
-
-					ddtArticoli.push(ddtArticolo);
-				});
-				ddt.ddtArticoli = ddtArticoli;
-			}
-			ddt.fatturato = false;
-			ddt.numeroColli = $('#colli').val();
-			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();
-			ddt.dataTrasporto = $('#dataTrasporto').val();
-
-			var regex = /:/g;
-			var oraTrasporto = $('#oraTrasporto').val();
-			if(oraTrasporto != null && oraTrasporto != ''){
-				var count = oraTrasporto.match(regex);
-				count = (count) ? count.length : 0;
-				if(count == 1){
-					ddt.oraTrasporto = $('#oraTrasporto').val() + ':00';
-				} else {
-					ddt.oraTrasporto = $('#oraTrasporto').val();
-				}
-			}
-			ddt.trasportatore = $('#trasportatore').val();
-			ddt.note = $('#note').val();
-
-			var ddtJson = JSON.stringify(ddt);
-
-			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-			$.ajax({
-				url: baseUrl + "ddts/"+ddt.id,
-				type: 'PUT',
-				contentType: "application/json",
-				dataType: 'json',
-				data: ddtJson,
-				success: function(result) {
-					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT aggiornato con successo').replace('@@alertResult@@', 'success'));
-
-					$('#updateDdtButton').attr("disabled", true);
-
-					// Returns to the page with the list of DDTs
-					setTimeout(function() {
-						window.location.href = "ddt.html";
-					}, 1000);
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nella modifica del DDT';
-					if(jqXHR != null && jqXHR != undefined){
-						var jqXHRResponseJson = jqXHR.responseJSON;
-						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
-							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
-							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
-								errorMessage = jqXHRResponseJsonMessage;
-							}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var errorMessage = 'Errore nella creazione delle fatture vendite';
+				if(jqXHR != null && jqXHR != undefined){
+					var jqXHRResponseJson = jqXHR.responseJSON;
+					if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+						var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+						if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+							errorMessage = jqXHRResponseJsonMessage;
 						}
 					}
-					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 				}
-			});
+				$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+			}
 		});
-	}
-	*/
+	});
 });
 
 $.fn.preloadSearchFields = function(){

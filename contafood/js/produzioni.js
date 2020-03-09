@@ -482,7 +482,7 @@ $.fn.loadIngredienti = function(idRicetta){
 							rowHtml = rowHtml + '<label for="codiceIngrediente">Codice</label>';
 						}
 						rowHtml = rowHtml + '<input type="text" class="form-control codiceIngrediente" id="codiceIngrediente_' + id + '" disabled value="' + codice + '"></div>';
-						rowHtml = rowHtml + '<div class="form-group col-md-4">';
+						rowHtml = rowHtml + '<div class="form-group col-md-3">';
 
 						if (i == 0) {
 							rowHtml = rowHtml + '<label for="descrizioneIngrediente">Descrizione</label>';
@@ -506,7 +506,7 @@ $.fn.loadIngredienti = function(idRicetta){
 						if (i == 0) {
 							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
 						}
-						rowHtml += '<div class="input-group input-group-sm mb-2">';
+						rowHtml += '<div class="input-group input-group-sm mb-3">';
 						rowHtml += '<input type="number" class="form-control quantitaIngrediente" id="quantitaIngrediente_' + id + '" step=".001" min="0" value="' + quantita + '" onchange="$.fn.computeCostoIngredienti(this);" style="text-align: right;">';
 						rowHtml += '<div class="input-group-prepend"><div class="input-group-text">di</div></div>';
 						rowHtml += '<input type="number" class="form-control quantitaTotaleIngrediente" id="quantitaTotaleIngrediente_' + id + '" step=".001" min="0" value="' + quantita + '" disabled style="text-align: right;">';
@@ -564,7 +564,7 @@ $.fn.computeQuantitaTotale = function() {
 	var quantitaTotale;
 	$('.confezioneNum').each(function(i, item){
 		var numeroConfezioni = $(this).val();
-		var peso = $(this).parent().parent().prev().prev().find('input').val();
+		var peso = $(this).parent().parent().find('.confezionePeso').val();
 		if(numeroConfezioni != undefined && peso != undefined){
 			var pesoConfezione = parseFloat(numeroConfezioni)*parseFloat(peso);
 			if(quantitaTotale != null && quantitaTotale != undefined && quantitaTotale != ""){
