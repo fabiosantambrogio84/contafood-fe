@@ -665,7 +665,7 @@ $(document).on('change','#cliente', function(){
 				$(cells[0]).css('text-align','center');
 				$(cells[1]).css('text-align','center');
 				$(cells[2]).css('text-align','center');
-				$(cells[3]).css('text-align','center');
+				$(cells[3]).css('text-align','center').addClass('ddtTotale');
 			}
 		});
 	} else {
@@ -695,4 +695,17 @@ $.fn.formatNumber = function(value){
 	return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
 }
 
-
+$(document).on('change','.fatturaVenditaDdtCheckbox', function(){
+	var numChecked = $('.fatturaVenditaDdtCheckbox:checkbox:checked').length;
+	if(numChecked == null || numChecked == undefined || numChecked == 0){
+		$('#totale').val(null);
+	} else{
+		var totale = 0;
+		$('.fatturaVenditaDdtCheckbox:checkbox:checked').each(function(i, item) {
+			$(this).parent().parent().find('.ddtTotale').each(function( index ) {
+				totale += parseFloat($(this).text());
+			});
+		});
+		$('#totale').val(parseFloat(Number(Math.round(totale+'e2')+'e-2')).toFixed(2));
+	};
+});
