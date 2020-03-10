@@ -373,6 +373,12 @@ $(document).ready(function() {
 		newingredienteRow.find('label').each(function( index ) {
 			$(this).remove();
 		});
+		newingredienteRow.find('.lottoIngrediente').each(function( index ) {
+			$(this).val(null);
+		});
+		newingredienteRow.find('.scadenzaIngrediente').each(function( index ) {
+			$(this).val(null);
+		});
 		newingredienteRow.find('.quantitaIngrediente').each(function( index ) {
 			$(this).val(newQuantita);
 		});
