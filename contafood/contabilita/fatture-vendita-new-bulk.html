@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fattura vendita Nuovo</title>
+  <title>ContaFood - Fatture vendite Creazione Automatica</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -34,8 +34,7 @@
   <script src="../js/fatture-vendita.js"></script>
 
   <script>
-    $.fn.preloadFields();
-    $.fn.getClienti();
+    $.fn.preloadFieldData();
   </script>
 
 </head>
@@ -63,22 +62,12 @@
       <div class="container-fluid" id="containerFattureVendita">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800">Nuova Fattura Vendita</h1>
+        <h1 class="h3 mb-4 text-gray-800">Creazione Automatica Fatture Vendite</h1>
 
         <div id="alertFattureVendita"></div>
 
-        <form id="newFatturaVenditaForm" class="needs-validation" novalidate>
+        <form id="creazioneAutomaticaFattureVenditeForm" class="needs-validation" novalidate>
           <div class="form-row">
-            <div class="form-group col-md-2">
-              <label for="progressivo" class="mb-0">Progressivo*</label>
-              <div class="input-group input-group-sm mb-2">
-                <input type="number" class="form-control form-control-sm text-right" id="progressivo" step="1" min="0" disabled>
-                <div class="input-group-prepend">
-                  <div class="input-group-text">/</div>
-                </div>
-                <input type="number" class="form-control form-control-sm text-right" id="anno" step="1" min="0" disabled>
-              </div>
-            </div>
             <div class="form-group col-md-2">
               <label for="data" class="mb-0">Data*</label>
               <input type="date" class="form-control form-control-sm" id="data" placeholder="" required>
@@ -87,52 +76,8 @@
               </div>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="cliente" class="">Cliente*</label>
-              <select id="cliente" class="form-control form-control-sm" required>
-                <option value=""></option>
-              </select>
-              <div class="invalid-feedback">
-                Seleziona un cliente
-              </div>
-            </div>
-          </div>
 
-          <div class="card-body pl-0">
-            <h6>DDT da fatturare*</h6>
-            <div class="form-row">
-              <div class="form-group col-md-10">
-                <div class="table-responsive">
-                  <table class="table table-bordered table-sm" id="fatturaVenditaDdtTable" width="100%" cellspacing="0">
-                    <thead class="text-center" style="background-color: #baddf5;">
-                    <tr>
-                      <th></th>
-                      <th>Numero</th>
-                      <th>Data</th>
-                      <th>Importo (€)</th>
-                    </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-2">
-              <label for="totale" class="mb-0">Totale (€)*</label>
-              <input type="number" class="form-control form-control-sm text-right" id="totale" step=".01" min="0" required>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-4">
-              <label for="note">Note</label>
-              <textarea class="form-control" id="note" rows="4"></textarea>
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary mt-4" id="newFatturaVenditaButton">Salva</button>
+          <button type="submit" class="btn btn-primary mt-4" id="creazioneAutomaticaFattureVenditeButton">Crea</button>
           <a href="fatture-vendita.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 
