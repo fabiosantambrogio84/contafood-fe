@@ -704,17 +704,17 @@ $.fn.loadDdtDaFatturare = function(){
 			],
 			"columns": [
 				{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-						var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="fatturaVenditaDdtCheckbox">';
-						return checkboxHtml;
-					}},
+					var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="fatturaVenditaDdtCheckbox">';
+					return checkboxHtml;
+				}},
 				{"name": "numero", "data": "progressivo", "width":"5%"},
 				{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
-						var a = moment(data.data);
-						return a.format('DD/MM/YYYY');
-					}},
+					var a = moment(data.data);
+					return a.format('DD/MM/YYYY');
+				}},
 				{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
-						return $.fn.formatNumber(data.totale);
-					}}
+					return $.fn.formatNumber(data.totale);
+				}}
 			],
 			"createdRow": function(row, data, dataIndex,cells){
 				$(cells[0]).css('text-align','center');

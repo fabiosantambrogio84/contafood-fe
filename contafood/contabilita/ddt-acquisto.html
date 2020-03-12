@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - DDT</title>
+  <title>ContaFood - DDT Acquisto</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -31,7 +31,7 @@
   <script src="../js/commons.js"></script>
   <script src="../js/core/moment.js"></script>
 
-  <script src="../js/ddt.js"></script>
+  <script src="../js/ddt-acquisto.js"></script>
 
   <script>
     $.fn.preloadSearchFields();
@@ -63,97 +63,53 @@
           <!-- Page Heading -->
           <div class="row">
             <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco DDT</h1>
+              <h1 class="h3 mb-4 text-gray-800">Elenco DDT Acquisto</h1>
             </div>
             <div class="col-md-2">
               <a href="ddt-new.html" class="btn btn-primary">Nuovo</a>
+              <a href="f#" class="btn btn-primary">Distinta</a>
             </div>
           </div>
 
-          <div id="alertDdt"></div>
+          <div id="alertDdtAcquisto"></div>
 
           <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="ddtMainDiv">
+          <div class="card shadow mb-4" id="ddtAcquistoMainDiv">
             <div class="card-body">
-              <form id="searchDdtForm">
+              <form id="searchDdtAcquistoForm">
                 <div class="form-row">
                   <div class="form-group col-md-2">
-                    <label for="searchDataFrom" class="mb-0">Data da</label>
-                    <input type="date" class="form-control form-control-sm" id="searchDataFrom">
+                    <label for="searchFornitore" class="mb-0">Fornitore</label>
+                    <input type="text" class="form-control form-control-sm" id="searchFornitore">
                   </div>
                   <div class="form-group col-md-2">
-                    <label for="searchDataTo" class="mb-0">Data a</label>
-                    <input type="date" class="form-control form-control-sm" id="searchDataTo">
+                    <label for="searchNumero" class="mb-0">Numero</label>
+                    <input type="number" class="form-control form-control-sm" id="searchNumero" step="1" min="0">
                   </div>
-                  <div class="form-group col-md-2">
-                    <label for="searchCliente" class="mb-0">Cliente</label>
-                    <input type="text" class="form-control form-control-sm" id="searchCliente">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="searchProgressivo" class="mb-0">Progressivo</label>
-                    <input type="number" class="form-control form-control-sm" id="searchProgressivo" step="1" min="0">
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="searchImporto" class="mb-0">Importo</label>
-                    <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
-                  </div>
-
-                </div>
-                <div class="form-row">
                   <div class="form-group col-md-2">
                     <label for="searchStato" class="mb-0">Stato</label>
                     <select id="searchStato" class="form-control form-control-sm" >
                       <option value=""></option>
                     </select>
                   </div>
-                  <div class="form-group col-md-2">
-                    <label for="searchTipoPagamento" class="mb-0">Tipo pagamento</label>
-                    <select id="searchTipoPagamento" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="searchAgente" class="mb-0">Agente</label>
-                    <select id="searchAgente" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2">
-                    <label for="searchAutista" class="mb-0">Autista</label>
-                    <select id="searchAutista" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-3">
-                    <label for="searchArticolo" class="mb-0">Articolo</label>
-                    <select id="searchArticolo" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
 
                 </div>
-
-                <button type="submit" class="btn btn-primary mt-0" id="searchDdtButton">Cerca</button>
-                <a href="#" id="resetSearchDdtButton" class="btn btn-secondary mt-0">Svuota</a>
+                <button type="submit" class="btn btn-primary mt-0" id="searchDdtAcquistoButton">Cerca</button>
+                <a href="#" id="resetSearchDdtAcquistoButton" class="btn btn-secondary mt-0">Svuota</a>
               </form>
             </div>
 
             <div class="card-body" style="font-size: 0.9rem;">
               <div class="table-responsive">
-                <table class="table table-bordered" id="ddtTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+                <table class="table table-bordered" id="ddtAcquistoTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                   <thead>
         		    <tr style="font-size:12px;">
+                      <th></th>
                       <th>Num.</th>
                       <th>Data</th>
-                      <th>Fatt.</th>
-                      <th>Cliente</th>
-                      <th>Agente</th>
-                      <th>Autista</th>
-                      <th>Acconto</th>
+                      <th>Fornitore</th>
                       <th>Importo</th>
                       <th>Imponibile</th>
-                      <th>Costo</th>
-                      <th>Guadagno</th>
                       <th></th>
                     </tr>
 
@@ -164,37 +120,37 @@
           </div>
 
           <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteDdtModal" tabindex="-1" role="dialog" aria-labelledby="deleteDdtModal" aria-hidden="true">
+          <div class="modal fade" id="deleteDdtAcquistoModal" tabindex="-1" role="dialog" aria-labelledby="deleteDdtAcquistoModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteDdtModalTitle">Conferma rimozione DDT</h5>
+                  <h5 class="modal-title" id="deleteDdtAcquistoModalTitle">Conferma rimozione DDT acquisto</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  Sei sicuro di voler rimuovere il DDT?
+                  Sei sicuro di voler rimuovere il DDT acquisto?
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteDdt">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteDdtAcquisto">Conferma</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Modal Details-->
-          <div class="modal fade" id="detailsDdtModal" tabindex="-1" role="dialog" aria-labelledby="detailsDdtModal" aria-hidden="true">
+          <div class="modal fade" id="detailsDdtAcquistoModal" tabindex="-1" role="dialog" aria-labelledby="detailsDdtAcquistoModal" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="detailsDdtModalTitle">Dettagli DDT</h5>
-                  <button type="button" class="close closeDdt" data-dismiss="modal" aria-label="Close">
+                  <h5 class="modal-title" id="detailsDdtAcquistoModalTitle">Dettagli DDT acquisto</h5>
+                  <button type="button" class="close closeDdtAcquisto" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body" id="detailsDdtMainDiv">
+                <div class="modal-body" id="detailsDdtAcquistoMainDiv">
                   <div class="container">
                     <div class="row">
                       <div class="col-sm">
@@ -232,54 +188,11 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Fatturato</h6>
-                            <p class="card-text" id="fatturato"></p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="row">
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
                             <h6 class="card-title mb-0 font-weight-bold">Stato</h6>
                             <p class="card-text" id="stato"></p>
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Cliente</h6>
-                            <p class="card-text" id="cliente"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Punto consegna</h6>
-                            <p class="card-text" id="puntoConsegna"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Autista</h6>
-                            <p class="card-text" id="autista"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Agente</h6>
-                            <p class="card-text" id="agente"></p>
-                          </div>
-                        </div>
-                      </div>
                     </div>
 
                     <div class="row">
@@ -287,32 +200,8 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Tipo trasporto</h6>
-                            <p class="card-text" id="tipoTrasporto"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Data trasporto</h6>
-                            <p class="card-text" id="dataTrasporto"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Ora trasporto</h6>
-                            <p class="card-text" id="ora trasporto"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Trasportatore</h6>
-                            <p class="card-text" id="trasportatore"></p>
+                            <h6 class="card-title mb-0 font-weight-bold">Fornitore</h6>
+                            <p class="card-text" id="fornitore"></p>
                           </div>
                         </div>
                       </div>
@@ -324,9 +213,6 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -338,38 +224,11 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Tot. iva (€)</h6>
-                            <p class="card-text" id="totaleIva"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Tot. costo (€)</h6>
-                            <p class="card-text" id="totaleCosto"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
-                            <p class="card-text" id="totaleAcconto"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
                             <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
                             <p class="card-text" id="totale"></p>
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -378,42 +237,41 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm">&nbsp;</div>
-                      <div class="col-sm">&nbsp;</div>
-                      <div class="col-sm">&nbsp;</div>
-                      <div class="col-sm">&nbsp;</div>
                     </div>
+
                   </div>
 
                   <hr class="my-4">
 
                   <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsDdtArticoliModalTable">
+                    <table class="table table-bordered" id="detailsDdtAcquistoArticoliModalTable">
                       <thead>
                         <th>Articolo</th>
+                        <th>Lotto</th>
                         <th>Quantita</th>
-                        <th>Pezzi</th>
+                        <th>Scadenza</th>
                         <th>Prezzo (€)</th>
                         <th>Sconto (€)</th>
                         <th>Imponibile (€)</th>
-                        <th>Costo (€)</th>
                       </thead>
                     </table>
                   </div>
 
                   <hr class="my-4">
 
+                  <!--
                   <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsDdtPagamentiModalTable">
+                    <table class="table table-bordered" id="detailsDdtAcquistoPagamentiModalTable">
                       <thead>
-                      <th>Data</th>
-                      <th>Descrizione</th>
-                      <th>Importo (€)</th>
-                      <th>Pagamento</th>
-                      <th>Note</th>
+                        <th>Data</th>
+                        <th>Descrizione</th>
+                        <th>Importo (€)</th>
+                        <th>Pagamento</th>
+                        <th>Note</th>
                       </thead>
                     </table>
                   </div>
+                  -->
 
                 </div>
               </div>
