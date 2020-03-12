@@ -507,7 +507,7 @@ $.fn.loadIngredienti = function(idRicetta){
 						}
 						rowHtml = rowHtml + '<input type="date" class="form-control scadenzaIngrediente" id="scadenzaIngrediente_' + id + '" style="font-size: smaller;"></div>';
 
-						rowHtml = rowHtml + '<div class="form-group col-md-2">';
+						rowHtml = rowHtml + '<div class="form-group col-md-3">';
 
 						if (i == 0) {
 							rowHtml = rowHtml + '<label for="quantitaIngrediente">Quantita (Kg)</label>';
