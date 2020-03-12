@@ -484,6 +484,34 @@ $(document).ready(function() {
 		});
 	}
 
+	$(document).on('keypress','#searchStato', function(event){
+		if (event.keyCode === 13) {
+			event.preventDefault();
+			$('#searchFattureVenditaButton').click();
+		}
+	});
+
+	$(document).on('keypress','#searchTipoPagamento', function(event){
+		if (event.keyCode === 13) {
+			event.preventDefault();
+			$('#searchFattureVenditaButton').click();
+		}
+	});
+
+	$(document).on('keypress','#searchAgente', function(event){
+		if (event.keyCode === 13) {
+			event.preventDefault();
+			$('#searchFattureVenditaButton').click();
+		}
+	});
+
+	$(document).on('keypress','#searchArticolo', function(event){
+		if (event.keyCode === 13) {
+			event.preventDefault();
+			$('#searchFattureVenditaButton').click();
+		}
+	});
+
 });
 
 $.fn.preloadSearchFields = function(){
@@ -550,6 +578,7 @@ $.fn.preloadSearchFields = function(){
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
+
 }
 
 $.fn.preloadFieldData = function(){
