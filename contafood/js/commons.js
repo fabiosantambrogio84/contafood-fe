@@ -2,24 +2,21 @@ $(document).ready(function() {
 
     var pageType = $('#accordionSidebar').attr('data-page-type');
     if(pageType != null && pageType != undefined){
+        $('.navbar').load('../commons/topbar.html');
         if(pageType == 'anagrafiche'){
-            $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-anagrafiche.html');
         } else if(pageType == 'configurazione'){
-            $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-configurazione.html');
         } else if(pageType == 'produzione'){
-            $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-produzione.html');
         } else if(pageType == 'magazzino'){
-            $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-magazzino.html');
         } else if(pageType == 'ordini'){
-            $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-ordini.html');
         } else if(pageType == 'contabilita'){
-            $('.navbar').load('../commons/topbar.html');
             $('#accordionSidebar').load('../commons/sidebar-contabilita.html');
+        } else if(pageType == 'lotti-statistiche'){
+            $('#accordionSidebar').load('../commons/sidebar-lotti-statistiche.html');
         }
 
     } else{

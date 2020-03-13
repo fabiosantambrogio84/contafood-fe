@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Ingredienti</title>
+  <title>ContaFood - Ricerca lotti</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -29,122 +29,124 @@
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
   <script src="../js/commons.js"></script>
+  <script src="../js/core/moment.js"></script>
+
+  <script src="../js/ricerca-lotti.js"></script>
 
 </head>
 
-<body id="page-top">
+<body id="page-top" class="">
 
-  <!-- Page Wrapper -->
-  <div id="wrapper">
+<!-- Page Wrapper -->
+<div id="wrapper">
 
-    <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="produzione"></ul>
-    <!-- End of Sidebar -->
+  <!-- Sidebar -->
+  <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="lotti-statistiche"></ul>
+  <!-- End of Sidebar -->
 
-    <!-- Content Wrapper -->
-    <div id="content-wrapper" class="d-flex flex-column">
+  <!-- Content Wrapper -->
+  <div id="content-wrapper" class="d-flex flex-column">
 
-      <!-- Main Content -->
-      <div id="content">
+    <!-- Main Content -->
+    <div id="content">
 
-        <!-- Topbar -->
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"></nav>
-        <!-- End of Topbar -->
+      <!-- Topbar -->
+      <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow"></nav>
+      <!-- End of Topbar -->
 
-        <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerIngredienti">
+      <!-- Begin Page Content -->
+      <div class="container-fluid" id="containerRicercaLotti">
 
-          <!-- Page Heading -->
-          <div class="row">
-            <div class="col-md-10">
-              <h1 class="h3 mb-4 text-gray-800">Elenco ingredienti</h1>
-            </div>
-            <div class="col-md-2">
-              <a href="ingredienti-new.html" class="btn btn-primary">Nuovo</a>
-            </div>
-          </div>
+        <!-- Page Heading -->
+        <h1 class="h3 mb-4 text-gray-800">Ricerca lotti</h1>
 
-          <div id="alertIngrediente"></div>
+        <div id="alertRicercaLotti"></div>
 
-          <!-- DataTables -->
-          <div class="card shadow mb-4" id="ingredientiMainDiv">
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-bordered" id="ingredientiTable" width="100%" cellspacing="0">
-                  <thead>
-        		    <tr>
-        			  <th>Codice</th>
-                      <th>Descrizione</th>
-                      <th>Prezzo</th>
-                      <th>Fornitore</th>
-                      <th>Data inserimento</th>
-                      <th>Note</th>
-                      <th></th>
-                    </tr>
-        		  </thead>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteIngredienteModal" tabindex="-1" role="dialog" aria-labelledby="deleteIngredienteModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="deleteIngredienteModalTitle">Conferma rimozione ingrediente</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  Sei sicuro di voler rimuovere l'ingrediente?
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteIngrediente">Conferma</button>
+        <div class="card shadow mb-4" id="ricercaLottiMainDiv">
+          <div class="card-body">
+            <form id="ricercaLottiForm" class="">
+              <div class="form-row">
+                <div class="form-group col-md-2">
+                  <label for="lotto" class="">Lotto*</label>
+                  <input type="text" class="form-control form-control-sm" id="lotto" placeholder="">
                 </div>
               </div>
+
+              <button type="submit" class="btn btn-primary" id="ricercaLottiButton">Cerca</button>
+              <a href="#" id="resetRicercaLottiButton" class="btn btn-secondary mt-0">Svuota</a>
+            </form>
+          </div>
+
+          <div class="card-body" style="font-size: 0.9rem;">
+            <div class="table-responsive">
+              <h4 id="ricercaLottiDdtTitle" class="d-none">DDT</h4>
+              <table class="table table-bordered" id="ricercaLottiDdtTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+                <thead>
+                  <tr style="font-size:12px;">
+                  </tr>
+                </thead>
+              </table>
             </div>
+
+            <hr class="sidebar-divider custom-divider d-none">
+
+            <div class="table-responsive mt-4">
+              <h4 id="ricercaLottiDdtAcquistoTitle" class="d-none">DDT Acquisto</h4>
+              <table class="table table-bordered" id="ricercaLottiDdtAcquistoTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+                <thead>
+                  <tr style="font-size:12px;">
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
+            <hr class="sidebar-divider custom-divider d-none">
+
+            <div class="table-responsive mt-4">
+              <h4 id="ricercaLottiProduzioneTitle" class="d-none">Produzioni</h4>
+              <table class="table table-bordered" id="ricercaLottiProduzioneTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+                <thead>
+                  <tr style="font-size:12px;">
+                  </tr>
+                </thead>
+              </table>
+            </div>
+
           </div>
-
         </div>
-        <!-- /.container-fluid -->
 
-      </div>
-      <!-- End of Main Content -->
-
-      <!-- Footer -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>v1.0 - Copyright &copy; Urbani Alimentari 2019</span>
-          </div>
-        </div>
-      </footer>
-      <!-- End of Footer -->
+      <!-- /.container-fluid -->
 
     </div>
-    <!-- End of Content Wrapper -->
+    <!-- End of Main Content -->
+
+    <!-- Footer -->
+    <footer class="sticky-footer bg-white">
+      <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+          <span>v1.0 - Copyright &copy; Urbani Alimentari 2019</span>
+        </div>
+      </div>
+    </footer>
+    <!-- End of Footer -->
 
   </div>
-  <!-- End of Page Wrapper -->
+  <!-- End of Content Wrapper -->
 
-  <!-- Scroll to Top Button-->
-  <a class="scroll-to-top rounded" href="#page-top">
-    <i class="fas fa-angle-up"></i>
-  </a>
+</div>
+<!-- End of Page Wrapper -->
 
-  <!-- Custom scripts for all pages-->
-  <script src="../js/sb-admin-2.min.js"></script>
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
 
-  <!-- Page level plugins -->
-  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-  <script src="https://cdn.datatables.net/plug-ins/1.10.19/dataRender/datetime.js"></script>
-  <script src="../js/core/moment.js"></script>
+<!-- Custom scripts for all pages-->
+<script src="../js/sb-admin-2.min.js"></script>
 
-  <script src="../js/ingredienti.js"></script>
+<!-- Page level plugins -->
+<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 </body>
 
