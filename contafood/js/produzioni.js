@@ -181,6 +181,7 @@ $(document).ready(function() {
 				$('.formRowIngrediente[data-id="'+dataId+'"]').find('.quantitaIngrediente').each(function( index ) {
 					quantita = quantita + parseFloat($(this).val());
 				});
+				quantita = quantita.toFixed(3);
 				if(quantita < quantitaTotale){
 					alertText += 'L ingrediente <strong>'+codiceIngrediente+'</strong> ha <strong>quantita</strong> minore della quantita totale.<br/>';
 				} else if(quantita > quantitaTotale){
@@ -311,7 +312,7 @@ $(document).ready(function() {
 				var peso = $(this).find(':selected').attr('data-peso');
 				$(this).parent().next().find('input').val(peso);
 				$(this).parent().next().next().next().find('input').val(1);
-				$(this).parent().next().next().next().next().find('input').val(peso);
+				//$(this).parent().next().next().next().next().find('input').val(peso);
 			}
 			$.fn.computeQuantitaTotale();
 			$.fn.computeQuantitaIngredienti();
