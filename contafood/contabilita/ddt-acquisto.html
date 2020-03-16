@@ -33,9 +33,6 @@
 
   <script src="../js/ddt-acquisto.js"></script>
 
-  <script>
-    $.fn.preloadSearchFields();
-  </script>
 </head>
 
 <body id="page-top" class="">
@@ -67,7 +64,7 @@
             </div>
             <div class="col-md-2">
               <a href="ddt-acquisto-new.html" class="btn btn-primary">Nuovo</a>
-              <a href="f#" class="btn btn-primary">Distinta</a>
+              <a href="f#" class="btn btn-primary">Crea Distinta</a>
             </div>
           </div>
 
@@ -86,17 +83,17 @@
                     <label for="searchNumero" class="mb-0">Numero</label>
                     <input type="number" class="form-control form-control-sm" id="searchNumero" step="1" min="0">
                   </div>
-                  <div class="form-group col-md-2">
-                    <label for="searchStato" class="mb-0">Stato</label>
-                    <select id="searchStato" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
 
                 </div>
                 <button type="submit" class="btn btn-primary mt-0" id="searchDdtAcquistoButton">Cerca</button>
                 <a href="#" id="resetSearchDdtAcquistoButton" class="btn btn-secondary mt-0">Svuota</a>
               </form>
+            </div>
+
+            <div class="card-body">
+              <p class="font-weight-bold m-0" id="ddtAcquistoNumSelezionati">
+                0 elementi selezionati
+              </p>
             </div>
 
             <div class="card-body" style="font-size: 0.9rem;">
@@ -108,8 +105,8 @@
                       <th>Num.</th>
                       <th>Data</th>
                       <th>Fornitore</th>
-                      <th>Importo</th>
-                      <th>Imponibile</th>
+                      <th>Imponibile (€)</th>
+                      <th>Importo totale (€)</th>
                       <th></th>
                     </tr>
 
@@ -188,8 +185,8 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Stato</h6>
-                            <p class="card-text" id="stato"></p>
+                            <h6 class="card-title mb-0 font-weight-bold">Fornitore</h6>
+                            <p class="card-text" id="fornitore"></p>
                           </div>
                         </div>
                       </div>
@@ -197,14 +194,6 @@
 
                     <div class="row">
 
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Fornitore</h6>
-                            <p class="card-text" id="fornitore"></p>
-                          </div>
-                        </div>
-                      </div>
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -238,7 +227,7 @@
                         </div>
                       </div>
                     </div>
-
+                    <div class="col-sm">&nbsp;</div>
                   </div>
 
                   <hr class="my-4">

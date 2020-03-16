@@ -34,6 +34,7 @@ $.fn.loadDdtAcquistoTable = function(url) {
 		"info": false,
 		"autoWidth": false,
 		"order": [
+			[2, 'desc'],
 			[1, 'desc']
 		],
 		"columns": [
@@ -59,33 +60,14 @@ $.fn.loadDdtAcquistoTable = function(url) {
 			{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
 				return $.fn.formatNumber(data.totale);
 			}},
-			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
-				var stato = data.statoDdtAcquisto;
-
+			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="detailsDdtAcquisto pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
 				links += '<a class="updateDdtAcquisto pr-1" data-id="'+data.id+'" href="ddt-acquisto-edit.html?idDdtAcquisto=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
-				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE'){
-					links += '<a class="payDdtAcquisto pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idDdtAcquisto=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
-				}
-				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE') {
-					links += '<a class="deleteDdtAcquisto" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
-				}
+				links += '<a class="deleteDdtAcquisto" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
-			//$(row).css('font-size', '12px');
-			if(data.statoDdtAcquisto != null){
-				var backgroundColor = '';
-				if(data.statoDdtAcquisto.codice == 'DA_PAGARE'){
-					backgroundColor = '#fcf456';
-				} else if(data.statoDdtAcquisto.codice == 'PARZIALMENTE_PAGATO'){
-					backgroundColor = '#fcc08b';
-				} else {
-					backgroundColor = 'trasparent';
-				}
-				$(row).css('background-color', backgroundColor);
-			}
 			$(cells[0]).css('text-align','center');
 			$(cells[4]).css('text-align','right');
 			$(cells[5]).css('font-weight','bold').css('text-align','right');
@@ -118,13 +100,6 @@ $(document).ready(function() {
 		]
 	});
 
-	$(document).on('keypress','#searchStato', function(event){
-		if (event.keyCode === 13) {
-			event.preventDefault();
-			$('#searchDdtAcquistoButton').click();
-		}
-	});
-
 	$(document).on('click','.detailsDdtAcquisto', function(){
 		var idDdtAcquisto = $(this).attr('data-id');
 
@@ -142,10 +117,6 @@ $(document).ready(function() {
 					var fornitore = result.fornitore;
 					if(fornitore != null && fornitore != undefined && fornitore != ''){
 						$('#fornitore').text(fornitore.ragioneSociale);
-					}
-					var stato = result.statoDdtAcquisto;
-					if(stato != null && stato != undefined && stato != ''){
-						$('#stato').text(stato.descrizione);
 					}
 					$('#colli').text(result.numeroColli);
 					$('#totaleImponibile').text(result.totaleImponibile);
@@ -200,61 +171,6 @@ $(document).ready(function() {
 						});
 					}
 
-					/*
-					if(result.ddtPagamenti != null && result.ddtPagamenti != undefined){
-						$('#detailsDdtPagamentiModalTable').DataTable({
-							"data": result.ddtPagamenti,
-							"language": {
-								"paginate": {
-									"first": "Inizio",
-									"last": "Fine",
-									"next": "Succ.",
-									"previous": "Prec."
-								},
-								"search": "Cerca",
-								"emptyTable": "Nessun pagamento presente",
-								"zeroRecords": "Nessun pagamento presente"
-							},
-							"pageLength": 20,
-							"lengthChange": false,
-							"info": false,
-							"order": [
-								[0, 'desc'],
-								[1, 'asc']
-							],
-							"autoWidth": false,
-							"columns": [
-								{"name": "data", "data": null, "width":"8%", render: function (data, type, row) {
-									var a = moment(data.data);
-									return a.format('DD/MM/YYYY');
-								}},
-								{"name": "descrizione", "data": "descrizione", "width":"15%"},
-								{"name": "importo", "data": null, "width":"8%", render: function ( data, type, row ) {
-									return $.fn.formatNumber(data.importo);
-								}},
-								{"name": "tipoPagamento", "data": null, "width":"12%", render: function ( data, type, row ) {
-									var tipoPagamento = data.tipoPagamento;
-									if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
-										return tipoPagamento.descrizione;
-									}
-									return '';
-								}},
-								{"name": "note", "data": null, "width":"15%", render: function ( data, type, row ) {
-									var note = data.note;
-									var noteTrunc = note;
-									var noteHtml = '<div>'+noteTrunc+'</div>';
-									if(note.length > 100){
-										noteTrunc = note.substring(0, 100)+'...';
-										noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
-									}
-
-									return noteHtml;
-								}}
-							]
-						});
-					}
-					*/
-
 				} else{
 					$('#detailsDdtAcquistoMainDiv').empty().append(alertContent);
 				}
@@ -270,7 +186,6 @@ $(document).ready(function() {
 
 	$(document).on('click','.closeDdtAcquisto', function(){
 		$('#detailsDdtAcquistoArticoliModalTable').DataTable().destroy();
-		//$('#detailsDdtPagamentiModalTable').DataTable().destroy();
 		$('#detailsDdtAcquistoModal').modal('hide');
 	});
 
@@ -307,7 +222,6 @@ $(document).ready(function() {
 
 			var numero = $('#searchNumero').val();
 			var fornitore = $('#searchFornitore').val();
-			var stato = $('#searchStato option:selected').val();
 
 			var params = {};
 			if(numero != null && numero != undefined && numero != ''){
@@ -315,9 +229,6 @@ $(document).ready(function() {
 			}
 			if(fornitore != null && fornitore != undefined && fornitore != ''){
 				params.fornitore = fornitore;
-			}
-			if(stato != null && stato != undefined && stato != ''){
-				params.stato = stato;
 			}
 			var url = baseUrl + "ddts-acquisto?" + $.param( params );
 
@@ -328,7 +239,6 @@ $(document).ready(function() {
 
 		$(document).on('click','#resetSearchDdtAcquistoButton', function(){
 			$('#searchDdtAcquistoForm :input').val(null);
-			$('#searchDdtAcquistoForm select option[value=""]').attr('selected', true);
 
 			$('#ddtAcquistoTable').DataTable().destroy();
 			$.fn.loadDdtAcquistoTable(baseUrl + "ddts-acquisto");
@@ -579,7 +489,14 @@ $(document).ready(function() {
 			$('#addDdtAcquistoArticoloAlert').removeClass("d-none");
 			return;
 		} else {
-			$('#addDdtAcquistoArticoloAlert').addClass("d-none");
+			if($('#lotto').val() == null || $('#lotto').val() == undefined || $('#lotto').val()==''){
+				var alertContent = '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Inserisci un lotto'
+				$('#addDdtAcquistoArticoloAlert').empty().append(alertContent).removeClass("d-none");
+				return;
+			} else{
+				var alertContent = '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Seleziona un articolo'
+				$('#addDdtAcquistoArticoloAlert').empty().append(alertContent).addClass("d-none");
+			}
 		}
 
 		var articolo = $('#articolo option:selected').text();
@@ -714,25 +631,20 @@ $(document).ready(function() {
 		$.fn.computeTotale();
 	});
 
-});
-
-$.fn.preloadSearchFields = function(){
-	$.ajax({
-		url: baseUrl + "stati-ddt-acquisto",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#searchStato').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+	$(document).on('change','.ddtAcquistoCheckbox', function(){
+		var numChecked = $('.ddtAcquistoCheckbox:checkbox:checked').length;
+		if(numChecked == null || numChecked == undefined || numChecked == 0){
+			$('#ddtAcquistoNumSelezionati').text('0 elementi selezionati');
+		} else{
+			var numSelezionati = 0;
+			$('.ddtAcquistoCheckbox:checkbox:checked').each(function(i, item) {
+				numSelezionati += 1;
+			});
+			$('#ddtAcquistoNumSelezionati').text(numSelezionati+' elementi selezionati');
+		};
 	});
-}
+
+});
 
 $.fn.preloadFields = function(){
 	$('#data').val(moment().format('YYYY-MM-DD'));
