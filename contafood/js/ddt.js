@@ -453,7 +453,10 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#newDdtButton') != null && $('#newDdtButton') != undefined){
+	if($('#newDdtButton') != null && $('#newDdtButton') != undefined && $('#newDdtButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#cliente').selectpicker();
+
 		$(document).on('submit','#newDdtForm', function(event){
 			event.preventDefault();
 
@@ -550,7 +553,10 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#updateDdtButton') != null && $('#updateDdtButton') != undefined){
+	if($('#updateDdtButton') != null && $('#updateDdtButton') != undefined && $('#updateDdtButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#cliente').selectpicker();
+
 		$(document).on('submit','#updateDdtForm', function(event){
 			event.preventDefault();
 
@@ -1117,6 +1123,8 @@ $.fn.getClienti = function(){
 						idListino = listino.id;
 					}
 					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+
+					$('#cliente').selectpicker('refresh');
 				});
 			}
 		},
@@ -1172,6 +1180,7 @@ $.fn.getArticoli = function(){
 					var dataPrezzoBase = item.prezzoListinoBase;
 					$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-base="'+dataPrezzoBase+'">'+item.codice+' '+item.descrizione+'</option>');
 
+					$('#articolo').selectpicker('refresh');
 				});
 			}
 		},

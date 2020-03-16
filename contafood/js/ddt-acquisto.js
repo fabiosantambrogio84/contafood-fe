@@ -25,13 +25,15 @@ $.fn.loadDdtAcquistoTable = function(url) {
 				"previous": "Prec."
 			},
 			"emptyTable": "Nessun DDT acquisto disponibile",
-			"zeroRecords": "Nessun DDT acquisto disponibile"
+			"zeroRecords": "Nessun DDT acquisto disponibile",
+			"info": "_TOTAL_ elementi",
+			"infoEmpty": "0 elementi"
 		},
 		"searching": false,
 		"responsive":true,
 		"pageLength": 20,
 		"lengthChange": false,
-		"info": false,
+		"info": true,
 		"autoWidth": false,
 		"order": [
 			[2, 'desc'],
@@ -71,6 +73,12 @@ $.fn.loadDdtAcquistoTable = function(url) {
 			$(cells[0]).css('text-align','center');
 			$(cells[4]).css('text-align','right');
 			$(cells[5]).css('font-weight','bold').css('text-align','right');
+		},
+		"infoCallback": function( settings, start, end, max, total, pre ) {
+			var api = this.api();
+			var pageInfo = api.page.info();
+
+			return '<div style="font-size:16px; font-weight:bold;">'+pageInfo.recordsTotal+' elementi</div>';
 		}
 	});
 }
@@ -245,7 +253,10 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#newDdtAcquistoButton') != null && $('#newDdtAcquistoButton') != undefined){
+	if($('#newDdtAcquistoButton') != null && $('#newDdtAcquistoButton') != undefined && $('#newDdtAcquistoButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#fornitore').selectpicker();
+
 		$(document).on('submit','#newDdtAcquistoForm', function(event){
 			event.preventDefault();
 
@@ -321,7 +332,10 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#updateDdtAcquistoButton') != null && $('#updateDdtAcquistoButton') != undefined){
+	if($('#updateDdtAcquistoButton') != null && $('#updateDdtAcquistoButton') != undefined && $('#updateDdtAcquistoButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#fornitore').selectpicker();
+
 		$(document).on('submit','#updateDdtAcquistoForm', function(event){
 			event.preventDefault();
 
@@ -461,8 +475,8 @@ $(document).ready(function() {
 		if(articolo != null && articolo != ''){
 			var udm = $('#articolo option:selected').attr('data-udm');
 			var quantita = $('#articolo option:selected').attr('data-qta');
-			var prezzoBase = $('#articolo option:selected').attr('data-prezzo-base');
-			var prezzo = prezzoBase;
+			var prezzoAcquisto = $('#articolo option:selected').attr('data-prezzo-acquisto');
+			var prezzo = prezzoAcquisto;
 
 			$('#udm').val(udm);
 			$('#lotto').val('');
@@ -631,6 +645,7 @@ $(document).ready(function() {
 		$.fn.computeTotale();
 	});
 
+	/*
 	$(document).on('change','.ddtAcquistoCheckbox', function(){
 		var numChecked = $('.ddtAcquistoCheckbox:checkbox:checked').length;
 		if(numChecked == null || numChecked == undefined || numChecked == 0){
@@ -643,7 +658,7 @@ $(document).ready(function() {
 			$('#ddtAcquistoNumSelezionati').text(numSelezionati+' elementi selezionati');
 		};
 	});
-
+	*/
 });
 
 $.fn.preloadFields = function(){
@@ -664,6 +679,7 @@ $.fn.getFornitori = function(){
 					label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
 
 					$('#fornitore').append('<option value="'+item.id+'">'+label+'</option>');
+					$('#fornitore').selectpicker('refresh');
 				});
 			}
 		},
@@ -693,9 +709,10 @@ $.fn.getArticoli = function(idFornitore){
 						dataIva = iva.valore;
 					}
 					var dataQta = item.quantitaPredefinita;
-					var dataPrezzoBase = item.prezzoListinoBase;
-					$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-base="'+dataPrezzoBase+'">'+item.codice+' '+item.descrizione+'</option>');
+					var dataPrezzoAcquisto = item.prezzoAcquisto;
+					$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-acquisto="'+dataPrezzoAcquisto+'">'+item.codice+' '+item.descrizione+'</option>');
 
+					$('#articolo').selectpicker('refresh');
 				});
 			}
 		},
@@ -707,6 +724,7 @@ $.fn.getArticoli = function(idFornitore){
 			$('#alertDdtAcquisto').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli articoli').replace('@@alertResult@@', 'danger'));
 		}
 	});
+
 }
 
 $.fn.extractIdDdtAcquistoFromUrl = function(){
@@ -769,7 +787,7 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 						}
 
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
-						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale" value="'+scadenza+'">';
+						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale" value="'+dataScadenza+'">';
 						var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
 						var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+sconto+'">';
 
