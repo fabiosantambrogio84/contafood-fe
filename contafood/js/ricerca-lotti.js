@@ -1,6 +1,10 @@
 var baseUrl = "/contafood-be/";
 
 $.fn.loadRicercaLottiDdtTable = function(url) {
+	if($.fn.DataTable.isDataTable( '#ricercaLottiDdtTable' )){
+		$('#ricercaLottiDdtTable').DataTable().destroy();
+	}
+
 	$('#ricercaLottiDdtTable').DataTable({
 		"ajax": {
 			"url": url,
@@ -58,6 +62,10 @@ $.fn.loadRicercaLottiDdtTable = function(url) {
 }
 
 $.fn.loadRicercaLottiDdtAcquistoTable = function(url) {
+	if($.fn.DataTable.isDataTable( '#ricercaLottiDdtAcquistoTable' )){
+		$('#ricercaLottiDdtAcquistoTable').DataTable().destroy();
+	}
+
 	$('#ricercaLottiDdtAcquistoTable').DataTable({
 		"ajax": {
 			"url": url,
@@ -95,7 +103,7 @@ $.fn.loadRicercaLottiDdtAcquistoTable = function(url) {
 			[0, 'desc']
 		],
 		"columns": [
-			{"title":"Numero", "name": "numero", "data": "progressivo", "width":"5%"},
+			{"title":"Numero", "name": "numero", "data": "numero", "width":"5%"},
 			{"title":"Data", "name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var a = moment(data.data);
 				return a.format('DD/MM/YYYY');
@@ -115,6 +123,10 @@ $.fn.loadRicercaLottiDdtAcquistoTable = function(url) {
 }
 
 $.fn.loadRicercaLottiProduzioneTable = function(url) {
+	if($.fn.DataTable.isDataTable( '#ricercaLottiProduzioneTable' )){
+		$('#ricercaLottiProduzioneTable').DataTable().destroy();
+	}
+
 	$('#ricercaLottiProduzioneTable').DataTable({
 		"ajax": {
 			"url": url,
@@ -153,6 +165,7 @@ $.fn.loadRicercaLottiProduzioneTable = function(url) {
 		],
 		"columns": [
 			{"title":"Codice", "name": "codice", "data": "codice", "width":"10%"},
+			{"title":"Lotto", "name": "lotto", "data": "lotto", "width":"10%"},
 			{"title":"Data", "name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var a = moment(data.dataProduzione);
 				return a.format('DD/MM/YYYY');
