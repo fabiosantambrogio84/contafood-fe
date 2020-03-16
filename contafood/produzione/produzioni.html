@@ -113,25 +113,160 @@
 			<div class="modal-dialog modal-xl">
 			  <div class="modal-content">
 				<div class="modal-header">
-				  <h5 class="modal-title" id="detailsProduzioneModalTitle">Produzione - Dettaglio confezioni</h5>
+				  <h5 class="modal-title" id="detailsProduzioneModalTitle">Dettaglio Produzione</h5>
 				  <button type="button" class="close closeProduzione" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				  </button>
 				</div>
-				<div class="modal-body">
-				  <div class="table-responsive">
-					<table class="table table-bordered" id="detailsProduzioneModalTable" width="100%" cellspacing="0">
-					  <thead>
-					  <tr>
-						<th>Tipo</th>
-						<th>Peso (Kg)</th>
-						<th>Numero confezioni</th>
-					  </tr>
-					  </thead>
-					</table>
-				  </div>
-				</div>
-			  </div>
+				<div class="modal-body" id="detailsProduzioneMainDiv">
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Codice</h6>
+                                        <p class="card-text" id="codice"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Data</h6>
+                                        <p class="card-text" id="dataProduzione"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Data inserimento</h6>
+                                        <p class="card-text" id="dataInserimento"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Data aggiornamento</h6>
+                                        <p class="card-text" id="dataAggiornamento"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Lotto</h6>
+                                        <p class="card-text" id="lotto"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Ricetta</h6>
+                                        <p class="card-text" id="ricetta"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Categoria ricetta</h6>
+                                        <p class="card-text" id="categoriaRicetta"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Scadenza</h6>
+                                        <p class="card-text" id="scadenza"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Quantità totale</h6>
+                                        <p class="card-text" id="quantitaTotale"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Num. confezioni</h6>
+                                        <p class="card-text" id="numConfezioni"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Film chiusura</h6>
+                                        <p class="card-text" id="filmChiusura"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Lotto film chiusura</h6>
+                                        <p class="card-text" id="lottoFilmChiusura"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">&nbsp;</div>
+                            <div class="col-sm">&nbsp;</div>
+                            <div class="col-sm">&nbsp;</div>
+                        </div>
+
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="modal-title">Confezioni</h5>
+                    <div class="table-responsive mt-4" style="font-size: 14px;">
+                        <table class="table table-bordered" id="detailsProduzioneConfezioniModalTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Lotto</th>
+                                <th>Peso (Kg)</th>
+                                <th>Numero confezioni</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="modal-title">Ingredienti</h5>
+                    <div class="table-responsive mt-4" style="font-size: 14px;">
+                        <table class="table table-bordered" id="detailsProduzioneIngredientiModalTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Ingrediente</th>
+                                <th>Lotto</th>
+                                <th>Scadenza</th>
+                                <th>Quantità</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                </div>
+              </div>
+
 			</div>
 		  </div>
 

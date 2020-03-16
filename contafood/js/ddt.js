@@ -278,7 +278,7 @@ $(document).ready(function() {
 							"info": false,
 							"order": [
 								[0, 'asc'],
-								[1, 'desc']
+								[3, 'desc']
 							],
 							"autoWidth": false,
 							"columns": [
@@ -289,6 +289,7 @@ $(document).ready(function() {
 									}
 									return result;
 								}},
+								{"name": "quantita", "data": "lotto"},
 								{"name": "quantita", "data": "quantita"},
 								{"name": "pezzi", "data": "numeroPezzi"},
 								{"name": "prezzo", "data": "prezzo"},

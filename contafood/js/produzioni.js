@@ -65,44 +65,124 @@ $(document).ready(function() {
 		var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>Errore nel recupero della produzione.</strong></div>';
 
-		$('#detailsProduzioneModalTable').DataTable({
-			"ajax": {
-				"url": baseUrl + "produzioni/" + idProduzione + "/confezioni",
-				"type": "GET",
-				"content-type": "json",
-				"cache": false,
-				"dataSrc": "",
-				"error": function(jqXHR, textStatus, errorThrown) {
-					console.log('Response text: ' + jqXHR.responseText);
-					$('#alertProduzione').append(alertContent);
+		$.ajax({
+			url: baseUrl + "produzioni/" + idProduzione,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != '') {
+					$('#codice').text(result.codice);
+					$('#dataProduzione').text(moment(result.dataProduzione).format('DD/MM/YYYY'));
+					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
+					var dataAggiornamento = result.dataAggiornamento;
+					if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
+						$('#dataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
+					}
+					$('#lotto').text(result.lotto);
+
+					var ricetta = result.ricetta;
+					if(ricetta != null && ricetta != undefined && ricetta != ''){
+						$('#ricetta').text(ricetta.codice+' - '+ricetta.nome);
+					}
+					var categoriaRicetta = result.categoria;
+					if(categoriaRicetta != null && categoriaRicetta != undefined && categoriaRicetta != ''){
+						$('#categoriaRicetta').text(categoriaRicetta.nome);
+					}
+					$('#scadenza').text(moment(result.scadenza).format('DD/MM/YYYY'));
+					$('#quantitaTotale').text(result.quantitaTotale);
+					$('#numConfezioni').text(result.numeroConfezioni);
+					$('#filmChiusura').text(result.filmChiusura);
+					$('#lottoFilmChiusura').text(result.lottoFilmChiusura);
+
+					if(result.produzioneConfezioni != null && result.produzioneConfezioni != undefined){
+						$('#detailsProduzioneConfezioniModalTable').DataTable({
+							"data": result.produzioneConfezioni,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessuna confezione presente",
+								"zeroRecords": "Nessuna confezione presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'desc'],
+								[2, 'desc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return data.confezione.tipo;
+
+								}},
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return data.lotto;
+								}},
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return data.peso;
+								}},
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return data.numConfezioni;
+								}}
+							]
+						});
+					}
+
+					if(result.produzioneIngredienti != null && result.produzioneIngredienti != undefined){
+						$('#detailsProduzioneIngredientiModalTable').DataTable({
+							"data": result.produzioneIngredienti,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun ingrediente presente",
+								"zeroRecords": "Nessun ingrediente presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'desc'],
+								[1, 'desc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return data.ingrediente.codice+' - '+data.ingrediente.descrizione;
+								}},
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return data.lotto;
+								}},
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return moment(data.scadenza).format('DD/MM/YYYY');
+								}},
+								{"data": null, "orderable":false, render: function ( data, type, row ) {
+									return data.quantita;
+								}}
+							]
+						});
+					}
+
+				} else {
+					$('#detailsProduzioneMainDiv').empty().append(alertContent);
 				}
 			},
-			"language": {
-				"search": "Cerca",
-				"emptyTable": "Nessuna confezione disponibile",
-				"zeroRecords": "Nessuna confezione disponibile"
-			},
-			"paging": false,
-			"lengthChange": false,
-			"info": false,
-			"order": [
-				[0,'desc']
-			],
-			"autoWidth": false,
-			"columns": [
-				{"data": null, "orderable":false, render: function ( data, type, row ) {
-					return data.confezione.tipo;
-					
-				}},
-				{"data": null, "orderable":false, render: function ( data, type, row ) {
-					return data.peso;
-					
-				}},
-				{"data": null, "orderable":false, render: function ( data, type, row ) {
-					return data.numConfezioni;
-				}}
-			]
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#detailsProduzioneMainDiv').empty().append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
 		});
+
 		$('#detailsProduzioneModal').modal('show');
 	});
 
