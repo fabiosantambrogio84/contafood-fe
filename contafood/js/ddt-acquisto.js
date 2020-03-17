@@ -78,7 +78,7 @@ $.fn.loadDdtAcquistoTable = function(url) {
 			var api = this.api();
 			var pageInfo = api.page.info();
 
-			return '<div style="font-size:16px; font-weight:bold;">'+pageInfo.recordsTotal+' elementi</div>';
+			return '<div style="font-size:16px; font-weight:bold;" id="ddtAcquistoInfoElements" data-num-records="'+pageInfo.recordsTotal+'">'+'0 elementi selezionati di '+pageInfo.recordsTotal+'</div>';
 		}
 	});
 }
@@ -645,20 +645,20 @@ $(document).ready(function() {
 		$.fn.computeTotale();
 	});
 
-	/*
 	$(document).on('change','.ddtAcquistoCheckbox', function(){
 		var numChecked = $('.ddtAcquistoCheckbox:checkbox:checked').length;
+		var numRecordsTotal = $('#ddtAcquistoInfoElements').attr('data-num-records');
 		if(numChecked == null || numChecked == undefined || numChecked == 0){
-			$('#ddtAcquistoNumSelezionati').text('0 elementi selezionati');
+			$('#ddtAcquistoInfoElements').text('0 elementi selezionati di '+numRecordsTotal);
 		} else{
 			var numSelezionati = 0;
 			$('.ddtAcquistoCheckbox:checkbox:checked').each(function(i, item) {
 				numSelezionati += 1;
 			});
-			$('#ddtAcquistoNumSelezionati').text(numSelezionati+' elementi selezionati');
+			$('#ddtAcquistoInfoElements').text(numSelezionati+' elementi selezionati di '+numRecordsTotal);
 		};
 	});
-	*/
+
 });
 
 $.fn.preloadFields = function(){
