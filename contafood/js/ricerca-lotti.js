@@ -222,17 +222,27 @@ $(document).ready(function() {
 
 		$('.custom-divider').addClass('d-none');
 
+		var tableContent = '<table class="table table-bordered" id="@@tableId@@" width="100%" cellspacing="0" style="color: #080707 !important;">\n' +
+			'                <thead>\n' +
+			'                  <tr style="font-size:12px;">\n' +
+			'                  </tr>\n' +
+			'                </thead>\n' +
+			'              </table>';
+
 		var ricercaLottiDdtTable = $('#ricercaLottiDdtTable');
 		if($.fn.DataTable.isDataTable( '#ricercaLottiDdtTable' )){
 			ricercaLottiDdtTable.DataTable().destroy(true);
+			$(tableContent.replace('@@tableId@@', 'ricercaLottiDdtTable')).insertAfter("#ricercaLottiDdtTitle");
 		}
 		var ricercaLottiDdtAcquistoTable = $('#ricercaLottiDdtAcquistoTable');
 		if($.fn.DataTable.isDataTable( '#ricercaLottiDdtAcquistoTable' )){
 			ricercaLottiDdtAcquistoTable.DataTable().destroy(true);
+			$(tableContent.replace('@@tableId@@', 'ricercaLottiDdtAcquistoTable')).insertAfter("#ricercaLottiDdtAcquistoTitle");
 		}
 		var ricercaLottiProduzioneTable = $('#ricercaLottiProduzioneTable');
 		if($.fn.DataTable.isDataTable( '#ricercaLottiProduzioneTable' )){
 			ricercaLottiProduzioneTable.DataTable().destroy(true);
+			$(tableContent.replace('@@tableId@@', 'ricercaLottiProduzioneTable')).insertAfter("#ricercaLottiProduzioneTitle");
 		}
 	});
 });

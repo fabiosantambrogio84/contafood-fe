@@ -763,6 +763,8 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 					$('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
 
 					$.fn.getArticoli(result.fornitore.id);
+
+					$('#fornitore').selectpicker('refresh');
 				}
 				$('#colli').attr('value', result.numeroColli);
 				$('#note').val(result.note);

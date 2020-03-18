@@ -1282,6 +1282,8 @@ $.fn.getDdt = function(idDdt){
 							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 						}
 					});
+
+					$('#cliente').selectpicker();
 				}
 				$('#colli').attr('value', result.numeroColli);
 				$('#dataTrasporto').attr('value', result.dataTrasporto);
