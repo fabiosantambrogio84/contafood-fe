@@ -611,6 +611,7 @@ $(document).ready(function() {
 		$('#sconto').val('');
 
 		$('#articolo').focus();
+		$('#articolo').selectpicker('refresh');
 	});
 
 	$(document).on('click','.deleteDdtArticolo', function(){

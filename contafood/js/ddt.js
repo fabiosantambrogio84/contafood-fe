@@ -454,6 +454,13 @@ $(document).ready(function() {
 	}
 
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined && $('#newDdtButton').length > 0){
+
+		$(document).on('keypress','#lotto', function(event){
+			if (event.keyCode === 13) {
+				event.preventDefault();
+			}
+		});
+
 		$('#articolo').selectpicker();
 		$('#cliente').selectpicker();
 
@@ -835,10 +842,15 @@ $(document).ready(function() {
 		var articoloId = $('#articolo option:selected').val();
 
 		if(articoloId == null || articoloId == undefined || articoloId == ''){
-			$('#addDdtArticoloAlert').removeClass("d-none");
+			var alertContent = '<div class="alert alert-danger alert-dismissable">\n' +
+				'                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>\n' +
+				'                Seleziona un articolo\n' +
+				'              </div>';
+
+			$('#addDdtArticoloAlert').empty().append(alertContent);
 			return;
 		} else {
-			$('#addDdtArticoloAlert').addClass("d-none");
+			$('#addDdtArticoloAlert').empty();
 		}
 
 		var articolo = $('#articolo option:selected').text();
@@ -943,6 +955,7 @@ $(document).ready(function() {
 		$('#sconto').val('');
 
 		$('#articolo').focus();
+		$('#articolo').selectpicker('refresh');
 	});
 
 	$(document).on('click','.deleteDdtArticolo', function(){
