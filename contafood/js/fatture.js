@@ -1,7 +1,7 @@
 var baseUrl = "/contafood-be/";
 
-$.fn.loadFattureVenditaTable = function(url) {
-	$('#fattureVenditaTable').DataTable({
+$.fn.loadFattureTable = function(url) {
+	$('#fattureTable').DataTable({
 		"ajax": {
 			"url": url,
 			"type": "GET",
@@ -10,10 +10,10 @@ $.fn.loadFattureVenditaTable = function(url) {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertFattureVenditaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero delle fatture vendita</strong>\n' +
+				var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero delle fatture</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertFattureVendita').empty().append(alertContent);
+				$('#alertFatture').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -24,8 +24,8 @@ $.fn.loadFattureVenditaTable = function(url) {
 				"next": "Succ.",
 				"previous": "Prec."
 			},
-			"emptyTable": "Nessuna fattura vendita disponibile",
-			"zeroRecords": "Nessuna fattura vendita disponibile"
+			"emptyTable": "Nessuna fattura disponibile",
+			"zeroRecords": "Nessuna fattura disponibile"
 		},
 		"searching": false,
 		"responsive":true,
@@ -34,9 +34,18 @@ $.fn.loadFattureVenditaTable = function(url) {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[1, 'desc']
+			[2, 'desc']
 		],
 		"columns": [
+			{"name": "tipo", "data": null, "width":"8%", render: function ( data, type, row ) {
+				var tipo = data.tipoFattura;
+				if(tipo != null){
+					if(tipo.id != null && tipo.id != undefined && tipo.id != '' && tipo.id == 1){
+						return "Si";
+					}
+				}
+				return "No";
+			}},
 			{"name": "speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var speditoAde = data.speditoAde;
 				if(speditoAde){
@@ -74,8 +83,8 @@ $.fn.loadFattureVenditaTable = function(url) {
 				return $.fn.formatNumber(data.totale);
 			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="detailsFattureVendita pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-				links += '<a class="deleteFattureVendita" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+				links += '<a class="deleteFatture" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		],
@@ -99,8 +108,8 @@ $.fn.loadFattureVenditaTable = function(url) {
 	});
 }
 
-$.fn.loadEmptyFatturaVenditaDdtTable = function() {
-	$('#fatturaVenditaDdtTable').DataTable({
+$.fn.loadEmptyFatturaDdtTable = function() {
+	$('#fatturaDdtTable').DataTable({
 		"searching": false,
 		"language": {
 			"paginate": {
@@ -126,26 +135,26 @@ $.fn.loadEmptyFatturaVenditaDdtTable = function() {
 
 $(document).ready(function() {
 
-	$.fn.loadFattureVenditaTable(baseUrl + "fatture-vendita");
+	$.fn.loadFattureTable(baseUrl + "fatture");
 
-	$.fn.loadEmptyFatturaVenditaDdtTable();
+	$.fn.loadEmptyFatturaDdtTable();
 
-	$(document).on('click','#resetSearchFattureVenditaButton', function(){
-		$('#searchFattureVenditaForm :input').val(null);
-		$('#searchFattureVenditaForm select option[value=""]').attr('selected', true);
+	$(document).on('click','#resetSearchFattureButton', function(){
+		$('#searchFattureForm :input').val(null);
+		$('#searchFattureForm select option[value=""]').attr('selected', true);
 
-		$('#fattureVenditaTable').DataTable().destroy();
-		$.fn.loadFattureVenditaTable(baseUrl + "fatture-vendita");
+		$('#fattureTable').DataTable().destroy();
+		$.fn.loadFattureTable(baseUrl + "fatture");
 	});
 
-	$(document).on('click','.detailsFattureVendita', function(){
-		var idFatturaVendita = $(this).attr('data-id');
+	$(document).on('click','.detailsFatture', function(){
+		var idFattura = $(this).attr('data-id');
 
-		var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-		alertContent = alertContent + '<strong>Errore nel recupero della fattura vendita.</strong></div>';
+		var alertContent = '<div id="alertFatturaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della fattura.</strong></div>';
 
 		$.ajax({
-			url: baseUrl + "fatture-vendita/" + idFatturaVendita,
+			url: baseUrl + "fatture/" + idFattura,
 			type: 'GET',
 			dataType: 'json',
 			success: function(result) {
@@ -167,6 +176,10 @@ $(document).ready(function() {
 					if(stato != null && stato != undefined && stato != ''){
 						$('#stato').text(stato.descrizione);
 					}
+					var tipo = result.tipoFattura;
+					if(tipo != null && tipo != undefined && tipo != ''){
+						$('#tipo').text(tipo.descrizione);
+					}
 					var cliente = result.cliente;
 					if(cliente != null && cliente != undefined && cliente != ''){
 						if(cliente.dittaIndividuale){
@@ -185,7 +198,7 @@ $(document).ready(function() {
 
 
 					if(result.fatturaDdts != null && result.fatturaDdts != undefined){
-						$('#detailsFattureVenditaDdtModalTable').DataTable({
+						$('#detailsFattureDdtModalTable').DataTable({
 							"data": result.fatturaDdts,
 							"language": {
 								"paginate": {
@@ -226,91 +239,91 @@ $(document).ready(function() {
 									if (data.ddt != null) {
 										result = data.ddt.totaleAcconto;
 									}
-									return result;
+									return $.fn.formatNumber(result);
 								}},
 								{"name": "importo", "data": null, render: function (data, type, row) {
 									var result = '';
 									if (data.ddt != null) {
 										result = data.ddt.totale;
 									}
-									return result;
+									return $.fn.formatNumber(result);
 								}},
 								{"name": "imponibile", "data": null, render: function (data, type, row) {
 									var result = '';
 									if (data.ddt != null) {
 										result = data.ddt.totaleImponibile;
 									}
-									return result;
+									return $.fn.formatNumber(result);
 								}},
 								{"name": "costo", "data": null, render: function (data, type, row) {
 									var result = '';
 									if (data.ddt != null) {
 										result = data.ddt.totaleCosto;
 									}
-									return result;
+									return $.fn.formatNumber(result);
 								}},
 								{"name": "guadagno", "data": null, render: function (data, type, row) {
 									var result = '';
 									if (data.ddt != null) {
-										result = data.ddt.totaleGuadagno;
+										result = data.ddt.totaleImponibile - data.ddt.totaleCosto;
 									}
-									return result;
+									return $.fn.formatNumber(result);
 								}}
 							]
 						});
 					}
 
 				} else{
-					$('#detailsFattureVenditaMainDiv').empty().append(alertContent);
+					$('#detailsFattureMainDiv').empty().append(alertContent);
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				$('#detailsFattureVenditaMainDiv').empty().append(alertContent);
+				$('#detailsFattureMainDiv').empty().append(alertContent);
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		})
 
-		$('#detailsFattureVenditaModal').modal('show');
+		$('#detailsFattureModal').modal('show');
 	});
 
-	$(document).on('click','.closeFattureVendita', function(){
-		$('#detailsFattureVenditaDdtModalTable').DataTable().destroy();
-		$('#detailsFattureVenditaModal').modal('hide');
+	$(document).on('click','.closeFatture', function(){
+		$('#detailsFattureDdtModalTable').DataTable().destroy();
+		$('#detailsFattureModal').modal('hide');
 	});
 
-	$(document).on('click','.deleteFattureVendita', function(){
-		var idFatturaVendita = $(this).attr('data-id');
-		$('#confirmDeleteFattureVendita').attr('data-id', idFatturaVendita);
-		$('#deleteFattureVenditaModal').modal('show');
+	$(document).on('click','.deleteFatture', function(){
+		var idFattura = $(this).attr('data-id');
+		$('#confirmDeleteFatture').attr('data-id', idFattura);
+		$('#deleteFattureModal').modal('show');
 	});
 
-	$(document).on('click','#confirmDeleteFattureVendita', function(){
-		$('#deleteFattureVenditaModal').modal('hide');
-		var idFatturaVendita = $(this).attr('data-id');
+	$(document).on('click','#confirmDeleteFatture', function(){
+		$('#deleteFattureModal').modal('hide');
+		var idFattura = $(this).attr('data-id');
 
 		$.ajax({
-			url: baseUrl + "fatture-vendita/" + idFatturaVendita,
+			url: baseUrl + "fatture/" + idFattura,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertFattureVenditaContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Fattura vendita</strong> cancellata con successo.\n' +
+				var alertContent = '<div id="alertFattureContent" class="alert alert-success alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Fattura </strong> cancellata con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertFattureVendita').empty().append(alertContent);
+				$('#alertFatture').empty().append(alertContent);
 
-				$('#fattureVenditaTable').DataTable().ajax.reload();
+				$('#fattureTable').DataTable().ajax.reload();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertFattureVenditaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nella cancellazione della fattura vendita.</strong>\n' +
+				var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nella cancellazione della fattura.</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertFattureVendita').empty().append(alertContent);
+				$('#alertFatture').empty().append(alertContent);
 			}
 		});
 	});
 
-	if($('#searchFattureVenditaButton') != null && $('#searchFattureVenditaButton') != undefined) {
-		$(document).on('submit', '#searchFattureVenditaForm', function (event) {
+	if($('#searchFattureButton') != null && $('#searchFattureButton') != undefined) {
+		$(document).on('submit', '#searchFattureForm', function (event) {
 			event.preventDefault();
 
 			var dataDa = $('#searchDataFrom').val();
@@ -322,6 +335,7 @@ $(document).ready(function() {
 			var tipoPagamento = $('#searchTipoPagamento option:selected').val();
 			var articolo = $('#searchArticolo option:selected').val();
 			var stato = $('#searchStato option:selected').val();
+			var tipo = $('#searchTipo option:selected').val();
 
 			var params = {};
 			if(dataDa != null && dataDa != undefined && dataDa != ''){
@@ -351,37 +365,45 @@ $(document).ready(function() {
 			if(stato != null && stato != undefined && stato != ''){
 				params.stato = stato;
 			}
-			var url = baseUrl + "fatture-vendita?" + $.param( params );
+			if(tipo != null && tipo != undefined && tipo != ''){
+				params.tipo = tipo;
+			}
+			var url = baseUrl + "fatture?" + $.param( params );
 
-			$('#fattureVenditaTable').DataTable().destroy();
-			$.fn.loadFattureVenditaTable(url);
+			$('#fattureTable').DataTable().destroy();
+			$.fn.loadFattureTable(url);
 
 		});
 	}
 
-	if($('#newFatturaVenditaButton') != null && $('#newFatturaVenditaButton') != undefined){
-		$(document).on('submit','#newFatturaVenditaForm', function(event){
+	if($('#newFatturaButton') != null && $('#newFatturaVButton') != undefined){
+		$(document).on('submit','#newFatturaForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertFattureVenditaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertFattureContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			var numChecked = $('.fatturaVenditaDdtCheckbox:checkbox:checked').length;
+			var numChecked = $('.fatturaDdtCheckbox:checkbox:checked').length;
 			if(numChecked == null || numChecked == undefined || numChecked == 0){
-				$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@','Selezionare almeno un DDT').replace('@@alertResult@@', 'danger'));
+				$('#alertFatture').empty().append(alertContent.replace('@@alertText@@','Selezionare almeno un DDT').replace('@@alertResult@@', 'danger'));
 			} else{
-				var fatturaVendita = new Object();
-				fatturaVendita.progressivo = $('#progressivo').val();
-				fatturaVendita.anno = $('#anno').val();
-				fatturaVendita.data = $('#data').val();
+				var fattura = new Object();
+				fattura.progressivo = $('#progressivo').val();
+				fattura.anno = $('#anno').val();
+				fattura.data = $('#data').val();
+
+				// tipo fattura = VENDITA
+				var tipo = new Object();
+				tipo.id = 0;
+				fattura.tipo = tipo;
 
 				var cliente = new Object();
 				cliente.id = $('#cliente option:selected').val();
-				fatturaVendita.cliente = cliente;
+				fattura.cliente = cliente;
 
 				var fatturaDdts = [];
-				$('.fatturaVenditaDdtCheckbox:checkbox:checked').each(function(i, item) {
+				$('.fatturaDdtCheckbox:checkbox:checked').each(function(i, item) {
 					var ddtId = item.id.replace('checkbox_', '');
 
 					var fatturaDdt = {};
@@ -392,32 +414,32 @@ $(document).ready(function() {
 					fatturaDdts.push(fatturaDdt);
 				});
 
-				fatturaVendita.fatturaDdts = fatturaDdts;
+				fattura.fatturaDdts = fatturaDdts;
 
-				fatturaVendita.totale = $('#totale').val();
-				fatturaVendita.totaleAcconto = 0;
-				fatturaVendita.note = $('#note').val();
+				fattura.totale = $('#totale').val();
+				fattura.totaleAcconto = 0;
+				fattura.note = $('#note').val();
 
-				var fatturaVenditaJson = JSON.stringify(fatturaVendita);
+				var fatturaJson = JSON.stringify(fattura);
 
 				$.ajax({
-					url: baseUrl + "fatture-vendita",
+					url: baseUrl + "fatture",
 					type: 'POST',
 					contentType: "application/json",
 					dataType: 'json',
-					data: fatturaVenditaJson,
+					data: fatturaJson,
 					success: function(result) {
-						$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@','Fattura vendita creata con successo').replace('@@alertResult@@', 'success'));
+						$('#alertFatture').empty().append(alertContent.replace('@@alertText@@','Fattura creata con successo').replace('@@alertResult@@', 'success'));
 
-						$('#newFatturaVenditaButton').attr("disabled", true);
+						$('#newFatturaButton').attr("disabled", true);
 
 						// Returns to the same page
 						setTimeout(function() {
-							window.location.href = "fatture-vendita.html";
+							window.location.href = "fatture.html";
 						}, 1000);
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
-						var errorMessage = 'Errore nella creazione della fattura vendita';
+						var errorMessage = 'Errore nella creazione della fattura';
 						if(jqXHR != null && jqXHR != undefined){
 							var jqXHRResponseJson = jqXHR.responseJSON;
 							if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
@@ -427,7 +449,7 @@ $(document).ready(function() {
 								}
 							}
 						}
-						$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+						$('#alertFatture').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 					}
 				});
 			}
@@ -435,15 +457,15 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#creazioneAutomaticaFattureVenditeButton') != null && $('#creazioneAutomaticaFattureVenditeButton') != undefined){
-		$(document).on('submit','#creazioneAutomaticaFattureVenditeForm', function(event){
+	if($('#creazioneAutomaticaFattureButton') != null && $('#creazioneAutomaticaFattureButton') != undefined){
+		$(document).on('submit','#creazioneAutomaticaFattureForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertFattureVenditaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertFattureContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@','Creazione fatture in corso...').replace('@@alertResult@@', 'warning'));
+			$('#alertFatture').empty().append(alertContent.replace('@@alertText@@','Creazione fatture in corso...').replace('@@alertResult@@', 'warning'));
 
 			var data = $('#data').val();
 
@@ -453,21 +475,21 @@ $(document).ready(function() {
 			var creazioneAutomaticaObjectJson = JSON.stringify(creazioneAutomaticaObject);
 
 			$.ajax({
-				url: baseUrl + "fatture-vendita/creazione-automatica",
+				url: baseUrl + "fatture/creazione-automatica",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
 				data: creazioneAutomaticaObjectJson,
 				success: function(result) {
-					$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@','Fatture vendite create con successo').replace('@@alertResult@@', 'success'));
+					$('#alertFatture').empty().append(alertContent.replace('@@alertText@@','Fatture create con successo').replace('@@alertResult@@', 'success'));
 
 					// Returns to the fatture vendite list page
 					setTimeout(function() {
-						window.location.href = "fatture-vendita.html";
+						window.location.href = "fatture.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nella creazione delle fatture vendite';
+					var errorMessage = 'Errore nella creazione delle fatture';
 					if(jqXHR != null && jqXHR != undefined){
 						var jqXHRResponseJson = jqXHR.responseJSON;
 						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
@@ -477,7 +499,7 @@ $(document).ready(function() {
 							}
 						}
 					}
-					$('#alertFattureVendita').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+					$('#alertFatture').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 
@@ -487,28 +509,35 @@ $(document).ready(function() {
 	$(document).on('keypress','#searchStato', function(event){
 		if (event.keyCode === 13) {
 			event.preventDefault();
-			$('#searchFattureVenditaButton').click();
+			$('#searchFattureButton').click();
 		}
 	});
 
 	$(document).on('keypress','#searchTipoPagamento', function(event){
 		if (event.keyCode === 13) {
 			event.preventDefault();
-			$('#searchFattureVenditaButton').click();
+			$('#searchFattureButton').click();
 		}
 	});
 
 	$(document).on('keypress','#searchAgente', function(event){
 		if (event.keyCode === 13) {
 			event.preventDefault();
-			$('#searchFattureVenditaButton').click();
+			$('#searchFattureButton').click();
 		}
 	});
 
 	$(document).on('keypress','#searchArticolo', function(event){
 		if (event.keyCode === 13) {
 			event.preventDefault();
-			$('#searchFattureVenditaButton').click();
+			$('#searchFattureButton').click();
+		}
+	});
+
+	$(document).on('keypress','#searchTipo', function(event){
+		if (event.keyCode === 13) {
+			event.preventDefault();
+			$('#searchFattureButton').click();
 		}
 	});
 
@@ -579,6 +608,22 @@ $.fn.preloadSearchFields = function(){
 		}
 	});
 
+	$.ajax({
+		url: baseUrl + "tipi-fattura",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchTipo').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
 }
 
 $.fn.preloadFieldData = function(){
@@ -587,7 +632,7 @@ $.fn.preloadFieldData = function(){
 
 $.fn.preloadFields = function(){
 	$.ajax({
-		url: baseUrl + "fatture-vendita/progressivo",
+		url: baseUrl + "fatture/progressivo",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -664,10 +709,10 @@ $.fn.loadDdtDaFatturare = function(){
 			dataString = moment(data).format('YYYY-MM-DD');
 		}
 
-		$('#fatturaVenditaDdtTable').DataTable().destroy();
+		$('#fatturaDdtTable').DataTable().destroy();
 
 		var url = baseUrl + "ddts?idCliente="+cliente+"&fatturato=false&dataA="+dataString;
-		$('#fatturaVenditaDdtTable').DataTable({
+		$('#fatturaDdtTable').DataTable({
 			"ajax": {
 				"url": url,
 				"type": "GET",
@@ -676,10 +721,10 @@ $.fn.loadDdtDaFatturare = function(){
 				"dataSrc": "",
 				"error": function(jqXHR, textStatus, errorThrown) {
 					console.log('Response text: ' + jqXHR.responseText);
-					var alertContent = '<div id="alertFattureVenditaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+					var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 					alertContent = alertContent + '<strong>Errore nel recupero dei ddt da fatturare</strong>\n' +
 						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-					$('#alertFattureVendita').empty().append(alertContent);
+					$('#alertFatture').empty().append(alertContent);
 				}
 			},
 			"language": {
@@ -704,7 +749,7 @@ $.fn.loadDdtDaFatturare = function(){
 			],
 			"columns": [
 				{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-					var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="fatturaVenditaDdtCheckbox">';
+					var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="fatturaDdtCheckbox">';
 					return checkboxHtml;
 				}},
 				{"name": "numero", "data": "progressivo", "width":"5%"},
@@ -724,13 +769,13 @@ $.fn.loadDdtDaFatturare = function(){
 			}
 		});
 	} else {
-		$('#fatturaVenditaDdtTable').DataTable().clear();
-		$('#fatturaVenditaDdtTable').DataTable().destroy();
-		$.fn.loadEmptyFatturaVenditaDdtTable();
+		$('#fatturaDdtTable').DataTable().clear();
+		$('#fatturaDdtTable').DataTable().destroy();
+		$.fn.loadEmptyFatturaDdtTable();
 	}
 }
 
-$.fn.extractIdFatturaVenditaFromUrl = function(){
+$.fn.extractIdFatturaFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
 	var urlVariables = pageUrl.split('&'),
@@ -740,7 +785,7 @@ $.fn.extractIdFatturaVenditaFromUrl = function(){
     for (i = 0; i < urlVariables.length; i++) {
         paramNames = urlVariables[i].split('=');
 
-        if (paramNames[0] === 'idFatturaVendita') {
+        if (paramNames[0] === 'idFattura') {
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
@@ -750,13 +795,13 @@ $.fn.formatNumber = function(value){
 	return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
 }
 
-$(document).on('change','.fatturaVenditaDdtCheckbox', function(){
-	var numChecked = $('.fatturaVenditaDdtCheckbox:checkbox:checked').length;
+$(document).on('change','.fatturaDdtCheckbox', function(){
+	var numChecked = $('.fatturaDdtCheckbox:checkbox:checked').length;
 	if(numChecked == null || numChecked == undefined || numChecked == 0){
 		$('#totale').val(null);
 	} else{
 		var totale = 0;
-		$('.fatturaVenditaDdtCheckbox:checkbox:checked').each(function(i, item) {
+		$('.fatturaDdtCheckbox:checkbox:checked').each(function(i, item) {
 			$(this).parent().parent().find('.ddtTotale').each(function( index ) {
 				totale += parseFloat($(this).text());
 			});

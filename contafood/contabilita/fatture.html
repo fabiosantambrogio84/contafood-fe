@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fatture vendita</title>
+  <title>ContaFood - Fatture</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -31,7 +31,7 @@
   <script src="../js/commons.js"></script>
   <script src="../js/core/moment.js"></script>
 
-  <script src="../js/fatture-vendita.js"></script>
+  <script src="../js/fatture.js"></script>
 
   <script>
     $.fn.preloadSearchFields();
@@ -58,30 +58,26 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containerFattureVendita">
+        <div class="container-fluid" id="containerFatture">
 
           <!-- Page Heading -->
           <div class="row">
             <div class="col-md-8">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Fatture Vendite</h1>
+              <h1 class="h3 mb-4 text-gray-800">Elenco Fatture</h1>
             </div>
             <div class="col-md-4 text-right">
-              <a href="fatture-vendita-new.html" class="btn btn-primary">Nuovo</a>
-              <a href="fatture-vendita-new-bulk.html" class="btn btn-primary">Creazione automatica</a>
+              <a href="fatture-new.html" class="btn btn-primary">Nuova</a>
+              <a href="fatture-accompagnatorie-new.html" class="btn btn-primary">Nuova Accom.</a>
+              <a href="fatture-new-bulk.html" class="btn btn-primary">Creazione automatica</a>
             </div>
-            <!--
-            <div class="col-md-2">
-              <a href="ddt-new.html" class="btn btn-primary">Creazione automatica</a>
-            </div>
-            -->
           </div>
 
-          <div id="alertFattureVendita"></div>
+          <div id="alertFatture"></div>
 
           <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="fattureVenditaMainDiv">
+          <div class="card shadow mb-4" id="fattureMainDiv">
             <div class="card-body">
-              <form id="searchFattureVenditaForm">
+              <form id="searchFattureForm">
                 <div class="form-row">
                   <div class="form-group col-md-2">
                     <label for="searchDataFrom" class="mb-0">Data da</label>
@@ -129,20 +125,27 @@
                       <option value=""></option>
                     </select>
                   </div>
+                  <div class="form-group col-md-3">
+                    <label for="searchTipo" class="mb-0">Tipo</label>
+                    <select id="searchTipo" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
 
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-0" id="searchFattureVenditaButton">Cerca</button>
-                <a href="#" id="resetSearchFattureVenditaButton" class="btn btn-secondary mt-0">Svuota</a>
+                <button type="submit" class="btn btn-primary mt-0" id="searchFattureButton">Cerca</button>
+                <a href="#" id="resetSearchFattureButton" class="btn btn-secondary mt-0">Svuota</a>
               </form>
             </div>
 
             <div class="card-body" style="font-size: 0.9rem;">
               <div class="table-responsive">
-                <table class="table table-bordered" id="fattureVenditaTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+                <table class="table table-bordered" id="fattureTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                   <thead>
         		    <tr>
                       <th>Spedito A.d.E.</th>
+                      <th>Accom.</th>
                       <th>Num.</th>
                       <th>Data</th>
                       <th>Cliente</th>
@@ -159,37 +162,37 @@
           </div>
 
           <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteFattureVenditaModal" tabindex="-1" role="dialog" aria-labelledby="deleteFattureVenditaModal" aria-hidden="true">
+          <div class="modal fade" id="deleteFattureModal" tabindex="-1" role="dialog" aria-labelledby="deleteFattureModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteFattureVenditaModalTitle">Conferma rimozione fattura vendita</h5>
+                  <h5 class="modal-title" id="deleteFattureModalTitle">Conferma rimozione fattura</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  Sei sicuro di voler rimuovere la fattura vendita?
+                  Sei sicuro di voler rimuovere la fattura?
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteFattureVendita">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteFatture">Conferma</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Modal Details-->
-          <div class="modal fade" id="detailsFattureVenditaModal" tabindex="-1" role="dialog" aria-labelledby="detailsFattureVenditaModal" aria-hidden="true">
+          <div class="modal fade" id="detailsFattureModal" tabindex="-1" role="dialog" aria-labelledby="detailsFattureModal" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="detailsFattureVenditaModalTitle">Dettagli fatture vendita</h5>
-                  <button type="button" class="close closeFattureVendita" data-dismiss="modal" aria-label="Close">
+                  <h5 class="modal-title" id="detailsFattureModalTitle">Dettagli fattura</h5>
+                  <button type="button" class="close closeFatture" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body" id="detailsFattureVenditaMainDiv">
+                <div class="modal-body" id="detailsFattureMainDiv">
                   <div class="container">
                     <div class="row">
                       <div class="col-sm">
@@ -227,8 +230,8 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Spedito A.d.E</h6>
-                            <p class="card-text" id="speditoAde"></p>
+                            <h6 class="card-title mb-0 font-weight-bold">Tipo</h6>
+                            <p class="card-text" id="tipo"></p>
                           </div>
                         </div>
                       </div>
@@ -282,12 +285,19 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Spedito A.d.E</h6>
+                            <p class="card-text" id="speditoAde"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
                             <h6 class="card-title mb-0 font-weight-bold">Note</h6>
                             <p class="card-text" id="note"></p>
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm">&nbsp;</div>
                       <div class="col-sm">&nbsp;</div>
                       <div class="col-sm">&nbsp;</div>
                       <div class="col-sm">&nbsp;</div>
@@ -297,7 +307,7 @@
                   <hr class="my-4">
 
                   <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsFattureVenditaDdtModalTable">
+                    <table class="table table-bordered" id="detailsFattureDdtModalTable">
                       <thead>
                         <th>Num.</th>
                         <th>Data</th>
