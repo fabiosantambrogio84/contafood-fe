@@ -187,7 +187,7 @@
             <div class="modal-dialog modal-xl" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="detailsFattureModalTitle">Dettagli fattura</h5>
+                  <h5 class="modal-title" id="detailsFattureModalTitle">Dettagli fattura vendita</h5>
                   <button type="button" class="close closeFatture" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -324,6 +324,162 @@
               </div>
             </div>
           </div>
+
+          <div class="modal fade" id="detailsFattureAccompagnatorieModal" tabindex="-1" role="dialog" aria-labelledby="detailsFattureAccompagnatorieModal" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="detailsFattureAccompagnatorieModalTitle">Dettagli fattura accompagnatoria</h5>
+                  <button type="button" class="close closeFattureAccompagnatorie" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body" id="detailsFattureAccompagnatorieMainDiv">
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Numero</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaNumero"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaData"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data inserimento</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaDataInserimento"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data aggiornamento</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaDataAggiornamento"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tipo</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaTipo"></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Stato</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaStato"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Cliente</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaCliente"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Punto consegna</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaPuntoConsegna"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaTotaleAcconto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaTotale"></p>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Spedito A.d.E</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaSpeditoAde"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Note</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaNote"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
+                    </div>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="table-responsive mt-4">
+                    <table class="table table-bordered" id="detailsFattureAccompagnatorieArticoliModalTable">
+                      <thead>
+                        <th>Articolo</th>
+                        <th>Lotto</th>
+                        <th>Quantita</th>
+                        <th>Pezzi</th>
+                        <th>Prezzo (€)</th>
+                        <th>Sconto (€)</th>
+                        <th>Imponibile (€)</th>
+                        <th>Costo (€)</th>
+                      </thead>
+                    </table>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="table-responsive mt-4">
+                    <table class="table table-bordered" id="detailsFattureAccompagnatorieTotaliModalTable">
+                      <thead>
+                        <th>Iva</th>
+                        <th>Totale Iva (€)</th>
+                        <th>Totale Imponibile (€)</th>
+                      </thead>
+                    </table>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
 
         </div>
         <!-- /.container-fluid -->

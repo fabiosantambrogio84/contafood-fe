@@ -37,6 +37,14 @@ $.fn.loadFattureTable = function(url) {
 			[2, 'desc']
 		],
 		"columns": [
+			{"name": "speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
+				var speditoAde = data.speditoAde;
+				if(speditoAde){
+					return "Si";
+				} else {
+					return "No";
+				}
+			}},
 			{"name": "tipo", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var tipo = data.tipoFattura;
 				if(tipo != null){
@@ -45,14 +53,6 @@ $.fn.loadFattureTable = function(url) {
 					}
 				}
 				return "No";
-			}},
-			{"name": "speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var speditoAde = data.speditoAde;
-				if(speditoAde){
-					return "Si";
-				} else {
-					return "No";
-				}
 			}},
 			{"name": "numero", "data": "progressivo", "width":"5%"},
 			{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
@@ -83,8 +83,8 @@ $.fn.loadFattureTable = function(url) {
 				return $.fn.formatNumber(data.totale);
 			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-				links += '<a class="deleteFatture" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+				links += '<a class="deleteFatture" data-id="' + data.id + '" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		],
@@ -149,146 +149,292 @@ $(document).ready(function() {
 
 	$(document).on('click','.detailsFatture', function(){
 		var idFattura = $(this).attr('data-id');
+		var tipoFattura = $(this).attr('data-tipo');
 
 		var alertContent = '<div id="alertFatturaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-		alertContent = alertContent + '<strong>Errore nel recupero della fattura.</strong></div>';
 
-		$.ajax({
-			url: baseUrl + "fatture/" + idFattura,
-			type: 'GET',
-			dataType: 'json',
-			success: function(result) {
-				if(result != null && result != undefined && result != '') {
-					$('#numero').text(result.progressivo);
-					$('#data').text(moment(result.data).format('DD/MM/YYYY'));
-					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
-					var dataAggiornamento = result.dataAggiornamento;
-					if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
-						$('#dataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
-					}
-					var speditoAde = result.speditoAde;
-					if(speditoAde){
-						$('#speditoAde').text("Si");
-					} else {
-						$('#speditoAde').text("No");
-					}
-					var stato = result.statoFattura;
-					if(stato != null && stato != undefined && stato != ''){
-						$('#stato').text(stato.descrizione);
-					}
-					var tipo = result.tipoFattura;
-					if(tipo != null && tipo != undefined && tipo != ''){
-						$('#tipo').text(tipo.descrizione);
-					}
-					var cliente = result.cliente;
-					if(cliente != null && cliente != undefined && cliente != ''){
-						if(cliente.dittaIndividuale){
-							$('#cliente').text(cliente.nome + ' ' + cliente.cognome);
+		if(tipoFattura == 'VENDITA'){
+			alertContent = alertContent + '<strong>Errore nel recupero della fattura.</strong></div>';
+
+			$.ajax({
+				url: baseUrl + "fatture/" + idFattura,
+				type: 'GET',
+				dataType: 'json',
+				success: function(result) {
+					if(result != null && result != undefined && result != '') {
+						$('#numero').text(result.progressivo);
+						$('#data').text(moment(result.data).format('DD/MM/YYYY'));
+						$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
+						var dataAggiornamento = result.dataAggiornamento;
+						if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
+							$('#dataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
+						}
+						var speditoAde = result.speditoAde;
+						if(speditoAde){
+							$('#speditoAde').text("Si");
 						} else {
-							$('#cliente').text(cliente.ragioneSociale);
+							$('#speditoAde').text("No");
 						}
-						var agente = cliente.agente;
-						if(agente != null){
-							$('#agente').text(agente.nome + ' ' + agente.cognome);
+						var stato = result.statoFattura;
+						if(stato != null && stato != undefined && stato != ''){
+							$('#stato').text(stato.descrizione);
 						}
-					}
-					$('#totaleAcconto').text(result.totaleAcconto);
-					$('#totale').text(result.totale);
-					$('#note').text(result.note);
+						var tipo = result.tipoFattura;
+						if(tipo != null && tipo != undefined && tipo != ''){
+							$('#tipo').text(tipo.descrizione);
+						}
+						var cliente = result.cliente;
+						if(cliente != null && cliente != undefined && cliente != ''){
+							if(cliente.dittaIndividuale){
+								$('#cliente').text(cliente.nome + ' ' + cliente.cognome);
+							} else {
+								$('#cliente').text(cliente.ragioneSociale);
+							}
+							var agente = cliente.agente;
+							if(agente != null){
+								$('#agente').text(agente.nome + ' ' + agente.cognome);
+							}
+						}
+						$('#totaleAcconto').text(result.totaleAcconto);
+						$('#totale').text(result.totale);
+						$('#note').text(result.note);
 
 
-					if(result.fatturaDdts != null && result.fatturaDdts != undefined){
-						$('#detailsFattureDdtModalTable').DataTable({
-							"data": result.fatturaDdts,
-							"language": {
-								"paginate": {
-									"first": "Inizio",
-									"last": "Fine",
-									"next": "Succ.",
-									"previous": "Prec."
+						if(result.fatturaDdts != null && result.fatturaDdts != undefined){
+							$('#detailsFattureDdtModalTable').DataTable({
+								"data": result.fatturaDdts,
+								"language": {
+									"paginate": {
+										"first": "Inizio",
+										"last": "Fine",
+										"next": "Succ.",
+										"previous": "Prec."
+									},
+									"search": "Cerca",
+									"emptyTable": "Nessun DDT presente",
+									"zeroRecords": "Nessun DDT presente"
 								},
-								"search": "Cerca",
-								"emptyTable": "Nessun DDT presente",
-								"zeroRecords": "Nessun DDT presente"
-							},
-							"pageLength": 20,
-							"lengthChange": false,
-							"info": false,
-							"order": [
-								[0, 'desc'],
-								[1, 'desc']
-							],
-							"autoWidth": false,
-							"columns": [
-								{"name": "numero", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.ddt != null) {
-										result = data.ddt.progressivo;
-									}
-									return result;
-								}},
-								{"name": "data", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.ddt != null) {
-										result = moment(data.ddt.data).format('DD/MM/YYYY');
-									}
-									return result;
-								}},
-								{"name": "acconto", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.ddt != null) {
-										result = data.ddt.totaleAcconto;
-									}
-									return $.fn.formatNumber(result);
-								}},
-								{"name": "importo", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.ddt != null) {
-										result = data.ddt.totale;
-									}
-									return $.fn.formatNumber(result);
-								}},
-								{"name": "imponibile", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.ddt != null) {
-										result = data.ddt.totaleImponibile;
-									}
-									return $.fn.formatNumber(result);
-								}},
-								{"name": "costo", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.ddt != null) {
-										result = data.ddt.totaleCosto;
-									}
-									return $.fn.formatNumber(result);
-								}},
-								{"name": "guadagno", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.ddt != null) {
-										result = data.ddt.totaleImponibile - data.ddt.totaleCosto;
-									}
-									return $.fn.formatNumber(result);
-								}}
-							]
-						});
+								"pageLength": 20,
+								"lengthChange": false,
+								"info": false,
+								"order": [
+									[0, 'desc'],
+									[1, 'desc']
+								],
+								"autoWidth": false,
+								"columns": [
+									{"name": "numero", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = data.ddt.progressivo;
+											}
+											return result;
+										}},
+									{"name": "data", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = moment(data.ddt.data).format('DD/MM/YYYY');
+											}
+											return result;
+										}},
+									{"name": "acconto", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = data.ddt.totaleAcconto;
+											}
+											return $.fn.formatNumber(result);
+										}},
+									{"name": "importo", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = data.ddt.totale;
+											}
+											return $.fn.formatNumber(result);
+										}},
+									{"name": "imponibile", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = data.ddt.totaleImponibile;
+											}
+											return $.fn.formatNumber(result);
+										}},
+									{"name": "costo", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = data.ddt.totaleCosto;
+											}
+											return $.fn.formatNumber(result);
+										}},
+									{"name": "guadagno", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = data.ddt.totaleImponibile - data.ddt.totaleCosto;
+											}
+											return $.fn.formatNumber(result);
+										}}
+								]
+							});
+						}
+
+					} else{
+						$('#detailsFattureMainDiv').empty().append(alertContent);
 					}
-
-				} else{
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
 					$('#detailsFattureMainDiv').empty().append(alertContent);
+					console.log('Response text: ' + jqXHR.responseText);
 				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				$('#detailsFattureMainDiv').empty().append(alertContent);
-				console.log('Response text: ' + jqXHR.responseText);
-			}
-		})
+			})
 
-		$('#detailsFattureModal').modal('show');
+			$('#detailsFattureModal').modal('show');
+
+		} else {
+			alertContent = alertContent + '<strong>Errore nel recupero della fattura accompagnatoria.</strong></div>';
+
+			$.ajax({
+				url: baseUrl + "fatture-accompagnatorie/" + idFattura,
+				type: 'GET',
+				dataType: 'json',
+				success: function(result) {
+					if(result != null && result != undefined && result != '') {
+						$('#fatturaAccompagnatoriaNumero').text(result.progressivo);
+						$('#fatturaAccompagnatoriaData').text(moment(result.data).format('DD/MM/YYYY'));
+						$('#fatturaAccompagnatoriaDataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
+						var dataAggiornamento = result.dataAggiornamento;
+						if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
+							$('#fatturaAccompagnatoriaDataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
+						}
+						var speditoAde = result.speditoAde;
+						if(speditoAde){
+							$('#fatturaAccompagnatoriaSpeditoAde').text("Si");
+						} else {
+							$('#fatturaAccompagnatoriaSpeditoAde').text("No");
+						}
+						var stato = result.statoFattura;
+						if(stato != null && stato != undefined && stato != ''){
+							$('#fatturaAccompagnatoriaStato').text(stato.descrizione);
+						}
+						var tipo = result.tipoFattura;
+						if(tipo != null && tipo != undefined && tipo != ''){
+							$('#fatturaAccompagnatoriaTipo').text(tipo.descrizione);
+						}
+						var cliente = result.cliente;
+						if(cliente != null && cliente != undefined && cliente != ''){
+							if(cliente.dittaIndividuale){
+								$('#fatturaAccompagnatoriaCliente').text(cliente.nome + ' ' + cliente.cognome);
+							} else {
+								$('#fatturaAccompagnatoriaCliente').text(cliente.ragioneSociale);
+							}
+						}
+						var puntoConsegna = result.puntoConsegna;
+						if(puntoConsegna != null && puntoConsegna != undefined && puntoConsegna != ''){
+							$('#fatturaAccompagnatoriaPuntoConsegna').text(puntoConsegna.nome);
+						}
+						$('#fatturaAccompagnatoriaTotaleAcconto').text(result.totaleAcconto);
+						$('#fatturaAccompagnatoriaTotale').text(result.totale);
+						$('#fatturaAccompagnatoriaNote').text(result.note);
+
+						if(result.fatturaAccompagnatoriaArticoli != null && result.fatturaAccompagnatoriaArticoli != undefined){
+							$('#detailsFattureAccompagnatorieArticoliModalTable').DataTable({
+								"data": result.fatturaAccompagnatoriaArticoli,
+								"language": {
+									"paginate": {
+										"first": "Inizio",
+										"last": "Fine",
+										"next": "Succ.",
+										"previous": "Prec."
+									},
+									"search": "Cerca",
+									"emptyTable": "Nessun articolo presente",
+									"zeroRecords": "Nessun articolo presente"
+								},
+								"pageLength": 20,
+								"lengthChange": false,
+								"info": false,
+								"order": [
+									[0, 'desc'],
+									[1, 'desc']
+								],
+								"autoWidth": false,
+								"columns": [
+									{"name": "articolo", "data": null, render: function (data, type, row) {
+										var result = '';
+										if (data.articolo != null) {
+											result = data.articolo.codice+' - '+data.articolo.descrizione;
+										}
+										return result;
+									}},
+									{"name": "quantita", "data": "lotto"},
+									{"name": "quantita", "data": "quantita"},
+									{"name": "pezzi", "data": "numeroPezzi"},
+									{"name": "prezzo", "data": "prezzo"},
+									{"name": "sconto", "data": "sconto"},
+									{"name": "imponibile", "data": "imponibile"},
+									{"name": "costo", "data": "costo"}
+								]
+							});
+						}
+
+						if(result.fatturaAccompagnatoriaTotali != null && result.fatturaAccompagnatoriaTotali != undefined){
+							$('#detailsFattureAccompagnatorieTotaliModalTable').DataTable({
+								"data": result.fatturaAccompagnatoriaTotali,
+								"language": {
+									"paginate": {
+										"first": "Inizio",
+										"last": "Fine",
+										"next": "Succ.",
+										"previous": "Prec."
+									},
+									"search": "Cerca",
+									"emptyTable": "Nessun totale presente",
+									"zeroRecords": "Nessun totale presente"
+								},
+								"paging": false,
+								"searching": false,
+								"lengthChange": false,
+								"info": false,
+								"order": [
+									[0, 'asc']
+								],
+								"autoWidth": false,
+								"columns": [
+									{"name": "aliquotaIva", "data": null, render: function (data, type, row) {
+										var result = '';
+										if (data.aliquotaIva != null) {
+											result = data.aliquotaIva.valore;
+										}
+										return result;
+									}},
+									{"name": "totaleIva", "data": "totaleIva"},
+									{"name": "totaleImponibile", "data": "totaleImponibile"}
+								]
+							});
+						}
+
+					} else{
+						$('#detailsFattureMainDiv').empty().append(alertContent);
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#detailsFattureMainDiv').empty().append(alertContent);
+					console.log('Response text: ' + jqXHR.responseText);
+				}
+			})
+
+			$('#detailsFattureAccompagnatorieModal').modal('show');
+		}
+
 	});
 
 	$(document).on('click','.closeFatture', function(){
 		$('#detailsFattureDdtModalTable').DataTable().destroy();
 		$('#detailsFattureModal').modal('hide');
+	});
+
+	$(document).on('click','.closeFattureAccompagnatorie', function(){
+		$('#detailsFattureAccompagnatorieArticoliModalTable').DataTable().destroy();
+		$('#detailsFattureAccompagnatorieTotaliModalTable').DataTable().destroy();
+		$('#detailsFattureAccompagnatorieModal').modal('hide');
 	});
 
 	$(document).on('click','.deleteFatture', function(){
@@ -300,13 +446,29 @@ $(document).ready(function() {
 	$(document).on('click','#confirmDeleteFatture', function(){
 		$('#deleteFattureModal').modal('hide');
 		var idFattura = $(this).attr('data-id');
+		var tipoFattura = $(this).attr('data-tipo');
+
+		var url;
+		var successText;
+		var errorText;
+
+		if(tipoFattura == 'VENDITA'){
+			url = baseUrl + "fatture/" + idFattura;
+			successText = '<strong>Fattura </strong> cancellata con successo.\n';
+			errorText = '<strong>Errore nella cancellazione della fattura.</strong>\n';
+		} else {
+			// Fattura accompagnatoria
+			url = baseUrl + "fatture-accompagnatorie/" + idFattura;
+			successText = '<strong>Fattura accompagnatoria </strong> cancellata con successo.\n';
+			errorText = '<strong>Errore nella cancellazione della fattura accompagnatoria.</strong>\n';
+		}
 
 		$.ajax({
-			url: baseUrl + "fatture/" + idFattura,
+			url: url,
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<div id="alertFattureContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Fattura </strong> cancellata con successo.\n' +
+				alertContent = alertContent + successText +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertFatture').empty().append(alertContent);
 
@@ -315,11 +477,12 @@ $(document).ready(function() {
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
 				var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nella cancellazione della fattura.</strong>\n' +
+				alertContent = alertContent + errorText +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertFatture').empty().append(alertContent);
 			}
 		});
+
 	});
 
 	if($('#searchFattureButton') != null && $('#searchFattureButton') != undefined) {
@@ -392,11 +555,6 @@ $(document).ready(function() {
 				fattura.progressivo = $('#progressivo').val();
 				fattura.anno = $('#anno').val();
 				fattura.data = $('#data').val();
-
-				// tipo fattura = VENDITA
-				var tipo = new Object();
-				tipo.id = 0;
-				fattura.tipo = tipo;
 
 				var cliente = new Object();
 				cliente.id = $('#cliente option:selected').val();
