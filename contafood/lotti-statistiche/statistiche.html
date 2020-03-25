@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Ricerca lotti</title>
+  <title>ContaFood - Statistiche</title>
 
   <!-- Custom fonts for this template -->
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -21,6 +21,9 @@
   <!-- Custom styles for this page -->
   <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <!-- Bootstrap-select -->
+  <link rel="stylesheet" href="../css/bootstrap-select-1.13.12.css">
+
   <!-- Bootstrap core JavaScript-->
   <script src="../vendor/jquery/jquery.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -28,10 +31,22 @@
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
 
+  <!-- Bootstrap-select -->
+  <script src="../js/bootstrap-select/bootstrap-select-1.13.12.js"></script>
+  <script src="../js/bootstrap-select/i18n/defaults-it_IT.js"></script>
+
   <script src="../js/commons.js"></script>
   <script src="../js/core/moment.js"></script>
 
-  <script src="../js/ricerca-lotti.js"></script>
+  <script src="../js/statistiche.js"></script>
+
+  <script>
+    $.fn.getClienti();
+    $.fn.getArticoli();
+    $.fn.getFornitori();
+    $.fn.getStatistichePeriodi();
+    $.fn.getStatisticheOpzioni();
+  </script>
 
 </head>
 
@@ -55,44 +70,83 @@
       <!-- End of Topbar -->
 
       <!-- Begin Page Content -->
-      <div class="container-fluid" id="containerRicercaLotti">
+      <div class="container-fluid" id="containerStatistiche">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800">Ricerca lotti</h1>
+        <h1 class="h3 mb-4 text-gray-800">Statistiche</h1>
 
-        <div id="alertRicercaLotti"></div>
+        <div id="alertStatistiche"></div>
 
-        <div class="card shadow mb-4" id="ricercaLottiMainDiv">
+        <div class="card shadow mb-4" id="statisticheMainDiv">
           <div class="card-body">
-            <form id="ricercaLottiForm" class="">
+            <form id="statisticheForm" class="">
               <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="cliente" class="">Cliente</label>
+                  <select id="cliente" class="form-control form-control-sm" data-live-search="true" multiple>
+                    <option value=""></option>
+                  </select>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="fornitore" class="">Fornitore</label>
+                  <select id="fornitore" class="form-control form-control-sm" data-live-search="true">
+                    <option value=""></option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-6">
+                  <label for="articolo" class="">Articolo</label>
+                  <select id="articolo" class="form-control form-control-sm" data-live-search="true" multiple>
+                    <option value=""></option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-3">
+                  <label for="periodo" class="">Periodo</label>
+                  <select id="periodo" class="form-control form-control-sm">
+                    <option value=""></option>
+                  </select>
+                </div>
                 <div class="form-group col-md-2">
-                  <label for="lotto" class="">Lotto*</label>
-                  <input type="text" class="form-control form-control-sm" id="lotto" placeholder="">
+                  <label for="dataDal" class="">Data dal*</label>
+                  <input type="date" class="form-control form-control-sm" id="dataDal" placeholder="" required>
+                  <div class="invalid-feedback">
+                    Inserisci una data
+                  </div>
+                </div>
+                <div class="form-group col-md-2">
+                  <label for="dataAl" class="">Data al*</label>
+                  <input type="date" class="form-control form-control-sm" id="dataAl" placeholder="" required>
+                  <div class="invalid-feedback">
+                    Inserisci una data
+                  </div>
+                </div>
+                <div class="form-group col-md-3">
+                  <label for="opzione" class="">Opzione</label>
+                  <select id="opzione" class="form-control form-control-sm">
+                    <option value=""></option>
+                  </select>
                 </div>
               </div>
 
-              <button type="submit" class="btn btn-primary" id="ricercaLottiButton">Cerca</button>
-              <a href="#" id="resetRicercaLottiButton" class="btn btn-secondary mt-0">Svuota</a>
+              <button type="submit" class="btn btn-primary" id="statisticheButton">Calcola</button>
+              <a href="#" id="resetStatisticheButton" class="btn btn-secondary mt-0">Svuota</a>
             </form>
           </div>
 
           <div class="card-body" style="font-size: 0.9rem;">
             <div class="table-responsive">
-              <h4 id="ricercaLottiDdtTitle" class="d-none">DDT</h4>
-              <table class="table table-bordered" id="ricercaLottiDdtTable" width="100%" cellspacing="0" style="color: #080707 !important;">
-                <thead>
-                  <tr style="font-size:12px;">
-                  </tr>
-                </thead>
-              </table>
+              <h4 id="statisticheTotaleVendutoTitle" class="d-none">Totale venduto: </h4>
+              <h4 id="statisticheQuantitaTotaleVendutaTitle" class="d-none">Quantità totale venduta: </h4>
+              <h4 id="statisticheRigheTitle" class="d-none"></h4>
             </div>
 
             <hr class="sidebar-divider custom-divider d-none">
 
-            <div class="table-responsive mt-4">
-              <h4 id="ricercaLottiDdtAcquistoTitle" class="d-none">DDT Acquisto</h4>
-              <table class="table table-bordered" id="ricercaLottiDdtAcquistoTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+            <div class="table-responsive mt-4" id="statisticheDdtArticoliTableDiv">
+              <table class="table table-bordered" id="statisticheDdtArticoliTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                 <thead>
                   <tr style="font-size:12px;">
                   </tr>
@@ -100,23 +154,21 @@
               </table>
             </div>
 
-            <hr class="sidebar-divider custom-divider d-none">
-
-            <div class="table-responsive mt-4">
-              <h4 id="ricercaLottiProduzioneTitle" class="d-none">Produzioni</h4>
-              <table class="table table-bordered" id="ricercaLottiProduzioneTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+            <div class="table-responsive mt-4" id="statisticheArticoliTableDiv">
+              <table class="table table-bordered" id="statisticheArticoliTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                 <thead>
-                  <tr style="font-size:12px;">
-                  </tr>
+                <tr style="font-size:12px;">
+                </tr>
                 </thead>
               </table>
             </div>
+
 
           </div>
         </div>
 
       <!-- /.container-fluid -->
-
+      </div>
     </div>
     <!-- End of Main Content -->
 
