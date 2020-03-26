@@ -42,13 +42,17 @@ $(document).ready(function() {
 
 						$('#statisticheTotaleVenduto').text(result.totaleVenduto+' €');
 						$('#statisticheQuantitaTotaleVenduta').text(result.totaleQuantitaVenduta);
+
+						$('#statisticheRigheTitle').addClass('d-none');
+
+						$.fn.resetDataTable('statisticheDdtArticoliTable', 'statisticheDdtArticoliTableDiv');
+						$.fn.resetDataTable('statisticheArticoliTable', 'statisticheArticoliTableDiv');
+
 						if(!$.fn.checkVariableIsNull(opzione) && opzione == 'MOSTRA_DETTAGLIO'){
 							$('#statisticheRigheTitle').text('Sono state trovate '+result.numeroRighe+' righe di dettaglio');
+							$('#statisticheRigheTitle').removeClass('d-none');
 
 							if(result.ddtArticoli != null && result.ddtArticoli != undefined){
-								if($.fn.DataTable.isDataTable( '#statisticheDdtArticoliTable' )){
-									$('#statisticheDdtArticoliTable').DataTable().destroy();
-								}
 
 								$('#statisticheDdtArticoliTable').DataTable({
 									"data": result.ddtArticoli,
@@ -119,13 +123,11 @@ $(document).ready(function() {
 							}
 
 						} else if(!$.fn.checkVariableIsNull(opzione) && opzione == 'RAGGRUPPA_DETTAGLIO'){
+							$('#statisticheRigheTitle').addClass('d-none');
 
 							if(result.statisticaArticoli != null && result.statisticaArticoli != undefined){
-								if($.fn.DataTable.isDataTable( '#statisticheDdtArticoliTable' )){
-									$('#statisticheDdtArticoliTable').DataTable().destroy();
-								}
 
-								$('#statisticheDdtArticoliTable').DataTable({
+								$('#statisticheArticoliTable').DataTable({
 									"data": result.statisticaArticoli,
 									"language": {
 										"paginate": {
@@ -178,7 +180,6 @@ $(document).ready(function() {
 
 						$('#statisticheTotaleVendutoTitle').removeClass('d-none');
 						$('#statisticheQuantitaTotaleVendutaTitle').removeClass('d-none');
-						$('#statisticheRigheTitle').removeClass('d-none');
 
 						$('#alertStatistiche').empty();
 					}
@@ -206,6 +207,10 @@ $(document).ready(function() {
 
 		$('.custom-divider').addClass('d-none');
 
+		$.fn.resetDataTable('statisticheDdtArticoliTable', 'statisticheDdtArticoliTableDiv');
+		$.fn.resetDataTable('statisticheArticoliTable', 'statisticheArticoliTableDiv');
+
+		/*
 		var tableContent = '<table class="table table-bordered" id="@@tableId@@" width="100%" cellspacing="0" style="color: #080707 !important;">\n' +
 			'                <thead>\n' +
 			'                  <tr style="font-size:12px;">\n' +
@@ -223,7 +228,7 @@ $(document).ready(function() {
 			statisticheArticoliTable.DataTable().destroy(true);
 			$(tableContent.replace('@@tableId@@', 'statisticheArticoliTable')).insertAfter("#statisticheArticoliTableDiv");
 		}
-
+		*/
 	});
 
 	$(document).on('change','#periodo', function(){
@@ -253,6 +258,17 @@ $(document).ready(function() {
 		}
 
 	});
+
+	$(document).on('change','#fornitore', function(){
+		$('#articolo option[value=""]').prop('selected', true);
+
+		var fornitore = $('#fornitore option:selected').val();
+		if(fornitore != null && fornitore != ''){
+			$.fn.getArticoli(fornitore);
+		} else {
+			$.fn.getArticoli(null);
+		}
+	});
 });
 
 $.fn.checkVariableIsNull = function(variable){
@@ -260,6 +276,21 @@ $.fn.checkVariableIsNull = function(variable){
 		return true;
 	}
 	return false;
+}
+
+$.fn.resetDataTable = function(idTable, idDiv){
+	var tableContent = '<table class="table table-bordered" id="@@tableId@@" width="100%" cellspacing="0" style="color: #080707 !important;">\n' +
+		'                <thead>\n' +
+		'                  <tr style="font-size:12px;">\n' +
+		'                  </tr>\n' +
+		'                </thead>\n' +
+		'              </table>';
+
+	var statisticheDdtArticoliTable = $('#'+idTable);
+	if($.fn.DataTable.isDataTable( '#'+idTable )){
+		statisticheDdtArticoliTable.DataTable().destroy(true);
+		$(tableContent.replace('@@tableId@@', idTable)).insertAfter('#'+idDiv);
+	}
 }
 
 $.fn.getClienti = function(){
@@ -311,19 +342,23 @@ $.fn.getFornitori = function(){
 	});
 }
 
-$.fn.getArticoli = function(){
+$.fn.getArticoli = function(idFornitore){
+	var url = baseUrl + "articoli?attivo=true";
+	if(idFornitore != null && idFornitore != undefined && idFornitore != ''){
+		url += "&idFornitore="+idFornitore;
+	}
 	$.ajax({
-		url: baseUrl + "articoli?attivo=true",
+		url: url,
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
+			$('#articolo').empty().append('<option value=""></option>');
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
 					$('#articolo').append('<option value="'+item.id+'" >'+item.codice+' '+item.descrizione+'</option>');
-
-					$('#articolo').selectpicker('refresh');
 				});
 			}
+			$('#articolo').selectpicker('refresh');
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
