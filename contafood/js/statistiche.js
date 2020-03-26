@@ -1,190 +1,5 @@
 var baseUrl = "/contafood-be/";
 
-$.fn.loadRicercaLottiDdtTable = function(url) {
-	if($.fn.DataTable.isDataTable( '#ricercaLottiDdtTable' )){
-		$('#ricercaLottiDdtTable').DataTable().destroy();
-	}
-
-	$('#ricercaLottiDdtTable').DataTable({
-		"ajax": {
-			"url": url,
-			"type": "GET",
-			"content-type": "json",
-			"cache": false,
-			"dataSrc": "",
-			"error": function(jqXHR, textStatus, errorThrown) {
-				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertRicercaLottiContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero dei DDT</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertRicercaLotti').empty().append(alertContent);
-			}
-		},
-		"language": {
-			"search": "Cerca",
-			"paginate": {
-				"first": "Inizio",
-				"last": "Fine",
-				"next": "Succ.",
-				"previous": "Prec."
-			},
-			"emptyTable": "Nessun DDT disponibile",
-			"zeroRecords": "Nessun DDT disponibile"
-		},
-		"searching": true,
-		"responsive":true,
-		"pageLength": 20,
-		"lengthChange": false,
-		"info": false,
-		"autoWidth": false,
-		"order": [
-			[1, 'desc'],
-			[0, 'desc']
-		],
-		"columns": [
-			{"title":"Numero", "name": "numero", "data": "progressivo", "width":"5%"},
-			{"title":"Data", "name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var a = moment(data.data);
-				return a.format('DD/MM/YYYY');
-			}},
-			{"title":"Cliente", "name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					return cliente.ragioneSociale;
-				}
-				return '';
-			}}
-		],
-		"initComplete": function( settings, json ) {
-			$('#ricercaLottiDdtTitle').removeClass('d-none');
-		}
-	});
-}
-
-$.fn.loadRicercaLottiDdtAcquistoTable = function(url) {
-	if($.fn.DataTable.isDataTable( '#ricercaLottiDdtAcquistoTable' )){
-		$('#ricercaLottiDdtAcquistoTable').DataTable().destroy();
-	}
-
-	$('#ricercaLottiDdtAcquistoTable').DataTable({
-		"ajax": {
-			"url": url,
-			"type": "GET",
-			"content-type": "json",
-			"cache": false,
-			"dataSrc": "",
-			"error": function(jqXHR, textStatus, errorThrown) {
-				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertRicercaLottiContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero dei DDT Acquisto</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertRicercaLotti').empty().append(alertContent);
-			}
-		},
-		"language": {
-			"search": "Cerca",
-			"paginate": {
-				"first": "Inizio",
-				"last": "Fine",
-				"next": "Succ.",
-				"previous": "Prec."
-			},
-			"emptyTable": "Nessun DDT Acquisto disponibile",
-			"zeroRecords": "Nessun DDT Acquisto disponibile"
-		},
-		"searching": true,
-		"responsive":true,
-		"pageLength": 20,
-		"lengthChange": false,
-		"info": false,
-		"autoWidth": false,
-		"order": [
-			[1, 'desc'],
-			[0, 'desc']
-		],
-		"columns": [
-			{"title":"Numero", "name": "numero", "data": "numero", "width":"5%"},
-			{"title":"Data", "name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var a = moment(data.data);
-				return a.format('DD/MM/YYYY');
-			}},
-			{"title":"Fornitore", "name": "fornitore", "data": null, "width": "10%", render: function (data, type, row) {
-				var fornitore = data.fornitore;
-				if (fornitore != null) {
-					return fornitore.ragioneSociale;
-				}
-				return '';
-			}}
-		],
-		"initComplete": function( settings, json ) {
-			$('#ricercaLottiDdtAcquistoTitle').removeClass('d-none');
-		}
-	});
-}
-
-$.fn.loadRicercaLottiProduzioneTable = function(url) {
-	if($.fn.DataTable.isDataTable( '#ricercaLottiProduzioneTable' )){
-		$('#ricercaLottiProduzioneTable').DataTable().destroy();
-	}
-
-	$('#ricercaLottiProduzioneTable').DataTable({
-		"ajax": {
-			"url": url,
-			"type": "GET",
-			"content-type": "json",
-			"cache": false,
-			"dataSrc": "",
-			"error": function(jqXHR, textStatus, errorThrown) {
-				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertRicercaLottiContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero delle produzioni</strong>\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertRicercaLotti').empty().append(alertContent);
-			}
-		},
-		"language": {
-			"search": "Cerca",
-			"paginate": {
-				"first": "Inizio",
-				"last": "Fine",
-				"next": "Succ.",
-				"previous": "Prec."
-			},
-			"emptyTable": "Nessuna produzione disponibile",
-			"zeroRecords": "Nessuna produzione disponibile"
-		},
-		"searching": true,
-		"responsive":true,
-		"pageLength": 20,
-		"lengthChange": false,
-		"info": false,
-		"autoWidth": false,
-		"order": [
-			[1, 'desc'],
-			[0, 'desc']
-		],
-		"columns": [
-			{"title":"Codice", "name": "codice", "data": "codice", "width":"10%"},
-			{"title":"Lotto", "name": "lotto", "data": "lotto", "width":"10%"},
-			{"title":"Data", "name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
-				var a = moment(data.dataProduzione);
-				return a.format('DD/MM/YYYY');
-			}},
-			{"title":"Scadenza", "name": "scadenza", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var a = moment(data.scadenza);
-				return a.format('DD/MM/YYYY');
-			}},
-			{"title":"Ricetta", "name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
-				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
-				return ricettaResult;
-			}}
-		],
-		"initComplete": function( settings, json ) {
-			$('#ricercaLottiProduzioneTitle').removeClass('d-none');
-		}
-	});
-}
-
 $(document).ready(function() {
 
 	$('#cliente').selectpicker();
@@ -203,17 +18,175 @@ $(document).ready(function() {
 		if(!$.fn.checkVariableIsNull(dataDal) && !$.fn.checkVariableIsNull(dataAl)){
 			$('#alertStatistiche').empty().append(alertContent.replace('@@alertText@@','Calcolo statistiche in corso...').replace('@@alertResult@@', 'warning'));
 
-			/*
-			var ricercaLottiDdtUrl = baseUrl + "ddts?lotto="+lotto;
-			var ricercaLottiDdtAcquistoUrl = baseUrl + "ddts-acquisto?lotto="+lotto;
-			var ricercaLottiProduzioneUrl = baseUrl + "produzioni?lotto="+lotto;
+			var statisticaFilter = new Object();
+			statisticaFilter.dataDal = $('#dataDal').val();
+			statisticaFilter.dataAl = $('#dataAl').val();
+			statisticaFilter.idFornitore = $('#fornitore').val();
+			statisticaFilter.idsClienti = $('#cliente').val().filter(Boolean);
+			statisticaFilter.idsArticoli = $('#articolo').val().filter(Boolean);
+			var opzione = $('#opzione').val();
+			if(!$.fn.checkVariableIsNull(opzione)){
+				statisticaFilter.opzione = opzione;
+			}
 
-			$.when($.fn.loadRicercaLottiDdtTable(ricercaLottiDdtUrl),$.fn.loadRicercaLottiDdtAcquistoTable(ricercaLottiDdtAcquistoUrl), $.fn.loadRicercaLottiProduzioneTable(ricercaLottiProduzioneUrl)).then(function(f1,f2,f3){
-				$('#alertRicercaLotti').empty();
-				$('.custom-divider').removeClass('d-none');
+			var statisticaFilterJson = JSON.stringify(statisticaFilter);
+
+			$.ajax({
+				url: baseUrl + "statistiche",
+				type: 'POST',
+				contentType: "application/json",
+				dataType: 'json',
+				data: statisticaFilterJson,
+				success: function(result) {
+					if(result != null && result != undefined && result != ''){
+
+						$('#statisticheTotaleVenduto').text(result.totaleVenduto+' €');
+						$('#statisticheQuantitaTotaleVenduta').text(result.totaleQuantitaVenduta);
+						if(!$.fn.checkVariableIsNull(opzione) && opzione == 'MOSTRA_DETTAGLIO'){
+							$('#statisticheRigheTitle').text('Sono state trovate '+result.numeroRighe+' righe di dettaglio');
+
+							if(result.ddtArticoli != null && result.ddtArticoli != undefined){
+								if($.fn.DataTable.isDataTable( '#statisticheDdtArticoliTable' )){
+									$('#statisticheDdtArticoliTable').DataTable().destroy();
+								}
+
+								$('#statisticheDdtArticoliTable').DataTable({
+									"data": result.ddtArticoli,
+									"language": {
+										"paginate": {
+											"first": "Inizio",
+											"last": "Fine",
+											"next": "Succ.",
+											"previous": "Prec."
+										},
+										"search": "Cerca",
+										"emptyTable": "Nessun articolo presente",
+										"zeroRecords": "Nessun articolo presente"
+									},
+									"pageLength": 20,
+									"lengthChange": false,
+									"info": false,
+									"order": [
+										[0, 'asc'],
+										[1, 'asc']
+									],
+									"autoWidth": false,
+									"columns": [
+										{"title": "DDT", "name": "ddt", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ddt != null) {
+												result = data.ddt.progressivo;
+											}
+											return result;
+										}},
+										{"title": "Articolo", "name": "articolo", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.articolo != null) {
+												result = data.articolo.codice+' - '+data.articolo.descrizione;
+											}
+											return result;
+										}},
+										{"title": "Quantit&agrave;", "name": "quantita", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.quantita != null) {
+												result = data.quantita;
+											}
+											return result;
+										}},
+										{"title": "Prezzo (€)", "name": "prezzo", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.prezzo != null) {
+												result = data.prezzo;
+											}
+											return result;
+										}},
+										{"title": "Totale (€)", "name": "totale", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.totale != null) {
+												result = data.totale;
+											}
+											return result;
+										}},
+										{"title": "Lotto", "name": "lotto", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.lotto != null) {
+												result = data.lotto;
+											}
+											return result;
+										}}
+									]
+								});
+							}
+
+						} else if(!$.fn.checkVariableIsNull(opzione) && opzione == 'RAGGRUPPA_DETTAGLIO'){
+
+							if(result.statisticaArticoli != null && result.statisticaArticoli != undefined){
+								if($.fn.DataTable.isDataTable( '#statisticheDdtArticoliTable' )){
+									$('#statisticheDdtArticoliTable').DataTable().destroy();
+								}
+
+								$('#statisticheDdtArticoliTable').DataTable({
+									"data": result.statisticaArticoli,
+									"language": {
+										"paginate": {
+											"first": "Inizio",
+											"last": "Fine",
+											"next": "Succ.",
+											"previous": "Prec."
+										},
+										"search": "Cerca",
+										"emptyTable": "Nessun articolo presente",
+										"zeroRecords": "Nessun articolo presente"
+									},
+									"pageLength": 20,
+									"lengthChange": false,
+									"info": false,
+									"order": [
+										[0, 'asc'],
+										[2, 'desc']
+									],
+									"autoWidth": false,
+									"columns": [
+										{"title": "Articolo", "name": "articolo", "data": null, render: function (data, type, row) {
+											return data.codice+' - '+data.descrizione;
+										}},
+										{"title": "Tot. Quantit&agrave;", "name": "quantita", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.totaleQuantitaVenduta != null) {
+												result = data.totaleQuantitaVenduta;
+											}
+											return result;
+										}},
+										{"title": "Tot. venduto (€)", "name": "totale", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.totaleVenduto != null) {
+												result = data.totaleVenduto;
+											}
+											return result;
+										}},
+										{"title": "Tot. venduto medio", "name": "totale_medio", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.totaleVendutoMedio != null) {
+												result = data.totaleVendutoMedio;
+											}
+											return result;
+										}}
+									]
+								});
+							}
+						}
+
+						$('#statisticheTotaleVendutoTitle').removeClass('d-none');
+						$('#statisticheQuantitaTotaleVendutaTitle').removeClass('d-none');
+						$('#statisticheRigheTitle').removeClass('d-none');
+
+						$('#alertStatistiche').empty();
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.log('Response text: ' + jqXHR.responseText);
+				}
 			});
-
-			 */
 
 		} else {
 			$('#alertStatistiche').empty().append(alertContent.replace('@@alertText@@','Inserire Data Dal e Data Al').replace('@@alertResult@@', 'danger'));

@@ -1332,7 +1332,9 @@ $.fn.getDdt = function(idDdt){
 						quantita = $.fn.parseValue(quantita, 'float');
 						prezzo = $.fn.parseValue(prezzo, 'float');
 						sconto = $.fn.parseValue(sconto, 'float');
-						totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
+						var quantitaPerPrezzo = (quantita * prezzo);
+						var scontoValue = (sconto/100)*quantitaPerPrezzo;
+						totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 						var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
@@ -1397,14 +1399,6 @@ $.fn.computeTotale = function() {
 	var totaleDocumento = 0;
 
 	$('.rowArticolo').each(function(i, item){
-		var quantita = $(this).children().eq(3).text();
-		quantita = $.fn.parseValue(quantita, 'float');
-		var pezzi = $(this).children().eq(4).text();
-		pezzi = $.fn.parseValue(pezzi, 'int');
-		var prezzo = $(this).children().eq(5).text();
-		prezzo = $.fn.parseValue(prezzo, 'float');
-		var sconto = $(this).children().eq(6).text();
-		sconto = $.fn.parseValue(sconto, 'float');
 		var totale = $(this).children().eq(7).text();
 		totale = $.fn.parseValue(totale, 'float');
 		var iva = $(this).children().eq(8).text();

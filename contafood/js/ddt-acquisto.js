@@ -798,7 +798,9 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 						quantita = $.fn.parseValue(quantita, 'float');
 						prezzo = $.fn.parseValue(prezzo, 'float');
 						sconto = $.fn.parseValue(sconto, 'float');
-						imponibile = $.fn.formatNumber(((quantita * prezzo) - sconto));
+						var quantitaPerPrezzo = (quantita * prezzo);
+						var scontoValue = (sconto/100)*quantitaPerPrezzo;
+						imponibile = $.fn.formatNumber((quantitaPerPrezzo - scontoValue));
 
 						var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
