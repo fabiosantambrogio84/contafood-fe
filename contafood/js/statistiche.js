@@ -52,10 +52,10 @@ $(document).ready(function() {
 							$('#statisticheRigheTitle').text('Sono state trovate '+result.numeroRighe+' righe di dettaglio');
 							$('#statisticheRigheTitle').removeClass('d-none');
 
-							if(result.ddtArticoli != null && result.ddtArticoli != undefined){
+							if(result.statisticaArticoli != null && result.statisticaArticoli != undefined){
 
 								$('#statisticheDdtArticoliTable').DataTable({
-									"data": result.ddtArticoli,
+									"data": result.statisticaArticoli,
 									"language": {
 										"paginate": {
 											"first": "Inizio",
@@ -71,22 +71,36 @@ $(document).ready(function() {
 									"lengthChange": false,
 									"info": false,
 									"order": [
-										[0, 'asc'],
-										[1, 'asc']
+										[1, 'desc'],
+										[2, 'asc']
 									],
 									"autoWidth": false,
 									"columns": [
-										{"title": "DDT", "name": "ddt", "data": null, render: function (data, type, row) {
+										{"title": "Tipologia", "name": "tipologia", "data": null, render: function (data, type, row) {
 											var result = '';
-											if (data.ddt != null) {
-												result = data.ddt.progressivo;
+											if (data.tipologia != null) {
+												if(data.tipologia == 'DDT'){
+													result = 'Ddt';
+												} else {
+													result = 'Fattura accom.';
+												}
+											}
+											return result;
+										}},
+										{"title": "Progressivo", "name": "progressivo", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.progressivo != null) {
+												result = data.progressivo;
 											}
 											return result;
 										}},
 										{"title": "Articolo", "name": "articolo", "data": null, render: function (data, type, row) {
 											var result = '';
-											if (data.articolo != null) {
-												result = data.articolo.codice+' - '+data.articolo.descrizione;
+											if (data.codice != null) {
+												result = data.codice;
+											}
+											if(data.descrizione !=null){
+												result += ' - '+data.descrizione
 											}
 											return result;
 										}},
@@ -125,10 +139,10 @@ $(document).ready(function() {
 						} else if(!$.fn.checkVariableIsNull(opzione) && opzione == 'RAGGRUPPA_DETTAGLIO'){
 							$('#statisticheRigheTitle').addClass('d-none');
 
-							if(result.statisticaArticoli != null && result.statisticaArticoli != undefined){
+							if(result.statisticaArticoloGroups != null && result.statisticaArticoloGroups != undefined){
 
 								$('#statisticheArticoliTable').DataTable({
-									"data": result.statisticaArticoli,
+									"data": result.statisticaArticoloGroups,
 									"language": {
 										"paginate": {
 											"first": "Inizio",
