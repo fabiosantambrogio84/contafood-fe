@@ -212,6 +212,8 @@ $(document).ready(function() {
 	$(document).on('click','#resetStatisticheButton', function(){
 		$('#statisticheForm :input').val(null);
 
+		$.fn.getArticoli(null);
+
 		$('#cliente').selectpicker('refresh');
 		$('#articolo').selectpicker('refresh');
 
@@ -224,25 +226,6 @@ $(document).ready(function() {
 		$.fn.resetDataTable('statisticheDdtArticoliTable', 'statisticheDdtArticoliTableDiv');
 		$.fn.resetDataTable('statisticheArticoliTable', 'statisticheArticoliTableDiv');
 
-		/*
-		var tableContent = '<table class="table table-bordered" id="@@tableId@@" width="100%" cellspacing="0" style="color: #080707 !important;">\n' +
-			'                <thead>\n' +
-			'                  <tr style="font-size:12px;">\n' +
-			'                  </tr>\n' +
-			'                </thead>\n' +
-			'              </table>';
-
-		var statisticheDdtArticoliTable = $('#statisticheDdtArticoliTable');
-		if($.fn.DataTable.isDataTable( '#statisticheDdtArticoliTable' )){
-			statisticheDdtArticoliTable.DataTable().destroy(true);
-			$(tableContent.replace('@@tableId@@', 'statisticheDdtArticoliTable')).insertAfter("#statisticheDdtArticoliTableDiv");
-		}
-		var statisticheArticoliTable = $('#statisticheArticoliTable');
-		if($.fn.DataTable.isDataTable( '#statisticheArticoliTable' )){
-			statisticheArticoliTable.DataTable().destroy(true);
-			$(tableContent.replace('@@tableId@@', 'statisticheArticoliTable')).insertAfter("#statisticheArticoliTableDiv");
-		}
-		*/
 	});
 
 	$(document).on('change','#periodo', function(){
