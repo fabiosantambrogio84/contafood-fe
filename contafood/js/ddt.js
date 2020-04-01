@@ -455,12 +455,6 @@ $(document).ready(function() {
 
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined && $('#newDdtButton').length > 0){
 
-		$(document).on('keypress','#lotto', function(event){
-			if (event.keyCode === 13) {
-				event.preventDefault();
-			}
-		});
-
 		$('#articolo').selectpicker();
 		$('#cliente').selectpicker();
 
@@ -706,6 +700,10 @@ $(document).ready(function() {
 		$('#prezzo').val('');
 		$('#sconto').val('');
 
+		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
 		if(cliente != null && cliente != ''){
@@ -780,6 +778,10 @@ $(document).ready(function() {
 	});
 
 	$.fn.loadScontiArticoli = function(data, cliente){
+		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
 		$.ajax({
 			url: baseUrl + "sconti?idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
 			type: 'GET',
@@ -863,15 +865,15 @@ $(document).ready(function() {
 		var iva = $('#iva').val();
 
 		if(lotto != null && lotto != undefined && lotto != ''){
-			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'">';
+			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+lotto+'">';
 		} else {
-			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="">';
+			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="">';
 		}
 
-		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
-		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale" value="'+pezzi+'">';
-		var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
-		var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+sconto+'">';
+		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
+		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
+		var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+prezzo+'">';
+		var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+sconto+'">';
 
 		// check if a same articolo was already added
 		var found = 0;
@@ -915,7 +917,7 @@ $(document).ready(function() {
 			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(3).children().eq(0).val(quantita + $.fn.parseValue(currentQuantita,'float'));
 			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(7).text(totale);
 
-			var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
+			var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
 
 			var rowData = table.row(currentRowIndex).data();
 			rowData[3] = newQuantitaHtml;
@@ -1107,6 +1109,7 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
+
 }
 
 $.fn.getClienti = function(){
@@ -1427,3 +1430,58 @@ $.fn.computeTotale = function() {
 	$('#totale').val(Number(Math.round(totaleDocumento+'e2')+'e-2'));
 }
 
+// BARCODE SCANNER FUNCTIONS
+
+$(document).ready(function() {
+	// https://github.com/axenox/onscan.js
+
+	onScan.attachTo(document, {
+		suffixKeyCodes: [13], // enter-key expected at the end of a scan
+		reactToPaste: false, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
+		ignoreIfFocusOn: '.ignore-barcode-scanner',
+		onScan: function(barcode, iQty) { // Alternative to document.addEventListener('scan')
+			console.log('Scanned: ' + iQty + 'x ' + barcode);
+			//var $focused = $(':focus');
+
+			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			$.ajax({
+				url: baseUrl + "articoli?attivo=true&barcode="+barcode,
+				type: 'GET',
+				dataType: 'json',
+				success: function(result) {
+					if(result != null && result != undefined && result.length!=0){
+						$.each(result, function(i, item){
+							var articoloId = item.id;
+							console.log('--> '+articoloId);
+						});
+					} else {
+						var barcodeTruncate = barcode.substring(0, 6);
+						var alertText = "Nessun articolo trovato con barcode completo '"+barcode+"' o barcode '"+barcodeTruncate+"'";
+						$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+					}
+
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var barcodeTruncate = barcode.substring(0, 6);
+					var alertText = "Nessun articolo trovato con barcode completo '"+barcode+"' o barcode '"+barcodeTruncate+"'";
+					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+				}
+			});
+		},
+		onKeyDetect: function(iKeyCode){ // output all potentially relevant key events - great for debugging!
+			//console.log('Pressed: ' + iKeyCode);
+		}
+	});
+
+
+	$(document).on('keypress', function(event){
+		if (event.keyCode === 13) {
+			console.log(event);
+			event.preventDefault();
+		}
+	});
+
+});
