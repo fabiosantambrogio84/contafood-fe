@@ -40,13 +40,97 @@ $(document).ready(function() {
 			{"name": "nome", "data": "nome"},
 			{"name": "scadenzaGiorni", "data": "scadenzaGiorni"},
 			{"name": "note", "data": "note"},
-			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
-				var links = '<a class="updateRicetta pr-2" data-id="'+data.id+'" href="ricette-edit.html?idRicetta=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links = links + '<a class="deleteRicetta pr-2" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-				links = links + '<a href="produzioni-new.html?idRicetta='+data.id+'"><i class="fas fa-atom"></i></a>';
+			{"data": null, "orderable":false, "width":"12%", render: function ( data, type, row ) {
+				var links = '<a class="detailsRicetta pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>'
+				links += '<a class="updateRicetta pr-1" data-id="'+data.id+'" href="ricette-edit.html?idRicetta=' + data.id + '"><i class="far fa-edit"></i></a>';
+				links += '<a class="deleteRicetta pr-1" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+				links += '<a href="produzioni-new.html?idRicetta='+data.id+'"><i class="fas fa-atom"></i></a>';
 				return links;
 			}}
 		]
+	});
+
+	$(document).on('click','.detailsRicetta', function(){
+		var idRicetta = $(this).attr('data-id');
+
+		var alertContent = '<div id="alertRicettaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della ricetta.</strong></div>';
+
+		$.ajax({
+			url: baseUrl + "ricette/" + idRicetta,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != '') {
+					$('#codice').text(result.codice);
+					$('#nome').text(result.nome);
+					var categoria = result.categoria;
+					if(categoria != null && categoria != undefined && categoria != ""){
+						$('#categoria').text(categoria.nome);
+					}
+					$('#tempoPreparazione').text(result.tempoPreparazione);
+					$('#pesoTotale').text(result.pesoTotale);
+					$('#scadenzaGiorni').text(result.scadenzaGiorni);
+					$('#costoIngredienti').text(result.costoIngredienti);
+					$('#costoPreparazione').text(result.costoPreparazione);
+					$('#costoTotale').text(result.costoTotale);
+					$('#preparazione').text(result.preparazione);
+					$('#allergeni').text(result.allergeni);
+					$('#valoriNutrizionali').text(result.valoriNutrizionali);
+					$('#note').text(result.note);
+
+					if(result.ricettaIngredienti != null && result.ricettaIngredienti != undefined){
+						$('#detailsRicettaIngredientiModalTable').DataTable({
+							"data": result.ricettaIngredienti,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun ingrediente presente",
+								"zeroRecords": "Nessun ingrediente presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'asc'],
+								[1, 'desc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "ingrediente", "data": null, render: function (data, type, row) {
+									var result = '';
+									if (data.ingrediente != null) {
+										result = data.ingrediente.codice+' - '+data.ingrediente.descrizione;
+									}
+									return result;
+								}},
+								{"name": "quantita", "data": "quantita"},
+								{"name": "percentuale", "data": "percentuale"}
+							]
+						});
+					}
+
+				} else{
+					$('#detailsRicettaMainDiv').empty().append(alertContent);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#detailsRicettaMainDiv').empty().append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		})
+
+		$('#detailsRicettaModal').modal('show');
+	});
+
+	$(document).on('click','.closeRicetta', function(){
+		$('#detailsRicettaIngredientiModalTable').DataTable().destroy();
+		$('#detailsRicettaModal').modal('hide');
 	});
 
 	$(document).on('click','.deleteRicetta', function(){
@@ -127,6 +211,11 @@ $(document).ready(function() {
 				data: ricettaJson,
 				success: function(result) {
 					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta modificata con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the page with the list of ricette
+					setTimeout(function() {
+						window.location.href = "ricette.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della ricetta').replace('@@alertResult@@', 'danger'));
@@ -185,6 +274,11 @@ $(document).ready(function() {
 				data: ricettaJson,
 				success: function(result) {
 					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Ricetta creata con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the page with the list of ricette
+					setTimeout(function() {
+						window.location.href = "ricette.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertRicetta').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della ricetta').replace('@@alertResult@@', 'danger'));

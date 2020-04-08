@@ -453,6 +453,19 @@ $(document).ready(function() {
 		});
 	}
 
+	$.fn.validateLotto = function(){
+		var validLotto = true;
+		// check if all input fields 'lotto' are not empty
+		$('.lotto').each(function(i, item){
+			var lottoValue = $(this).val();
+			if($.fn.checkVariableIsNull(lottoValue)){
+				validLotto = false;
+				return false;
+			}
+		});
+		return validLotto;
+	}
+
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined && $('#newDdtButton').length > 0){
 
 		$('#articolo').selectpicker();
@@ -460,6 +473,16 @@ $(document).ready(function() {
 
 		$(document).on('submit','#newDdtForm', function(event){
 			event.preventDefault();
+
+			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var validLotto = $.fn.validateLotto();
+			if(!validLotto){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
 
 			var ddt = new Object();
 			ddt.progressivo = $('#progressivo').val();
@@ -516,10 +539,6 @@ $(document).ready(function() {
 
 			var ddtJson = JSON.stringify(ddt);
 
-			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
 			$.ajax({
 				url: baseUrl + "ddts",
 				type: 'POST',
@@ -560,6 +579,16 @@ $(document).ready(function() {
 
 		$(document).on('submit','#updateDdtForm', function(event){
 			event.preventDefault();
+
+			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var validLotto = $.fn.validateLotto();
+			if(!validLotto){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
 
 			var ddt = new Object();
 			ddt.id = $('#hiddenIdDdt').val();
@@ -616,10 +645,6 @@ $(document).ready(function() {
 			ddt.note = $('#note').val();
 
 			var ddtJson = JSON.stringify(ddt);
-
-			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "ddts/"+ddt.id,
@@ -865,9 +890,9 @@ $(document).ready(function() {
 		var iva = $('#iva').val();
 
 		if(lotto != null && lotto != undefined && lotto != ''){
-			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+lotto+'">';
+			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="'+lotto+'">';
 		} else {
-			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="">';
+			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="">';
 		}
 
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
@@ -1114,7 +1139,7 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 
 $.fn.getClienti = function(){
 	$.ajax({
-		url: baseUrl + "clienti",
+		url: baseUrl + "clienti?bloccaDdt=false",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -1321,9 +1346,9 @@ $.fn.getDdt = function(idDdt){
 						var sconto = item.sconto;
 						var lotto = item.lotto;
 						if(lotto != null && lotto != undefined && lotto != ''){
-							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'">';
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto" value="'+lotto+'">';
 						} else {
-							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="">';
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto" value="">';
 						}
 
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
@@ -1517,9 +1542,9 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, prezzoLi
 	}
 
 	if(lotto != null && lotto != undefined && lotto != ''){
-		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+lotto+'">';
+		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="'+lotto+'">';
 	} else {
-		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="">';
+		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="">';
 	}
 
 	var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';

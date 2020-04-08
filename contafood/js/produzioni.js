@@ -89,6 +89,7 @@ $(document).ready(function() {
 						$('#categoriaRicetta').text(categoriaRicetta.nome);
 					}
 					$('#scadenza').text(moment(result.scadenza).format('DD/MM/YYYY'));
+					$('#tempoImpiegato').text(result.tempoImpiegato);
 					$('#quantitaTotale').text(result.quantitaTotale);
 					$('#numConfezioni').text(result.numeroConfezioni);
 					$('#filmChiusura').text(result.filmChiusura);
@@ -330,6 +331,7 @@ $(document).ready(function() {
 				produzione.produzioneIngredienti = produzioneIngredienti;
 			}
 			produzione.scadenza = $('#scadenza').val();
+			produzione.tempoImpiegato = $('#tempoImpiegato').val();
 			produzione.quantitaTotale = $('#quantitaTotale').val();
 			produzione.scopo = $('input[name="generaLotto"]:checked').val();
 			produzione.filmChiusura = $('#filmChiusura').val();
@@ -470,6 +472,10 @@ $(document).ready(function() {
 		newingredienteRow.find('.linkIngrediente').after(removeLink);
 		$('.formRowIngrediente[data-id="'+dataId+'"]').last().after(newingredienteRow);
 		newingredienteRow.focus();
+
+		$('html, body').animate({
+			scrollTop: $("#formRowIngredientiBody").offset().top
+		}, 1000);
 	});
 
 	$(document).on('click','.removeIngrediente', function(){
@@ -483,6 +489,10 @@ $(document).ready(function() {
 
 		$.fn.computeQuantitaTotale();
 		$.fn.computeQuantitaIngredienti();
+
+		$('html, body').animate({
+			scrollTop: $("#formRowIngredientiBody").offset().top
+		}, 1000);
 	});
 
 });

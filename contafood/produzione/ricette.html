@@ -108,15 +108,146 @@
 
           <!-- Modal Details-->
           <div class="modal fade" id="detailsRicettaModal" tabindex="-1" role="dialog" aria-labelledby="detailsRicettaModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog modal-xl" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="detailsRicettaModalTitle">Dettagli ricetta</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <h5 class="modal-title" id="detailsRicettaModalTitle">Dettagli Ricetta</h5>
+                  <button type="button" class="close closeRicetta" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body" id="detailsRicettaMainDiv"></div>
+                <div class="modal-body" id="detailsRicettaMainDiv">
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Codice</h6>
+                            <p class="card-text" id="codice"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Nome</h6>
+                            <p class="card-text" id="nome"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Categoria</h6>
+                            <p class="card-text" id="categoria"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tempo prep.</h6>
+                            <p class="card-text" id="tempoPreparazione"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Peso totale</h6>
+                            <p class="card-text" id="pesoTotale"></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Scadenza giorni</h6>
+                            <p class="card-text" id="scadenzaGiorni"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Costo ingr. (€)</h6>
+                            <p class="card-text" id="costoIngredienti"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Costo prep. (€)</h6>
+                            <p class="card-text" id="costoPreparazione"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Costo tot. (€)</h6>
+                            <p class="card-text" id="costoTotale"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">&nbsp;</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Preparazione</h6>
+                            <p class="card-text" id="preparazione"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Allergeni</h6>
+                            <p class="card-text" id="allergeni"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Valori Nutr.</h6>
+                            <p class="card-text" id="valoriNutrizionali"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Note</h6>
+                            <p class="card-text" id="note"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">&nbsp;</div>
+                    </div>
+
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="table-responsive mt-4" style="font-size: 14px;">
+                    <table class="table table-bordered" id="detailsRicettaIngredientiModalTable">
+                      <thead>
+                        <th>Ingrediente</th>
+                        <th>Quantita</th>
+                        <th>Percentuale</th>
+                      </thead>
+                    </table>
+                  </div>
+
+                </div>
               </div>
             </div>
           </div>
