@@ -1654,16 +1654,14 @@ $(document).ready(function() {
 							var idArticolo = item.id;
 
 							// check if articolo has barcode complete or not
-							var barcodeComplete = articolo.completeBarcode;
+							var barcodeComplete = item.completeBarcode;
 							var quantita;
 							if(barcodeComplete){
-								quantita = articolo.quantitaPredefinita;
+								quantita = item.quantitaPredefinita;
 							} else {
-								var subBarcode = barcode.substring(7, barcode.length);
+								var subBarcode = barcode.substring(8, barcode.length);
 								console.log(subBarcode);
-								subBarcode = subBarcode.substring(0, subBarcode.length-1);
-								console.log(subBarcode);
-								quantita = parseFloat(subBarcode)/1000;
+								quantita = parseFloat(subBarcode)/10000;
 							}
 
 							// get sconto articolo
@@ -1706,13 +1704,82 @@ $(document).ready(function() {
 		}
 	});
 
-
 	$(document).on('keypress', function(event){
 		if (event.keyCode === 13) {
 			console.log(event);
 			event.preventDefault();
 			if(event.target.nodeName == 'INPUT'){
 				$(event.target).blur();
+				if(event.target.classList.contains("lotto")){
+					// check if some rows could be grouped together
+					var insertedRow = $(event.target).parent().parent();
+					var insertedRowIndex = insertedRow.attr("data-row-index");
+					var insertedArticoloId = insertedRow.attr("data-id");
+					var	insertedLotto = insertedRow.children().eq(1).children().eq(0).val();
+					var	insertedPrezzo = insertedRow.children().eq(5).children().eq(0).val();
+					var	insertedSconto = insertedRow.children().eq(6).children().eq(0).val();
+					var insertedPezzi = insertedRow.children().eq(4).children().eq(0).val();
+					var insertedQuantita = insertedRow.children().eq(3).children().eq(0).val();
+
+					var found = 0;
+					var currentRowIndex;
+					var currentIdArticolo;
+					var currentLotto;
+					var currentPrezzo;
+					var currentSconto;
+					var currentPezzi = 0;
+					var currentQuantita = 0;
+
+					var ddtArticoliLength = $('.rowArticolo').length;
+					if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
+						$('.rowArticolo').each(function(i, item){
+
+							if(found != 1){
+								currentRowIndex = $(this).attr('data-row-index');
+								if(currentRowIndex != insertedRowIndex){
+									currentIdArticolo = $(this).attr('data-id');
+									currentLotto = $(this).children().eq(1).children().eq(0).val();
+									currentPrezzo = $(this).children().eq(5).children().eq(0).val();
+									currentSconto = $(this).children().eq(6).children().eq(0).val();
+
+									if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(insertedArticoloId)
+										&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(insertedLotto)
+										&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(insertedPrezzo)
+										&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(insertedSconto)){
+										found = 1;
+										currentPezzi = $(this).children().eq(4).children().eq(0).val();
+										currentQuantita = $(this).children().eq(3).children().eq(0).val();
+									}
+								}
+							}
+						});
+					}
+					var table = $('#ddtArticoliTable').DataTable();
+					if(found == 1){
+                        var totale = 0;
+                        sconto = $.fn.parseValue(sconto, 'float');
+
+                        var quantitaPerPrezzo = (($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float')) * $.fn.parseValue(insertedPrezzo, 'float'));
+                        var scontoValue = ($.fn.parseValue(insertedSconto, 'float')/100)*quantitaPerPrezzo;
+                        totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+						var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+($.fn.parseValue(insertedPezzi,'float') + $.fn.parseValue(currentPezzi,'float'))+'">';
+						var newLottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="'+insertedLotto+'">';
+						var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float'))+'">';
+
+						var rowData = table.row(currentRowIndex).data();
+						rowData[1] = newLottoHtml;
+						rowData[3] = newQuantitaHtml;
+						rowData[4] = newPezziHtml;
+                        rowData[7] = totale;
+						table.row(currentRowIndex).data(rowData).draw();
+						table.row(insertedRowIndex).remove().draw();
+
+					}
+
+                    $.fn.computeTotale();
+
+				}
 			}
 		}
 	});
