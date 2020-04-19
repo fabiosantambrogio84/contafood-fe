@@ -289,7 +289,11 @@ $(document).ready(function() {
 									}
 									return result;
 								}},
-								{"name": "quantita", "data": "lotto"},
+								{"name": "lotto", "data": "lotto"},
+								{"name": "scadenza", "data": null, render: function (data, type, row) {
+									var a = moment(data.scadenza);
+									return a.format('DD/MM/YYYY');
+								}},
 								{"name": "quantita", "data": "quantita"},
 								{"name": "pezzi", "data": "numeroPezzi"},
 								{"name": "prezzo", "data": "prezzo"},
@@ -509,10 +513,11 @@ $(document).ready(function() {
 					ddtArticolo.id = ddtArticoloId;
 
 					ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-					ddtArticolo.quantita = $(this).children().eq(3).children().eq(0).val();
-					ddtArticolo.numeroPezzi = $(this).children().eq(4).children().eq(0).val();
-					ddtArticolo.prezzo = $(this).children().eq(5).children().eq(0).val();
-					ddtArticolo.sconto = $(this).children().eq(6).children().eq(0).val();
+					ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
+					ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
+					ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
+					ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
+					ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
 
 					ddtArticoli.push(ddtArticolo);
 				});
@@ -616,10 +621,11 @@ $(document).ready(function() {
 					ddtArticolo.id = ddtArticoloId;
 
 					ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-					ddtArticolo.quantita = $(this).children().eq(3).children().eq(0).val();
-					ddtArticolo.numeroPezzi = $(this).children().eq(4).children().eq(0).val();
-					ddtArticolo.prezzo = $(this).children().eq(5).children().eq(0).val();
-					ddtArticolo.sconto = $(this).children().eq(6).children().eq(0).val();
+					ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
+					ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
+					ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
+					ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
+					ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
 
 					ddtArticoli.push(ddtArticolo);
 				});
@@ -729,6 +735,8 @@ $(document).ready(function() {
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+		$('#alertDdt').empty();
+
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
 		if(cliente != null && cliente != ''){
@@ -787,10 +795,13 @@ $(document).ready(function() {
 					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 				}
 			});
-
+			$('#articolo').removeAttr('disabled');
+			$('#articolo').selectpicker('refresh');
 		} else {
 			$('#puntoConsegna').empty();
 			$('#puntoConsegna').attr('disabled', true);
+			$('#articolo').attr('disabled', true);
+			$('#articolo').selectpicker('refresh');
 		}
 	});
 
@@ -894,6 +905,7 @@ $(document).ready(function() {
 		} else {
 			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="">';
 		}
+		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza" value="">';
 
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
 		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
@@ -917,12 +929,12 @@ $(document).ready(function() {
 					currentRowIndex = $(this).attr('data-row-index');
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(5).children().eq(0).val();
-					currentSconto = $(this).children().eq(6).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+					currentSconto = $(this).children().eq(7).children().eq(0).val();
 
 					if(currentIdArticolo == articoloId && currentLotto == lotto && currentPrezzo == prezzo && currentSconto == sconto){
 						found = 1;
-						currentQuantita = $(this).children().eq(3).children().eq(0).val();
+						currentQuantita = $(this).children().eq(4).children().eq(0).val();
 					}
 				}
 			});
@@ -945,8 +957,8 @@ $(document).ready(function() {
 			var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
 
 			var rowData = table.row(currentRowIndex).data();
-			rowData[3] = newQuantitaHtml;
-			rowData[7] = totale;
+			rowData[4] = newQuantitaHtml;
+			rowData[8] = totale;
 			table.row(currentRowIndex).data(rowData).draw();
 			//$('#ddtArticoliTable').DataTable().row(currentRowIndex)
 
@@ -956,6 +968,7 @@ $(document).ready(function() {
 			var rowNode = table.row.add( [
 				articolo,
 				lottoHtml,
+				scadenzaHtml,
 				udm,
 				quantitaHtml,
 				pezziHtml,
@@ -996,11 +1009,11 @@ $(document).ready(function() {
 
 	$(document).on('change','.compute-totale', function(){
 		$.row = $(this).parent().parent();
-		var quantita = $.row.children().eq(3).children().eq(0).val();
+		var quantita = $.row.children().eq(4).children().eq(0).val();
 		quantita = $.fn.parseValue(quantita, 'float');
-		var prezzo = $.row.children().eq(5).children().eq(0).val();
+		var prezzo = $.row.children().eq(6).children().eq(0).val();
 		prezzo = $.fn.parseValue(prezzo, 'float');
-		var sconto = $.row.children().eq(6).children().eq(0).val();
+		var sconto = $.row.children().eq(7).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
 
 		var quantitaPerPrezzo = (quantita * prezzo);
@@ -1008,7 +1021,7 @@ $(document).ready(function() {
 		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		//var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
-		$.row.children().eq(7).text(totale);
+		$.row.children().eq(8).text(totale);
 
 		$.fn.computeTotale();
 	});
@@ -1345,12 +1358,13 @@ $.fn.getDdt = function(idDdt){
 						var prezzo = item.prezzo;
 						var sconto = item.sconto;
 						var lotto = item.lotto;
+						var scadenza = item.scadenza;
 						if(lotto != null && lotto != undefined && lotto != ''){
 							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto" value="'+lotto+'">';
 						} else {
 							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto" value="">';
 						}
-
+						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale scadenza" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
 						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale" value="'+pezzi+'">';
 						var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
@@ -1370,6 +1384,7 @@ $.fn.getDdt = function(idDdt){
 						var rowNode = table.row.add( [
 							articoloDesc,
 							lottoHtml,
+							scadenzaHtml,
 							udm,
 							quantitaHtml,
 							pezziHtml,
@@ -1399,7 +1414,6 @@ $.fn.getDdt = function(idDdt){
 	});
 }
 
-
 $.fn.parseValue = function(value, resultType){
 	if(value != null && value != undefined && value != ''){
 		if(resultType == 'float'){
@@ -1427,9 +1441,9 @@ $.fn.computeTotale = function() {
 	var totaleDocumento = 0;
 
 	$('.rowArticolo').each(function(i, item){
-		var totale = $(this).children().eq(7).text();
+		var totale = $(this).children().eq(8).text();
 		totale = $.fn.parseValue(totale, 'float');
-		var iva = $(this).children().eq(8).text();
+		var iva = $(this).children().eq(9).text();
 		iva = $.fn.parseValue(iva, 'int');
 
 		var totaliIva;
@@ -1518,7 +1532,7 @@ $.fn.getPrezzoListinoClienteArticolo = function(idArticolo, idListino){
 	}
 }
 
-$.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, prezzoListino, sconto){
+$.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, scadenza, prezzoListino, sconto){
 	var articoloId = articolo.id;
 
 	var articoloLabel = articolo.codice + ' - ' + articolo.descrizione;
@@ -1526,7 +1540,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, prezzoLi
 	if(!$.fn.checkVariableIsNull(articolo.unitaMisura)){
 		udm = articolo.unitaMisura.etichetta;
 	}
-	var lotto = articolo.lotto;
+	var lotto = lotto;
+	var scadenza = scadenza;
 	var quantita = quantita;
 	var pezzi = numeroPezzi;
 	var prezzo;
@@ -1546,7 +1561,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, prezzoLi
 	} else {
 		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="">';
 	}
-
+	var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 	var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
 	var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
 	var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+prezzo+'">';
@@ -1569,15 +1584,15 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, prezzoLi
 				currentRowIndex = $(this).attr('data-row-index');
 				currentIdArticolo = $(this).attr('data-id');
 				currentLotto = $(this).children().eq(1).children().eq(0).val();
-				currentPrezzo = $(this).children().eq(5).children().eq(0).val();
-				currentSconto = $(this).children().eq(6).children().eq(0).val();
+				currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+				currentSconto = $(this).children().eq(7).children().eq(0).val();
 
 				if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)){
 					found = 1;
-					currentPezzi = $(this).children().eq(4).children().eq(0).val();
+					currentPezzi = $(this).children().eq(5).children().eq(0).val();
 				}
 			}
 		});
@@ -1598,8 +1613,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, prezzoLi
 		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'float'))+'">';
 
 		var rowData = table.row(currentRowIndex).data();
-		rowData[4] = newPezziHtml;
-		rowData[7] = totale;
+		rowData[5] = newPezziHtml;
+		rowData[8] = totale;
 		table.row(currentRowIndex).data(rowData).draw();
 		rowIndex = currentRowIndex;
 
@@ -1609,6 +1624,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, prezzoLi
 		var rowNode = table.row.add( [
 			articoloLabel,
 			lottoHtml,
+			scadenzaHtml,
 			udm,
 			quantitaHtml,
 			pezziHtml,
@@ -1637,32 +1653,43 @@ $(document).ready(function() {
 		reactToPaste: false, // Compatibility to built-in scanners in paste-mode (as opposed to keyboard-mode)
 		ignoreIfFocusOn: '.ignore-barcode-scanner',
 		onScan: function(barcode, numeroPezzi) { // Alternative to document.addEventListener('scan')
-			console.log('Scanned: ' + numeroPezzi + 'x ' + barcode);
+			console.log('Scanned: ' + numeroPezzi + ' - ' + barcode);
 			//var $focused = $(':focus');
 
 			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+			var cliente = $('#cliente option:selected').val();
+			if($.fn.checkVariableIsNull(cliente)){
+				var alertText = "Selezionare un cliente prima di effettuare la lettura del barcode";
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger'));
+				return;
+			}
+
+			/*
+				Check length of barcode
+			   	if length > 13 -> ean 128
+			   	else -> ean 13
+
+			*/
+			var barcodeType = 'ean13';
+			var barcodeToSearch = barcode;
+			if(!$.fn.checkVariableIsNull(barcode) && barcode.length > 13){
+				barcodeType = 'ean128';
+				var startBarcodeIndex = barcode.indexOf(")") + 1;
+				var endBarcodeIndex = barcode.indexOf("(", startBarcodeIndex);
+				barcodeToSearch = barcode.substring(startBarcodeIndex, endBarcodeIndex).trim();
+			}
+
 			$.ajax({
-				url: baseUrl + "articoli?attivo=true&barcode="+barcode,
+				url: baseUrl + "articoli?attivo=true&barcode="+barcodeToSearch,
 				type: 'GET',
 				dataType: 'json',
 				success: function(result) {
 					if(result != null && result != undefined && result.length!=0){
 						$.each(result, function(i, item){
 							var idArticolo = item.id;
-
-							// check if articolo has barcode complete or not
-							var barcodeComplete = item.completeBarcode;
-							var quantita;
-							if(barcodeComplete){
-								quantita = item.quantitaPredefinita;
-							} else {
-								var subBarcode = barcode.substring(8, barcode.length);
-								console.log(subBarcode);
-								quantita = parseFloat(subBarcode)/10000;
-							}
 
 							// get sconto articolo
 							var sconto;
@@ -1681,8 +1708,86 @@ $(document).ready(function() {
 								console.log('PREZZO LISTINO: '+prezzoListino);
 							}
 
+							var quantita;
+							var numPezzi = numeroPezzi;
+							var lotto = item.lotto;
+							var scadenza;
+							if(barcodeType == 'ean13'){
+								// check if articolo has barcode complete or not
+								var barcodeComplete = item.completeBarcode;
+								if(barcodeComplete){
+									quantita = item.quantitaPredefinita;
+								} else {
+									var subBarcode = barcode.substring(8, barcode.length);
+									console.log(subBarcode);
+									quantita = parseFloat(subBarcode)/10000;
+								}
+							} else {
+								// get fornitore
+								var fornitore = item.fornitore;
+								if($.fn.checkVariableIsNull(fornitore)){
+									var alertText = "Errore nel recupero del fornitore.";
+									$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+									return;
+								}
+								var codiceFornitore = fornitore.codice;
+								if($.fn.checkVariableIsNull(codiceFornitore)){
+									var alertText = "Codice fornitore non presente. Impossibile gestire il barcode ean128.";
+									$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+									return;
+								}
+
+								var startIndex = 0;
+								var endIndex = 0;
+
+								// check codice fornitore
+								if(codiceFornitore == '29'){
+									// fornitore 'La Gastronomica'
+
+									// example: "(01) 98025997021321 (3193) 000278 (10) 09809400 (15) 200427"
+
+									numPezzi = barcode.substring(1, barcode.indexOf(")")).trim();
+
+									startIndex = barcode.split(")", 2).join(")").length + 1;
+									endIndex = barcode.split("(", 3).join("(").length;
+
+									quantita = parseInt(barcode.substring(startIndex, endIndex).trim()) / 1000;
+
+									startIndex = barcode.split(")", 3).join(")").length + 1;
+									endIndex = barcode.split("(", 4).join("(").length;
+
+									lotto = barcode.substring(startIndex, endIndex).trim();
+									lotto = lotto.substring(0,6);
+									lotto = lotto.slice(3,6) + lotto.slice(0,3);
+
+									startIndex = barcode.split(")", 4).join(")").length + 1;
+									scadenza = barcode.substring(startIndex, str.length).trim();
+
+								} else if(codiceFornitore == '30'){
+									// fornitore 'EuroChef'
+
+									// example "(02) 18013554100422 (15) 200525 (10) 20700 (37) 0002"
+
+									startIndex = barcode.split(")", 3).join(")").length + 1;
+									endIndex = barcode.split("(", 4).join("(").length;
+
+									lotto = barcode.substring(startIndex, endIndex).trim();
+
+									startIndex = barcode.split(")", 2).join(")").length + 1;
+									endIndex = barcode.split("(", 3).join("(").length;
+
+									scadenza = barcode.substring(startIndex, endIndex).trim();
+
+
+								} else {
+									var alertText = "Codice fornitore '"+codiceFornitore+"' non gestito.";
+									$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+									return;
+								}
+							}
+
 							// add articolo to table
-							$.fn.addArticoloFromScanner(item, numeroPezzi, quantita, prezzoListino, sconto);
+							$.fn.addArticoloFromScanner(item, numPezzi, quantita, lotto, scadenza, prezzoListino, sconto);
 
 						});
 					} else {
@@ -1716,10 +1821,10 @@ $(document).ready(function() {
 					var insertedRowIndex = insertedRow.attr("data-row-index");
 					var insertedArticoloId = insertedRow.attr("data-id");
 					var	insertedLotto = insertedRow.children().eq(1).children().eq(0).val();
-					var	insertedPrezzo = insertedRow.children().eq(5).children().eq(0).val();
-					var	insertedSconto = insertedRow.children().eq(6).children().eq(0).val();
-					var insertedPezzi = insertedRow.children().eq(4).children().eq(0).val();
-					var insertedQuantita = insertedRow.children().eq(3).children().eq(0).val();
+					var	insertedPrezzo = insertedRow.children().eq(6).children().eq(0).val();
+					var	insertedSconto = insertedRow.children().eq(7).children().eq(0).val();
+					var insertedPezzi = insertedRow.children().eq(5).children().eq(0).val();
+					var insertedQuantita = insertedRow.children().eq(4).children().eq(0).val();
 
 					var found = 0;
 					var currentRowIndex;
@@ -1739,8 +1844,8 @@ $(document).ready(function() {
 								if(currentRowIndex != insertedRowIndex){
 									currentIdArticolo = $(this).attr('data-id');
 									currentLotto = $(this).children().eq(1).children().eq(0).val();
-									currentPrezzo = $(this).children().eq(5).children().eq(0).val();
-									currentSconto = $(this).children().eq(6).children().eq(0).val();
+									currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+									currentSconto = $(this).children().eq(7).children().eq(0).val();
 
 									if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(insertedArticoloId)
 										&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(insertedLotto)
@@ -1769,9 +1874,9 @@ $(document).ready(function() {
 
 						var rowData = table.row(currentRowIndex).data();
 						rowData[1] = newLottoHtml;
-						rowData[3] = newQuantitaHtml;
-						rowData[4] = newPezziHtml;
-                        rowData[7] = totale;
+						rowData[4] = newQuantitaHtml;
+						rowData[5] = newPezziHtml;
+                        rowData[8] = totale;
 						table.row(currentRowIndex).data(rowData).draw();
 						table.row(insertedRowIndex).remove().draw();
 

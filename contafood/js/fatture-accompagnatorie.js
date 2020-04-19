@@ -214,6 +214,12 @@ $(document).ready(function() {
 		$('#prezzo').val('');
 		$('#sconto').val('');
 
+		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		$('#alertDdt').empty();
+
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
 		if(cliente != null && cliente != ''){
@@ -272,10 +278,14 @@ $(document).ready(function() {
 					$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 				}
 			});
+			$('#articolo').removeAttr('disabled');
+			$('#articolo').selectpicker('refresh');
 
 		} else {
 			$('#puntoConsegna').empty();
 			$('#puntoConsegna').attr('disabled', true);
+			$('#articolo').attr('disabled', true);
+			$('#articolo').selectpicker('refresh');
 		}
 	});
 
