@@ -726,6 +726,7 @@ $(document).ready(function() {
 		$('#udm').val('');
 		$('#iva').val('');
 		$('#lotto').val('');
+		$('#scadenza').val('');
 		$('#quantita').val('');
 		$('#pezzi').val('');
 		$('#prezzo').val('');
@@ -859,6 +860,7 @@ $(document).ready(function() {
 			$('#udm').val(udm);
 			$('#iva').val(iva);
 			$('#lotto').val('');
+			$('#scadenza').val('');
 			$('#quantita').val(quantita);
 			$('#pezzi').val('');
 			$('#prezzo').val(prezzo);
@@ -867,6 +869,7 @@ $(document).ready(function() {
 			$('#udm').val('');
 			$('#iva').val('');
 			$('#lotto').val('');
+			$('#scadenza').val('');
 			$('#quantita').val('');
 			$('#pezzi').val('');
 			$('#prezzo').val('');
@@ -894,6 +897,7 @@ $(document).ready(function() {
 		var articolo = $('#articolo option:selected').text();
 		var udm = $('#udm').val();
 		var lotto = $('#lotto').val();
+		var scadenza = $('#scadenza').val();
 		var quantita = $('#quantita').val();
 		var pezzi = $('#pezzi').val();
 		var prezzo = $('#prezzo').val();
@@ -905,7 +909,7 @@ $(document).ready(function() {
 		} else {
 			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto" value="">';
 		}
-		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza" value="">';
+		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
 		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
@@ -1812,8 +1816,9 @@ $(document).ready(function() {
 	$(document).on('keypress', function(event){
 		if (event.keyCode === 13) {
 			console.log(event);
-			event.preventDefault();
+
 			if(event.target.nodeName == 'INPUT'){
+				event.preventDefault();
 				$(event.target).blur();
 				if(event.target.classList.contains("lotto")){
 					// check if some rows could be grouped together
