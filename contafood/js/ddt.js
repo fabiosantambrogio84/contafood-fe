@@ -1591,7 +1591,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var currentSconto;
 	var currentScadenza;
 	var currentPezzi = 0;
-	var currentQuantita = 0;
+	var currentQuantita= 0;
 
 	var ddtArticoliLength = $('.rowArticolo').length;
 	if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
