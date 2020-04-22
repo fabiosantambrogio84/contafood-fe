@@ -1583,47 +1583,50 @@ $.fn.groupArticoloRow = function(insertedRow){
 // BARCODE SCANNER FUNCTIONS
 
 $.fn.getScontoArticolo = function(idArticolo, data, cliente){
+	var sconto = null;
 	$.ajax({
 		url: baseUrl + "sconti?idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
 		type: 'GET',
 		dataType: 'json',
+		async: false,
 		success: function(result) {
 			$.each(result, function(i, item){
 				var articoloId = item.articolo.id;
-				var valore = item.valore;
 				if(articoloId == idArticolo){
-					return valore;
+					sconto = item.valore;
 				}
 			});
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Errore nel recupero dello sconto articolo');
-			return null;
 		}
 	});
+	return sconto;
 }
 
 $.fn.getPrezzoListinoClienteArticolo = function(idArticolo, idListino){
+	var prezzoListino = null;
 	if(idListino != null && idListino != undefined && idListino != '-1'){
 		$.ajax({
 			url: baseUrl + "listini/"+idListino+"/listini-prezzi",
 			type: 'GET',
 			dataType: 'json',
+			async: false,
 			success: function(result) {
 				$.each(result, function(i, item){
 					var articoloId = item.articolo.id;
-					var prezzoListino = item.prezzo;
 					if(articoloId == idArticolo){
-						return prezzoListino;
+						prezzoListino = item.prezzo;
+						return false;
 					}
 				});
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Errore nel recupero dei prezzi del listino cliente');
-				return null;
 			}
 		});
 	}
+	return prezzoListino;
 }
 
 $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, scadenza, prezzoListino, sconto){
