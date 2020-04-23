@@ -1781,13 +1781,12 @@ $(document).ready(function() {
 			   	else -> ean 13
 
 			*/
+
 			var barcodeType = 'ean13';
 			var barcodeToSearch = barcode;
 			if(!$.fn.checkVariableIsNull(barcode) && barcode.length > 13){
 				barcodeType = 'ean128';
-				var startBarcodeIndex = barcode.indexOf(")") + 1;
-				var endBarcodeIndex = barcode.indexOf("(", startBarcodeIndex);
-				barcodeToSearch = barcode.substring(startBarcodeIndex, endBarcodeIndex).trim();
+				barcodeToSearch = barcode.substring(2, 16).trim();
 			}
 
 			$.ajax({
@@ -1832,6 +1831,8 @@ $(document).ready(function() {
 									quantita = parseFloat(subBarcode)/10000;
 								}
 							} else {
+								quantita = item.quantitaPredefinita;
+
 								// get fornitore
 								var fornitore = item.fornitore;
 								if($.fn.checkVariableIsNull(fornitore)){
@@ -1853,44 +1854,66 @@ $(document).ready(function() {
 								if(codiceFornitore == '29'){
 									// fornitore 'La Gastronomica'
 
-									// example: "(01) 98025997021321 (3193) 000278 (10) 09809400 (15) 200427"
+									// example: "01980259970213213193000278100980940015200427"
+									/*
+										Numero pezzi = 01
+										Codice articolo = 98025997021321
+										Peso = 000278 -> 0.278 kg
+										Lotto = 098094 -> 094098
+										Scadenza = 200427 -> 27/04/20
+									*/
 
-									numPezzi = barcode.substring(1, barcode.indexOf(")")).trim();
+									//numPezzi = barcode.substring(1, barcode.indexOf(")")).trim();
+									numPezzi = barcode.substring(0, 2);
 									if(numPezzi.indexOf('0') == 0){
 										numPezzi = numPezzi.substring(1, numPezzi.length);
 									}
 
-									startIndex = barcode.split(")", 2).join(")").length + 1;
-									endIndex = barcode.split("(", 3).join("(").length;
+									//startIndex = barcode.split(")", 2).join(")").length + 1;
+									//endIndex = barcode.split("(", 3).join("(").length;
+									startIndex = 20;
+									endIndex = 26;
 
 									quantita = parseInt(barcode.substring(startIndex, endIndex).trim()) / 1000;
 
-									startIndex = barcode.split(")", 3).join(")").length + 1;
-									endIndex = barcode.split("(", 4).join("(").length;
+									//startIndex = barcode.split(")", 3).join(")").length + 1;
+									//endIndex = barcode.split("(", 4).join("(").length;
+									startIndex = 28;
+									endIndex = 34;
 
 									lotto = barcode.substring(startIndex, endIndex).trim();
 									lotto = lotto.substring(0,6);
 									lotto = lotto.slice(3,6) + lotto.slice(0,3);
 
-									startIndex = barcode.split(")", 4).join(")").length + 1;
-									scadenza = barcode.substring(startIndex, barcode.length).trim();
+									//startIndex = barcode.split(")", 4).join(")").length + 1;
+									scadenza = barcode.substring(barcode.length-6).trim();
 									scadenza = moment(scadenza, 'YYMMDD');
 
 								} else if(codiceFornitore == '30'){
 									// fornitore 'EuroChef'
 
-									// example "(02) 18013554100422 (15) 200525 (10) 20700 (37) 0002"
-
-									startIndex = barcode.split(")", 3).join(")").length + 1;
-									endIndex = barcode.split("(", 4).join("(").length;
-
-									lotto = barcode.substring(startIndex, endIndex).trim();
-
-									startIndex = barcode.split(")", 2).join(")").length + 1;
-									endIndex = barcode.split("(", 3).join("(").length;
+									// example "0218013554100422152005251020700370002"
+									/*
+										Numero pezzi = 02 -> vengono ignorati
+										Codice articolo = 18013554100422
+										Scadenza = 200525 -> 25/05/20
+										Lotto = 20700
+									*/
+									//startIndex = barcode.split(")", 2).join(")").length + 1;
+									//endIndex = barcode.split("(", 3).join("(").length;
+									startIndex = 18;
+									endIndex = 24;
 
 									scadenza = barcode.substring(startIndex, endIndex).trim();
 									scadenza = moment(scadenza, 'YYMMDD');
+
+									//startIndex = barcode.split(")", 3).join(")").length + 1;
+									//endIndex = barcode.split("(", 4).join("(").length;
+
+									startIndex = 26;
+									endIndex = 31;
+
+									lotto = barcode.substring(startIndex, endIndex).trim();
 
 								} else {
 									var alertText = "Codice fornitore '"+codiceFornitore+"' non gestito.";
