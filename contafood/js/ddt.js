@@ -1813,6 +1813,7 @@ $(document).ready(function() {
 					}
 					$('.lotto').val(lotto);
 				}
+				$('.lotto').blur();
 
 			} else {
 				$.ajax({
