@@ -541,6 +541,7 @@ $(document).ready(function() {
 			}
 			ddt.trasportatore = $('#trasportatore').val();
 			ddt.note = $('#note').val();
+			ddt.scannerLog = $('#scannerLog').val();
 
 			var ddtJson = JSON.stringify(ddt);
 
@@ -649,6 +650,7 @@ $(document).ready(function() {
 			}
 			ddt.trasportatore = $('#trasportatore').val();
 			ddt.note = $('#note').val();
+			ddt.scannerLog = $('#scannerLog').val();
 
 			var ddtJson = JSON.stringify(ddt);
 
@@ -1513,7 +1515,7 @@ $.fn.groupArticoloRow = function(insertedRow){
 	var insertedQuantita = insertedRow.children().eq(4).children().eq(0).val();
 
 	var found = 0;
-	var currentRowIndex;
+	var currentRowIndex = 0;
 	var currentIdArticolo;
 	var currentLotto;
 	var currentScadenza;
@@ -1766,6 +1768,9 @@ $(document).ready(function() {
 			console.log('Scanned: ' + numeroPezzi + ' - ' + barcode);
 			//var $focused = $(':focus');
 
+			var scannerLog = '--------------------------------------------------\n';
+			scannerLog += 'Barcode: '+barcode+', numero pezzi: '+numeroPezzi+'\n';
+
 			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
@@ -1791,14 +1796,23 @@ $(document).ready(function() {
 				barcodeToSearch = barcode.substring(2, 16).trim();
 			}
 
-			// check if the scan is on Lotto field or is for adding Articolo
+			scannerLog += 'Barcode type: '+barcodeType+'\n';
+			scannerLog += 'Codice articolo: '+barcodeToSearch+'\n';
+
+			// check if the scan is on a Lotto field or is for adding Articolo
 			var isLottoFocused = $('.lotto').is(":focus");
 
+			scannerLog += 'Focus lotto? '+isLottoFocused+'\n';
+
 			if(isLottoFocused){
-				var codiceFornitore = $('.lotto').attr("data-codice-fornitore");
+				var lottoFocused = $(':focus');
+				var codiceFornitore = lottoFocused.attr("data-codice-fornitore");
 
 				if(barcodeType == 'ean13') {
-					$('.lotto').val(barcodeToSearch);
+
+					scannerLog += 'Lotto: '+barcodeToSearch+'\n';
+
+					lottoFocused.val(barcodeToSearch);
 				} else {
 					var lotto;
 					if(codiceFornitore == '29') {
@@ -1807,13 +1821,22 @@ $(document).ready(function() {
 						lotto = lotto.substring(0,6);
 						lotto = lotto.slice(3,6) + lotto.slice(0,3);
 
+						scannerLog += 'Lotto: '+lotto+' (fornitore "La Gastronomica")\n';
+
 					} else if(codiceFornitore == '30'){
 						// fornitore 'EuroChef'
 						lotto = barcode.substring(26, 31).trim();
+
+						scannerLog += 'Lotto: '+lotto+' (fornitore "EuroChef")\n';
 					}
 					$('.lotto').val(lotto);
 				}
 				$('.lotto').blur();
+
+				$.fn.groupArticoloRow(lottoFocused.parent().parent());
+
+				scannerLog += '--------------------------------------------------\n';
+				$('#scannerLog').append(scannerLog);
 
 			} else {
 				$.ajax({
@@ -1842,6 +1865,8 @@ $(document).ready(function() {
 									console.log('PREZZO LISTINO: '+prezzoListino);
 								}
 
+								scannerLog += 'Articolo id: '+idArticolo+', sconto: '+sconto+', prezzo listino: '+prezzoListino+'\n';
+
 								var quantita;
 								var numPezzi = numeroPezzi;
 								var lotto = item.lotto;
@@ -1852,11 +1877,17 @@ $(document).ready(function() {
 									var barcodeComplete = item.completeBarcode;
 									if(barcodeComplete){
 										quantita = item.quantitaPredefinita;
+
+										scannerLog += 'Barcode complete. Quantita: '+quantita+'\n';
+
 									} else {
 										var subBarcode = barcode.substring(8, barcode.length);
 										console.log(subBarcode);
 										quantita = parseFloat(subBarcode)/10000;
+
+										scannerLog += 'Barcode non complete. (SubBarcode: '+subBarcode+'). Quantita: '+quantita+'\n';
 									}
+
 								} else {
 									quantita = item.quantitaPredefinita;
 
@@ -1873,6 +1904,8 @@ $(document).ready(function() {
 										$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 										return;
 									}
+
+									scannerLog += 'Codice fornitore: '+codiceFornitore+'\n';
 
 									var startIndex = 0;
 									var endIndex = 0;
@@ -1916,6 +1949,8 @@ $(document).ready(function() {
 										scadenza = barcode.substring(barcode.length-6).trim();
 										scadenza = moment(scadenza, 'YYMMDD');
 
+										scannerLog += 'Fornitore "La Gastronomica". Numero pezzi: '+numPezzi+', quantita: '+quantita+', lotto: '+lotto+', scadenza: '+scadenza+'\n';
+
 									} else if(codiceFornitore == '30'){
 										// fornitore 'EuroChef'
 
@@ -1942,6 +1977,8 @@ $(document).ready(function() {
 
 										lotto = barcode.substring(startIndex, endIndex).trim();
 
+										scannerLog += 'Fornitore "EuroChef". Lotto: '+lotto+', scadenza: '+scadenza+'\n';
+
 									} else {
 										var alertText = "Codice fornitore '"+codiceFornitore+"' non gestito.";
 										$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
@@ -1951,6 +1988,9 @@ $(document).ready(function() {
 
 								// add articolo to table
 								$.fn.addArticoloFromScanner(item, numPezzi, quantita, lotto, scadenza, prezzoListino, sconto);
+
+								scannerLog += '--------------------------------------------------\n';
+								$('#scannerLog').append(scannerLog);
 
 							});
 						} else {
