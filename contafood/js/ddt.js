@@ -973,15 +973,17 @@ $(document).ready(function() {
 			var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
 			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'int'))+'">';
 
-			var rowData = table.row(currentRowIndex).data();
+			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
 			rowData[4] = newQuantitaHtml;
 			rowData[5] = newPezziHtml;
 			rowData[8] = totale;
-			table.row(currentRowIndex).data(rowData).draw();
+			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 			//$('#ddtArticoliTable').DataTable().row(currentRowIndex)
 
 		} else {
 			var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+			var rowsCount = table.rows().count();
 
 			var rowNode = table.row.add( [
 				articolo,
@@ -999,7 +1001,7 @@ $(document).ready(function() {
 			$(rowNode).css('text-align', 'center');
 			$(rowNode).addClass('rowArticolo');
 			$(rowNode).attr('data-id', articoloId);
-			$(rowNode).attr('data-row-index', $(rowNode).index());
+			$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
 		}
 		$.fn.computeTotale();
 
@@ -1566,7 +1568,7 @@ $.fn.groupArticoloRow = function(insertedRow){
 		var newPrezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedPrezzo+'">';
 		var newScontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedSconto+'">';
 
-		var rowData = table.row(currentRowIndex).data();
+		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
 		rowData[1] = newLottoHtml;
 		rowData[2] = newScadenzaHtml;
 		rowData[4] = newQuantitaHtml;
@@ -1574,8 +1576,8 @@ $.fn.groupArticoloRow = function(insertedRow){
 		rowData[6] = newPrezzoHtml;
 		rowData[7] = newScontoHtml;
 		rowData[8] = totale;
-		table.row(currentRowIndex).data(rowData).draw();
-		table.row(insertedRowIndex).remove().draw();
+		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+		table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
 
 	}
 
@@ -1723,15 +1725,18 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
 		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'int'))+'">';
 
-		var rowData = table.row(currentRowIndex).data();
+		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
 		rowData[4] = newQuantitaHtml;
 		rowData[5] = newPezziHtml;
 		rowData[8] = totale;
-		table.row(currentRowIndex).data(rowData).draw();
+		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 		rowIndex = currentRowIndex;
 
 	} else {
 		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+		var rowsCount = table.rows().count();
+		var newRowindex = parseInt(rowsCount) + 1;
 
 		var rowNode = table.row.add( [
 			articoloLabel,
@@ -1749,8 +1754,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		$(rowNode).css('text-align', 'center');
 		$(rowNode).addClass('rowArticolo');
 		$(rowNode).attr('data-id', articoloId);
-		$(rowNode).attr('data-row-index', $(rowNode).index());
-		rowIndex = $(rowNode).index();
+		$(rowNode).attr('data-row-index', newRowindex);
+		rowIndex = newRowindex;
 	}
 	$.fn.computeTotale();
 
@@ -1829,9 +1834,9 @@ $(document).ready(function() {
 
 						scannerLog += 'Lotto: '+lotto+' (fornitore "EuroChef")\n';
 					}
-					$('.lotto').val(lotto);
+					lottoFocused.val(lotto);
 				}
-				$('.lotto').blur();
+				lottoFocused.blur();
 
 				$.fn.groupArticoloRow(lottoFocused.parent().parent());
 
