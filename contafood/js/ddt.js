@@ -1794,8 +1794,6 @@ $(document).ready(function() {
 
 			*/
 
-			barcode = '510000028688';
-
 			var barcodeType = 'ean13';
 			var barcodeToSearch = barcode;
 			if(!$.fn.checkVariableIsNull(barcode) && barcode.length > 13){
