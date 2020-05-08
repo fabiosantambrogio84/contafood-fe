@@ -1794,6 +1794,8 @@ $(document).ready(function() {
 
 			*/
 
+			barcode = '510000028688';
+
 			var barcodeType = 'ean13';
 			var barcodeToSearch = barcode;
 			if(!$.fn.checkVariableIsNull(barcode) && barcode.length > 13){
@@ -1853,6 +1855,12 @@ $(document).ready(function() {
 							$.each(result, function(i, item){
 								var idArticolo = item.id;
 
+								$('.bs-searchbox > input').val(null);
+								$('#articolo').selectpicker('refresh');
+								//$('span:contains('+item.codice+" "+item.descrizione+')').parent().click();
+								$('.dropdown-item > span:contains("")').parent().click();
+
+
 								// get sconto articolo
 								var sconto;
 								var data = $('#data').val();
@@ -1886,7 +1894,7 @@ $(document).ready(function() {
 										scannerLog += 'Barcode complete. Quantita: '+quantita+'\n';
 
 									} else {
-										var subBarcode = barcode.substring(8, barcode.length);
+										var subBarcode = barcode.substring(7, barcode.length);
 										console.log(subBarcode);
 										quantita = parseFloat(subBarcode)/10000;
 
@@ -2002,6 +2010,9 @@ $(document).ready(function() {
 							var barcodeTruncate = barcode.substring(0, 6);
 							var alertText = "Nessun articolo trovato con barcode completo '"+barcode+"' o barcode '"+barcodeTruncate+"'";
 							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+
+							scannerLog += '--------------------------------------------------\n';
+							$('#scannerLog').append(scannerLog);
 						}
 
 					},
@@ -2009,6 +2020,9 @@ $(document).ready(function() {
 						var barcodeTruncate = barcode.substring(0, 6);
 						var alertText = "Nessun articolo trovato con barcode completo '"+barcode+"' o barcode '"+barcodeTruncate+"'";
 						$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+
+						scannerLog += '--------------------------------------------------\n';
+						$('#scannerLog').append(scannerLog);
 					}
 				});
 

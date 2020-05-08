@@ -439,7 +439,9 @@ $(document).ready(function() {
 
 	$(document).on('click','.deleteFatture', function(){
 		var idFattura = $(this).attr('data-id');
+		var tipoFattura = $(this).attr('data-tipo');
 		$('#confirmDeleteFatture').attr('data-id', idFattura);
+		$('#confirmDeleteFatture').attr('data-tipo', tipoFattura);
 		$('#deleteFattureModal').modal('show');
 	});
 

@@ -737,3 +737,97 @@ $.fn.computeTotale = function() {
 	$('#totale').val(Number(Math.round(totaleDocumento+'e2')+'e-2'));
 }
 
+$.fn.checkVariableIsNull = function(variable){
+	if(variable == null || variable == undefined || variable == ''){
+		return true;
+	}
+	return false;
+}
+
+$.fn.normalizeIfEmptyOrNullVariable = function(variable){
+	if(variable != null && variable != undefined && variable != ''){
+		return variable;
+	}
+	if(variable == null || variable == undefined){
+		return '';
+	}
+	return '';
+}
+
+$.fn.groupArticoloRow = function(insertedRow){
+	var insertedRowIndex = insertedRow.attr("data-row-index");
+	var insertedArticoloId = insertedRow.attr("data-id");
+	var	insertedLotto = insertedRow.children().eq(1).children().eq(0).val();
+	var	insertedScadenza = insertedRow.children().eq(2).children().eq(0).val();
+	var	insertedPrezzo = insertedRow.children().eq(6).children().eq(0).val();
+	var	insertedSconto = insertedRow.children().eq(7).children().eq(0).val();
+	var insertedPezzi = insertedRow.children().eq(5).children().eq(0).val();
+	var insertedQuantita = insertedRow.children().eq(4).children().eq(0).val();
+
+	var found = 0;
+	var currentRowIndex = 0;
+	var currentIdArticolo;
+	var currentLotto;
+	var currentScadenza;
+	var currentPrezzo;
+	var currentSconto;
+	var currentPezzi = 0;
+	var currentQuantita = 0;
+
+	var ddtArticoliLength = $('.rowArticolo').length;
+	if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
+		$('.rowArticolo').each(function(i, item){
+
+			if(found != 1){
+				currentRowIndex = $(this).attr('data-row-index');
+				if(currentRowIndex != insertedRowIndex){
+					currentIdArticolo = $(this).attr('data-id');
+					currentLotto = $(this).children().eq(1).children().eq(0).val();
+					currentScadenza = $(this).children().eq(2).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+					currentSconto = $(this).children().eq(7).children().eq(0).val();
+
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(insertedArticoloId)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(insertedLotto)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(insertedPrezzo)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(insertedSconto)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(insertedScadenza)){
+						found = 1;
+						currentQuantita = $(this).children().eq(4).children().eq(0).val();
+						currentPezzi = $(this).children().eq(5).children().eq(0).val();
+					}
+				}
+			}
+		});
+	}
+	var table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+	if(found == 1){
+		var totale = 0;
+		sconto = $.fn.parseValue(sconto, 'float');
+
+		var quantitaPerPrezzo = (($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float')) * $.fn.parseValue(insertedPrezzo, 'float'));
+		var scontoValue = ($.fn.parseValue(insertedSconto, 'float')/100)*quantitaPerPrezzo;
+		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+($.fn.parseValue(insertedPezzi,'int') + $.fn.parseValue(currentPezzi,'int'))+'">';
+		var newLottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto group" value="'+insertedLotto+'">';
+		var newScadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(insertedScadenza).format('YYYY-MM-DD')+'">';
+		var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float'))+'">';
+		var newPrezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedPrezzo+'">';
+		var newScontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedSconto+'">';
+
+		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
+		rowData[1] = newLottoHtml;
+		rowData[2] = newScadenzaHtml;
+		rowData[4] = newQuantitaHtml;
+		rowData[5] = newPezziHtml;
+		rowData[6] = newPrezzoHtml;
+		rowData[7] = newScontoHtml;
+		rowData[8] = totale;
+		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+		table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
+
+	}
+
+	$.fn.computeTotale();
+}
