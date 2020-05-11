@@ -107,6 +107,18 @@ $(document).ready(function() {
 		$(document).on('submit','#updateArticoloForm', function(event){
 			event.preventDefault();
 
+			var alertContent = '<div id="alertArticoloContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var barcode = $('#barcode').val();
+			if(barcode != null && barcode != ''){
+				if(barcode.startsWith('0')){
+					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@', "Il barcode non può iniziare con 0").replace('@@alertResult@@', 'danger'));
+					return false;
+				}
+			}
+
 			var articolo = new Object();
 			articolo.id = $('#hiddenIdArticolo').val();
 			articolo.codice = $('#codice').val();
@@ -155,10 +167,6 @@ $(document).ready(function() {
 
 			var articoloJson = JSON.stringify(articolo);
 
-			var alertContent = '<div id="alertArticoloContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
 			$.ajax({
 				url: baseUrl + "articoli/" + $('#hiddenIdArticolo').val(),
 				type: 'PUT',
@@ -178,6 +186,18 @@ $(document).ready(function() {
 	if($('#newArticoloButton') != null && $('#newArticoloButton') != undefined){
 		$(document).on('submit','#newArticoloForm', function(event){
 			event.preventDefault();
+
+			var alertContent = '<div id="alertArticoloContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var barcode = $('#barcode').val();
+			if(barcode != null && barcode != ''){
+				if(barcode.startsWith('0')){
+					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@', "Il barcode non può iniziare con 0").replace('@@alertResult@@', 'danger'));
+					return false;
+				}
+			}
 
 			var articolo = new Object();
 			articolo.codice = $('#codice').val();
@@ -224,10 +244,6 @@ $(document).ready(function() {
 				articolo.attivo = false;
 			}
 			var articoloJson = JSON.stringify(articolo);
-
-			var alertContent = '<div id="alertArticoloContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
 				url: baseUrl + "articoli",

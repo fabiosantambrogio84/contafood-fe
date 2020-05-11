@@ -42,6 +42,8 @@
 
   <script src="../js/fatture-accompagnatorie.js"></script>
 
+  <script src="../js/barcode-scanner/onscan.js"></script>
+
   <script>
     var dataTrasporto = $.fn.extractDataTrasportoFromUrl();
     var oraTrasporto = $.fn.extractOraTrasportoFromUrl();
@@ -142,11 +144,15 @@
                   <label for="lotto" class="mb-0">Lotto</label>
                   <input type="text" class="form-control form-control-sm text-right ignore-barcode-scanner" id="lotto">
                 </div>
+                <div class="form-group col-md-2">
+                  <label for="scadenza" class="mb-0">Scadenza</label>
+                  <input type="date" class="form-control form-control-sm text-right ignore-barcode-scanner" id="scadenza">
+                </div>
               </div>
               <div class="form-row">
                 <div class="form-group col-md-1 mb-0">
                   <label for="quantita" class="mb-0">Quantita</label>
-                  <input type="number" class="form-control form-control-sm text-right ignore-barcode-scanner" id="quantita" step=".01" min="0">
+                  <input type="number" class="form-control form-control-sm text-right ignore-barcode-scanner" id="quantita" step=".001" min="0">
                 </div>
                 <div class="form-group col-md-1 mb-0">
                   <label for="pezzi" class="mb-0">Pezzi</label>
@@ -176,8 +182,9 @@
                     <tr>
                       <th>Articolo</th>
                       <th>Lotto</th>
+                      <th>Scadenza</th>
                       <th>UdM</th>
-                      <th>Quantita</th>
+                      <th>Q.ta</th>
                       <th>Pezzi</th>
                       <th>Prezzo (€)</th>
                       <th>Sconto (%)</th>
@@ -240,6 +247,10 @@
             <div class="form-group col-md-4">
               <label for="note">Note</label>
               <textarea class="form-control ignore-barcode-scanner" id="note" rows="4"></textarea>
+            </div>
+            <div class="form-group col-md-4">
+              <label for="scannerLog">Scanner log</label>
+              <textarea class="form-control ignore-barcode-scanner" id="scannerLog" rows="4" disabled></textarea>
             </div>
           </div>
 

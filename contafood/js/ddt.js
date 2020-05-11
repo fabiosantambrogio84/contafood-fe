@@ -914,7 +914,7 @@ $(document).ready(function() {
 		}
 		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 
-		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
+		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(quantita,3)+'">';
 		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
 		var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
 		var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
@@ -970,7 +970,9 @@ $(document).ready(function() {
 			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(3).children().eq(0).val(quantita + $.fn.parseValue(currentQuantita,'float'));
 			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(7).text(totale);
 
-			var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
+			var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+
+			var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
 			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'int'))+'">';
 
 			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
@@ -1009,6 +1011,7 @@ $(document).ready(function() {
 		$('#udm').val('');
 		$('#iva').val('');
 		$('#lotto').val('');
+		$('#scadenza').val('');
 		$('#quantita').val('');
 		$('#pezzi').val('');
 		$('#prezzo').val('');
@@ -1561,10 +1564,12 @@ $.fn.groupArticoloRow = function(insertedRow){
 		var scontoValue = ($.fn.parseValue(insertedSconto, 'float')/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
+		var newQuantita = ($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float'));
+
 		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+($.fn.parseValue(insertedPezzi,'int') + $.fn.parseValue(currentPezzi,'int'))+'">';
 		var newLottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto group" value="'+insertedLotto+'">';
 		var newScadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(insertedScadenza).format('YYYY-MM-DD')+'">';
-		var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float'))+'">';
+		var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
 		var newPrezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedPrezzo+'">';
 		var newScontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedSconto+'">';
 
@@ -1584,6 +1589,19 @@ $.fn.groupArticoloRow = function(insertedRow){
 	$.fn.computeTotale();
 }
 
+$.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
+	var quantitaFixed = quantita;
+
+	if(quantita.indexOf('.') != -1){
+		var numDecimalPlaces = quantita.substring(quantita.indexOf('.')+1, quantita.length).length;
+		if(numDecimalPlaces > 3){
+			quantitaFixed = quantita.substring(0, quantita.indexOf('.')+1);
+			quantitaFixed += quantita.substring(quantita.indexOf('.')+1, quantita.indexOf('.')+4);
+		}
+	}
+
+	return quantitaFixed;
+}
 
 // BARCODE SCANNER FUNCTIONS
 
@@ -1722,7 +1740,9 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var table = $('#ddtArticoliTable').DataTable();
 	var rowIndex;
 	if(found == 1){
-		var newQuantitaHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(quantita + $.fn.parseValue(currentQuantita,'float'))+'">';
+		var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+
+		var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
 		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'int'))+'">';
 
 		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
@@ -1996,6 +2016,8 @@ $(document).ready(function() {
 										return;
 									}
 								}
+
+								$.fn.fixDecimalPlaces(quantita, 3);
 
 								// add articolo to table
 								$.fn.addArticoloFromScanner(item, numPezzi, quantita, lotto, scadenza, prezzoListino, sconto);
