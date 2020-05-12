@@ -15,7 +15,7 @@ $(document).ready(function() {
 			"emptyTable": "",
 			"zeroRecords": ""
 		},
-		"pageLength": 10,
+		"pageLength": 50,
 		"lengthChange": false,
 		"info": false,
 		"autoWidth": false,
@@ -472,7 +472,6 @@ $(document).ready(function() {
 			rowData[5] = newPezziHtml;
 			rowData[8] = totale;
 			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
-			//$('#ddtArticoliTable').DataTable().row(currentRowIndex)
 
 		} else {
 			var deleteLink = '<a class="deleteFatturaAccompagnatoriaArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
@@ -866,6 +865,10 @@ $.fn.groupArticoloRow = function(insertedRow){
 $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
 	var quantitaFixed = quantita;
 
+	if(typeof quantita != "string"){
+		quantita = quantita.toString();
+	}
+
 	if(quantita.indexOf('.') != -1){
 		var numDecimalPlaces = quantita.substring(quantita.indexOf('.')+1, quantita.length).length;
 		if(numDecimalPlaces > 3){
@@ -976,8 +979,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var currentPezzi = 0;
 	var currentQuantita= 0;
 
-	var ddtArticoliLength = $('.rowArticolo').length;
-	if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
+	var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
+	if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0) {
 		$('.rowArticolo').each(function(i, item){
 
 			if(found != 1){
@@ -1011,7 +1014,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var scontoValue = (sconto/100)*quantitaPerPrezzo;
 	totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-	var table = $('#ddtArticoliTable').DataTable();
+	var table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
 	var rowIndex;
 	if(found == 1){
 		var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
@@ -1199,13 +1202,13 @@ $(document).ready(function() {
 									var fornitore = item.fornitore;
 									if($.fn.checkVariableIsNull(fornitore)){
 										var alertText = "Errore nel recupero del fornitore.";
-										$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+										$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 										return;
 									}
 									var codiceFornitore = fornitore.codice;
 									if($.fn.checkVariableIsNull(codiceFornitore)){
 										var alertText = "Codice fornitore non presente. Impossibile gestire il barcode ean128.";
-										$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+										$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 										return;
 									}
 
@@ -1285,7 +1288,7 @@ $(document).ready(function() {
 
 									} else {
 										var alertText = "Codice fornitore '"+codiceFornitore+"' non gestito.";
-										$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+										$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 										return;
 									}
 								}

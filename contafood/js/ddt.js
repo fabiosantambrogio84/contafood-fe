@@ -182,7 +182,7 @@ $(document).ready(function() {
 			"emptyTable": "",
 			"zeroRecords": ""
 		},
-		"pageLength": 10,
+		"pageLength": 50,
 		"lengthChange": false,
 		"info": false,
 		"autoWidth": false,
@@ -1591,6 +1591,10 @@ $.fn.groupArticoloRow = function(insertedRow){
 
 $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
 	var quantitaFixed = quantita;
+
+	if(typeof quantita != "string"){
+		quantita = quantita.toString();
+	}
 
 	if(quantita.indexOf('.') != -1){
 		var numDecimalPlaces = quantita.substring(quantita.indexOf('.')+1, quantita.length).length;
