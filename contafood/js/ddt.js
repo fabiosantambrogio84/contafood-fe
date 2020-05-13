@@ -1879,8 +1879,8 @@ $(document).ready(function() {
 
 								$('.bs-searchbox > input').val(null);
 								$('#articolo').selectpicker('refresh');
-								//$('span:contains('+item.codice+" "+item.descrizione+')').parent().click();
-								$('.dropdown-item > span:contains("")').parent().click();
+								var mainArticoloDiv = $('#articolo').parent();
+								mainArticoloDiv.find('.dropdown-item > span:empty').parent().click();
 
 
 								// get sconto articolo
@@ -2021,7 +2021,7 @@ $(document).ready(function() {
 									}
 								}
 
-								$.fn.fixDecimalPlaces(quantita, 3);
+								quantita = $.fn.fixDecimalPlaces(quantita, 3);
 
 								// add articolo to table
 								$.fn.addArticoloFromScanner(item, numPezzi, quantita, lotto, scadenza, prezzoListino, sconto);
