@@ -1598,7 +1598,7 @@ $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
 
 	if(quantita.indexOf('.') != -1){
 		var numDecimalPlaces = quantita.substring(quantita.indexOf('.')+1, quantita.length).length;
-		if(numDecimalPlaces > 3){
+		if(numDecimalPlaces > decimalPlaces){
 			quantitaFixed = quantita.substring(0, quantita.indexOf('.')+1);
 			quantitaFixed += quantita.substring(quantita.indexOf('.')+1, quantita.indexOf('.')+4);
 		}
