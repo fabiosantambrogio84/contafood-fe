@@ -364,7 +364,11 @@ $(document).ready(function() {
 										}
 										return result;
 									}},
-									{"name": "quantita", "data": "lotto"},
+									{"name": "lotto", "data": "lotto"},
+									{"name": "scadenza", "data": null, render: function (data, type, row) {
+										var a = moment(data.scadenza);
+										return a.format('DD/MM/YYYY');
+									}},
 									{"name": "quantita", "data": "quantita"},
 									{"name": "pezzi", "data": "numeroPezzi"},
 									{"name": "prezzo", "data": "prezzo"},
