@@ -38,19 +38,27 @@ $.fn.loadNoteAccreditoTable = function(url) {
 			[0, 'desc']
 		],
 		"columns": [
+			{"name": "speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
+				var speditoAde = data.speditoAde;
+				if(speditoAde){
+					return "Si";
+				} else {
+					return "No";
+				}
+			}},
 			{"name": "numero", "data": "progressivo", "width":"5%"},
 			{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var a = moment(data.data);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
+			{"name": "cliente", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var cliente = data.cliente;
 				if(cliente != null){
 					return cliente.ragioneSociale;
 				}
 				return '';
 			}},
-			{"name": "agente", "data": null, "width":"10%", render: function ( data, type, row ) {
+			{"name": "agente", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var cliente = data.cliente;
 				if(cliente != null){
 					var agente = cliente.agente;
@@ -64,18 +72,23 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				return $.fn.formatNumber(data.totale);
 			}},
 			{"data": null, "orderable":false, "width":"17%", render: function ( data, type, row ) {
-				var acconto = data.totaleAcconto;
-				if(acconto == null || acconto == undefined || acconto == ''){
-					acconto = 0;
-				}
-				var totale = data.totale;
-				if(totale == null || totale == undefined || totale == ''){
-					totale = 0;
-				}
-				var stato = data.statoDdt;
+					var acconto = data.totaleAcconto;
+					if(acconto == null || acconto == undefined || acconto == ''){
+						acconto = 0;
+					}
+					var totale = data.totale;
+					if(totale == null || totale == undefined || totale == ''){
+						totale = 0;
+					}
+					var stato = data.statoNotaAccredito;
 
 				var links = '<a class="detailsNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-				links += '<a class="updateNotaAccredito pr-1" data-id="'+data.id+'" href="nota-accredito-edit.html?idNotaAccredito=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE'){
+					links += '<a class="updateNotaAccredito pr-1" data-id="'+data.id+'" href="nota-accredito-edit.html?idNotaAccredito=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+				}
+				if((totale - acconto) != 0){
+					links += '<a class="payNotaAccredito pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idNotaAccredito=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+				}
 				links += '<a class="emailNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 				links += '<a class="printNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 				links += '<a class="deleteNotaAccredito" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
@@ -84,16 +97,86 @@ $.fn.loadNoteAccreditoTable = function(url) {
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
+			if(data.statoNotaAccredito != null){
+				var backgroundColor = '';
+				if(data.statoNotaAccredito.codice == 'DA_PAGARE'){
+					backgroundColor = '#fcf456';
+				} else if(data.statoNotaAccredito.codice == 'PARZIALMENTE_PAGATA'){
+					backgroundColor = '#fcc08b';
+				} else {
+					backgroundColor = 'trasparent';
+				}
+				$(row).css('background-color', backgroundColor);
+			}
 			$(cells[6]).css('padding-right','0px').css('padding-left','3px');
 			$(cells[5]).css('font-weight','bold').css('text-align','right');
 		}
 	});
+}
 
+$.fn.loadNoteAccreditoTotaliTable = function(){
+
+	$('#notaAccreditoTotaliTable').DataTable({
+		"ajax": {
+			"url": baseUrl + "aliquote-iva?all=true",
+			"type": "GET",
+			"content-type": "json",
+			"cache": false,
+			"dataSrc": "",
+			"error": function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				var alertContent = '<div id="alertNoteAccreditoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero delle aliquote iva</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertNoteAccredito').empty().append(alertContent);
+			}
+		},
+		"language": {
+			"paginate": {
+				"first": "Inizio",
+				"last": "Fine",
+				"next": "Succ.",
+				"previous": "Prec."
+			},
+			"emptyTable": "Nessuna aliquota iva disponibile",
+			"zeroRecords": "Nessuna aliquota iva disponibile"
+		},
+		"searching": false,
+		"responsive":true,
+		"paging": false,
+		"lengthChange": false,
+		"info": false,
+		"autoWidth": false,
+		"order": [
+			[0, 'asc']
+		],
+		"columns": [
+			{"name": "valore", "data": null, "width":"8%", render: function ( data, type, row ) {
+				return data.valore;
+			}},
+			{"name": "totaleIva", "data": null, "width":"8%", render: function ( data, type, row ) {
+				return ''
+			}},
+			{"name": "totaleImponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
+				return ''
+			}}
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			$(row).attr('data-id', data.id);
+			$(row).attr('data-valore', data.valore);
+			$(row).addClass('rowTotaliByIva');
+			$(cells[0]).css('text-align','center');
+			$(cells[1]).css('text-align','center');
+			$(cells[2]).css('text-align','center');
+		}
+	});
 }
 
 $(document).ready(function() {
 
 	$.fn.loadNoteAccreditoTable(baseUrl + "note-accredito");
+
+	$.fn.loadNoteAccreditoTotaliTable();
 
 	$('#notaAccreditoArticoliTable').DataTable({
 		"searching": false,
@@ -111,6 +194,18 @@ $(document).ready(function() {
 		"lengthChange": false,
 		"info": false,
 		"autoWidth": false,
+		"columns": [
+			{ "width": "25%" },
+			{ "width": "12%" },
+			{ "width": "10%" },
+			{ "width": "5%" },
+			{ "width": "8%" },
+			{ "width": "8%" },
+			{ "width": "8%" },
+			{ "width": "8%" },
+			{ "width": "5%" },
+			{ "width": "5%" }
+		],
 		"order": [
 			[0, 'asc']
 		]
@@ -159,7 +254,10 @@ $(document).ready(function() {
 					} else {
 						$('#speditoAde').text("No");
 					}
-
+					var stato = result.statoNotaAccredito;
+					if(stato != null && stato != undefined && stato != ''){
+						$('#stato').text(stato.descrizione);
+					}
 					$('#note').text(result.note);
 					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
 					var dataAggiornamento = result.dataAggiornamento;
@@ -167,9 +265,9 @@ $(document).ready(function() {
 						$('#dataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
 					}
 
-					if(result.notaAccreditoArticoli != null && result.notaAccreditoArticoli != undefined){
-						$('#detailsNoteAccreditoArticoliModalTable').DataTable({
-							"data": result.notaAccreditoArticoli,
+					if(result.notaAccreditoRighe != null && result.notaAccreditoRighe != undefined){
+						$('#detailsNoteAccreditoRigheModalTable').DataTable({
+							"data": result.notaAccreditoRighe,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -178,38 +276,38 @@ $(document).ready(function() {
 									"previous": "Prec."
 								},
 								"search": "Cerca",
-								"emptyTable": "Nessun articolo presente",
-								"zeroRecords": "Nessun articolo presente"
+								"emptyTable": "Nessuna riga presente",
+								"zeroRecords": "Nessuna riga presente"
 							},
-							"pageLength": 20,
+							"paging": false,
+							"searching": false,
 							"lengthChange": false,
 							"info": false,
 							"order": [
-								[0, 'asc'],
-								[1, 'asc'],
-								[2, 'asc'],
-								[3, 'desc']
+								[0, 'asc']
 							],
 							"autoWidth": false,
 							"columns": [
-								{"name": "articolo", "data": null, render: function (data, type, row) {
+								{"name": "descrizione", "data": "descrizione"},
+								{"name": "lotto", "data": "lotto"},
+								{"name": "unitaMisura", "data": null, render: function (data, type, row) {
 									var result = '';
-									if (data.articolo != null) {
-										result = data.articolo.codice+' - '+data.articolo.descrizione;
+									if(data.unitaMisura != null){
+										result = data.unitaMisura.etichetta;
 									}
 									return result;
 								}},
-								{"name": "lotto", "data": "lotto"},
-								{"name": "scadenza", "data": null, render: function (data, type, row) {
-									var a = moment(data.scadenza);
-									return a.format('DD/MM/YYYY');
-								}},
 								{"name": "quantita", "data": "quantita"},
-								{"name": "pezzi", "data": "numeroPezzi"},
 								{"name": "prezzo", "data": "prezzo"},
 								{"name": "sconto", "data": "sconto"},
 								{"name": "imponibile", "data": "imponibile"},
-								{"name": "costo", "data": "costo"}
+								{"name": "aliquotaIva", "data": null, render: function (data, type, row) {
+									var result = '';
+									if (data.aliquotaIva != null) {
+										result = data.aliquotaIva.valore;
+									}
+									return result;
+								}}
 							]
 						});
 					}
@@ -246,53 +344,6 @@ $(document).ready(function() {
 								}},
 								{"name": "totaleIva", "data": "totaleIva"},
 								{"name": "totaleImponibile", "data": "totaleImponibile"}
-							]
-						});
-					}
-
-					if(result.notaAccreditoInfo != null && result.notaAccreditoInfo != undefined){
-						$('#detailsNoteAccreditoInfoModalTable').DataTable({
-							"data": result.notaAccreditoInfo,
-							"language": {
-								"paginate": {
-									"first": "Inizio",
-									"last": "Fine",
-									"next": "Succ.",
-									"previous": "Prec."
-								},
-								"search": "Cerca",
-								"emptyTable": "Nessuna info aggiuntiva presente",
-								"zeroRecords": "Nessuna info aggiuntiva presente"
-							},
-							"paging": false,
-							"searching": false,
-							"lengthChange": false,
-							"info": false,
-							"order": [
-								[0, 'asc']
-							],
-							"autoWidth": false,
-							"columns": [
-								{"name": "descrizione", "data": "descrizione"},
-								{"name": "lotto", "data": "lotto"},
-								{"name": "unitaMisura", "data": null, render: function (data, type, row) {
-									var result = '';
-									if(data.unitaMisura != null){
-										result = data.unitaMisura.etichetta;
-									}
-									return result;
-								}},
-								{"name": "quantita", "data": "quantita"},
-								{"name": "prezzo", "data": "prezzo"},
-								{"name": "sconto", "data": "sconto"},
-								{"name": "aliquotaIva", "data": null, render: function (data, type, row) {
-									var result = '';
-									if (data.aliquotaIva != null) {
-										result = data.aliquotaIva.valore;
-									}
-									return result;
-								}},
-								{"name": "imponibile", "data": "imponibile"}
 							]
 						});
 					}
@@ -355,6 +406,7 @@ $(document).ready(function() {
 			var cliente = $('#searchCliente').val();
 			var agente = $('#searchAgente option:selected').val();
 			var articolo = $('#searchArticolo option:selected').val();
+			var stato = $('#searchStato option:selected').val();
 
 			var params = {};
 			if(dataDa != null && dataDa != undefined && dataDa != ''){
@@ -377,6 +429,9 @@ $(document).ready(function() {
 			}
 			if(articolo != null && articolo != undefined && articolo != ''){
 				params.articolo = articolo;
+			}
+			if(stato != null && stato != undefined && stato != ''){
+				params.stato = stato;
 			}
 			var url = baseUrl + "note-accredito?" + $.param( params );
 
@@ -407,15 +462,9 @@ $(document).ready(function() {
 		$(document).on('submit','#newNotaAccreditoForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-			var validLotto = $.fn.validateLotto();
-			if(!validLotto){
-				$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
-				return false;
-			}
 
 			var notaAccredito = new Object();
 			notaAccredito.progressivo = $('#progressivo').val();
@@ -426,29 +475,50 @@ $(document).ready(function() {
 			cliente.id = $('#cliente option:selected').val();
 			notaAccredito.cliente = cliente;
 
-			var notaAccreditoArticoliLength = $('.rowArticolo').length;
-			if(notaAccreditoArticoliLength != null && notaAccreditoArticoliLength != undefined && notaAccreditoArticoliLength != 0){
-				var notaAccreditoArticoli = [];
+			notaAccredito.note = $('#note').val();
+
+			var notaAccreditoRigheLength = $('.rowArticolo').length;
+			if(notaAccreditoRigheLength != null && notaAccreditoRigheLength != undefined && notaAccreditoRigheLength != 0){
+				var notaAccreditoRighe = [];
 				$('.rowArticolo').each(function(i, item){
 					var articoloId = $(this).attr('data-id');
 
-					var notaAccreditoArticolo = {};
-					var notaAccreditoArticoloId = new Object();
-					notaAccreditoArticoloId.articoloId = articoloId;
-					notaAccreditoArticolo.id = notaAccreditoArticoloId;
+					var notaAccreditoRiga = {};
 
-					notaAccreditoArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-					notaAccreditoArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
-					notaAccreditoArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-					notaAccreditoArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-					notaAccreditoArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-					notaAccreditoArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+					var notaAccreditoRigaId = new Object();
+					notaAccreditoRiga.id = notaAccreditoRigaId;
 
-					notaAccreditoArticoli.push(notaAccreditoArticolo);
+					notaAccreditoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
+					notaAccreditoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
+					notaAccreditoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
+
+					var udm = $(this).children().eq(3).children().eq(0).val();
+					if(udm != null && udm != ""){
+						var unitaMisura = new Object();
+						unitaMisura.id = udm;
+						notaAccreditoRiga.unitaMisura = unitaMisura;
+					}
+					notaAccreditoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
+					notaAccreditoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
+					notaAccreditoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
+
+					var iva = $(this).children().eq(8).children().eq(0).val();
+					if(iva != null && iva != ""){
+						var aliquotaIva = new Object();
+						aliquotaIva.id = iva;
+						notaAccreditoRiga.aliquotaIva = aliquotaIva;
+					}
+
+					if(articoloId != null && articoloId != ""){
+						var articolo = new Object();
+						articolo.id = articoloId;
+						notaAccreditoRiga.articolo = articolo;
+					}
+
+					notaAccreditoRighe.push(notaAccreditoRiga);
 				});
-				notaAccredito.notaAccreditoArticoli = notaAccreditoArticoli;
+				notaAccredito.notaAccreditoRighe = notaAccreditoRighe;
 			}
-			notaAccredito.note = $('#note').val();
 
 			var notaAccreditoTotaliLength = $('.rowTotaliByIva').length;
 			if(notaAccreditoTotaliLength != null && notaAccreditoTotaliLength != undefined && notaAccreditoTotaliLength != 0){
@@ -725,8 +795,9 @@ $(document).ready(function() {
 			}
 			var sconto = $('#articolo option:selected').attr('data-sconto');
 
-			$('#udm').val(udm);
-			$('#iva').val(iva);
+			$('#udm option[value="' + udm +'"]').attr('selected', true);
+			$('#iva option[value="' + iva +'"]').attr('selected', true);
+
 			$('#lotto').val('');
 			$('#scadenza').val('');
 			$('#quantita').val(quantita);
@@ -734,8 +805,8 @@ $(document).ready(function() {
 			$('#prezzo').val(prezzo);
 			$('#sconto').val(sconto);
 		} else {
-			$('#udm').val('');
-			$('#iva').val('');
+			('#udm option[value=""]').attr('selected', true);
+			('#iva option[value=""]').attr('selected', true);
 			$('#lotto').val('');
 			$('#scadenza').val('');
 			$('#quantita').val('');
@@ -750,24 +821,13 @@ $(document).ready(function() {
 
 		var articoloId = $('#articolo option:selected').val();
 
-		if(articoloId == null || articoloId == undefined || articoloId == ''){
-			var alertContent = '<div class="alert alert-danger alert-dismissable">\n' +
-				'                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>\n' +
-				'                Seleziona un articolo\n' +
-				'              </div>';
-
-			$('#addNotaAccreditoArticoloAlert').empty().append(alertContent);
-			return;
-		} else {
-			$('#addNotaAccreditoArticoloAlert').empty();
-		}
+		$('#addNotaAccreditoArticoloAlert').empty();
 
 		var articolo = $('#articolo option:selected').text();
 		var udm = $('#udm').val();
 		var lotto = $('#lotto').val();
 		var scadenza = $('#scadenza').val();
 		var quantita = $('#quantita').val();
-		var pezzi = $('#pezzi').val();
 		var prezzo = $('#prezzo').val();
 		var sconto = $('#sconto').val();
 		var iva = $('#iva').val();
@@ -779,98 +839,76 @@ $(document).ready(function() {
 			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="" data-codice-fornitore="'+codiceFornitore+'">';
 		}
 		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
-
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+ $.fn.fixDecimalPlaces(quantita,3)+'">';
-		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale" value="'+pezzi+'">';
 		var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+prezzo+'">';
 		var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+sconto+'">';
 
-		// check if a same articolo was already added
-		var found = 0;
-		var currentRowIndex;
-		var currentIdArticolo;
-		var currentLotto;
-		var currentPrezzo;
-		var currentSconto;
-		var currentScadenza;
-		var currentQuantita = 0;
-		var currentPezzi = 0;
-
-		var notaAccreditoArticoliLength = $('.rowArticolo').length;
-		if(notaAccreditoArticoliLength != null && notaAccreditoArticoliLength != undefined && notaAccreditoArticoliLength != 0) {
-			$('.rowArticolo').each(function(i, item){
-
-				if(found != 1){
-					currentRowIndex = $(this).attr('data-row-index');
-					currentIdArticolo = $(this).attr('data-id');
-					currentLotto = $(this).children().eq(1).children().eq(0).val();
-					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
-					currentSconto = $(this).children().eq(7).children().eq(0).val();
-
-					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
-						found = 1;
-						currentQuantita = $(this).children().eq(4).children().eq(0).val();
-						currentPezzi = $(this).children().eq(5).children().eq(0).val();
+		var udmHtml = '<select class="form-control form-control-sm ">\n' +
+			'                    <option value=""></option>';
+		var udmValues = $('#_udm').data("udmValues");
+		if(udmValues != null){
+			udmValues.forEach(function(item, i){
+				udmHtml += '<option value="'+item.id+'"';
+				if(udm != null && udm != ""){
+					if(udm == item.id){
+						udmHtml += ' selected';
 					}
 				}
+				udmHtml += '>'+item.etichetta+'</option>';
 			});
 		}
+		udmHtml += '</select>';
+
+		var ivaHtml = '<select class="form-control form-control-sm compute-totale">';
+		var ivaValues = $('#_iva').data("ivaValues");
+		if(ivaValues != null){
+			ivaValues.forEach(function(item, i){
+				ivaHtml += '<option value="'+item.id+'"';
+				if(iva != null && iva != ""){
+					if(iva == item.id){
+						ivaHtml += ' selected';
+					}
+				}
+				ivaHtml += '>'+item.valore+'</option>';
+			});
+		}
+		ivaHtml += '</select>';
+
+		var descrizioneHtml = '<textarea rows="1" style="width: 100%">'+articolo+'</textarea>';
 
 		var totale = 0;
 		quantita = $.fn.parseValue(quantita, 'float');
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		sconto = $.fn.parseValue(sconto, 'float');
-		pezzi = $.fn.parseValue(pezzi, 'int');
 
-		var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
+		var quantitaPerPrezzo = (quantita * prezzo);
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		var table = $('#notaAccreditoArticoliTable').DataTable();
-		if(found == 1){
-			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(3).children().eq(0).val(quantita + $.fn.parseValue(currentQuantita,'float'));
-			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(7).text(totale);
 
-			var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+		var rowsCount = $.fn.getMaxRowsCountArticoliTable();
 
-			var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
-			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'int'))+'">';
+		var deleteLink = '<a class="deleteNotaAccreditoArticolo" data-row-index="'+(parseInt(rowsCount) + 1)+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
-			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
-			rowData[4] = newQuantitaHtml;
-			rowData[5] = newPezziHtml;
-			rowData[8] = totale;
-			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
-			//$('#ddtArticoliTable').DataTable().row(currentRowIndex)
+		var rowNode = table.row.add( [
+			descrizioneHtml,
+			lottoHtml,
+			scadenzaHtml,
+			udmHtml,
+			quantitaHtml,
+			prezzoHtml,
+			scontoHtml,
+			totale,
+			ivaHtml,
+			deleteLink
+		] ).draw( false ).node();
+		$(rowNode).css('text-align', 'center');
+		$(rowNode).addClass('rowArticolo');
+		$(rowNode).attr('data-id', articoloId);
+		$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
 
-		} else {
-			var deleteLink = '<a class="deleteNotaAccreditoArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
-			var rowsCount = table.rows().count();
-
-			var rowNode = table.row.add( [
-				articolo,
-				lottoHtml,
-				scadenzaHtml,
-				udm,
-				quantitaHtml,
-				pezziHtml,
-				prezzoHtml,
-				scontoHtml,
-				totale,
-				iva,
-				deleteLink
-			] ).draw( false ).node();
-			$(rowNode).css('text-align', 'center');
-			$(rowNode).addClass('rowArticolo');
-			$(rowNode).attr('data-id', articoloId);
-			$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
-		}
 		$.fn.computeTotale();
 
 		$('#articolo option[value=""]').prop('selected',true);
@@ -900,9 +938,9 @@ $(document).ready(function() {
 		$.row = $(this).parent().parent();
 		var quantita = $.row.children().eq(4).children().eq(0).val();
 		quantita = $.fn.parseValue(quantita, 'float');
-		var prezzo = $.row.children().eq(6).children().eq(0).val();
+		var prezzo = $.row.children().eq(5).children().eq(0).val();
 		prezzo = $.fn.parseValue(prezzo, 'float');
-		var sconto = $.row.children().eq(7).children().eq(0).val();
+		var sconto = $.row.children().eq(6).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
 
 		var quantitaPerPrezzo = (quantita * prezzo);
@@ -910,7 +948,7 @@ $(document).ready(function() {
 		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		//var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
-		$.row.children().eq(8).text(totale);
+		$.row.children().eq(7).text(totale);
 
 		$.fn.computeTotale();
 	});
@@ -935,6 +973,7 @@ $.fn.preloadSearchFields = function(){
 		}
 	});
 
+	/*
 	$.ajax({
 		url: baseUrl + "articoli?attivo=true",
 		type: 'GET',
@@ -943,6 +982,23 @@ $.fn.preloadSearchFields = function(){
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
 					$('#searchArticolo').append('<option value="'+item.id+'" >'+item.codice+' '+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+	*/
+
+	$.ajax({
+		url: baseUrl + "stati-note-accredito",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchStato').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
 				});
 			}
 		},
@@ -1029,12 +1085,12 @@ $.fn.getArticoli = function(){
 					var dataUdm = '';
 					var udm = item.unitaMisura;
 					if(udm != null && udm != undefined){
-						dataUdm = udm.etichetta;
+						dataUdm = udm.id;
 					}
 					var dataIva = '';
 					var iva = item.aliquotaIva;
 					if(iva != null && iva != undefined){
-						dataIva = iva.valore;
+						dataIva = iva.id;
 					}
 					var dataQta = item.quantitaPredefinita;
 					var dataPrezzoBase = item.prezzoListinoBase;
@@ -1042,6 +1098,51 @@ $.fn.getArticoli = function(){
 
 					$('#articolo').selectpicker('refresh');
 				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+
+$.fn.getUnitaMisura = function(){
+	$.ajax({
+		url: baseUrl + "unita-misura",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				var udm = [];
+				$.each(result, function(i, item){
+					$('#udm').append('<option value="'+item.id+'">'+item.etichetta+'</option>');
+
+					udm.push(item);
+				});
+				$('#_udm').data("udmValues", udm);
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getAliquoteIVa = function(){
+	$.ajax({
+		url: baseUrl + "aliquote-iva?all=true",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			var iva = [];
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#iva').append('<option value="'+item.id+'">'+item.valore+'</option>');
+
+					iva.push(item);
+				});
+				$('#_iva').data("ivaValues", iva);
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -1180,14 +1281,37 @@ $.fn.formatNumber = function(value){
 	return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
 }
 
+$.fn.getMaxRowsCountArticoliTable = function(){
+	var maxRowsCount = 0;
+	var rowIndexes = [];
+	$('#notaAccreditoArticoliTable tbody tr').each(function(i, item){
+		rowIndexes.push($.fn.parseValue($(this).attr('data-row-index'), 'int'));
+	});
+
+	if (Array.isArray(rowIndexes) && rowIndexes.length > 0){
+		maxRowsCount= Math.max.apply(null, rowIndexes);
+	}
+
+	return maxRowsCount;
+}
+
+$.fn.emptyTotaliTable = function(){
+	$('#notaAccreditoTotaliTable tbody tr').each(function(i, item){
+		$(this).find('td').eq(1).text('');
+		$(this).find('td').eq(2).text('');
+	});
+}
+
 $.fn.computeTotale = function() {
 	var ivaMap = new Map();
 	var totaleDocumento = 0;
 
+	$.fn.emptyTotaliTable();
+
 	$('.rowArticolo').each(function(i, item){
-		var totale = $(this).children().eq(8).text();
+		var totale = $(this).children().eq(7).text();
 		totale = $.fn.parseValue(totale, 'float');
-		var iva = $(this).children().eq(9).text();
+		var iva = $(this).children().eq(8).children().eq(0).find('option:selected').text();
 		iva = $.fn.parseValue(iva, 'int');
 
 		var totaliIva;
@@ -1205,12 +1329,17 @@ $.fn.computeTotale = function() {
 		var totaleConIva = totalePerIva + (totalePerIva * key/100);
 
 		totaleDocumento += totaleConIva;
+
+		// populating the table with iva and imponibile
+		$('tr[data-valore='+key+']').find('td').eq(1).text($.fn.formatNumber((totalePerIva * key/100)));
+		$('tr[data-valore='+key+']').find('td').eq(2).text($.fn.formatNumber(totalePerIva));
 	});
 
 	if(totaleDocumento != null && totaleDocumento != undefined && totaleDocumento != ""){
 		totaleDocumento = parseFloat(totaleDocumento);
 	}
 	$('#totale').val(Number(Math.round(totaleDocumento+'e2')+'e-2'));
+
 }
 
 $.fn.checkVariableIsNull = function(variable){

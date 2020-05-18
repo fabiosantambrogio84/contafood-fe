@@ -102,14 +102,14 @@
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-2">
-                    <label for="searchAgente" class="mb-0">Agente</label>
-                    <select id="searchAgente" class="form-control form-control-sm" >
+                    <label for="searchStato" class="mb-0">Stato</label>
+                    <select id="searchStato" class="form-control form-control-sm" >
                       <option value=""></option>
                     </select>
                   </div>
-                  <div class="form-group col-md-3">
-                    <label for="searchArticolo" class="mb-0">Articolo</label>
-                    <select id="searchArticolo" class="form-control form-control-sm" >
+                  <div class="form-group col-md-2">
+                    <label for="searchAgente" class="mb-0">Agente</label>
+                    <select id="searchAgente" class="form-control form-control-sm" >
                       <option value=""></option>
                     </select>
                   </div>
@@ -247,6 +247,14 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Stato</h6>
+                            <p class="card-text" id="stato"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
                             <h6 class="card-title mb-0 font-weight-bold">Spedito A.d.E</h6>
                             <p class="card-text" id="speditoAde"></p>
                           </div>
@@ -261,24 +269,22 @@
                         </div>
                       </div>
                       <div class="col-sm">&nbsp;</div>
-                      <div class="col-sm">&nbsp;</div>
                     </div>
                   </div>
 
                   <hr class="my-4">
 
                   <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsNoteAccreditoArticoliModalTable">
+                    <table class="table table-bordered" id="detailsNoteAccreditoRigheModalTable">
                       <thead>
-                      <th>Articolo</th>
+                      <th>Descrizione</th>
                       <th>Lotto</th>
-                      <th>Scadenza</th>
+                      <th>UdM</th>
                       <th>Quantita</th>
-                      <th>Pezzi</th>
                       <th>Prezzo (€)</th>
                       <th>Sconto (€)</th>
                       <th>Imponibile (€)</th>
-                      <th>Costo (€)</th>
+                      <th>Iva (%)</th>
                       </thead>
                     </table>
                   </div>
@@ -291,23 +297,6 @@
                       <th>Iva</th>
                       <th>Totale Iva (€)</th>
                       <th>Totale Imponibile (€)</th>
-                      </thead>
-                    </table>
-                  </div>
-
-                  <hr class="my-4">
-
-                  <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsNoteAccreditoInfoModalTable">
-                      <thead>
-                      <th>Descrizione</th>
-                      <th>Lotto</th>
-                      <th>UdM</th>
-                      <th>Quantita</th>
-                      <th>Prezzo (€)</th>
-                      <th>Sconto (€)</th>
-                      <th>Imponibile (€)</th>
-                      <th>Iva (%)</th>
                       </thead>
                     </table>
                   </div>
