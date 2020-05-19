@@ -42,15 +42,19 @@ $.fn.loadPagamentiTable = function(url) {
 			}},
 			{"name": "cliente", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var clienteHtml = '';
+				var cliente;
 				var ddt = data.ddt;
-				if(ddt != null && ddt != undefined && ddt != ''){
-					var cliente = ddt.cliente;
-					if(cliente != null && cliente != undefined && cliente != ''){
-						if(cliente.dittaIndividuale){
-							clienteHtml += cliente.nome + ' - ' + cliente.cognome;
-						} else {
-							clienteHtml += cliente.ragioneSociale;
-						}
+				var notaAccredito = data.notaAccredito;
+				if(ddt != null && ddt != ''){
+					cliente = ddt.cliente;
+				} else if(notaAccredito != null && notaAccredito != ''){
+					cliente = notaAccredito.cliente;
+				}
+				if(cliente != null && cliente != undefined && cliente != ''){
+					if(cliente.dittaIndividuale){
+						clienteHtml += cliente.nome + ' - ' + cliente.cognome;
+					} else {
+						clienteHtml += cliente.ragioneSociale;
 					}
 				}
 				return clienteHtml;
@@ -96,14 +100,14 @@ $.fn.loadPagamentiTable = function(url) {
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
 
-	$.fn.loadPagamentiTable(baseUrl + "ddts/pagamenti");
+	$.fn.loadPagamentiTable(baseUrl + "pagamenti");
 
 	$(document).on('click','#resetSearchPagamentoButton', function(){
 		$('#searchPagamentoForm :input').val(null);
 		$('#searchPagamentoForm select option[value=""]').attr('selected', true);
 
 		$('#pagamentiTable').DataTable().destroy();
-		$.fn.loadPagamentiTable(baseUrl + "ddts/pagamenti");
+		$.fn.loadPagamentiTable(baseUrl + "pagamenti");
 	});
 
 	$(document).on('click','.deletePagamento', function(){
@@ -117,7 +121,7 @@ $(document).ready(function() {
 		var idPagamento = $(this).attr('data-id');
 
 		$.ajax({
-			url: baseUrl + "ddts/pagamenti/" + idPagamento,
+			url: baseUrl + "pagamenti/" + idPagamento,
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<div id="alertPagamentoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
@@ -162,7 +166,7 @@ $(document).ready(function() {
 			if(importo != null && importo != undefined && importo != ''){
 				params.importo = importo;
 			}
-			var url = baseUrl + "ddts/pagamenti?" + $.param( params );
+			var url = baseUrl + "pagamenti?" + $.param( params );
 
 			$('#pagamentiTable').DataTable().destroy();
 			$.fn.loadPagamentiTable(url);
@@ -174,6 +178,7 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var idDdt = $('#hiddenIdDdt').val();
+			var idNotaAccredito = $('#hiddenIdNotaAccredito').val();
 
 			var pagamento = new Object();
 			pagamento.data = $('#data').val();
@@ -184,8 +189,16 @@ $(document).ready(function() {
 			pagamento.tipoPagamento = tipoPagamento;
 
 			var ddt = new Object();
-			ddt.id = idDdt;
+			if(idDdt != null && idDdt != ""){
+				ddt.id = idDdt;
+			}
 			pagamento.ddt = ddt;
+
+			var notaAccredito = new Object();
+			if(idNotaAccredito != null && idNotaAccredito != ""){
+				notaAccredito.id = idNotaAccredito;
+			}
+			pagamento.notaAccredito = notaAccredito;
 
 			pagamento.importo = $('#importo').val();
 			pagamento.note = $('#note').val();
@@ -197,7 +210,7 @@ $(document).ready(function() {
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
-				url: baseUrl + "ddts/"+idDdt+"/pagamenti",
+				url: baseUrl + "pagamenti",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
@@ -207,9 +220,14 @@ $(document).ready(function() {
 
 					$('#newPagamentoButton').attr("disabled", true);
 
+					var returnPage = "ddt.html";
+					if(idNotaAccredito != null && idNotaAccredito != ""){
+						returnPage = 'note-accredito.html';
+					}
+
 					// Returns to the page with the list of DDTs
 					setTimeout(function() {
-						window.location.href = "ddt.html";
+						window.location.href = returnPage;
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -246,6 +264,22 @@ $.fn.extractIdDdtFromUrl = function(){
     }
 }
 
+$.fn.extractIdNotaAccreditoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idNotaAccredito') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
 $.fn.getTipiPagamento = function(){
 	$.ajax({
 		url: baseUrl + "tipi-pagamento",
@@ -258,7 +292,6 @@ $.fn.getTipiPagamento = function(){
 					$('#tipoPagamento').append('<option value="'+item.id+'" >'+label+'</option>');
 				});
 
-				$('#data').val(moment().format('YYYY-MM-DD'));
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -300,6 +333,47 @@ $.fn.getDdt = function(idDdt){
 				$('#descrizione').val(descrizione);
 
 				$('#hiddenIdDdt').val(result.id);
+				$('#data').val(moment().format('YYYY-MM-DD'));
+
+				$('#annullaPagamentoButton').attr('href', 'ddt.html');
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getNotaAccredito = function(idNotaAccredito){
+	$.ajax({
+		url: baseUrl + "note-accredito/" + idNotaAccredito,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				var totaleAcconto = result.totaleAcconto;
+				var totale = result.totale;
+
+				if(totaleAcconto == null || totaleAcconto == undefined || totaleAcconto == ''){
+					totaleAcconto = 0;
+				}
+
+				if(totale == null || totale == undefined || totale == ''){
+					totale = 0;
+				}
+
+				var importo = (totale - totaleAcconto);
+				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
+
+				var descrizione = "Pagamento NOTA ACCREDITO n. "+result.progressivo+" del "+moment(result.data).format('DD/MM/YYYY');
+				$('#descrizione').val(descrizione);
+
+				$('#tipoPagamento').parent().remove();
+
+				$('#hiddenIdNotaAccredito').val(result.id);
+				$('#data').val(moment().format('YYYY-MM-DD'));
+
+				$('#annullaPagamentoButton').attr('href', 'note-accredito.html');
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {

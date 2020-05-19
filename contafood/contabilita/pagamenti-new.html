@@ -37,10 +37,13 @@
 
   <script>
     var idDdt = $.fn.extractIdDdtFromUrl();
-    if(idDdt != null && idDdt != undefined){
+    var idNotaAccredito = $.fn.extractIdNotaAccreditoFromUrl();
+    if(idDdt != null && idDdt != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
         $.fn.getDdt(idDdt);
       });
+    } else if(idNotaAccredito != null && idNotaAccredito != ""){
+      $.fn.getNotaAccredito(idNotaAccredito);
     } else {
       $.fn.getTipiPagamento();
     }
@@ -119,8 +122,10 @@
           </div>
 
           <input type="hidden" id="hiddenIdDdt"/>
+          <input type="hidden" id="hiddenIdNotaAccredito"/>
+
           <button type="submit" class="btn btn-primary" id="newPagamentoButton">Salva</button>
-          <a href="ddt.html" class="btn btn-secondary">Annulla</a>
+          <a href="" class="btn btn-secondary" id="annullaPagamentoButton">Annulla</a>
         </form>
 
         <script>
