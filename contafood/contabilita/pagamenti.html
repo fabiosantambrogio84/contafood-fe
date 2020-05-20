@@ -35,6 +35,9 @@
 
   <script src="../js/pagamenti.js"></script>
 
+  <script>
+    $.fn.preloadSearchFields();
+  </script>
 </head>
 
 <body id="page-top">
@@ -90,9 +93,21 @@
                     <label for="searchCliente" class="mb-0">Cliente</label>
                     <input type="text" class="form-control form-control-sm" id="searchCliente">
                   </div>
+                  <div class="form-group col-md-3">
+                    <label for="searchFornitore" class="mb-0">Fornitore</label>
+                    <input type="text" class="form-control form-control-sm" id="searchFornitore">
+                  </div>
                   <div class="form-group col-md-2">
                     <label for="searchImporto" class="mb-0">Importo</label>
                     <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group col-md-2">
+                    <label for="searchTipologia" class="mb-0">Tipologia</label>
+                    <select id="searchTipologia" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
                   </div>
                 </div>
 
@@ -108,6 +123,7 @@
         		    <tr style="font-size: 12px;">
                       <th>Data</th>
                       <th>Cliente</th>
+                      <th>Fornitore</th>
                       <th>Descrizione</th>
                       <th>Importo (€)</th>
                       <th>Pagamento</th>

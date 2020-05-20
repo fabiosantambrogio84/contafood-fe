@@ -59,6 +59,18 @@ $.fn.loadPagamentiTable = function(url) {
 				}
 				return clienteHtml;
 			}},
+			{"name": "fornitore", "data": null, "width":"8%", render: function ( data, type, row ) {
+				var fornitoreHtml = '';
+				var fornitore;
+				var notaReso = data.notaReso;
+				if(notaReso != null && notaReso != ''){
+					fornitore = notaReso.fornitore;
+				}
+				if(fornitore != null && fornitore != undefined && fornitore != ''){
+					fornitoreHtml += fornitore.ragioneSociale;
+				}
+				return fornitoreHtml;
+			}},
 			{"name": "descrizione", "data": "descrizione", "width":"12%"},
 			{"name": "importo", "data": null, "width":"5%", render: function ( data, type, row ) {
 				return $.fn.formatNumber(data.importo);
@@ -95,7 +107,6 @@ $.fn.loadPagamentiTable = function(url) {
 		}
 	});
 }
-
 
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
@@ -151,7 +162,9 @@ $(document).ready(function() {
 			var dataDa = $('#searchDataFrom').val();
 			var dataA = $('#searchDataTo').val();
 			var cliente = $('#searchCliente').val();
+			var fornitore = $('#searchFornitore').val();
 			var importo = $('#searchImporto').val();
+			var tipologia = $('#searchTipologia option:selected').val();
 
 			var params = {};
 			if(dataDa != null && dataDa != undefined && dataDa != ''){
@@ -163,8 +176,14 @@ $(document).ready(function() {
 			if(cliente != null && cliente != undefined && cliente != ''){
 				params.cliente = cliente;
 			}
+			if(fornitore != null && fornitore != undefined && fornitore != ''){
+				params.fornitore = fornitore;
+			}
 			if(importo != null && importo != undefined && importo != ''){
 				params.importo = importo;
+			}
+			if(tipologia != null && tipologia != undefined && tipologia != ''){
+				params.tipologia = tipologia;
 			}
 			var url = baseUrl + "pagamenti?" + $.param( params );
 
@@ -179,6 +198,7 @@ $(document).ready(function() {
 
 			var idDdt = $('#hiddenIdDdt').val();
 			var idNotaAccredito = $('#hiddenIdNotaAccredito').val();
+			var idNotaReso = $('#hiddenIdNotaReso').val();
 
 			var pagamento = new Object();
 			pagamento.data = $('#data').val();
@@ -188,18 +208,30 @@ $(document).ready(function() {
 			tipoPagamento.id = $('#tipoPagamento option:selected').val();
 			pagamento.tipoPagamento = tipoPagamento;
 
+			var tipologia;
+
 			var ddt = new Object();
 			if(idDdt != null && idDdt != ""){
 				ddt.id = idDdt;
+				tipologia = "DDT";
 			}
 			pagamento.ddt = ddt;
 
 			var notaAccredito = new Object();
 			if(idNotaAccredito != null && idNotaAccredito != ""){
 				notaAccredito.id = idNotaAccredito;
+				tipologia = "NOTA_ACCREDITO";
 			}
 			pagamento.notaAccredito = notaAccredito;
 
+			var notaReso = new Object();
+			if(idNotaReso != null && idNotaReso != ""){
+				notaReso.id = idNotaReso;
+				tipologia = "NOTA_RESO_FORNITORE";
+			}
+			pagamento.notaReso = notaReso;
+
+			pagamento.tipologia = tipologia;
 			pagamento.importo = $('#importo').val();
 			pagamento.note = $('#note').val();
 
@@ -223,6 +255,8 @@ $(document).ready(function() {
 					var returnPage = "ddt.html";
 					if(idNotaAccredito != null && idNotaAccredito != ""){
 						returnPage = 'note-accredito.html';
+					} else if(idNotaReso != null && idNotaReso != ""){
+						returnPage = 'note-reso.html';
 					}
 
 					// Returns to the page with the list of DDTs
@@ -247,6 +281,26 @@ $(document).ready(function() {
 		});
 	}
 });
+
+$.fn.preloadSearchFields = function(){
+
+	$.ajax({
+		url: baseUrl + "utils/tipologie-pagamenti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchTipologia').append('<option value="'+item.value+'" >'+item.label+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+}
 
 $.fn.extractIdDdtFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
@@ -275,6 +329,22 @@ $.fn.extractIdNotaAccreditoFromUrl = function(){
 		paramNames = urlVariables[i].split('=');
 
 		if (paramNames[0] === 'idNotaAccredito') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
+$.fn.extractIdNotaResoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idNotaReso') {
 			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
 		}
 	}
@@ -374,6 +444,44 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 				$('#data').val(moment().format('YYYY-MM-DD'));
 
 				$('#annullaPagamentoButton').attr('href', 'note-accredito.html');
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getNotaReso = function(idNotaReso){
+	$.ajax({
+		url: baseUrl + "note-reso/" + idNotaReso,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				var totaleAcconto = result.totaleAcconto;
+				var totale = result.totale;
+
+				if(totaleAcconto == null || totaleAcconto == undefined || totaleAcconto == ''){
+					totaleAcconto = 0;
+				}
+
+				if(totale == null || totale == undefined || totale == ''){
+					totale = 0;
+				}
+
+				var importo = (totale - totaleAcconto);
+				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
+
+				var descrizione = "Pagamento NOTA RESO FORNITORE n. "+result.progressivo+" del "+moment(result.data).format('DD/MM/YYYY');
+				$('#descrizione').val(descrizione);
+
+				$('#tipoPagamento').parent().remove();
+
+				$('#hiddenIdNotaReso').val(result.id);
+				$('#data').val(moment().format('YYYY-MM-DD'));
+
+				$('#annullaPagamentoButton').attr('href', 'note-reso.html');
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {

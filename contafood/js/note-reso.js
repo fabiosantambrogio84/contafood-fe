@@ -1,8 +1,8 @@
 var baseUrl = "/contafood-be/";
 
-$.fn.loadNoteAccreditoTable = function(url) {
+$.fn.loadNoteResoTable = function(url) {
 
-	$('#noteAccreditoTable').DataTable({
+	$('#noteResoTable').DataTable({
 		"ajax": {
 			"url": url,
 			"type": "GET",
@@ -11,10 +11,10 @@ $.fn.loadNoteAccreditoTable = function(url) {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertNoteAccreditoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Errore nel recupero delle Note Accredito</strong>\n' +
+				var alertContent = '<div id="alertNoteResoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero delle Note Reso</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertNoteAccredito').empty().append(alertContent);
+				$('#alertNoteReso').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -25,8 +25,8 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				"next": "Succ.",
 				"previous": "Prec."
 			},
-			"emptyTable": "Nessuna Nota Accredito disponibile",
-			"zeroRecords": "Nessun Nota Accredito disponibile"
+			"emptyTable": "Nessuna Nota Reso disponibile",
+			"zeroRecords": "Nessun Nota Reso disponibile"
 		},
 		"searching": false,
 		"responsive":true,
@@ -52,20 +52,10 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				var a = moment(data.data);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"name": "cliente", "data": null, "width":"15%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					return cliente.ragioneSociale;
-				}
-				return '';
-			}},
-			{"name": "agente", "data": null, "width":"15%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					var agente = cliente.agente;
-					if(agente != null){
-						return agente.nome + ' ' + agente.cognome;
-					}
+			{"name": "fornitore", "data": null, "width":"15%", render: function ( data, type, row ) {
+				var fornitore = data.fornitore;
+				if(fornitore != null){
+					return fornitore.ragioneSociale;
 				}
 				return '';
 			}},
@@ -75,53 +65,53 @@ $.fn.loadNoteAccreditoTable = function(url) {
 			{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
 				return $.fn.formatNumber(data.totale);
 			}},
-			{"data": null, "orderable":false, "width":"12%", render: function ( data, type, row ) {
-					var acconto = data.totaleAcconto;
-					if(acconto == null || acconto == undefined || acconto == ''){
-						acconto = 0;
-					}
-					var totale = data.totale;
-					if(totale == null || totale == undefined || totale == ''){
-						totale = 0;
-					}
-					var stato = data.statoNotaAccredito;
+			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
+				var acconto = data.totaleAcconto;
+				if(acconto == null || acconto == undefined || acconto == ''){
+					acconto = 0;
+				}
+				var totale = data.totale;
+				if(totale == null || totale == undefined || totale == ''){
+					totale = 0;
+				}
+				var stato = data.statoNotaReso;
 
-				var links = '<a class="detailsNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+				var links = '<a class="detailsNotaReso pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
 				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE'){
-					links += '<a class="updateNotaAccredito pr-1" data-id="'+data.id+'" href="note-accredito-edit.html?idNotaAccredito=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+					links += '<a class="updateNotaReso pr-1" data-id="'+data.id+'" href="note-reso-edit.html?idNotaReso=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 				}
 				if((totale - acconto) != 0){
-					links += '<a class="payNotaAccredito pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idNotaAccredito=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+					links += '<a class="payNotaReso pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idNotaReso=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 				}
-				links += '<a class="emailNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
-				links += '<a class="printNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-				links += '<a class="deleteNotaAccredito" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+				links += '<a class="emailNotaReso pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
+				links += '<a class="printNotaReso pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+				links += '<a class="deleteNotaReso" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
-			if(data.statoNotaAccredito != null){
+			if(data.statoNotaReso != null){
 				var backgroundColor = '';
-				if(data.statoNotaAccredito.codice == 'DA_PAGARE'){
+				if(data.statoNotaReso.codice == 'DA_PAGARE'){
 					backgroundColor = '#fcf456';
-				} else if(data.statoNotaAccredito.codice == 'PARZIALMENTE_PAGATA'){
+				} else if(data.statoNotaReso.codice == 'PARZIALMENTE_PAGATA'){
 					backgroundColor = '#fcc08b';
 				} else {
 					backgroundColor = 'trasparent';
 				}
 				$(row).css('background-color', backgroundColor);
 			}
-			$(cells[5]).css('text-align','right');
-			$(cells[6]).css('font-weight','bold').css('text-align','right');
-			$(cells[7]).css('padding-right','0px').css('padding-left','3px');
+			$(cells[4]).css('text-align','right');
+			$(cells[5]).css('font-weight','bold').css('text-align','right');
+			$(cells[6]).css('padding-right','0px').css('padding-left','3px');
 		}
 	});
 }
 
-$.fn.loadNoteAccreditoTotaliTable = function(){
+$.fn.loadNoteResoTotaliTable = function(){
 
-	$('#notaAccreditoTotaliTable').DataTable({
+	$('#notaResoTotaliTable').DataTable({
 		"ajax": {
 			"url": baseUrl + "aliquote-iva",
 			"type": "GET",
@@ -130,10 +120,10 @@ $.fn.loadNoteAccreditoTotaliTable = function(){
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertNoteAccreditoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertNoteResoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Errore nel recupero delle aliquote iva</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertNoteAccredito').empty().append(alertContent);
+				$('#alertNoteReso').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -178,9 +168,9 @@ $.fn.loadNoteAccreditoTotaliTable = function(){
 	});
 }
 
-$.fn.loadNoteAccreditoRigheTable = function(){
+$.fn.loadNoteResoArticoliTable = function(){
 
-	var table = $('#notaAccreditoArticoliTable').DataTable({
+	var table =  $('#notaResoArticoliTable').DataTable({
 		"searching": false,
 		"language": {
 			"paginate": {
@@ -218,47 +208,38 @@ $.fn.loadNoteAccreditoRigheTable = function(){
 
 $(document).ready(function() {
 
-	$.fn.loadNoteAccreditoTable(baseUrl + "note-accredito");
+	$.fn.loadNoteResoTable(baseUrl + "note-reso");
 
-	if(window.location.search.substring(1).indexOf('idNotaAccredito') == -1){
-		$.fn.loadNoteAccreditoTotaliTable();
-
-		$.fn.loadNoteAccreditoRigheTable();
+	if(window.location.search.substring(1).indexOf('idNotaReso') == -1){
+		$.fn.loadNoteResoTotaliTable();
+		$.fn.loadNoteResoArticoliTable();
 	}
 
-	$(document).on('click','#resetSearchNoteAccreditoButton', function(){
-		$('#searchNoteAccreditoForm :input').val(null);
-		$('#searchNoteAccreditoForm select option[value=""]').attr('selected', true);
+	$(document).on('click','#resetSearchNoteResoButton', function(){
+		$('#searchNoteResoForm :input').val(null);
+		$('#searchNoteResoForm select option[value=""]').attr('selected', true);
 
-		$('#noteAccreditoTable').DataTable().destroy();
-		$.fn.loadNoteAccreditoTable(baseUrl + "note-accredito");
+		$('#noteResoTable').DataTable().destroy();
+		$.fn.loadNoteResoTable(baseUrl + "note-reso");
 	});
 
-	$(document).on('click','.detailsNotaAccredito', function(){
-		var idNotaAccredito = $(this).attr('data-id');
+	$(document).on('click','.detailsNotaReso', function(){
+		var idNotaReso = $(this).attr('data-id');
 
-		var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-		alertContent = alertContent + '<strong>Errore nel recupero della Nota Accredito.</strong></div>';
+		var alertContent = '<div id="alertNotaResoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della Nota Reso.</strong></div>';
 
 		$.ajax({
-			url: baseUrl + "note-accredito/" + idNotaAccredito,
+			url: baseUrl + "note-reso/" + idNotaReso,
 			type: 'GET',
 			dataType: 'json',
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
 					$('#numero').text(result.progressivo);
 					$('#data').text(moment(result.data).format('DD/MM/YYYY'));
-					var cliente = result.cliente;
-					if(cliente != null && cliente != undefined && cliente != ''){
-						if(cliente.dittaIndividuale){
-							$('#cliente').text(cliente.nome + ' ' + cliente.cognome);
-						} else {
-							$('#cliente').text(cliente.ragioneSociale);
-						}
-						var agente = cliente.agente;
-						if(agente != null){
-							$('#agente').text(agente.nome + ' ' + agente.cognome);
-						}
+					var fornitore = result.fornitore;
+					if(fornitore != null && fornitore != undefined && fornitore != ''){
+						$('#fornitore').text(fornitore.ragioneSociale);
 					}
 					$('#totale').text(result.totale);
 					$('#totaleAcconto').text(result.totaleAcconto);
@@ -269,7 +250,7 @@ $(document).ready(function() {
 					} else {
 						$('#speditoAde').text("No");
 					}
-					var stato = result.statoNotaAccredito;
+					var stato = result.statoNotaReso;
 					if(stato != null && stato != undefined && stato != ''){
 						$('#stato').text(stato.descrizione);
 					}
@@ -280,9 +261,9 @@ $(document).ready(function() {
 						$('#dataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
 					}
 
-					if(result.notaAccreditoRighe != null && result.notaAccreditoRighe != undefined){
-						$('#detailsNoteAccreditoRigheModalTable').DataTable({
-							"data": result.notaAccreditoRighe,
+					if(result.notaResoRighe != null && result.notaResoRighe != undefined){
+						$('#detailsNoteResoRigheModalTable').DataTable({
+							"data": result.notaResoRighe,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -327,9 +308,9 @@ $(document).ready(function() {
 						});
 					}
 
-					if(result.notaAccreditoTotali != null && result.notaAccreditoTotali != undefined){
-						$('#detailsNoteAccreditoTotaliModalTable').DataTable({
-							"data": result.notaAccreditoTotali,
+					if(result.notaResoTotali != null && result.notaResoTotali != undefined){
+						$('#detailsNoteResoTotaliModalTable').DataTable({
+							"data": result.notaResoTotali,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -363,9 +344,9 @@ $(document).ready(function() {
 						});
 					}
 
-					if(result.notaAccreditoPagamenti != null && result.notaAccreditoPagamenti != undefined){
-						$('#detailsNoteAccreditoPagamentiModalTable').DataTable({
-							"data": result.notaAccreditoPagamenti,
+					if(result.notaResoPagamenti != null && result.notaResoPagamenti != undefined){
+						$('#detailsNoteResoPagamentiModalTable').DataTable({
+							"data": result.notaResoPagamenti,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -410,45 +391,45 @@ $(document).ready(function() {
 					}
 
 				} else{
-					$('#detailsNoteAccreditoMainDiv').empty().append(alertContent);
+					$('#detailsNoteResoMainDiv').empty().append(alertContent);
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				$('#detailsNoteAccreditoMainDiv').empty().append(alertContent);
+				$('#detailsNoteResoMainDiv').empty().append(alertContent);
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		})
 
-		$('#detailsNoteAccreditoModal').modal('show');
+		$('#detailsNoteResoModal').modal('show');
 	});
 
-	$(document).on('click','.closeNoteAccredito', function(){
-		$('#detailsNoteAccreditoRigheModalTable').DataTable().destroy();
-		$('#detailsNoteAccreditoTotaliModalTable').DataTable().destroy();
-		$('#detailsNoteAccreditoPagamentiModalTable').DataTable().destroy();
-		$('#detailsNoteAccreditoModal').modal('hide');
+	$(document).on('click','.closeNoteReso', function(){
+		$('#detailsNoteResoRigheModalTable').DataTable().destroy();
+		$('#detailsNoteResoTotaliModalTable').DataTable().destroy();
+		$('#detailsNoteResoPagamentiModalTable').DataTable().destroy();
+		$('#detailsNoteResoModal').modal('hide');
 	});
 
-	$(document).on('click','.deleteNotaAccredito', function(){
-		var idNotaAccredito = $(this).attr('data-id');
-		$('#confirmDeleteNoteAccredito').attr('data-id', idNotaAccredito);
-		$('#deleteNoteAccreditoModal').modal('show');
+	$(document).on('click','.deleteNotaReso', function(){
+		var idNotaReso = $(this).attr('data-id');
+		$('#confirmDeleteNoteReso').attr('data-id', idNotaReso);
+		$('#deleteNoteResoModal').modal('show');
 	});
 
-	$(document).on('click','#confirmDeleteNoteAccredito', function(){
-		$('#deleteNoteAccreditoModal').modal('hide');
-		var idNotaAccredito = $(this).attr('data-id');
+	$(document).on('click','#confirmDeleteNoteReso', function(){
+		$('#deleteNoteResoModal').modal('hide');
+		var idNotaReso = $(this).attr('data-id');
 
 		$.ajax({
-			url: baseUrl + "note-accredito/" + idNotaAccredito,
+			url: baseUrl + "note-reso/" + idNotaReso,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertNoteAccreditoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Nota Accredito</strong> cancellata con successo.\n' +
+				var alertContent = '<div id="alertNoteResoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Nota Reso</strong> cancellata con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertNoteAccredito').empty().append(alertContent);
+				$('#alertNoteReso').empty().append(alertContent);
 
-				$('#noteAccreditoTable').DataTable().ajax.reload();
+				$('#noteResoTable').DataTable().ajax.reload();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -456,16 +437,15 @@ $(document).ready(function() {
 		});
 	});
 
-	if($('#searchNoteAccreditoButton') != null && $('#searchNoteAccreditoButton') != undefined) {
-		$(document).on('submit', '#searchNoteAccreditoForm', function (event) {
+	if($('#searchNoteResoButton') != null && $('#searchNoteResoButton') != undefined) {
+		$(document).on('submit', '#searchNoteResoForm', function (event) {
 			event.preventDefault();
 
 			var dataDa = $('#searchDataFrom').val();
 			var dataA = $('#searchDataTo').val();
 			var progressivo = $('#searchProgressivo').val();
 			var importo = $('#searchImporto').val();
-			var cliente = $('#searchCliente').val();
-			var agente = $('#searchAgente option:selected').val();
+			var fornitore = $('#searchFornitore').val();
 			var articolo = $('#searchArticolo option:selected').val();
 			var stato = $('#searchStato option:selected').val();
 
@@ -482,11 +462,8 @@ $(document).ready(function() {
 			if(importo != null && importo != undefined && importo != ''){
 				params.importo = importo;
 			}
-			if(cliente != null && cliente != undefined && cliente != ''){
-				params.cliente = cliente;
-			}
-			if(agente != null && agente != undefined && agente != ''){
-				params.agente = agente;
+			if(fornitore != null && fornitore != undefined && fornitore != ''){
+				params.fornitore = fornitore;
 			}
 			if(articolo != null && articolo != undefined && articolo != ''){
 				params.articolo = articolo;
@@ -494,132 +471,119 @@ $(document).ready(function() {
 			if(stato != null && stato != undefined && stato != ''){
 				params.stato = stato;
 			}
-			var url = baseUrl + "note-accredito?" + $.param( params );
+			var url = baseUrl + "note-reso?" + $.param( params );
 
-			$('#noteAccreditoTable').DataTable().destroy();
-			$.fn.loadNoteAccreditoTable(url);
+			$('#noteResoTable').DataTable().destroy();
+			$.fn.loadNoteResoTable(url);
 
 		});
 	}
 
-	$.fn.validateLotto = function(){
-		var validLotto = true;
-		// check if all input fields 'lotto' are not empty
-		$('.lotto').each(function(i, item){
-			var lottoValue = $(this).val();
-			if($.fn.checkVariableIsNull(lottoValue)){
-				validLotto = false;
-				return false;
-			}
-		});
-		return validLotto;
-	}
-
-	if($('#newNotaAccreditoButton') != null && $('#newNotaAccreditoButton') != undefined && $('#newNotaAccreditoButton').length > 0){
+	if($('#newNotaResoButton') != null && $('#newNotaResoButton') != undefined && $('#newNotaResoButton').length > 0){
 
 		$('#articolo').selectpicker();
-		$('#cliente').selectpicker();
+		$('#fornitore').selectpicker();
 
-		$(document).on('submit','#newNotaAccreditoForm', function(event){
+		$(document).on('submit','#newNotaResoForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertNotaResoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			var notaAccredito = new Object();
-			notaAccredito.progressivo = $('#progressivo').val();
-			notaAccredito.anno = $('#anno').val();
-			notaAccredito.data = $('#data').val();
+			var notaReso = new Object();
+			notaReso.progressivo = $('#progressivo').val();
+			notaReso.anno = $('#anno').val();
+			notaReso.data = $('#data').val();
 
-			var cliente = new Object();
-			cliente.id = $('#cliente option:selected').val();
-			notaAccredito.cliente = cliente;
+			var fornitore = new Object();
+			fornitore.id = $('#fornitore option:selected').val();
+			notaReso.fornitore = fornitore;
 
-			notaAccredito.note = $('#note').val();
+			notaReso.note = $('#note').val();
 
-			var notaAccreditoRigheLength = $('.rowArticolo').length;
-			if(notaAccreditoRigheLength != null && notaAccreditoRigheLength != undefined && notaAccreditoRigheLength != 0){
-				var notaAccreditoRighe = [];
+			var notaResoRigheLength = $('.rowArticolo').length;
+			if(notaResoRigheLength != null && notaResoRigheLength != undefined && notaResoRigheLength != 0){
+				var notaResoRighe = [];
 				$('.rowArticolo').each(function(i, item){
 					var articoloId = $(this).attr('data-id');
 
-					var notaAccreditoRiga = {};
+					var notaResoRiga = {};
 
-					var notaAccreditoRigaId = new Object();
-					notaAccreditoRiga.id = notaAccreditoRigaId;
+					var notaResoRigaId = new Object();
+					notaResoRiga.id = notaResoRigaId;
 
-					notaAccreditoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
-					notaAccreditoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
-					notaAccreditoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
+					notaResoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
+					notaResoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
+					notaResoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
 
 					var udm = $(this).children().eq(3).children().eq(0).val();
 					if(udm != null && udm != ""){
 						var unitaMisura = new Object();
 						unitaMisura.id = udm;
-						notaAccreditoRiga.unitaMisura = unitaMisura;
+						notaResoRiga.unitaMisura = unitaMisura;
 					}
-					notaAccreditoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
-					notaAccreditoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
-					notaAccreditoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
+					notaResoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
+					notaResoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
+					notaResoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
 
 					var iva = $(this).children().eq(8).children().eq(0).val();
 					if(iva != null && iva != ""){
 						var aliquotaIva = new Object();
 						aliquotaIva.id = iva;
-						notaAccreditoRiga.aliquotaIva = aliquotaIva;
+						notaResoRiga.aliquotaIva = aliquotaIva;
 					}
 
 					if(articoloId != null && articoloId != ""){
 						var articolo = new Object();
 						articolo.id = articoloId;
-						notaAccreditoRiga.articolo = articolo;
+						notaResoRiga.articolo = articolo;
 					}
 
-					notaAccreditoRighe.push(notaAccreditoRiga);
+					notaResoRighe.push(notaResoRiga);
 				});
-				notaAccredito.notaAccreditoRighe = notaAccreditoRighe;
+				notaReso.notaResoRighe = notaResoRighe;
 			}
 
-			var notaAccreditoTotaliLength = $('.rowTotaliByIva').length;
-			if(notaAccreditoTotaliLength != null && notaAccreditoTotaliLength != undefined && notaAccreditoTotaliLength != 0){
-				var notaAccreditoTotali = [];
+			var notaResoTotaliLength = $('.rowTotaliByIva').length;
+			if(notaResoTotaliLength != null && notaResoTotaliLength != undefined && notaResoTotaliLength != 0){
+				var notaResoTotali = [];
 				$('.rowTotaliByIva').each(function(i, item){
 					var aliquotaIvaId = $(this).attr('data-id');
 
-					var notaAccreditoTotale = {};
-					var notaAccreditoTotaleId = new Object();
-					notaAccreditoTotaleId.aliquotaIvaId = aliquotaIvaId;
-					notaAccreditoTotale.id = notaAccreditoTotaleId;
+					var notaResoTotale = {};
+					var notaResoTotaleId = new Object();
+					notaResoTotaleId.aliquotaIvaId = aliquotaIvaId;
+					notaResoTotale.id = notaResoTotaleId;
 
-					notaAccreditoTotale.totaleIva = $(this).find('td').eq(1).text();
-					notaAccreditoTotale.totaleImponibile = $(this).find('td').eq(2).text();
+					notaResoTotale.totaleIva = $(this).find('td').eq(1).text();
+					notaResoTotale.totaleImponibile = $(this).find('td').eq(2).text();
 
-					notaAccreditoTotali.push(notaAccreditoTotale);
+					notaResoTotali.push(notaResoTotale);
 				});
-				notaAccredito.notaAccreditoTotali = notaAccreditoTotali;
+				notaReso.notaResoTotali = notaResoTotali;
 			}
 
-			var notaAccreditoJson = JSON.stringify(notaAccredito);
+			var notaResoJson = JSON.stringify(notaReso);
 
 			$.ajax({
-				url: baseUrl + "note-accredito",
+				url: baseUrl + "note-reso",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: notaAccreditoJson,
+				data: notaResoJson,
 				success: function(result) {
-					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@','Nota Accredito creata con successo').replace('@@alertResult@@', 'success'));
+					$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@','Nota Reso creata con successo').replace('@@alertResult@@', 'success'));
 
 					$('#newNotaAccreditoButton').attr("disabled", true);
 
-					// Returns to the page with the list of Nota Accredito
+					// Returns to the page with the list of Nota Reso
 					setTimeout(function() {
-						window.location.href = "note-accredito.html";
+						window.location.href = "note-reso.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nella creazione della Nota Accredito';
+					var errorMessage = 'Errore nella creazione della Nota Reso';
 					if(jqXHR != null && jqXHR != undefined){
 						var jqXHRResponseJson = jqXHR.responseJSON;
 						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
@@ -629,119 +593,119 @@ $(document).ready(function() {
 							}
 						}
 					}
-					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+					$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 
 		});
 	}
 
-	if($('#updateNotaAccreditoButton') != null && $('#updateNotaAccreditoButton') != undefined && $('#updateNotaAccreditoButton').length > 0){
+	if($('#updateNotaResoButton') != null && $('#updateNotaResoButton') != undefined && $('#updateNotaResoButton').length > 0){
 		$('#articolo').selectpicker();
-		$('#cliente').selectpicker();
+		$('#fornitore').selectpicker();
 
-		$(document).on('submit','#updateNotaAccreditoForm', function(event){
+		$(document).on('submit','#updateNotaResoForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertNotaResoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 
-			var notaAccredito = new Object();
-			notaAccredito.id = $('#hiddenIdNotaAccredito').val();
-			notaAccredito.progressivo = $('#progressivo').val();
-			notaAccredito.anno = $('#anno').val();
-			notaAccredito.data = $('#data').val();
+			var notaReso = new Object();
+			notaReso.id = $('#hiddenIdNotaReso').val();
+			notaReso.progressivo = $('#progressivo').val();
+			notaReso.anno = $('#anno').val();
+			notaReso.data = $('#data').val();
 
-			var cliente = new Object();
-			cliente.id = $('#cliente option:selected').val();
-			notaAccredito.cliente = cliente;
+			var fornitore = new Object();
+			fornitore.id = $('#fornitore option:selected').val();
+			notaReso.fornitore = fornitore;
 
-			notaAccredito.note = $('#note').val();
+			notaReso.note = $('#note').val();
 
-			var notaAccreditoRigheLength = $('.rowArticolo').length;
-			if(notaAccreditoRigheLength != null && notaAccreditoRigheLength != undefined && notaAccreditoRigheLength != 0){
-				var notaAccreditoRighe = [];
+			var notaResoRigheLength = $('.rowArticolo').length;
+			if(notaResoRigheLength != null && notaResoRigheLength != undefined && notaResoRigheLength != 0){
+				var notaResoRighe = [];
 				$('.rowArticolo').each(function(i, item){
 					var articoloId = $(this).attr('data-id');
 
-					var notaAccreditoRiga = {};
+					var notaResoRiga = {};
 
-					var notaAccreditoRigaId = new Object();
-					notaAccreditoRiga.id = notaAccreditoRigaId;
+					var notaResoRigaId = new Object();
+					notaResoRiga.id = notaResoRigaId;
 
-					notaAccreditoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
-					notaAccreditoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
-					notaAccreditoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
+					notaResoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
+					notaResoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
+					notaResoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
 
 					var udm = $(this).children().eq(3).children().eq(0).val();
 					if(udm != null && udm != ""){
 						var unitaMisura = new Object();
 						unitaMisura.id = udm;
-						notaAccreditoRiga.unitaMisura = unitaMisura;
+						notaResoRiga.unitaMisura = unitaMisura;
 					}
-					notaAccreditoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
-					notaAccreditoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
-					notaAccreditoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
+					notaResoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
+					notaResoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
+					notaResoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
 
 					var iva = $(this).children().eq(8).children().eq(0).val();
 					if(iva != null && iva != ""){
 						var aliquotaIva = new Object();
 						aliquotaIva.id = iva;
-						notaAccreditoRiga.aliquotaIva = aliquotaIva;
+						notaResoRiga.aliquotaIva = aliquotaIva;
 					}
 
 					if(articoloId != null && articoloId != ""){
 						var articolo = new Object();
 						articolo.id = articoloId;
-						notaAccreditoRiga.articolo = articolo;
+						notaResoRiga.articolo = articolo;
 					}
 
-					notaAccreditoRighe.push(notaAccreditoRiga);
+					notaResoRighe.push(notaResoRiga);
 				});
-				notaAccredito.notaAccreditoRighe = notaAccreditoRighe;
+				notaReso.notaResoRighe = notaResoRighe;
 			}
 
-			var notaAccreditoTotaliLength = $('.rowTotaliByIva').length;
-			if(notaAccreditoTotaliLength != null && notaAccreditoTotaliLength != undefined && notaAccreditoTotaliLength != 0){
-				var notaAccreditoTotali = [];
+			var notaResoTotaliLength = $('.rowTotaliByIva').length;
+			if(notaResoTotaliLength != null && notaResoTotaliLength != undefined && notaResoTotaliLength != 0){
+				var notaResoTotali = [];
 				$('.rowTotaliByIva').each(function(i, item){
 					var aliquotaIvaId = $(this).attr('data-id');
 
-					var notaAccreditoTotale = {};
-					var notaAccreditoTotaleId = new Object();
-					notaAccreditoTotaleId.aliquotaIvaId = aliquotaIvaId;
-					notaAccreditoTotale.id = notaAccreditoTotaleId;
+					var notaResoTotale = {};
+					var notaResoTotaleId = new Object();
+					notaResoTotaleId.aliquotaIvaId = aliquotaIvaId;
+					notaResoTotale.id = notaResoTotaleId;
 
-					notaAccreditoTotale.totaleIva = $(this).find('td').eq(1).text();
-					notaAccreditoTotale.totaleImponibile = $(this).find('td').eq(2).text();
+					notaResoTotale.totaleIva = $(this).find('td').eq(1).text();
+					notaResoTotale.totaleImponibile = $(this).find('td').eq(2).text();
 
-					notaAccreditoTotali.push(notaAccreditoTotale);
+					notaResoTotali.push(notaResoTotale);
 				});
-				notaAccredito.notaAccreditoTotali = notaAccreditoTotali;
+				notaReso.notaResoTotali = notaResoTotali;
 			}
 
-			var notaAccreditoJson = JSON.stringify(notaAccredito);
+			var notaResoJson = JSON.stringify(notaReso);
 
 			$.ajax({
-				url: baseUrl + "note-accredito/"+notaAccredito.id,
+				url: baseUrl + "note-reso/"+notaReso.id,
 				type: 'PUT',
 				contentType: "application/json",
 				dataType: 'json',
-				data: notaAccreditoJson,
+				data: notaResoJson,
 				success: function(result) {
-					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@','Nota Accredito aggiornata con successo').replace('@@alertResult@@', 'success'));
+					$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@','Nota Reso aggiornata con successo').replace('@@alertResult@@', 'success'));
 
 					$('#updateNotaAccreditoButton').attr("disabled", true);
 
-					// Returns to the page with the list of Nota Accredito
+					// Returns to the page with the list of Nota Reso
 					setTimeout(function() {
-						window.location.href = "note-accredito.html";
+						window.location.href = "note-reso.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nella modifica della Nota Accredito';
+					var errorMessage = 'Errore nella modifica della Nota Reso';
 					if(jqXHR != null && jqXHR != undefined){
 						var jqXHRResponseJson = jqXHR.responseJSON;
 						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
@@ -751,13 +715,13 @@ $(document).ready(function() {
 							}
 						}
 					}
-					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+					$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
 	}
 
-	$(document).on('change','#cliente', function(){
+	$(document).on('change','#fornitore', function(){
 		$('#articolo option[value=""]').prop('selected', true);
 		$('#udm').val('');
 		$('#iva').val('');
@@ -771,13 +735,14 @@ $(document).ready(function() {
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-		$('#alertNoteAccredito').empty();
+		$('#alertNoteReso').empty();
 
-		var cliente = $('#cliente option:selected').val();
-		var idListino = $('#cliente option:selected').attr('data-id-listino');
-		if(cliente != null && cliente != ''){
+		var fornitore = $('#fornitore option:selected').val();
+		var idListino = $('#fornitore option:selected').attr('data-id-listino');
 
-			// load the prices of the Listino associated to the Cliente
+		if(fornitore != null && fornitore != ''){
+			/*
+			// load the prices of the Listino associated to the Fornitore
 			if(idListino != null && idListino != undefined && idListino != '-1'){
 				$.ajax({
 					url: baseUrl + "listini/"+idListino+"/listini-prezzi",
@@ -796,7 +761,7 @@ $(document).ready(function() {
 						});
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
-						$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
+						$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
 					}
 				});
 			} else {
@@ -811,6 +776,7 @@ $(document).ready(function() {
 			if(data != null && data != undefined && data != ''){
 				$.fn.loadScontiArticoli(data, cliente);
 			}
+			*/
 
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
@@ -820,6 +786,7 @@ $(document).ready(function() {
 		}
 	});
 
+	/*
 	$(document).on('change','#data', function(){
 		var data = $(this).val();
 		var cliente = $('#cliente option:selected').val();
@@ -827,7 +794,9 @@ $(document).ready(function() {
 			$.fn.loadScontiArticoli(data, cliente);
 		}
 	});
+	*/
 
+	/*
 	$.fn.loadScontiArticoli = function(data, cliente){
 		var alertContent = '<div id="alertNoteAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
@@ -850,10 +819,11 @@ $(document).ready(function() {
 				});
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
+				$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
 			}
 		});
 	}
+	 */
 
 	$(document).on('change','#articolo', function(){
 		var articolo = $('#articolo option:selected').val();
@@ -895,7 +865,7 @@ $(document).ready(function() {
 
 		var articoloId = $('#articolo option:selected').val();
 
-		$('#addNotaAccreditoArticoloAlert').empty();
+		$('#addNotaResoArticoloAlert').empty();
 
 		var articolo = $('#articolo option:selected').text();
 		var udm = $('#udm').val();
@@ -959,11 +929,11 @@ $(document).ready(function() {
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var table = $('#notaAccreditoArticoliTable').DataTable();
+		var table = $('#notaResoArticoliTable').DataTable();
 
 		var rowsCount = $.fn.getMaxRowsCountArticoliTable();
 
-		var deleteLink = '<a class="deleteNotaAccreditoArticolo" data-row-index="'+(parseInt(rowsCount) + 1)+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+		var deleteLink = '<a class="deleteNotaResoArticolo" data-row-index="'+(parseInt(rowsCount) + 1)+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 		var rowNode = table.row.add( [
 			descrizioneHtml,
@@ -997,11 +967,11 @@ $(document).ready(function() {
 		$('#articolo').selectpicker('refresh');
 	});
 
-	$(document).on('click','.deleteNotaAccreditoArticolo', function(){
-		$('#notaAccreditoArticoliTable').DataTable().row( $(this).parent().parent() )
+	$(document).on('click','.deleteNotaResoArticolo', function(){
+		$('#notaResoArticoliTable').DataTable().row( $(this).parent().parent() )
 			.remove()
 			.draw();
-		$('#notaAccreditoArticoliTable').focus();
+		$('#notaResoArticoliTable').focus();
 
 		$.fn.computeTotale();
 	});
@@ -1019,7 +989,6 @@ $(document).ready(function() {
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		//var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
 		$.row.children().eq(7).text(totale);
 
 		$.fn.computeTotale();
@@ -1030,41 +999,7 @@ $(document).ready(function() {
 $.fn.preloadSearchFields = function(){
 
 	$.ajax({
-		url: baseUrl + "agenti",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#searchAgente').append('<option value="'+item.id+'" >'+item.nome+' '+item.cognome+'</option>');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
-
-	/*
-	$.ajax({
-		url: baseUrl + "articoli?attivo=true",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#searchArticolo').append('<option value="'+item.id+'" >'+item.codice+' '+item.descrizione+'</option>');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
-	*/
-
-	$.ajax({
-		url: baseUrl + "stati-note-accredito",
+		url: baseUrl + "stati-note-reso",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -1083,7 +1018,7 @@ $.fn.preloadSearchFields = function(){
 
 $.fn.preloadFields = function(){
 	$.ajax({
-		url: baseUrl + "note-accredito/progressivo",
+		url: baseUrl + "note-reso/progressivo",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -1092,7 +1027,7 @@ $.fn.preloadFields = function(){
 				$('#anno').attr('value', result.anno);
 				$('#data').val(moment().format('YYYY-MM-DD'));
 
-				$('#cliente').focus();
+				$('#fornitore').focus();
 
 				var uri = window.location.toString();
 				if (uri.indexOf("?") > 0) {
@@ -1108,35 +1043,20 @@ $.fn.preloadFields = function(){
 
 }
 
-$.fn.getClienti = function(){
+$.fn.getFornitori = function(){
 	$.ajax({
-		url: baseUrl + "clienti?bloccaDdt=false",
+		url: baseUrl + "fornitori",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					var label = '';
-					if(item.dittaIndividuale){
-						label += item.cognome + ' - ' + item.nome;
-					} else {
-						label += item.ragioneSociale;
-					}
+					var label = item.ragioneSociale;
 					label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
 
-					var agente = item.agente;
-					var idAgente = '-1';
-					if(agente != null && agente != undefined) {
-						idAgente = agente.id;
-					}
-					var listino = item.listino;
-					var idListino = '-1';
-					if(listino != null && listino != undefined){
-						idListino = listino.id;
-					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+					$('#fornitore').append('<option value="'+item.id+'">'+label+'</option>');
 
-					$('#cliente').selectpicker('refresh');
+					$('#fornitore').selectpicker('refresh');
 				});
 			}
 		},
@@ -1225,7 +1145,7 @@ $.fn.getAliquoteIva = function(){
 	});
 }
 
-$.fn.extractIdNotaAccreditoFromUrl = function(){
+$.fn.extractIdNotaResoFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
 	var urlVariables = pageUrl.split('&'),
@@ -1235,45 +1155,45 @@ $.fn.extractIdNotaAccreditoFromUrl = function(){
     for (i = 0; i < urlVariables.length; i++) {
         paramNames = urlVariables[i].split('=');
 
-        if (paramNames[0] === 'idNotaAccredito') {
+        if (paramNames[0] === 'idNotaReso') {
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
 }
 
-$.fn.getNotaAccredito = function(idNotaAccredito){
+$.fn.getNotaReso = function(idNotaReso){
 
-	var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-	alertContent = alertContent +  '<strong>Errore nel recupero della Nota Accredito</strong>\n' +
+	var alertContent = '<div id="alertNotaResoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent +  '<strong>Errore nel recupero della Nota Reso</strong>\n' +
 		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 	$.ajax({
-		url: baseUrl + "note-accredito/" + idNotaAccredito,
+		url: baseUrl + "note-reso/" + idNotaReso,
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 
-				$('#hiddenIdNotaAccredito').attr('value', result.id);
+				$('#hiddenIdNotaReso').attr('value', result.id);
 				$('#progressivo').attr('value', result.progressivo);
 				$('#anno').attr('value', result.anno);
 				$('#data').attr('value', result.data);
-				if(result.cliente != null && result.cliente != undefined){
-					$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
+				if(result.fornitore != null && result.fornitore != undefined){
+					$('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
 
-					$('#cliente').selectpicker('refresh');
+					$('#fornitore').selectpicker('refresh');
 				}
 				$('#note').val(result.note);
 
-				if(result.notaAccreditoRighe != null && result.notaAccreditoRighe != undefined && result.notaAccreditoRighe.length != 0){
+				if(result.notaResoRighe != null && result.notaResoRighe != undefined && result.notaResoRighe.length != 0){
 
-					var table = $('#notaAccreditoArticoliTable').DataTable();
+					var table = $('#notaResoArticoliTable').DataTable();
 					if(table != null){
 						table.destroy();
-						table = $.fn.loadNoteAccreditoRigheTable();
+						table = $.fn.loadNoteResoArticoliTable();
 					}
 
-					result.notaAccreditoRighe.forEach(function(item, i){
+					result.notaResoRighe.forEach(function(item, i){
 						var articolo = item.articolo;
 						var articoloId;
 						var codiceFornitore;
@@ -1352,10 +1272,9 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 						var scontoValue = (sconto/100)*quantitaPerPrezzo;
 						totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-
 						var rowsCount = $.fn.getMaxRowsCountArticoliTable();
 
-						var deleteLink = '<a class="deleteNotaAccreditoArticolo" data-row-index="'+(parseInt(rowsCount) + 1)+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+						var deleteLink = '<a class="deleteNotaResoArticolo" data-row-index="'+(parseInt(rowsCount) + 1)+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 						var rowNode = table.row.add( [
 							descrizioneHtml,
@@ -1377,15 +1296,15 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 						$.fn.computeTotale();
 					});
 
-					if(result.notaAccreditoTotali != null && result.notaAccreditoTotali != undefined && result.notaAccreditoTotali.length != 0){
+					if(result.notaResoTotali != null && result.notaResoTotali != undefined && result.notaResoTotali.length != 0){
 
-						var notaAccreditoTotaliTable = $('#notaAccreditoTotaliTable').DataTable();
-						if(notaAccreditoTotaliTable != null){
-							notaAccreditoTotaliTable.destroy();
+						var notaResoTotaliTable = $('#notaResoTotaliTable').DataTable();
+						if(notaResoTotaliTable != null){
+							notaResoTotaliTable.destroy();
 						}
 
-						$('#notaAccreditoTotaliTable').DataTable({
-							"data": result.notaAccreditoTotali,
+						$('#notaResoTotaliTable').DataTable({
+							"data": result.notaResoTotali,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -1437,17 +1356,16 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 								$(cells[2]).css('text-align','center');
 							}
 						});
-
 					}
 
 				}
 			} else{
-				$('#alertNoteAccredito').empty().append(alertContent);
+				$('#alertNoteReso').empty().append(alertContent);
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			$('#alertNoteAccredito').append(alertContent);
-			$('#updateNotaAccreditoButton').attr('disabled', true);
+			$('#alertNoteReso').append(alertContent);
+			$('#updateNotaResoButton').attr('disabled', true);
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
@@ -1479,7 +1397,7 @@ $.fn.formatNumber = function(value){
 $.fn.getMaxRowsCountArticoliTable = function(){
 	var maxRowsCount = 0;
 	var rowIndexes = [];
-	$('#notaAccreditoArticoliTable tbody tr').each(function(i, item){
+	$('#notaResoArticoliTable tbody tr').each(function(i, item){
 		rowIndexes.push($.fn.parseValue($(this).attr('data-row-index'), 'int'));
 	});
 
@@ -1491,7 +1409,7 @@ $.fn.getMaxRowsCountArticoliTable = function(){
 }
 
 $.fn.emptyTotaliTable = function(){
-	$('#notaAccreditoTotaliTable tbody tr').each(function(i, item){
+	$('#notaResoTotaliTable tbody tr').each(function(i, item){
 		$(this).find('td').eq(1).text('');
 		$(this).find('td').eq(2).text('');
 	});

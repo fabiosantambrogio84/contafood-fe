@@ -38,12 +38,15 @@
   <script>
     var idDdt = $.fn.extractIdDdtFromUrl();
     var idNotaAccredito = $.fn.extractIdNotaAccreditoFromUrl();
+    var idNotaReso = $.fn.extractIdNotaResoFromUrl();
     if(idDdt != null && idDdt != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
         $.fn.getDdt(idDdt);
       });
     } else if(idNotaAccredito != null && idNotaAccredito != ""){
       $.fn.getNotaAccredito(idNotaAccredito);
+    } else if(idNotaReso != null && idNotaReso != ""){
+      $.fn.getNotaReso(idNotaReso);
     } else {
       $.fn.getTipiPagamento();
     }
@@ -123,6 +126,7 @@
 
           <input type="hidden" id="hiddenIdDdt"/>
           <input type="hidden" id="hiddenIdNotaAccredito"/>
+          <input type="hidden" id="hiddenIdNotaReso"/>
 
           <button type="submit" class="btn btn-primary" id="newPagamentoButton">Salva</button>
           <a href="" class="btn btn-secondary" id="annullaPagamentoButton">Annulla</a>

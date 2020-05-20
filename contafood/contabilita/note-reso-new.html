@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Nota Accredito Modifica</title>
+  <title>ContaFood - Nota Reso Nuovo</title>
 
   <link rel="icon" href="../img/favicon.png" type="image/png" />
 
@@ -40,15 +40,14 @@
   <script src="../js/commons.js"></script>
   <script src="../js/core/moment.js"></script>
 
-  <script src="../js/note-accredito.js"></script>
+  <script src="../js/note-reso.js"></script>
 
   <script>
-    var idNotaAccredito = $.fn.extractIdNotaAccreditoFromUrl();
-    if(idNotaAccredito != null && idNotaAccredito != undefined){
-      $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva()).done(function(f1,f2,f3,f4){
-        $.fn.getNotaAccredito(idNotaAccredito);
-      });
-    }
+    $.fn.preloadFields();
+    $.fn.getFornitori();
+    $.fn.getArticoli();
+    $.fn.getUnitaMisura();
+    $.fn.getAliquoteIva();
   </script>
 
 </head>
@@ -73,14 +72,14 @@
       <!-- End of Topbar -->
 
       <!-- Begin Page Content -->
-      <div class="container-fluid" id="containerNotaAccredito">
+      <div class="container-fluid" id="containerNotaReso">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800">Modifica Nota Accredito</h1>
+        <h1 class="h3 mb-4 text-gray-800">Nuova Nota Reso</h1>
 
-        <div id="alertNoteAccredito"></div>
+        <div id="alertNoteReso"></div>
 
-        <form id="updateNotaAccreditoForm" class="needs-validation" novalidate>
+        <form id="newNotaResoForm" class="needs-validation" novalidate>
           <div class="form-row">
             <div class="form-group col-md-2">
               <label for="progressivo" class="mb-0">Progressivo*</label>
@@ -102,12 +101,12 @@
           </div>
           <div class="form-row">
             <div class="form-group col-md-6 mb-0">
-              <label for="cliente" class="mb-0">Cliente*</label>
-              <select id="cliente" class="form-control form-control-sm" required data-live-search="true">
+              <label for="fornitore" class="mb-0">Fornitore*</label>
+              <select id="fornitore" class="form-control form-control-sm" required data-live-search="true">
                 <option value=""></option>
               </select>
               <div class="invalid-feedback">
-                Seleziona un cliente
+                Seleziona un fornitore
               </div>
             </div>
           </div>
@@ -118,7 +117,7 @@
               <div class="form-row">
                 <div class="form-group col-md-4">
                   <label for="articolo" class="mb-0">Articolo</label>
-                  <select id="articolo" class="form-control form-control-sm " data-live-search="true">
+                  <select id="articolo" class="form-control form-control-sm " data-live-search="true" disabled>
                     <option value=""></option>
                   </select>
                 </div>
@@ -162,11 +161,11 @@
                 </div>
               </div>
 
-              <div id="addNotaAccreditoArticoloAlert"></div>
+              <div id="addNotaResoArticoloAlert"></div>
 
               <div class="card-body pl-0 pt-0 pb-0">
                 <div class="table-responsive">
-                  <table class="table table-bordered table-sm" id="notaAccreditoArticoliTable" width="100%" cellspacing="0">
+                  <table class="table table-bordered table-sm" id="notaResoArticoliTable" width="100%" cellspacing="0">
                     <thead class="text-center" style="background-color: #baddf5;">
                     <tr>
                       <th>Descrizione</th>
@@ -187,7 +186,7 @@
 
               <div class="card-body pl-0">
                 <div class="table-responsive w-50">
-                  <table class="table table-bordered table-sm" id="notaAccreditoTotaliTable" width="50%" cellspacing="0">
+                  <table class="table table-bordered table-sm" id="notaResoTotaliTable" width="50%" cellspacing="0">
                     <thead class="text-center" style="background-color: #baddf5;">
                     <tr>
                       <th>Aliquota Iva (%)</th>
@@ -220,10 +219,9 @@
 
           </div>
 
-          <input type="hidden" id="hiddenIdNotaAccredito"/>
-          <button type="submit" class="btn btn-primary mt-4" id="updateNotaAccreditoButton">Salva</button>
-          <button type="submit" class="btn btn-primary mt-4" id="updateAndPrintNotaAccreditoButton" disabled>Salva e Stampa</button>
-          <a href="note-accredito.html" class="btn btn-secondary mt-4">Annulla</a>
+          <button type="submit" class="btn btn-primary mt-4" id="newNotaResoButton">Salva</button>
+          <button type="submit" class="btn btn-primary mt-4" id="newAndPrintNotaResoButton" disabled>Salva e Stampa</button>
+          <a href="note-reso.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 
         <script>
