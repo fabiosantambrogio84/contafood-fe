@@ -738,7 +738,9 @@ $(document).ready(function() {
 		$('#alertNoteReso').empty();
 
 		var fornitore = $('#fornitore option:selected').val();
-		var idListino = $('#fornitore option:selected').attr('data-id-listino');
+		//var idListino = $('#fornitore option:selected').attr('data-id-listino');
+
+		$.fn.getArticoli(fornitore);
 
 		if(fornitore != null && fornitore != ''){
 			/*
@@ -766,8 +768,8 @@ $(document).ready(function() {
 				});
 			} else {
 				$("#articolo option").each(function(i){
-					var prezzoBase = $(this).attr('data-prezzo-base');
-					$(this).attr('data-prezzo-listino', prezzoBase);
+					var prezzoAcquisto = $(this).attr('data-prezzo-acquisto');
+					$(this).attr('data-prezzo-listino', prezzoAcquisto);
 				});
 			}
 
@@ -831,13 +833,13 @@ $(document).ready(function() {
 			var udm = $('#articolo option:selected').attr('data-udm');
 			var iva = $('#articolo option:selected').attr('data-iva');
 			var quantita = $('#articolo option:selected').attr('data-qta');
-			var prezzoBase = $('#articolo option:selected').attr('data-prezzo-base');
+			var prezzoAcquisto = $('#articolo option:selected').attr('data-prezzo-acquisto');
 			var prezzoListino = $('#articolo option:selected').attr('data-prezzo-listino');
 			var prezzo;
 			if(prezzoListino != null && prezzoListino != undefined && prezzoListino != ''){
 				prezzo = prezzoListino;
 			} else {
-				prezzo = prezzoBase;
+				prezzo = prezzoAcquisto;
 			}
 			var sconto = $('#articolo option:selected').attr('data-sconto');
 
@@ -1066,9 +1068,18 @@ $.fn.getFornitori = function(){
 	});
 }
 
-$.fn.getArticoli = function(){
+$.fn.getArticoli = function(idFornitore){
+	var url = baseUrl + "articoli?attivo=true";
+	if(idFornitore != null && idFornitore != ''){
+		url += '&idFornitore='+idFornitore;
+	}
+
+	$('#articolo').empty();
+	$('#articolo').append('<<option value=""></option>');
+	$('#articolo').selectpicker('refresh');
+
 	$.ajax({
-		url: baseUrl + "articoli?attivo=true",
+		url: url,
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -1085,8 +1096,8 @@ $.fn.getArticoli = function(){
 						dataIva = iva.id;
 					}
 					var dataQta = item.quantitaPredefinita;
-					var dataPrezzoBase = item.prezzoListinoBase;
-					$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-base="'+dataPrezzoBase+'" data-codice-fornitore="'+item.fornitore.codice+'">'+item.codice+' '+item.descrizione+'</option>');
+					var dataAcquisto = item.prezzoAcquisto;
+					$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-acquisto="'+dataAcquisto+'" data-codice-fornitore="'+item.fornitore.codice+'">'+item.codice+' '+item.descrizione+'</option>');
 
 					$('#articolo').selectpicker('refresh');
 				});
@@ -1182,6 +1193,8 @@ $.fn.getNotaReso = function(idNotaReso){
 					$('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
 
 					$('#fornitore').selectpicker('refresh');
+
+					$.fn.getArticoli(result.fornitore.id);
 				}
 				$('#note').val(result.note);
 
