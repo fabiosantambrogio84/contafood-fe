@@ -43,11 +43,7 @@
   <script src="../js/note-reso.js"></script>
 
   <script>
-    $.fn.preloadFields();
-    $.fn.getFornitori();
-    $.fn.getArticoli();
-    $.fn.getUnitaMisura();
-    $.fn.getAliquoteIva();
+    $.when($.fn.getFornitori(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva()).then($.fn.preloadFields(), null);
   </script>
 
 </head>

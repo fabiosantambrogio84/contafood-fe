@@ -45,9 +45,7 @@
   <script>
     var idNotaReso = $.fn.extractIdNotaResoFromUrl();
     if(idNotaReso != null && idNotaReso != undefined){
-      $.when($.fn.getFornitori(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva()).then(
-        $.fn.getNotaReso(idNotaReso), null
-      );
+      $.when($.fn.getFornitori(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva()).then($.fn.getNotaReso(idNotaReso));
     }
   </script>
 

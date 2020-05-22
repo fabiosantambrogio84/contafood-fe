@@ -43,11 +43,12 @@
   <script src="../js/note-accredito.js"></script>
 
   <script>
-    $.fn.preloadFields();
-    $.fn.getClienti();
-    $.fn.getArticoli();
-    $.fn.getUnitaMisura();
-    $.fn.getAliquoteIva();
+    /*
+    $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva()).done(function(){
+      $.fn.preloadFields();
+    });
+    */
+    $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva()).then($.fn.preloadFields(), null);
   </script>
 
 </head>

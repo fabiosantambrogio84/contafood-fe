@@ -843,8 +843,8 @@ $(document).ready(function() {
 			}
 			var sconto = $('#articolo option:selected').attr('data-sconto');
 
-			$('#udm option[value="' + udm +'"]').attr('selected', true);
-			$('#iva option[value="' + iva +'"]').attr('selected', true);
+			$('#udm option[value="' + udm +'"]').prop('selected', true);
+			$('#iva option[value="' + iva +'"]').prop('selected', true);
 
 			$('#lotto').val('');
 			$('#scadenza').val('');
@@ -852,8 +852,8 @@ $(document).ready(function() {
 			$('#prezzo').val(prezzo);
 			$('#sconto').val(sconto);
 		} else {
-			('#udm option[value=""]').attr('selected', true);
-			('#iva option[value=""]').attr('selected', true);
+			('#udm option[value=""]').prop('selected', true);
+			('#iva option[value=""]').prop('selected', true);
 			$('#lotto').val('');
 			$('#scadenza').val('');
 			$('#quantita').val('');
@@ -1046,113 +1046,132 @@ $.fn.preloadFields = function(){
 }
 
 $.fn.getFornitori = function(){
-	$.ajax({
-		url: baseUrl + "fornitori",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					var label = item.ragioneSociale;
-					label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
 
-					$('#fornitore').append('<option value="'+item.id+'">'+label+'</option>');
+	return $.Deferred(function() {
 
-					$('#fornitore').selectpicker('refresh');
-				});
+		$.ajax({
+			url: baseUrl + "fornitori",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var label = item.ragioneSociale;
+						label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
+
+						$('#fornitore').append('<option value="'+item.id+'">'+label+'</option>');
+
+						$('#fornitore').selectpicker('refresh');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 
 $.fn.getArticoli = function(idFornitore){
-	var url = baseUrl + "articoli?attivo=true";
-	if(idFornitore != null && idFornitore != ''){
-		url += '&idFornitore='+idFornitore;
-	}
 
-	$('#articolo').empty();
-	$('#articolo').append('<<option value=""></option>');
-	$('#articolo').selectpicker('refresh');
+	return $.Deferred(function() {
 
-	$.ajax({
-		url: url,
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					var dataUdm = '';
-					var udm = item.unitaMisura;
-					if(udm != null && udm != undefined){
-						dataUdm = udm.id;
-					}
-					var dataIva = '';
-					var iva = item.aliquotaIva;
-					if(iva != null && iva != undefined){
-						dataIva = iva.id;
-					}
-					var dataQta = item.quantitaPredefinita;
-					var dataAcquisto = item.prezzoAcquisto;
-					$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-acquisto="'+dataAcquisto+'" data-codice-fornitore="'+item.fornitore.codice+'">'+item.codice+' '+item.descrizione+'</option>');
-
-					$('#articolo').selectpicker('refresh');
-				});
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
+		var url = baseUrl + "articoli?attivo=true";
+		if(idFornitore != null && idFornitore != ''){
+			url += '&idFornitore='+idFornitore;
 		}
+
+		$('#articolo').empty();
+		$('#articolo').append('<<option value=""></option>');
+		$('#articolo').selectpicker('refresh');
+
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var dataUdm = '';
+						var udm = item.unitaMisura;
+						if(udm != null && udm != undefined){
+							dataUdm = udm.id;
+						}
+						var dataIva = '';
+						var iva = item.aliquotaIva;
+						if(iva != null && iva != undefined){
+							dataIva = iva.id;
+						}
+						var dataQta = item.quantitaPredefinita;
+						var dataAcquisto = item.prezzoAcquisto;
+						$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-acquisto="'+dataAcquisto+'" data-codice-fornitore="'+item.fornitore.codice+'">'+item.codice+' '+item.descrizione+'</option>');
+
+						$('#articolo').selectpicker('refresh');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+
 	});
 }
 
 
 $.fn.getUnitaMisura = function(){
 
-	$.ajax({
-		url: baseUrl + "unita-misura",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				var udm = [];
-				$.each(result, function(i, item){
-					$('#udm').append('<option value="'+item.id+'">'+item.etichetta+'</option>');
+	return $.Deferred(function() {
 
-					udm.push(item);
-				});
-				$('#_udm').data("udmValues", udm);
+		$.ajax({
+			url: baseUrl + "unita-misura",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					var udm = [];
+					$.each(result, function(i, item){
+						$('#udm').append('<option value="'+item.id+'">'+item.etichetta+'</option>');
 
+						udm.push(item);
+					});
+					$('#_udm').data("udmValues", udm);
+
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 
 $.fn.getAliquoteIva = function(){
-	$.ajax({
-		url: baseUrl + "aliquote-iva",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			var iva = [];
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#iva').append('<option value="'+item.id+'">'+item.valore+'</option>');
 
-					iva.push(item);
-				});
-				$('#_iva').data("ivaValues", iva);
+	return $.Deferred(function() {
+
+		$.ajax({
+			url: baseUrl + "aliquote-iva",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				var iva = [];
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						$('#iva').append('<option value="'+item.id+'">'+item.valore+'</option>');
+
+						iva.push(item);
+					});
+					$('#_iva').data("ivaValues", iva);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 

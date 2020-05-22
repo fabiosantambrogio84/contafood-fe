@@ -871,8 +871,8 @@ $(document).ready(function() {
 			}
 			var sconto = $('#articolo option:selected').attr('data-sconto');
 
-			$('#udm option[value="' + udm +'"]').attr('selected', true);
-			$('#iva option[value="' + iva +'"]').attr('selected', true);
+			$('#udm option[value="' + udm +'"]').prop('selected', true);
+			$('#iva option[value="' + iva +'"]').prop('selected', true);
 
 			$('#lotto').val('');
 			$('#scadenza').val('');
@@ -880,8 +880,8 @@ $(document).ready(function() {
 			$('#prezzo').val(prezzo);
 			$('#sconto').val(sconto);
 		} else {
-			('#udm option[value=""]').attr('selected', true);
-			('#iva option[value=""]').attr('selected', true);
+			('#udm option[value=""]').prop('selected', true);
+			('#iva option[value=""]').prop('selected', true);
 			$('#lotto').val('');
 			$('#scadenza').val('');
 			$('#quantita').val('');
@@ -1109,119 +1109,144 @@ $.fn.preloadFields = function(){
 }
 
 $.fn.getClienti = function(){
-	$.ajax({
-		url: baseUrl + "clienti?bloccaDdt=false",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					var label = '';
-					if(item.dittaIndividuale){
-						label += item.cognome + ' - ' + item.nome;
-					} else {
-						label += item.ragioneSociale;
-					}
-					label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
 
-					var agente = item.agente;
-					var idAgente = '-1';
-					if(agente != null && agente != undefined) {
-						idAgente = agente.id;
-					}
-					var listino = item.listino;
-					var idListino = '-1';
-					if(listino != null && listino != undefined){
-						idListino = listino.id;
-					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+	return $.Deferred(function() {
 
-					$('#cliente').selectpicker('refresh');
-				});
+		$.ajax({
+			url: baseUrl + "clienti?bloccaDdt=false",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var label = '';
+						if(item.dittaIndividuale){
+							label += item.cognome + ' - ' + item.nome;
+						} else {
+							label += item.ragioneSociale;
+						}
+						label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
+
+						var agente = item.agente;
+						var idAgente = '-1';
+						if(agente != null && agente != undefined) {
+							idAgente = agente.id;
+						}
+						var listino = item.listino;
+						var idListino = '-1';
+						if(listino != null && listino != undefined){
+							idListino = listino.id;
+						}
+						$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+
+						$('#cliente').selectpicker('refresh');
+
+					});
+					$('#log').append('Clienti caricati\n');
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 
 $.fn.getArticoli = function(){
-	$.ajax({
-		url: baseUrl + "articoli?attivo=true",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					var dataUdm = '';
-					var udm = item.unitaMisura;
-					if(udm != null && udm != undefined){
-						dataUdm = udm.id;
-					}
-					var dataIva = '';
-					var iva = item.aliquotaIva;
-					if(iva != null && iva != undefined){
-						dataIva = iva.id;
-					}
-					var dataQta = item.quantitaPredefinita;
-					var dataPrezzoBase = item.prezzoListinoBase;
-					$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-base="'+dataPrezzoBase+'" data-codice-fornitore="'+item.fornitore.codice+'">'+item.codice+' '+item.descrizione+'</option>');
 
-					$('#articolo').selectpicker('refresh');
-				});
+	return $.Deferred(function() {
+
+		$.ajax({
+			url: baseUrl + "articoli?attivo=true",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var dataUdm = '';
+						var udm = item.unitaMisura;
+						if(udm != null && udm != undefined){
+							dataUdm = udm.id;
+						}
+						var dataIva = '';
+						var iva = item.aliquotaIva;
+						if(iva != null && iva != undefined){
+							dataIva = iva.id;
+						}
+						var dataQta = item.quantitaPredefinita;
+						var dataPrezzoBase = item.prezzoListinoBase;
+						$('#articolo').append('<option value="'+item.id+'" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="'+dataQta+'" data-prezzo-base="'+dataPrezzoBase+'" data-codice-fornitore="'+item.fornitore.codice+'">'+item.codice+' '+item.descrizione+'</option>');
+
+						$('#articolo').selectpicker('refresh');
+
+					});
+				}
+				$('#log').append('Articoli caricati\n');
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 
 
 $.fn.getUnitaMisura = function(){
 
-	$.ajax({
-		url: baseUrl + "unita-misura",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				var udm = [];
-				$.each(result, function(i, item){
-					$('#udm').append('<option value="'+item.id+'">'+item.etichetta+'</option>');
+	return $.Deferred(function() {
 
-					udm.push(item);
-				});
-				$('#_udm').data("udmValues", udm);
+		$.ajax({
+			url: baseUrl + "unita-misura",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					var udm = [];
+					$.each(result, function(i, item){
+						$('#udm').append('<option value="'+item.id+'">'+item.etichetta+'</option>');
 
+						udm.push(item);
+					});
+					$('#_udm').data("udmValues", udm);
+					$('#log').append('Unita di misura caricate\n');
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 
 $.fn.getAliquoteIva = function(){
-	$.ajax({
-		url: baseUrl + "aliquote-iva",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			var iva = [];
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#iva').append('<option value="'+item.id+'">'+item.valore+'</option>');
 
-					iva.push(item);
-				});
-				$('#_iva').data("ivaValues", iva);
+	return $.Deferred(function() {
+
+		$.ajax({
+			url: baseUrl + "aliquote-iva",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				var iva = [];
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						$('#iva').append('<option value="'+item.id+'">'+item.valore+'</option>');
+
+						iva.push(item);
+					});
+					$('#_iva').data("ivaValues", iva);
+
+					$('#log').append('Aliquote iva caricate\n');
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 
@@ -1262,6 +1287,8 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 					$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
 
 					$('#cliente').selectpicker('refresh');
+
+					$('#log').append('Preseleziona cliente\n');
 				}
 				$('#note').val(result.note);
 
@@ -1439,6 +1466,8 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 						});
 
 					}
+
+					$('#log').append('Nota accredito caricata\n');
 
 				}
 			} else{
