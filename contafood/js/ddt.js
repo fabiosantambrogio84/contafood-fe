@@ -1,4 +1,6 @@
 var baseUrl = "/contafood-be/";
+var rowBackgroundPezziLessOrdinati = '#ff4f4f';
+var rowBackgroundPezziGreaterOrdinati = '#c9c5c5';
 
 $.fn.loadDdtTable = function(url) {
 	$.ajax({
@@ -186,6 +188,20 @@ $(document).ready(function() {
 		"lengthChange": false,
 		"info": false,
 		"autoWidth": false,
+		"columns": [
+			{ "width": "12%" },
+			{ "width": "12%" },
+			{ "width": "8%" },
+			{ "width": "3%" },
+			{ "width": "5%" },
+			{ "width": "5%" },
+			{ "width": "5%" },
+			{ "width": "5%" },
+			{ "width": "5%" },
+			{ "width": "5%" },
+			{ "width": "4%" },
+			{ "width": "2%" }
+		],
 		"order": [
 			[0, 'asc']
 		]
@@ -386,19 +402,22 @@ $(document).ready(function() {
 		$('#deleteDdtModal').modal('hide');
 		var idDdt = $(this).attr('data-id');
 
+		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@\n' +
+			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
 		$.ajax({
 			url: baseUrl + "ddts/" + idDdt,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertDdtContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>DDT</strong> cancellato con successo.\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertDdt').empty().append(alertContent);
+
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'DDT</strong> cancellato con successo.').replace('@@alertResult@@', 'success'));
 
 				$('#ddtTable').DataTable().ajax.reload();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nella cancellazione del DDT').replace('@@alertResult@@', 'danger'));
 			}
 		});
 	});
@@ -516,8 +535,14 @@ $(document).ready(function() {
 					ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
 					ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
 					ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-					ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-					ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+					ddtArticolo.numeroPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
+					ddtArticolo.prezzo = $(this).children().eq(7).children().eq(0).val();
+					ddtArticolo.sconto = $(this).children().eq(8).children().eq(0).val();
+
+					var idOrdiniClienti = $(this).attr('data-id-ordine-cliente');
+					if(idOrdiniClienti != null && idOrdiniClienti != ''){
+						ddtArticolo.idOrdiniClienti = idOrdiniClienti.split(";");
+					}
 
 					ddtArticoli.push(ddtArticolo);
 				});
@@ -625,8 +650,14 @@ $(document).ready(function() {
 					ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
 					ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
 					ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-					ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-					ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+					ddtArticolo.numeroPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
+					ddtArticolo.prezzo = $(this).children().eq(7).children().eq(0).val();
+					ddtArticolo.sconto = $(this).children().eq(8).children().eq(0).val();
+
+					var idOrdiniClienti = $(this).attr('data-id-ordine-cliente');
+					if(idOrdiniClienti != null && idOrdiniClienti != ''){
+						ddtArticolo.idOrdiniClienti = idOrdiniClienti.split(";");
+					}
 
 					ddtArticoli.push(ddtArticolo);
 				});
@@ -740,6 +771,8 @@ $(document).ready(function() {
 
 		$('#alertDdt').empty();
 
+		$.fn.emptyArticoli();
+
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
 		if(cliente != null && cliente != ''){
@@ -793,6 +826,9 @@ $(document).ready(function() {
 					if(data != null && data != undefined && data != ''){
 						$.fn.loadScontiArticoli(data, cliente);
 					}
+
+					$.fn.loadArticoliFromOrdiniClienti();
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
@@ -809,10 +845,56 @@ $(document).ready(function() {
 	});
 
 	$(document).on('change','#data', function(){
+		$.fn.emptyArticoli();
+
 		var data = $(this).val();
 		var cliente = $('#cliente option:selected').val();
 		if(data != null && data != undefined && data != '' && cliente != null && cliente != undefined && cliente != ''){
 			$.fn.loadScontiArticoli(data, cliente);
+
+			$.fn.loadArticoliFromOrdiniClienti();
+		}
+	});
+
+	$(document).on('change','#puntoConsegna', function(){
+		$.fn.emptyArticoli();
+	});
+
+	$(document).on('change','.pezzi', function(){
+		var pezzi = $(this).val();
+		var pezziDaEvadere = $(this).parent().parent().children().eq(6).children().eq(0).val();
+
+		if(pezzi == null || pezzi == ''){
+			pezzi = 0;
+		}
+		if(pezziDaEvadere == null || pezziDaEvadere == ''){
+			pezziDaEvadere = 0;
+		}
+		if(pezzi < pezziDaEvadere){
+			$(this).parent().parent().css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(pezzi > pezziDaEvadere){
+			$(this).parent().parent().css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$(this).parent().parent().css('background-color', 'transparent');
+		}
+	});
+
+	$(document).on('change','.pezziDaEvadere', function(){
+		var pezzi = $(this).parent().parent().children().eq(5).children().eq(0).val();
+		var pezziDaEvadere = $(this).val();
+
+		if(pezzi == null || pezzi == ''){
+			pezzi = 0;
+		}
+		if(pezziDaEvadere == null || pezziDaEvadere == ''){
+			pezziDaEvadere = 0;
+		}
+		if(pezzi < pezziDaEvadere){
+			$(this).parent().parent().css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(pezzi > pezziDaEvadere){
+			$(this).parent().parent().css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$(this).parent().parent().css('background-color', 'transparent');
 		}
 	});
 
@@ -915,7 +997,8 @@ $(document).ready(function() {
 		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(quantita,3)+'">';
-		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
+		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+		var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="">';
 		var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
 		var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
 
@@ -929,6 +1012,7 @@ $(document).ready(function() {
 		var currentScadenza;
 		var currentQuantita = 0;
 		var currentPezzi = 0;
+		var currentPezziDaEvadere = 0;
 
 		var ddtArticoliLength = $('.rowArticolo').length;
 		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
@@ -939,8 +1023,9 @@ $(document).ready(function() {
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
-					currentSconto = $(this).children().eq(7).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(7).children().eq(0).val();
+					currentSconto = $(this).children().eq(8).children().eq(0).val();
+					currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 
 					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
@@ -970,15 +1055,25 @@ $(document).ready(function() {
 			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(3).children().eq(0).val(quantita + $.fn.parseValue(currentQuantita,'float'));
 			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(7).text(totale);
 
+			var newPezzi = pezzi + $.fn.parseValue(currentPezzi,'int');
+
 			var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
 
 			var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
-			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'int'))+'">';
+			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
 
 			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
 			rowData[4] = newQuantitaHtml;
 			rowData[5] = newPezziHtml;
-			rowData[8] = totale;
+			rowData[9] = totale;
+			if(newPezzi < currentPezziDaEvadere){
+				$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
+			} else if(newPezzi > currentPezziDaEvadere){
+				$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
+			} else {
+				$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+			}
+
 			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 			//$('#ddtArticoliTable').DataTable().row(currentRowIndex)
 
@@ -994,16 +1089,25 @@ $(document).ready(function() {
 				udm,
 				quantitaHtml,
 				pezziHtml,
+				pezziDaEvadereHtml,
 				prezzoHtml,
 				scontoHtml,
 				totale,
 				iva,
 				deleteLink
 			] ).draw( false ).node();
-			$(rowNode).css('text-align', 'center');
+			$(rowNode).css('text-align', 'center').css('color','#080707');
 			$(rowNode).addClass('rowArticolo');
 			$(rowNode).attr('data-id', articoloId);
 			$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
+
+			if(pezzi < currentPezziDaEvadere){
+				$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
+			} else if(pezzi > currentPezziDaEvadere){
+				$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
+			} else {
+				$(rowNode).css('background-color', 'transparent');
+			}
 		}
 		$.fn.computeTotale();
 
@@ -1034,9 +1138,9 @@ $(document).ready(function() {
 		$.row = $(this).parent().parent();
 		var quantita = $.row.children().eq(4).children().eq(0).val();
 		quantita = $.fn.parseValue(quantita, 'float');
-		var prezzo = $.row.children().eq(6).children().eq(0).val();
+		var prezzo = $.row.children().eq(7).children().eq(0).val();
 		prezzo = $.fn.parseValue(prezzo, 'float');
-		var sconto = $.row.children().eq(7).children().eq(0).val();
+		var sconto = $.row.children().eq(8).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
 
 		var quantitaPerPrezzo = (quantita * prezzo);
@@ -1044,7 +1148,7 @@ $(document).ready(function() {
 		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		//var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
-		$.row.children().eq(8).text(totale);
+		$.row.children().eq(9).text(totale);
 
 		$.fn.computeTotale();
 	});
@@ -1219,7 +1323,6 @@ $.fn.getTipologieTrasporto = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					var tipologiaTrasporto = item;
 					if(item != null && item != '' && item == 'Mittente'){
 						$('#tipoTrasporto').append('<option value="'+item+'" selected>'+item+'</option>');
 					} else {
@@ -1377,6 +1480,7 @@ $.fn.getDdt = function(idDdt){
 						var udm = articolo.unitaMisura.etichetta;
 						var iva = articolo.aliquotaIva.valore;
 						var pezzi = item.numeroPezzi;
+						var pezziDaEvadere = '';
 						var quantita = item.quantita;
 						var prezzo = item.prezzo;
 						var sconto = item.sconto;
@@ -1389,7 +1493,8 @@ $.fn.getDdt = function(idDdt){
 						}
 						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
-						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
+						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+						var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
 						var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
 						var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
 
@@ -1411,15 +1516,24 @@ $.fn.getDdt = function(idDdt){
 							udm,
 							quantitaHtml,
 							pezziHtml,
+							pezziDaEvadereHtml,
 							prezzoHtml,
 							scontoHtml,
 							totale,
 							iva,
 							deleteLink
 						] ).draw( false ).node();
-						$(rowNode).css('text-align', 'center');
+						$(rowNode).css('text-align', 'center').css('color','#080707');
 						$(rowNode).addClass('rowArticolo');
 						$(rowNode).attr('data-id', articoloId);
+
+						if(pezzi < pezziDaEvadere){
+							$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
+						} else if(pezzi > pezziDaEvadere){
+							$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
+						} else {
+							$(rowNode).css('background-color', 'transparent');
+						}
 
 						$.fn.computeTotale();
 
@@ -1464,9 +1578,9 @@ $.fn.computeTotale = function() {
 	var totaleDocumento = 0;
 
 	$('.rowArticolo').each(function(i, item){
-		var totale = $(this).children().eq(8).text();
+		var totale = $(this).children().eq(9).text();
 		totale = $.fn.parseValue(totale, 'float');
-		var iva = $(this).children().eq(9).text();
+		var iva = $(this).children().eq(10).text();
 		iva = $.fn.parseValue(iva, 'int');
 
 		var totaliIva;
@@ -1514,10 +1628,11 @@ $.fn.groupArticoloRow = function(insertedRow){
 	var insertedArticoloId = insertedRow.attr("data-id");
 	var	insertedLotto = insertedRow.children().eq(1).children().eq(0).val();
 	var	insertedScadenza = insertedRow.children().eq(2).children().eq(0).val();
-	var	insertedPrezzo = insertedRow.children().eq(6).children().eq(0).val();
-	var	insertedSconto = insertedRow.children().eq(7).children().eq(0).val();
-	var insertedPezzi = insertedRow.children().eq(5).children().eq(0).val();
 	var insertedQuantita = insertedRow.children().eq(4).children().eq(0).val();
+	var insertedPezzi = insertedRow.children().eq(5).children().eq(0).val();
+	var insertedPezziDaEvadere = insertedRow.children().eq(6).children().eq(0).val();
+	var	insertedPrezzo = insertedRow.children().eq(7).children().eq(0).val();
+	var	insertedSconto = insertedRow.children().eq(8).children().eq(0).val();
 
 	var found = 0;
 	var currentRowIndex = 0;
@@ -1527,6 +1642,7 @@ $.fn.groupArticoloRow = function(insertedRow){
 	var currentPrezzo;
 	var currentSconto;
 	var currentPezzi = 0;
+	var currentPezziDaEvadere = 0;
 	var currentQuantita = 0;
 
 	var ddtArticoliLength = $('.rowArticolo').length;
@@ -1539,8 +1655,9 @@ $.fn.groupArticoloRow = function(insertedRow){
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
-					currentSconto = $(this).children().eq(7).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(7).children().eq(0).val();
+					currentSconto = $(this).children().eq(8).children().eq(0).val();
+					currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 
 					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(insertedArticoloId)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(insertedLotto)
@@ -1565,8 +1682,10 @@ $.fn.groupArticoloRow = function(insertedRow){
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		var newQuantita = ($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float'));
+		var newPezzi = ($.fn.parseValue(insertedPezzi,'int') + $.fn.parseValue(currentPezzi,'int'));
 
-		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+($.fn.parseValue(insertedPezzi,'int') + $.fn.parseValue(currentPezzi,'int'))+'">';
+		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+newPezzi+'">';
+		var newPezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+insertedPezziDaEvadere+'">';
 		var newLottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto group" value="'+insertedLotto+'">';
 		var newScadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(insertedScadenza).format('YYYY-MM-DD')+'">';
 		var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
@@ -1578,9 +1697,19 @@ $.fn.groupArticoloRow = function(insertedRow){
 		rowData[2] = newScadenzaHtml;
 		rowData[4] = newQuantitaHtml;
 		rowData[5] = newPezziHtml;
-		rowData[6] = newPrezzoHtml;
-		rowData[7] = newScontoHtml;
+		rowData[6] = newPezziDaEvadereHtml;
+		rowData[7] = newPrezzoHtml;
+		rowData[9] = newScontoHtml;
 		rowData[8] = totale;
+
+		if(newPezzi < currentPezziDaEvadere){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(newPezzi > currentPezziDaEvadere){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+		}
+
 		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 		table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
 
@@ -1607,6 +1736,264 @@ $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
 	return quantitaFixed;
 }
 
+$.fn.emptyArticoli = function(){
+	$('#ddtArticoliTable').DataTable().rows()
+		.remove()
+		.draw();
+}
+
+$.fn.getStatoOrdineClienteEvaso = function(){
+
+	var idStatoOrdineEvaso = 2;
+
+	$.ajax({
+		url: baseUrl + "stati-ordine/evaso",
+		type: 'GET',
+		ajax: false,
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				idStatoOrdineEvaso = result.id;
+			}
+
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Errore nel recupero dello stato ordine evaso');
+		}
+	});
+
+	return idStatoOrdineEvaso;
+}
+
+$.fn.loadArticoliFromOrdiniClienti = function(){
+
+	var idStatoOrdineEvaso = $.fn.getStatoOrdineClienteEvaso();
+
+	var dataConsegna = $('#data').val();
+	var idCliente = $('#cliente option:selected').val();
+	var idPuntoConsegna = $('#puntoConsegna option:selected').val();
+
+	var url = baseUrl + "ordini-clienti?idCliente="+idCliente;
+	url += "&idPuntoConsegna="+idPuntoConsegna;
+	url += "&dataConsegnaLessOrEqual="+moment(dataConsegna).format('YYYY-MM-DD');
+	url += "&idStatoNot="+idStatoOrdineEvaso;
+
+	$.ajax({
+		url: url,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					var idOrdineCliente = item.id;
+					var ordineClienteArticoli = item.ordineClienteArticoli;
+
+					if(ordineClienteArticoli != null && ordineClienteArticoli != undefined && ordineClienteArticoli.length != 0){
+
+						ordineClienteArticoli.forEach(function(item, j){
+							var ordineClienteArticolo = item;
+							var pezziOrdinati = ordineClienteArticolo.numeroPezziOrdinati;
+							var pezziDaEvadere = ordineClienteArticolo.numeroPezziDaEvadere;
+
+							// controllo sul numero di pezzi ordinati e il numero di pezzi da evadere
+							if(pezziOrdinati == null || pezziOrdinati == ''){
+								pezziOrdinati = 0;
+							} else {
+								pezziOrdinati = $.fn.parseValue(pezziOrdinati, 'int');
+							}
+							if(pezziDaEvadere == null || pezziDaEvadere == ''){
+								pezziDaEvadere = 0;
+							} else {
+								pezziDaEvadere = $.fn.parseValue(pezziDaEvadere, 'int');
+							}
+
+							if(pezziOrdinati > 0 && pezziDaEvadere > 0){
+								var articolo = ordineClienteArticolo.articolo;
+								if(articolo != null && articolo != ''){
+									var idArticolo = articolo.id;
+
+									// get sconto articolo
+									var sconto;
+									if(!$.fn.checkVariableIsNull(dataConsegna) && !$.fn.checkVariableIsNull(idCliente)){
+										sconto = $.fn.getScontoArticolo(idArticolo, dataConsegna, idCliente);
+										console.log('SCONTO: '+sconto);
+									}
+
+									// get articolo prezzo listino cliente
+									var prezzoListino;
+									var idListino = $('#cliente option:selected').attr('data-id-listino');
+									if(!$.fn.checkVariableIsNull(idListino)){
+										prezzoListino = $.fn.getPrezzoListinoClienteArticolo(idArticolo, idListino);
+										console.log('PREZZO LISTINO: '+prezzoListino);
+									}
+
+									var articoloLabel = articolo.codice + ' - ' + articolo.descrizione;
+									var udm;
+									if(!$.fn.checkVariableIsNull(articolo.unitaMisura)){
+										udm = articolo.unitaMisura.etichetta;
+									}
+									var lotto = '';
+									var scadenza = '';
+									var quantita = articolo.quantitaPredefinita;
+									var pezzi = 0;
+									var prezzo;
+									if(!$.fn.checkVariableIsNull(prezzoListino)){
+										prezzo = prezzoListino;
+									} else {
+										prezzo = articolo.prezzoListinoBase;
+									}
+									var sconto = sconto;
+									var iva;
+									if(!$.fn.checkVariableIsNull(articolo.aliquotaIva)){
+										iva = articolo.aliquotaIva.valore;
+									}
+									var codiceFornitore = articolo.fornitore.codice;
+
+									var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="" data-codice-fornitore="'+codiceFornitore+'">';
+									var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="">';
+									var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
+									var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+									var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
+									var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
+									var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
+
+									// check if a same articolo was already added
+									var found = 0;
+									var currentRowIndex;
+									var currentIdArticolo;
+									var currentLotto;
+									var currentPrezzo;
+									var currentSconto;
+									var currentScadenza;
+									var currentPezzi = 0;
+									var currentPezziDaEvadere = 0;
+									var currentQuantita= 0;
+									var currentIdOrdineCliente;
+
+									var ddtArticoliLength = $('.rowArticolo').length;
+									if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
+										$('.rowArticolo').each(function(i, item){
+
+											if(found != 1){
+												currentRowIndex = $(this).attr('data-row-index');
+												currentIdArticolo = $(this).attr('data-id');
+												currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
+												currentLotto = $(this).children().eq(1).children().eq(0).val();
+												currentScadenza = $(this).children().eq(2).children().eq(0).val();
+												currentPrezzo = $(this).children().eq(7).children().eq(0).val();
+												currentSconto = $(this).children().eq(8).children().eq(0).val();
+												currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
+
+												if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(idArticolo)
+													&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+													&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+													&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
+													&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+													found = 1;
+													currentQuantita = $(this).children().eq(4).children().eq(0).val();
+													currentPezzi = $(this).children().eq(5).children().eq(0).val();
+													currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
+												}
+											}
+										});
+									}
+
+									var totale = 0;
+									quantita = $.fn.parseValue(quantita, 'float');
+									prezzo = $.fn.parseValue(prezzo, 'float');
+									sconto = $.fn.parseValue(sconto, 'float');
+									pezzi = $.fn.parseValue(pezzi, 'int');
+
+									var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
+									var scontoValue = (sconto/100)*quantitaPerPrezzo;
+									totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+									var table = $('#ddtArticoliTable').DataTable();
+
+									if(found == 1){
+										var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+										var newPezzi = (pezzi + $.fn.parseValue(currentPezzi,'int'));
+										var newPezziDaEvadere = (pezziDaEvadere + $.fn.parseValue(currentPezziDaEvadere,'int'));
+
+										var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
+										var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
+										var newPezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+newPezziDaEvadere+'">';
+
+										var newIdOrdiniClienti;
+										if(currentIdOrdineCliente != null && currentIdOrdineCliente != ''){
+											newIdOrdiniClienti = currentIdOrdineCliente+';'+idOrdineCliente;
+										} else {
+											newIdOrdiniClienti = ''+idOrdineCliente;
+										}
+
+										var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
+										rowData[4] = newQuantitaHtml;
+										rowData[5] = newPezziHtml;
+										rowData[6] = newPezziDaEvadereHtml;
+										rowData[9] = totale;
+										if(newPezzi < newPezziDaEvadere){
+											$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
+										} else if(newPezzi > newPezziDaEvadere){
+											$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
+										} else {
+											$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+										}
+										$(table.row("[data-row-index='"+currentRowIndex+"']").node()).attr('data-id-ordine-cliente', newIdOrdiniClienti);
+
+										table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+
+									} else {
+										var deleteLink = '<a class="deleteDdtArticolo" data-id="'+idArticolo+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+										var rowsCount = table.rows().count();
+										var newRowindex = parseInt(rowsCount) + 1;
+
+										var rowNode = table.row.add( [
+											articoloLabel,
+											lottoHtml,
+											scadenzaHtml,
+											udm,
+											quantitaHtml,
+											pezziHtml,
+											pezziDaEvadereHtml,
+											prezzoHtml,
+											scontoHtml,
+											totale,
+											iva,
+											deleteLink
+										] ).draw( false ).node();
+										$(rowNode).css('text-align', 'center').css('color','#080707');
+										$(rowNode).addClass('rowArticolo');
+										$(rowNode).attr('data-id', idArticolo);
+										$(rowNode).attr('data-id-ordine-cliente', idOrdineCliente);
+										$(rowNode).attr('data-row-index', newRowindex);
+										if(pezzi < pezziDaEvadere){
+											$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
+										} else if(pezzi > pezziDaEvadere){
+											$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
+										} else {
+											$(rowNode).css('background-color', 'transparent');
+										}
+
+									}
+									$.fn.computeTotale();
+
+								}
+							}
+						});
+					}
+				});
+			}
+
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Errore nel recupero degli ordini clienti');
+		}
+	});
+
+}
+
+// #####################################################################################################################
 // BARCODE SCANNER FUNCTIONS
 
 $.fn.getScontoArticolo = function(idArticolo, data, cliente){
@@ -1671,6 +2058,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	}
 	var quantita = quantita;
 	var pezzi = numeroPezzi;
+	var pezziDaEvadere = '';
 	var prezzo;
 	if(!$.fn.checkVariableIsNull(prezzoListino)){
 		prezzo = prezzoListino;
@@ -1691,7 +2079,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	}
 	var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+scadenza+'">';
 	var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
-	var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
+	var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+	var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
 	var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
 	var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
 
@@ -1704,6 +2093,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var currentSconto;
 	var currentScadenza;
 	var currentPezzi = 0;
+	var currentPezziDaEvadere = 0;
 	var currentQuantita= 0;
 
 	var ddtArticoliLength = $('.rowArticolo').length;
@@ -1715,8 +2105,9 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 				currentIdArticolo = $(this).attr('data-id');
 				currentLotto = $(this).children().eq(1).children().eq(0).val();
 				currentScadenza = $(this).children().eq(2).children().eq(0).val();
-				currentPrezzo = $(this).children().eq(6).children().eq(0).val();
-				currentSconto = $(this).children().eq(7).children().eq(0).val();
+				currentPrezzo = $(this).children().eq(7).children().eq(0).val();
+				currentSconto = $(this).children().eq(8).children().eq(0).val();
+				currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 
 				if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
@@ -1745,14 +2136,23 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var rowIndex;
 	if(found == 1){
 		var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+		var newPezzi = (pezzi + $.fn.parseValue(currentPezzi,'int'));
 
 		var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
-		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+(pezzi + $.fn.parseValue(currentPezzi,'int'))+'">';
+		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
 
 		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
 		rowData[4] = newQuantitaHtml;
 		rowData[5] = newPezziHtml;
-		rowData[8] = totale;
+		rowData[9] = totale;
+		if(newPezzi < currentPezziDaEvadere){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(newPezzi > currentPezziDaEvadere){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+		}
+
 		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 		rowIndex = currentRowIndex;
 
@@ -1769,16 +2169,25 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 			udm,
 			quantitaHtml,
 			pezziHtml,
+			pezziDaEvadereHtml,
 			prezzoHtml,
 			scontoHtml,
 			totale,
 			iva,
 			deleteLink
 		] ).draw( false ).node();
-		$(rowNode).css('text-align', 'center');
+		$(rowNode).css('text-align', 'center').css('color','#080707');
 		$(rowNode).addClass('rowArticolo');
 		$(rowNode).attr('data-id', articoloId);
 		$(rowNode).attr('data-row-index', newRowindex);
+		if(pezzi < pezziDaEvadere){
+			$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(pezzi > pezziDaEvadere){
+			$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$(rowNode).css('background-color', 'transparent');
+		}
+
 		rowIndex = newRowindex;
 	}
 	$.fn.computeTotale();
@@ -1881,7 +2290,6 @@ $(document).ready(function() {
 								$('#articolo').selectpicker('refresh');
 								var mainArticoloDiv = $('#articolo').parent();
 								mainArticoloDiv.find('.dropdown-item > span:empty').parent().click();
-
 
 								// get sconto articolo
 								var sconto;

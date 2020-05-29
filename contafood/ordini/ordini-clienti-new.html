@@ -38,13 +38,9 @@
   <script>
     var idTelefonata = $.fn.extractIdTelefonataFromUrl();
     if(idTelefonata != null && idTelefonata != undefined){
-      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti()).then(function(f1,f2,f3){
-        $.fn.getTelefonata(idTelefonata);
-      });
+      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti()).then($.fn.getTelefonata(idTelefonata));
     } else {
-      $.fn.getClienti();
-      $.fn.getAutisti();
-      $.fn.getAgenti();
+      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti()).then();
     }
   </script>
 </head>
@@ -55,7 +51,7 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="ordini"></ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion toggled" id="accordionSidebar" data-page-type="ordini"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -72,103 +68,139 @@
         <div class="container-fluid" id="containerOrdineCliente">
 
           <!-- Page Heading -->
-          <h1 class="h3 mb-4 text-gray-800">Nuovo ordine cliente</h1>
+          <h1 class="h3 mb-4 text-gray-800">Nuovo Ordine Cliente</h1>
 
           <div id="alertOrdineCliente"></div>
 
-          <form id="newOrdineClienteForm" class="needs-validation" novalidate>
-            <div class="form-row">
-              <div class="form-group col-md-4">
-                <label for="cliente">Cliente*</label>
-                <select id="cliente" class="form-control" required>
-                  <option value=""></option>
-                </select>
-                <div class="invalid-feedback">
-                  Seleziona un cliente
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-4">
-                <label for="puntoConsegna">Punto consegna*</label>
-                <div class="d-flex flex-row">
-                  <div class="p-2">
-                    <select id="puntoConsegna" class="form-control" disabled required>
+          <div class="d-flex flex-row">
+            <div class="w-50">
+
+              <form id="newOrdineClienteForm" class="needs-validation" novalidate>
+                <div class="form-row">
+                  <div class="form-group col-md-10">
+                    <label for="cliente">Cliente*</label>
+                    <select id="cliente" class="form-control form-control-sm" required>
+                      <option value=""></option>
                     </select>
                     <div class="invalid-feedback">
-                      Seleziona un punto di consegna
+                      Seleziona un cliente
                     </div>
                   </div>
-                  <div class="p-2 d-none" id="loadingDiv"><i class="fas fa-spinner fa-pulse"></i></div>
                 </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="dataConsegna">Data consegna*</label>
-                <input type="date" class="form-control" id="dataConsegna" placeholder="" required>
-                <div class="invalid-feedback">
-                  Inserisci una data di consegna
+                <div class="form-row">
+                  <div class="form-group col-md-10">
+                    <label for="puntoConsegna">Punto consegna*</label>
+                    <div class="d-flex flex-row">
+                      <div class="p-2">
+                        <select id="puntoConsegna" class="form-control form-control-sm" disabled required>
+                        </select>
+                        <div class="invalid-feedback">
+                          Seleziona un punto di consegna
+                        </div>
+                      </div>
+                      <div class="p-2 d-none" id="loadingDiv"><i class="fas fa-spinner fa-pulse"></i></div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-2">
-                <label for="autista">Autista*</label>
-                <select id="autista" class="form-control" required>
-                  <option value=""></option>
-                </select>
-                <div class="invalid-feedback">
-                  Seleziona un autista
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="dataConsegna">Data consegna*</label>
+                    <input type="date" class="form-control form-control-sm" id="dataConsegna" placeholder="" required>
+                    <div class="invalid-feedback">
+                      Inserisci una data di consegna
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="form-group col-md-2">
-                <label for="agente">Agente</label>
-                <select id="agente" class="form-control">
-                  <option value=""></option>
-                </select>
-              </div>
-            </div>
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="autista">Autista*</label>
+                    <select id="autista" class="form-control form-control-sm" required>
+                      <option value=""></option>
+                    </select>
+                    <div class="invalid-feedback">
+                      Seleziona un autista
+                    </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="agente">Agente</label>
+                    <select id="agente" class="form-control form-control-sm">
+                      <option value=""></option>
+                    </select>
+                  </div>
+                </div>
 
-            <div class="form-row" id="formRowArticoli">
-              <div class="form-group col-md-12" id="formRowArticoliBody">
-                <label for="articoli">Articoli</label>
-                <div id="articoli" class="mb-2">
-                  <a id="addArticolo" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
+                <div class="form-row" id="formRowArticoli">
+                  <div class="form-group col-md-12" id="formRowArticoliBody">
+                    <label for="articoli">Articoli</label>
+                    <div id="articoli" class="mb-2">
+                      <a id="addArticolo" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="note">Note</label>
-                <textarea class="form-control" id="note"></textarea>
-              </div>
-            </div>
+                <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="note">Note</label>
+                    <textarea class="form-control form-control-sm" id="note"></textarea>
+                  </div>
+                </div>
 
-            <button type="submit" class="btn btn-primary" id="newOrdineClienteButton">Salva</button>
-            <a href="ordini-clienti.html" class="btn btn-secondary">Annulla</a>
-          </form>
+                <button type="submit" class="btn btn-primary" id="newOrdineClienteButton">Salva</button>
+                <a href="ordini-clienti.html" class="btn btn-secondary">Annulla</a>
+              </form>
 
-          <script>
-            // Example starter JavaScript for disabling form submissions if there are invalid fields
-            (function() {
-              'use strict';
-              window.addEventListener('load', function() {
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var forms = document.getElementsByClassName('needs-validation');
-                // Loop over them and prevent submission
-                var validation = Array.prototype.filter.call(forms, function(form) {
-                  form.addEventListener('submit', function(event) {
-                    if (form.checkValidity() === false) {
-                      event.preventDefault();
-                      event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
+              <script>
+                // Example starter JavaScript for disabling form submissions if there are invalid fields
+                (function() {
+                  'use strict';
+                  window.addEventListener('load', function() {
+                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                    var forms = document.getElementsByClassName('needs-validation');
+                    // Loop over them and prevent submission
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                      form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                      }, false);
+                    });
                   }, false);
-                });
-              }, false);
-            })();
-            </script>
+                })();
+              </script>
+
+            </div>
+
+            <div class="w-50">
+
+              <div class="d-flex flex-row">
+
+                <div class="card w-50 mr-2" id="statisticheSettimana">
+                  <div class="card-body text-center">
+                    <h5 class="card-title" style="color:#0f0f0f;">Statistiche settimana</h5>
+                    <h6 class="card-subtitle mt-2" id="statisticheSettimanaFromTo"></h6>
+                    <ul class="list-group list-group-flush mt-2 statisticheSettimanaList" style="font-size:0.9rem;">
+                      <li class="list-group-item statisticheSettimanaEmptyList">Nessuna statistica</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="card w-50" id="statisticheMese">
+                  <div class="card-body text-center">
+                    <h5 class="card-title" style="color:#0f0f0f;">Statistiche mese</h5>
+                    <h6 class="card-subtitle mt-2" id="statisticheMeseFromTo"></h6>
+                    <ul class="list-group list-group-flush mt-2 statisticheMeseList" style="font-size:0.9rem;">
+                      <li class="list-group-item statisticheMeseEmptyList">Nessuna statistica</li>
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
 
         </div>
         <!-- /.container-fluid -->
@@ -196,6 +228,7 @@
                     <th>Codice</th>
                     <th>Descrizione</th>
                     <th>Prezzo listino base (&euro;)</th>
+                    <th>Pezzi</th>
                   </tr>
                   </thead>
                 </table>

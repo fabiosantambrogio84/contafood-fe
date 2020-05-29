@@ -2,168 +2,9 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
-	if($('#ordiniClientiTable') != null && $('#ordiniClientiTable') != undefined && $('#ordiniClientiTable').length > 0){
+	$.fn.preloadFields();
 
-		var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-		alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
-			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-		$.ajax({
-			url: baseUrl + "autisti",
-			type: 'GET',
-			dataType: 'json',
-			success: function(autistiResult) {
-
-				$('#ordiniClientiTable').DataTable({
-					"ajax": {
-						"url": baseUrl + "ordini-clienti",
-						"type": "GET",
-						"content-type": "json",
-						"cache": false,
-						"dataSrc": "",
-						"error": function(jqXHR, textStatus, errorThrown) {
-							console.log('Response text: ' + jqXHR.responseText);
-							var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-							alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
-								'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-							$('#alertOrdineCliente').empty().append(alertContent);
-						}
-					},
-					"language": {
-						"search": "Cerca",
-						"paginate": {
-							"first": "Inizio",
-							"last": "Fine",
-							"next": "Succ.",
-							"previous": "Prec."
-						},
-						"emptyTable": "Nessun ordine cliente disponibile",
-						"zeroRecords": "Nessun ordine cliente disponibile"
-					},
-					"pageLength": 20,
-					"lengthChange": false,
-					"info": false,
-					"autoWidth": false,
-					"order": [
-						[0, 'desc']
-					],
-					"columns": [
-						{"name":"codice", "data": null, render: function ( data, type, row ) {
-							return data.progressivo + '/' + data.annoContabile;
-						}},
-						{"name":"cliente", "data": null, render: function ( data, type, row ) {
-							if(data.cliente != null){
-								var clienteHtml = '';
-
-								if(data.cliente.dittaIndividuale){
-									clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
-								} else {
-									clienteHtml += data.cliente.ragioneSociale;
-								}
-								return clienteHtml;
-							} else {
-								return '';
-							}
-						}},
-						{"name":"puntoConsegna", "data": null, render: function ( data, type, row ) {
-							if(data.puntoConsegna != null){
-								var puntoConsegnaHtml = '';
-
-								if(data.puntoConsegna.indirizzo != null){
-									puntoConsegnaHtml += data.puntoConsegna.indirizzo;
-								}
-								if(data.puntoConsegna.localita != null){
-									puntoConsegnaHtml += ' ' + data.puntoConsegna.localita;
-								}
-								return puntoConsegnaHtml;
-							} else {
-								return '';
-							}
-						}},
-						{"name": "dataConsegna", "data": null, render: function ( data, type, row ) {
-							var ordineClienteId = data.id;
-							var inputId = "dataConsegna_" + ordineClienteId;
-							var dataConsegnaInput = '<input type="date" class="form-control dataConsegnaOrdineCliente" id="'+inputId+'" data-id="'+ordineClienteId+'"';
-
-							if(data.dataConsegna != null){
-								var dataConsegnaFormatted = moment(data.dataConsegna).format('YYYY-MM-DD');
-								dataConsegnaInput += ' value="'+dataConsegnaFormatted+'"';
-							}
-							dataConsegnaInput += '>';
-							return dataConsegnaInput;
-						}},
-						{"name":"autista", "data": null, render: function ( data, type, row ) {
-							var ordineClienteId = data.id;
-							var selectId = "autista_" + ordineClienteId;
-
-							var autistaId = null;
-							if(data.autista != null){
-								autistaId = data.autista.id;
-							}
-
-							var autistaSelect = '<select id="'+selectId+'" class="form-control autistaOrdineCliente" data-id="'+ordineClienteId+'">';
-							if(autistiResult != null && autistiResult != undefined && autistiResult != ''){
-								$.each(autistiResult, function(i, item){
-									var label = item.cognome + ' ' + item.nome;
-									var optionHtml = '<option value="'+item.id+'"';
-									if(autistaId != null && autistaId != undefined){
-										if(autistaId == item.id){
-											optionHtml += ' selected';
-										}
-									}
-									optionHtml += '>'+label+'</option>';
-									autistaSelect += optionHtml;
-								});
-							}
-							autistaSelect += '</select';
-							return autistaSelect;
-
-						}},
-						{"name":"agente", "data": null, render: function ( data, type, row ) {
-							if(data.agente != null){
-								var agenteHtml = '';
-
-								if(data.agente.nome){
-									agenteHtml += data.agente.nome;
-								}
-								if(data.agente.cognome){
-									agenteHtml += ' ' + data.agente.cognome;
-								}
-								return agenteHtml;
-							} else {
-								return '';
-							}
-						}},
-						{"name":"statoOrdine", "data": null, render: function ( data, type, row ) {
-							if(data.statoOrdine != null){
-								var statoOrdineHtml = '';
-
-								if(data.statoOrdine.descrizione){
-									statoOrdineHtml += data.statoOrdine.descrizione;
-								}
-
-								return statoOrdineHtml;
-							} else {
-								return '';
-							}
-						}},
-						{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-							var links = '<a class="detailsOrdineCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-							links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
-							links += '<a class="deleteOrdineCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
-							return links;
-						}}
-					]
-				});
-
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				console.log('Response text: ' + jqXHR.responseText);
-				$('#alertOrdineCliente').empty().append(alertContent);
-			}
-		});
-
-	}
+	$.fn.loadOrdiniClientiTable(baseUrl + "ordini-clienti");
 
 	$(document).on('change','.dataConsegnaOrdineCliente', function(){
 		var dataConsegna = $(this).val();
@@ -650,7 +491,12 @@ $(document).ready(function() {
 				}},
 				{"name": "codice", "data": "codice"},
 				{"name": "descrizione", "data": "descrizione"},
-				{"name": "prezzoListinoBase", "data": "prezzoListinoBase"}
+				{"name": "prezzoListinoBase", "data": "prezzoListinoBase"},
+				{"name": "numeroPezzi", "data": null, "orderable":false, "width": "12%", render: function ( data, type, row ) {
+					var numeroPezziHtml = '<input type="number" class="form-control" id="pezzi_'+data.id+'" step="1" min="0" value="1">';
+					return numeroPezziHtml;
+				}}
+
 			]
 		});
 	});
@@ -677,6 +523,7 @@ $(document).ready(function() {
 			$('.addArticoloCheckbox:checkbox:checked').each(function(i, item){
 				var id = item.id.replace('checkbox_','');
 				var codice = $('#'+item.id).attr('data-codice');
+				var pezzi = $('#pezzi_'+id).val();
 
 				if($.inArray(id, rowsIdPresent) != -1){
 					var alertContent = '<div id="alertOrdineClienteAddArticoloContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
@@ -687,35 +534,7 @@ $(document).ready(function() {
 					var descrizione = $('#'+item.id).attr('data-descrizione');
 					var prezzoListinoBase = $('#'+item.id).attr('data-prezzo');
 
-					var rowHtml = '<div class="form-row formRowArticolo" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
-						'<div class="form-group col-md-2">';
-
-					if(i == 0 && alreadyAddedRows == 0){
-						rowHtml = rowHtml + '<label for="codiceArticolo">Codice</label>';
-					}
-					rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceArticolo_'+id+'" disabled value="'+codice+'"></div>';
-					rowHtml = rowHtml + '<div class="form-group col-md-4">';
-
-					if(i == 0 && alreadyAddedRows == 0){
-						rowHtml = rowHtml + '<label for="descrizioneArticolo">Descrizione</label>';
-					}
-					rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneArticolo_'+id+'" disabled value="'+descrizione+'"></div>';
-					rowHtml = rowHtml + '<div class="form-group col-md-3">';
-
-					if(i == 0 && alreadyAddedRows == 0){
-						rowHtml = rowHtml + '<label for="prezzoArticolo">Prezzo listino base (&euro;)</label>';
-					}
-					rowHtml = rowHtml + '<input type="number" class="form-control" id="prezzoArticolo_'+id+'" disabled value="'+prezzoListinoBase+'"></div>';
-					rowHtml = rowHtml + '<div class="form-group col-md-2">';
-
-					if(i == 0 && alreadyAddedRows == 0){
-						rowHtml = rowHtml + '<label for="pezziArticolo">Numero pezzi</label>';
-					}
-					rowHtml = rowHtml + '<div class="input-group">';
-					rowHtml = rowHtml + '<input type="number" class="form-control pezziArticolo" id="pezziArticolo_'+id+'" step="1" min="0">';
-					rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddArticolo" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
-					rowHtml = rowHtml + '</div></div></div>';
-					rowHtml = rowHtml + '</div>';
+					var rowHtml = $.fn.createArticoloRow(id, codice, descrizione, prezzoListinoBase, pezzi, i, alreadyAddedRows);
 
 					$('#formRowArticoli').append(rowHtml);
 
@@ -739,7 +558,7 @@ $(document).ready(function() {
 			firstId = -1;
 		}
 		var id = $(this).attr('data-id');
-		$('#formRowarticolo_'+id).remove();
+		$('#formRowArticolo_'+id).remove();
 		if(id == firstId){
 			var firstRow = $('.formRowArticolo').first();
 			if(firstRow != null && firstRow != undefined && firstRow.length != 0){
@@ -780,8 +599,14 @@ $(document).ready(function() {
 					if(result != null && result != undefined && result != ''){
 						$('#puntoConsegna').empty();
 						$.each(result, function(i, item){
+
 							var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
-							$('#puntoConsegna').append('<option value="'+item.id+'">'+label+'</option>');
+							var optionHtml = '<option value="'+item.id+'"';
+							if(i == 0){
+								optionHtml += ' selected';
+							}
+							optionHtml += '>'+label+'</option>';
+							$('#puntoConsegna').append(optionHtml);
 						});
 					}
 					$('#puntoConsegna').removeAttr('disabled');
@@ -791,6 +616,8 @@ $(document).ready(function() {
 					if(idAgente != null && idAgente != '-1'){
 						$('#agente option[value="' + idAgente +'"]').attr('selected', true);
 					}
+
+					$.fn.loadStatistiche();
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
@@ -806,7 +633,253 @@ $(document).ready(function() {
 		}
 	});
 
+	$(document).on('change','#puntoConsegna', function(){
+		$.fn.loadStatistiche();
+	});
+
+	$(document).on('click','.statsArticolo', function(event){
+		event.preventDefault();
+
+		$.fn.addArticoloFromStats($(this));
+	});
+
+	$(document).on('click','#resetSearchOrdineClienteButton', function(){
+		$('#searchOrdineClienteForm :input').val(null);
+		$('#searchOrdineClienteForm select option[value=""]').attr('selected', true);
+
+		$('#ordiniClientiTable').DataTable().destroy();
+		$.fn.loadOrdiniClientiTable(baseUrl + "ordini-clienti");
+	});
+
+	if($('#searchOrdineClienteButton') != null && $('#searchOrdineClienteButton') != undefined) {
+		$(document).on('submit', '#searchOrdineClienteForm', function (event) {
+			event.preventDefault();
+
+			var cliente = $('#searchCliente').val();
+			var dataConsegna = $('#searchData').val();
+			var idAutista = $('#searchAutista option:selected').val();
+			var idStato = $('#searchStato option:selected').val();
+
+			var params = {};
+			if(cliente != null && cliente != undefined && cliente != ''){
+				params.cliente = cliente;
+			}
+			if(dataConsegna != null && dataConsegna != undefined && dataConsegna != ''){
+				params.dataConsegna = dataConsegna;
+			}
+			if(idAutista != null && idAutista != undefined && idAutista != ''){
+				params.idAutista = idAutista;
+			}
+			if(idStato != null && idStato != undefined && idStato != ''){
+				params.idStato = idStato;
+			}
+			var url = baseUrl + "ordini-clienti?" + $.param(params);
+
+			$('#ordiniClientiTable').DataTable().destroy();
+			$.fn.loadOrdiniClientiTable(url);
+		});
+	}
+
 });
+
+$.fn.loadOrdiniClientiTable = function(url){
+	if($('#ordiniClientiTable') != null && $('#ordiniClientiTable') != undefined && $('#ordiniClientiTable').length > 0){
+
+		var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
+			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		$.ajax({
+			url: baseUrl + "autisti",
+			type: 'GET',
+			dataType: 'json',
+			success: function(autistiResult) {
+
+				$('#ordiniClientiTable').DataTable({
+					"ajax": {
+						"url": url,
+						"type": "GET",
+						"content-type": "json",
+						"cache": false,
+						"dataSrc": "",
+						"error": function(jqXHR, textStatus, errorThrown) {
+							console.log('Response text: ' + jqXHR.responseText);
+							var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+							alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
+								'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+							$('#alertOrdineCliente').empty().append(alertContent);
+						}
+					},
+					"language": {
+						"search": "Cerca",
+						"paginate": {
+							"first": "Inizio",
+							"last": "Fine",
+							"next": "Succ.",
+							"previous": "Prec."
+						},
+						"emptyTable": "Nessun ordine cliente disponibile",
+						"zeroRecords": "Nessun ordine cliente disponibile"
+					},
+					"searching": false,
+					"pageLength": 20,
+					"lengthChange": false,
+					"info": false,
+					"autoWidth": false,
+					"order": [
+						[0, 'desc']
+					],
+					"columns": [
+						{"name":"codice", "data": null, render: function ( data, type, row ) {
+							return data.progressivo + '/' + data.annoContabile;
+						}},
+						{"name":"cliente", "data": null, render: function ( data, type, row ) {
+							if(data.cliente != null){
+								var clienteHtml = '';
+
+								if(data.cliente.dittaIndividuale){
+									clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
+								} else {
+									clienteHtml += data.cliente.ragioneSociale;
+								}
+								return clienteHtml;
+							} else {
+								return '';
+							}
+						}},
+						{"name":"puntoConsegna", "data": null, render: function ( data, type, row ) {
+							if(data.puntoConsegna != null){
+								var puntoConsegnaHtml = '';
+
+								if(data.puntoConsegna.indirizzo != null){
+									puntoConsegnaHtml += data.puntoConsegna.indirizzo;
+								}
+								if(data.puntoConsegna.localita != null){
+									puntoConsegnaHtml += ' ' + data.puntoConsegna.localita;
+								}
+								return puntoConsegnaHtml;
+							} else {
+								return '';
+							}
+						}},
+						{"name": "dataConsegna", "data": null, render: function ( data, type, row ) {
+							var ordineClienteId = data.id;
+							var inputId = "dataConsegna_" + ordineClienteId;
+							var dataConsegnaInput = '<input type="date" class="form-control form-control-sm dataConsegnaOrdineCliente" id="'+inputId+'" data-id="'+ordineClienteId+'"';
+
+							if(data.dataConsegna != null){
+								var dataConsegnaFormatted = moment(data.dataConsegna).format('YYYY-MM-DD');
+								dataConsegnaInput += ' value="'+dataConsegnaFormatted+'"';
+							}
+							dataConsegnaInput += '>';
+							return dataConsegnaInput;
+						}},
+						{"name":"autista", "data": null, render: function ( data, type, row ) {
+							var ordineClienteId = data.id;
+							var selectId = "autista_" + ordineClienteId;
+
+							var autistaId = null;
+							if(data.autista != null){
+								autistaId = data.autista.id;
+							}
+
+							var autistaSelect = '<select id="'+selectId+'" class="form-control form-control-sm autistaOrdineCliente" data-id="'+ordineClienteId+'">';
+							if(autistiResult != null && autistiResult != undefined && autistiResult != ''){
+								$.each(autistiResult, function(i, item){
+									var label = item.nome + ' ' + item.cognome;
+									var optionHtml = '<option value="'+item.id+'"';
+									if(autistaId != null && autistaId != undefined){
+										if(autistaId == item.id){
+											optionHtml += ' selected';
+										}
+									}
+									optionHtml += '>'+label+'</option>';
+									autistaSelect += optionHtml;
+								});
+							}
+							autistaSelect += '</select';
+							return autistaSelect;
+
+						}},
+						{"name":"agente", "data": null, render: function ( data, type, row ) {
+							if(data.agente != null){
+								var agenteHtml = '';
+
+								if(data.agente.nome){
+									agenteHtml += data.agente.nome;
+								}
+								if(data.agente.cognome){
+									agenteHtml += ' ' + data.agente.cognome;
+								}
+								return agenteHtml;
+							} else {
+								return '';
+							}
+						}},
+						{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
+							var links = '<a class="detailsOrdineCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+
+							var stato = data.statoOrdine;
+							if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_EVADERE'){
+								links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
+							}
+							links += '<a class="deleteOrdineCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+							return links;
+						}}
+					],
+					"createdRow": function(row, data, dataIndex,cells){
+						$(row).css('font-size', '12px');
+						if(data.statoOrdine != null){
+							var backgroundColor = '';
+							if(data.statoOrdine.codice == 'EVASO'){
+								backgroundColor = '#a3f59d';
+							} else if(data.statoOrdine.codice == 'PARZIALMENTE_EVASO'){
+								backgroundColor = '#fcf456';
+							} else {
+								backgroundColor = 'trasparent';
+							}
+							$(row).css('background-color', backgroundColor);
+						}
+					}
+				});
+
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				$('#alertOrdineCliente').empty().append(alertContent);
+			}
+		});
+
+	}
+}
+
+$.fn.normalizeIfEmptyOrNullVariable = function(variable){
+	if(variable != null && variable != undefined && variable != ''){
+		return variable;
+	}
+	if(variable == null || variable == undefined){
+		return '';
+	}
+	return '';
+}
+
+$.fn.parseValue = function(value, resultType){
+	if(value != null && value != undefined && value != ''){
+		if(resultType == 'float'){
+			return parseFloat(value);
+		} else if(resultType == 'int'){
+			return parseInt(value);
+		} else {
+			return value;
+		}
+	} else {
+		if(resultType == 'float'){
+			return 0.0;
+		} else {
+			return 0;
+		}
+	}
+}
 
 $.fn.printVariable = function(variable){
 	if(variable != null && variable != undefined && variable != ""){
@@ -848,38 +921,99 @@ $.fn.extractIdTelefonataFromUrl = function(){
 }
 
 $.fn.getClienti = function(){
-	$.ajax({
-		url: baseUrl + "clienti",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					var label = '';
-					if(item.dittaIndividuale){
-						label += item.cognome + ' - ' + item.nome;
-					} else {
-						label += item.ragioneSociale;
-					}
-					label += ' - ' + item.partitaIva + ' - ' + item.codiceFiscale;
 
-					var agente = item.agente;
-					var idAgente = '-1';
-					if(agente != null) {
-						idAgente = agente.id;
-					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'">'+label+'</option>');
-				});
+	return $.Deferred(function() {
+		$.ajax({
+			url: baseUrl + "clienti",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var label = '';
+						if(item.dittaIndividuale){
+							label += item.cognome + ' - ' + item.nome;
+						} else {
+							label += item.ragioneSociale;
+						}
+						label += ' - ' + item.partitaIva + ' - ' + item.codiceFiscale;
+
+						var agente = item.agente;
+						var idAgente = '-1';
+						if(agente != null) {
+							idAgente = agente.id;
+						}
+						$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'">'+label+'</option>');
+					});
+				}
+				$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-			$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
+		});
+
 	});
 }
 
 $.fn.getAutisti = function(){
+
+	return $.Deferred(function() {
+		$.ajax({
+			url: baseUrl + "autisti",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var label = item.cognome + ' ' + item.nome;
+						$('#autista').append('<option value="'+item.id+'">'+label+'</option>');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+	});
+}
+
+$.fn.getAgenti = function(){
+
+	return $.Deferred(function() {
+		$.ajax({
+			url: baseUrl + "agenti",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var label = item.cognome + ' ' + item.nome;
+						$('#agente').append('<option value="'+item.id+'">'+label+'</option>');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+	});
+}
+
+$.fn.preloadFields = function(){
+	var lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek');
+	var lastWeekEnd = moment(lastWeekStart).add(6, 'days');
+
+	$('#statisticheSettimanaFromTo').text(lastWeekStart.format('DD/MM/YYYY')+' - '+lastWeekEnd.format('DD/MM/YYYY'));
+
+	var lastMonthStart = moment().subtract(1, 'months').startOf('month');
+	var lastMonthEnd = moment(lastMonthStart).endOf('month');
+
+	$('#statisticheMeseFromTo').text(lastMonthStart.format('DD/MM/YYYY')+' - '+lastMonthEnd.format('DD/MM/YYYY'));
+};
+
+$.fn.preloadSearchFields = function(){
+
 	$.ajax({
 		url: baseUrl + "autisti",
 		type: 'GET',
@@ -887,8 +1021,7 @@ $.fn.getAutisti = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					var label = item.cognome + ' ' + item.nome;
-					$('#autista').append('<option value="'+item.id+'">'+label+'</option>');
+					$('#searchAutista').append('<option value="'+item.id+'" >'+item.nome+' '+item.cognome+'</option>');
 				});
 			}
 		},
@@ -896,18 +1029,14 @@ $.fn.getAutisti = function(){
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
-}
-
-$.fn.getAgenti = function(){
 	$.ajax({
-		url: baseUrl + "agenti",
+		url: baseUrl + "stati-ordine",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					var label = item.cognome + ' ' + item.nome;
-					$('#agente').append('<option value="'+item.id+'">'+label+'</option>');
+					$('#searchStato').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
 				});
 			}
 		},
@@ -921,7 +1050,7 @@ $.fn.getAgenti = function(){
 $.fn.getOrdineCliente = function(idOrdineCliente){
 
 	var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-	alertContent = alertContent +  '<strong>Errore nel recupero dell ordine cliente.</strong>\n' +
+	alertContent = alertContent +  '<strong>@@alertText@@</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 	$.ajax({
@@ -956,9 +1085,11 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
 						  });
 					  }
 					  $('#puntoConsegna').removeAttr('disabled');
+
+					  $.fn.loadStatistiche();
 				  },
 				  error: function(jqXHR, textStatus, errorThrown) {
-					  $('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
+					  $('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna'));
 				  }
 				});
 			}
@@ -1014,7 +1145,7 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
 				});
 			}
           } else{
-            $('#alertOrdineCliente').empty().append(alertContent);
+            $('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero dell ordine cliente.'));
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -1027,7 +1158,7 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
 
 $.fn.getTelefonata = function(idTelefonata){
 	var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-	alertContent = alertContent + '<strong>Errore nel recupero della telefonata.</strong>\n' +
+	alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 	$.ajax({
@@ -1060,6 +1191,8 @@ $.fn.getTelefonata = function(idTelefonata){
 								});
 							}
 							$('#puntoConsegna').removeAttr('disabled');
+
+							$.fn.loadStatistiche();
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
@@ -1068,12 +1201,182 @@ $.fn.getTelefonata = function(idTelefonata){
 				}
 
 			} else{
-				$('#alertOrdineCliente').empty().append(alertContent);
+				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero della telefonata'));
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
-			$('#alertOrdineCliente').empty().append(alertContent);
+			$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero della telefonata'));
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
+}
+
+$.fn.loadStatisticheSettimana = function(idCliente, idPuntoConsegna, alertContent){
+
+	return $.Deferred(function() {
+
+		$.ajax({
+			url: baseUrl + "ordini-clienti-statistiche/settimana?idCliente="+idCliente+"&idPuntoConsegna="+idPuntoConsegna,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$('.statisticheSettimanaList').empty();
+					$.each(result, function(i, item){
+						var listHtml = '<li class="list-group-item">';
+						listHtml += '<a href="" class="statsArticolo" data-id-articolo="'+item.id+'" data-codice-articolo="'+item.codice+'" data-descrizione-articolo="'+item.descrizione+'" data-prezzo-listino-base-articolo="'+item.prezzoListinoBase+'">'+item.codice+' '+item.descrizione+'</a></li>';
+
+						$('.statisticheSettimanaList').append(listHtml);
+					});
+				} else {
+					$('.statisticheSettimanaList').empty().append('<li class="list-group-item statisticheSettimanaEmptyList">Nessuna statistica</li>');
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero delle statistiche'));
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+
+	});
+}
+
+$.fn.loadStatisticheMese = function(idCliente, idPuntoConsegna, alertContent){
+
+	return $.Deferred(function() {
+
+		$.ajax({
+			url: baseUrl + "ordini-clienti-statistiche/mese?idCliente="+idCliente+"&idPuntoConsegna="+idPuntoConsegna,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$('.statisticheMeseList').empty();
+					$.each(result, function(i, item){
+						var listHtml = '<li class="list-group-item">';
+						listHtml += '<a href="" class="statsArticolo" data-id-articolo="'+item.id+'" data-codice-articolo="'+item.codice+'" data-descrizione-articolo="'+item.descrizione+'" data-prezzo-listino-base-articolo="'+item.prezzoListinoBase+'">'+item.codice+' '+item.descrizione+'</a></li>';
+
+						$('.statisticheMeseList').append(listHtml);
+					});
+				} else {
+					$('.statisticheMeseList').empty().append('<li class="list-group-item statisticheMeseEmptyList">Nessuna statistica</li>');
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero delle statistiche'));
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+
+	});
+}
+
+$.fn.loadStatistiche = function(){
+	var idCliente = $('#cliente option:selected').val();
+	var idPuntoConsegna = $('#puntoConsegna option:selected').val();
+
+	var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-warning alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+	if(idCliente == null || idCliente == ''){
+		$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Cliente obbligatorio per il recupero delle statistiche'));
+		return;
+	}
+	if(idPuntoConsegna == null || idPuntoConsegna == ''){
+		$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Punto di consegna obbligatorio per il recupero delle statistiche'));
+		return;
+	}
+
+	$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Recupero statistiche in corso...'));
+
+	$.when($.fn.loadStatisticheSettimana(idCliente, idPuntoConsegna, alertContent), $.fn.loadStatisticheMese(idCliente, idPuntoConsegna, alertContent)).then(
+		$('#alertOrdineCliente').empty()
+	);
+
+};
+
+$.fn.createArticoloRow = function(id, codice, descrizione, prezzoListinoBase, pezzi, index, alreadyAddedRows){
+	var rowHtml = '<div class="form-row formRowArticolo" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
+		'<div class="form-group col-md-2">';
+
+	if(index == 0 && alreadyAddedRows == 0){
+		rowHtml = rowHtml + '<label for="codiceArticolo">Codice</label>';
+	}
+	rowHtml = rowHtml + '<input type="text" class="form-control form-control-sm" id="codiceArticolo_'+id+'" disabled value="'+codice+'"></div>';
+	rowHtml = rowHtml + '<div class="form-group col-md-4">';
+
+	if(index == 0 && alreadyAddedRows == 0){
+		rowHtml = rowHtml + '<label for="descrizioneArticolo">Descrizione</label>';
+	}
+	rowHtml = rowHtml + '<input type="text" class="form-control form-control-sm" id="descrizioneArticolo_'+id+'" disabled value="'+descrizione+'"></div>';
+	rowHtml = rowHtml + '<div class="form-group col-md-3">';
+
+	if(index == 0 && alreadyAddedRows == 0){
+		rowHtml = rowHtml + '<label for="prezzoArticolo">Prezzo listino base (&euro;)</label>';
+	}
+	rowHtml = rowHtml + '<input type="number" class="form-control form-control-sm" id="prezzoArticolo_'+id+'" disabled value="'+prezzoListinoBase+'"></div>';
+	rowHtml = rowHtml + '<div class="form-group col-md-2">';
+
+	if(index == 0 && alreadyAddedRows == 0){
+		rowHtml = rowHtml + '<label for="pezziArticolo">Numero pezzi</label>';
+	}
+	rowHtml = rowHtml + '<div class="input-group">';
+	rowHtml = rowHtml + '<input type="number" class="form-control form-control-sm pezziArticolo" id="pezziArticolo_'+id+'" step="1" min="0" value="'+pezzi+'">';
+	rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddArticolo" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
+	rowHtml = rowHtml + '</div></div></div>';
+	rowHtml = rowHtml + '</div>';
+
+	return rowHtml;
+};
+
+$.fn.addArticoloFromStats = function(articolo){
+
+	var idArticolo = articolo.attr('data-id-articolo');
+	var codiceArticolo = articolo.attr('data-codice-articolo');
+	var descrizioneArticolo = articolo.attr('data-descrizione-articolo');
+	var prezzoListinoBaseArticolo = articolo.attr('data-prezzo-listino-base-articolo');
+	var pezziArticolo = 1;
+
+	var found = 0;
+	var currentIdArticolo = 0;
+	var currentPezzi = 0;
+
+	var articoliLength = $('.formRowArticolo').length;
+	if(articoliLength != null && articoliLength != undefined && articoliLength != 0) {
+		$('.formRowArticolo').each(function(i, item){
+
+			if(found != 1){
+				currentIdArticolo = $(this).attr('data-id');
+
+				if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(idArticolo)){
+					found = 1;
+					currentPezzi = $(this).children().eq(3).find('input').val();
+				}
+			}
+		});
+	}
+
+	if(found == 1){
+		var newPezzi = $.fn.parseValue(currentPezzi,'int') + $.fn.parseValue(pezziArticolo,'int');
+		$('.formRowArticolo[data-id='+idArticolo+']').children().eq(3).find('input').val(newPezzi);
+
+	} else {
+		var alreadyAddedRows = $('.formRowArticolo').length;
+		if(alreadyAddedRows == null || alreadyAddedRows == undefined){
+			alreadyAddedRows = 0;
+		}
+		if(alreadyAddedRows != 0){
+			var rowsIdPresent = [];
+			$('.formRowArticolo').each(function(i,item){
+				var itemId = item.id;
+				rowsIdPresent.push(itemId.replace('formRowArticolo_',''));
+			});
+		}
+
+		var rowHtml = $.fn.createArticoloRow(idArticolo, codiceArticolo, descrizioneArticolo, prezzoListinoBaseArticolo, pezziArticolo, 0, alreadyAddedRows);
+
+		$('#formRowArticoli').append(rowHtml);
+
+	}
 }
