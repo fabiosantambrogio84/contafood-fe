@@ -1,0 +1,452 @@
+var baseUrl = "/contafood-be/";
+
+$.fn.loadGiacenzeTable = function(url) {
+	$('#giacenzeTable').DataTable({
+		"processing": true,
+		"ajax": {
+			"url": url,
+			"type": "GET",
+			"content-type": "json",
+			"cache": false,
+			"dataSrc": "",
+			"error": function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				var alertContent = '<div id="alertGiacenzaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero delle giacenze</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertGiacenza').empty().append(alertContent);
+			}
+		},
+		"language": {
+			"search": "Cerca",
+			"paginate": {
+				"first": "Inizio",
+				"last": "Fine",
+				"next": "Succ.",
+				"previous": "Prec."
+			},
+			"emptyTable": "Nessuna giacenza disponibile",
+			"zeroRecords": "Nessuna giacenza disponibile"
+		},
+		"pageLength": 20,
+		"lengthChange": false,
+		"info": false,
+		"autoWidth": false,
+		"order": [
+			[1, 'asc'],
+			[4, 'asc'],
+			[5, 'asc']
+		],
+		"columns": [
+			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
+				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="deleteGiacenzaCheckbox">';
+				return checkboxHtml;
+			}},
+			{"name": "articolo", "data": null, render: function ( data, type, row ) {
+				var articolo = data.articolo;
+				if(articolo != null){
+					var articoloHtml = articolo.codice + ' '+articolo.descrizione;
+					return articoloHtml;
+				} else {
+					return '';
+				}
+			}},
+			{"name": "attivo", "data": null, render: function ( data, type, row ) {
+				var articolo = data.articolo;
+				if(articolo != null){
+					var attivo = articolo.attivo;
+					if(attivo != null){
+						//return attivo;
+						return attivo == true ? 'Si' : 'No';
+					} else {
+						return '';
+					}
+				} else{
+					return '';
+				}
+			}},
+			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
+				var articolo = data.articolo;
+				if(articolo != null){
+					var fornitore = articolo.fornitore;
+					return fornitore.ragioneSociale;
+				} else {
+					return '';
+				}
+			}},
+			{"name": "lotto", "data": "lotto"},
+			{"name": "scadenza", "data": null, "width":"8%", render: function ( data, type, row ) {
+				if(data.scadenza != null){
+					var a = moment(data.scadenza);
+					return a.format('DD/MM/YYYY');
+				} else {
+					return '';
+				}
+			}},
+			{"name": "quantita", "data": "quantita"},
+			{"data": null, "orderable":false, "width":"4%", render: function ( data, type, row ) {
+				var links = '<a class="detailsGiacenza pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+				return links;
+			}}
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			//$(row).css('font-size', '12px');
+			$(cells[1]).css('text-align','left');
+			$(cells[2]).css('text-align','left');
+			$(cells[3]).css('text-align','left');
+			$(cells[4]).css('text-align','left');
+			$(cells[6]).css('font-weight','bold');
+		}
+	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadGiacenzeTable(baseUrl + "giacenze");
+
+	$(document).on('click','#deleteGiacenzeBulk', function(){
+		$('#deleteGiacenzeBulkModal').modal('show');
+	});
+
+	$(document).on('click','#confirmDeleteGiacenzeBulk', function(){
+		$('#deleteGiacenzeBulkModal').modal('hide');
+
+		var alertContent = '<div id="alertGiacenzaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		var numChecked = $('.deleteGiacenzaCheckbox:checkbox:checked').length;
+		if(numChecked == null || numChecked == undefined || numChecked == 0){
+			var alertContent = '<div id="alertGiacenzaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>Selezionare almeno una giacenza</strong>\n' +
+				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$('#alertGiacenza').empty().append(alertContent);
+		} else{
+			var giacenzeIds = [];
+			$('.deleteGiacenzaCheckbox:checkbox:checked').each(function(i, item) {
+				var id = item.id.replace('checkbox_', '');
+				giacenzeIds.push(id);
+			});
+			$.ajax({
+				url: baseUrl + "giacenze/operations/delete",
+				type: 'POST',
+				contentType: "application/json",
+				dataType: 'json',
+				data: JSON.stringify(giacenzeIds),
+				success: function(result) {
+					$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Giacenze cancellate con successo').replace('@@alertResult@@', 'success'));
+
+					$('#giacenzeTable').DataTable().ajax.reload();
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Errore nella cancellazione delle giacenze').replace('@@alertResult@@', 'danger'));
+				}
+			});
+		}
+	});
+
+	$(document).on('click','.detailsGiacenza', function(){
+		var idGiacenza = $(this).attr('data-id');
+
+		var alertContent = '<div id="alertGiacenzaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della giacenza.</strong></div>';
+
+		$.ajax({
+			url: baseUrl + "giacenze/" + idGiacenza,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != '') {
+					var articolo = result.articolo;
+					$('#articolo').text(articolo.codice+' '+articolo.descrizione);
+					$('#lotto').text(result.lotto);
+					$('#scadenza').text(moment(result.scadenza).format('DD/MM/YYYY'));
+					$('#quantita').text(result.quantita);
+
+					if(result.movimentazioni != null && result.movimentazioni != undefined){
+						$('#detailsGiacenzaModalTable').DataTable({
+							"data": result.movimentazioni,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessuna movimentazione presente",
+								"zeroRecords": "Nessuna movimentazione presente"
+							},
+							"pageLength": 100,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'asc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "movimentazione", "data": null, render: function (data, type, row) {
+									var result = '';
+									if (data.descrizione != null) {
+										if (data.inputOutput != null) {
+											if(data.inputOutput == 'INPUT'){
+												result = '<span style="color:green;padding-right:5px;"><i class="fas fa-arrow-down"></i></span>';
+											} else if(data.inputOutput == 'OUTPUT'){
+												result = '<span style="color:red;padding-right:5px;"><i class="fas fa-arrow-up"></i></span>';
+											}
+										}
+										result += data.descrizione;
+									}
+									return result;
+								}}
+							],
+							"createdRow": function(row, data, dataIndex,cells){
+								$(row).css('text-align', 'center');
+								/*
+								if(data.inputOutput != null){
+									var backgroundColor = '';
+									if(data.inputOutput == 'INPUT'){
+										backgroundColor = 'green';
+									} else if(data.inputOutput == 'OUTPUT'){
+										backgroundColor = 'red';
+									} else {
+										backgroundColor = 'trasparent';
+									}
+									$(row).css('background-color', backgroundColor);
+								}
+								*/
+							}
+						});
+					}
+
+				} else{
+					$('#detailsGiacenzaMainDiv').empty().append(alertContent);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#detailsGiacenzaMainDiv').empty().append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		})
+
+		$('#detailsGiacenzaModal').modal('show');
+	});
+
+	$(document).on('click','.closeGiacenza', function(){
+		$('#detailsGiacenzaModalTable').DataTable().destroy();
+		$('#detailsGiacenzaModal').modal('hide');
+	});
+
+	$(document).on('click','#resetSearchGiacenzaButton', function(){
+		$('#searchGiacenzaForm :input').val(null);
+		$('#searchGiacenzaForm select option[value=""]').attr('selected', true);
+
+		$('#giacenzeTable').DataTable().destroy();
+		$.fn.loadGiacenzeTable(baseUrl + "giacenze");
+	});
+
+	if($('#searchGiacenzaButton') != null && $('#searchGiacenzaButton') != undefined) {
+		$(document).on('submit', '#searchGiacenzaForm', function (event) {
+			event.preventDefault();
+
+			var articolo = $('#searchArticolo').val();
+			var attivo = $('#searchAttivo').val();
+			var idFornitore = $('#searchFornitore option:selected').val();
+			var lotto = $('#searchLotto').val();
+			var scadenza = $('#searchScadenza').val();
+
+			var params = {};
+			if(articolo != null && articolo != undefined && articolo != ''){
+				params.articolo = articolo;
+			}
+			if(attivo != null && attivo != undefined && attivo != ''){
+				params.attivo = attivo;
+			}
+			if(idFornitore != null && idFornitore != undefined && idFornitore != ''){
+				params.idFornitore = idFornitore;
+			}
+			if(lotto != null && lotto != undefined && lotto != ''){
+				params.lotto = lotto;
+			}
+			if(scadenza != null && scadenza != undefined && scadenza != ''){
+				params.scadenza = scadenza;
+			}
+			var url = baseUrl + "giacenze?" + $.param( params );
+
+			$('#giacenzeTable').DataTable().destroy();
+			$.fn.loadGiacenzeTable(url);
+
+		});
+	}
+
+	if($('#newGiacenzaButton') != null && $('#newGiacenzaButton') != undefined){
+
+		$('#articolo').selectpicker();
+
+		$(document).on('submit','#newGiacenzaForm', function(event){
+			event.preventDefault();
+
+			var giacenza = new Object();
+
+			var idArticolo = $('#articolo option:selected').val();
+			if(idArticolo != null && idArticolo != ''){
+			    var articolo = new Object();
+                articolo.id = idArticolo;
+				giacenza.articolo = articolo;
+			}
+			giacenza.lotto = $('#lotto').val();
+			giacenza.scadenza = $('#scadenza').val();
+			giacenza.quantita = $('#quantita').val();
+
+			var giacenzaJson = JSON.stringify(giacenza);
+
+			var alertContent = '<div id="alertGiacenzaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			$.ajax({
+				url: baseUrl + "giacenze",
+				type: 'POST',
+				contentType: "application/json",
+				dataType: 'json',
+				data: giacenzaJson,
+				success: function(result) {
+					$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Giacenza creata con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to giacenze-html
+					setTimeout(function() {
+						window.location.href = "giacenze.html";
+					}, 1000);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della giacenza').replace('@@alertResult@@', 'danger'));
+				}
+			});
+		});
+	}
+});
+
+$.fn.printVariable = function(variable){
+	if(variable != null && variable != undefined && variable != ""){
+		return variable;
+	}
+	return "";
+}
+
+$.fn.extractIdGiacenzaFromUrl = function(){
+    var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+        paramNames,
+        i;
+
+    for (i = 0; i < urlVariables.length; i++) {
+        paramNames = urlVariables[i].split('=');
+
+        if (paramNames[0] === 'idGiacenza') {
+        	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+        }
+    }
+}
+
+$.fn.preloadSearchFields = function(){
+	$.ajax({
+		url: baseUrl + "fornitori",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchFornitore').append('<option value="'+item.id+'" >'+item.ragioneSociale+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getArticoli = function(){
+	$.ajax({
+		url: baseUrl + "articoli",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#articolo').append('<option value="'+item.id+'">'+item.codice+' '+item.descrizione+'</option>');
+
+					$('#articolo').selectpicker('refresh');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getTelefonata = function(idTelefonata){
+
+	var alertContent = '<div id="alertGiacenzaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>Errore nel recupero della telefonata.</strong>\n' +
+    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+    $.ajax({
+        url: baseUrl + "telefonate/" + idTelefonata,
+        type: 'GET',
+        dataType: 'json',
+        success: function(result) {
+          if(result != null && result != undefined && result != ''){
+
+			$('#hiddenIdTelefonata').attr('value', result.id);
+			if(result.autista != null){
+				$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
+			}
+			$('#telefono').attr('value', result.telefono);
+			$('#telefono2').attr('value', result.telefonoTwo);
+			$('#telefono3').attr('value', result.telefonoThree);
+			$('#giorno option[value="' + result.giornoOrdinale +'"]').attr('selected', true);
+			$('#ora').attr('value', result.ora);
+			$('#giornoConsegna option[value="' + result.giornoConsegnaOrdinale +'"]').attr('selected', true);
+			$('#oraConsegna').attr('value', result.oraConsegna);
+			$('#note').val(result.note);
+			if(result.cliente != null){
+				$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
+				$.ajax({
+					url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
+					type: 'GET',
+					dataType: 'json',
+					success: function(result) {
+						if(result != null && result != undefined && result != ''){
+							$.each(result, function(i, item){
+								var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
+								var selected = '';
+								if(result.puntoConsegna != null){
+									if(result.puntoConsegna.id == item.id){
+										selected = 'selected';
+									}
+								}
+								$('#puntoConsegna').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
+							});
+						}
+						$('#puntoConsegna').removeAttr('disabled');
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
+					}
+				});
+			}
+          } else{
+            $('#alertGiacenza').empty().append(alertContent);
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $('#alertGiacenza').empty().append(alertContent);
+            $('#updateTelefonataButton').attr('disabled', true);
+            console.log('Response text: ' + jqXHR.responseText);
+        }
+    });
+
+}
