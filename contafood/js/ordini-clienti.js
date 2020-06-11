@@ -6,6 +6,10 @@ $(document).ready(function() {
 
 	$.fn.loadOrdiniClientiTable(baseUrl + "ordini-clienti");
 
+	if(window.location.search.substring(1).indexOf('idOrdineCliente') == -1 || window.location.search.substring(1).indexOf('idTelefonata') == -1){
+		$.fn.loadOrdineClienteArticoliTable();
+	}
+
 	$(document).on('change','.dataConsegnaOrdineCliente', function(){
 		var dataConsegna = $(this).val();
 		var ordineClienteId = $(this).attr("data-id");
@@ -358,6 +362,9 @@ $(document).ready(function() {
 	}
 
 	if($('#newOrdineClienteButton') != null && $('#newOrdineClienteButton') != undefined){
+
+		$('#articolo').selectpicker();
+
 		$(document).on('submit','#newOrdineClienteForm', function(event){
 			event.preventDefault();
 
@@ -454,6 +461,99 @@ $(document).ready(function() {
 		});
 	}
 
+	$(document).on('click','#addArticolo', function(event){
+		event.preventDefault();
+
+		var articoloId = $('#articolo option:selected').val();
+
+		if(articoloId == null || articoloId == undefined || articoloId == ''){
+			var alertContent = '<div class="alert alert-danger alert-dismissable">\n' +
+				'                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>\n' +
+				'                Seleziona un articolo\n' +
+				'              </div>';
+
+			$('#addOrdineClienteArticoloAlert').empty().append(alertContent);
+			return;
+		} else {
+			$('#addOrdineClienteArticoloAlert').empty();
+		}
+
+		var articolo = $('#articolo option:selected').text();
+		var prezzoListinoBase = $('#articolo option:selected').attr('data-prezzo-base');
+		var pezzi = $('#pezzi').val();
+
+		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center pezzi" value="'+pezzi+'">';
+
+		// check if a same articolo was already added
+		var found = 0;
+		var currentRowIndex;
+		var currentIdArticolo;
+		var currentPezzi = 0;
+
+		var ordineClienteArticoliLength = $('.rowArticolo').length;
+		if(ordineClienteArticoliLength != null && ordineClienteArticoliLength != undefined && ordineClienteArticoliLength != 0) {
+			$('.rowArticolo').each(function(i, item){
+
+				if(found != 1){
+					currentRowIndex = $(this).attr('data-row-index');
+					currentIdArticolo = $(this).attr('data-id');
+
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)){
+						found = 1;
+						currentPezzi = $(this).children().eq(2).children().eq(0).val();
+					}
+				}
+			});
+		}
+
+		var table = $('#ordineClienteArticoliTable').DataTable();
+		if(found == 1){
+			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(3).children().eq(0).val(quantita + $.fn.parseValue(currentQuantita,'float'));
+			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(7).text(totale);
+
+			var newPezzi = $.fn.parseValue(pezzi,'int') + $.fn.parseValue(currentPezzi,'int');
+
+			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center pezzi" value="'+newPezzi+'">';
+
+			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
+			rowData[2] = newPezziHtml;
+
+			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+
+		} else {
+			var deleteLink = '<a class="deleteOrdineClienteArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+			var rowsCount = table.rows().count();
+
+			var rowNode = table.row.add( [
+				articolo,
+				prezzoListinoBase,
+				pezziHtml,
+				deleteLink
+			] ).draw( false ).node();
+			$(rowNode).css('text-align', 'center').css('color','#080707');
+			$(rowNode).addClass('rowArticolo');
+			$(rowNode).attr('data-id', articoloId);
+			$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
+
+		}
+
+		$('#articolo option[value=""]').prop('selected',true);
+		$('#pezzi').val('');
+
+		$('#articolo').focus();
+		$('#articolo').selectpicker('refresh');
+	});
+
+	$(document).on('click','.deleteOrdineClienteArticolo', function(){
+		$('#ordineClienteArticoliTable').DataTable().row( $(this).parent().parent() )
+			.remove()
+			.draw();
+		$('#ordineClienteArticoliTable').focus();
+
+	});
+
+	/*
 	$(document).on('click','#addArticolo', function(){
 		$('#addArticoloModal').modal('show');
 
@@ -583,10 +683,22 @@ $(document).ready(function() {
 			}
 		}
 	});
+	*/
 
 	$(document).on('change','#cliente', function(){
 		$('#loadingDiv').removeClass('d-none');
 		$('#loadingAgenteDiv').removeClass('d-none');
+
+		$('#articolo option[value=""]').prop('selected', true);
+		$('#pezzi').val('');
+
+		var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		$('#alertOrdineCliente').empty();
+
+		$.fn.emptyArticoli();
 
 		var cliente = $('#cliente option:selected').val();
 		var idAgente = $('#cliente option:selected').attr('data-id-agente');
@@ -623,6 +735,8 @@ $(document).ready(function() {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 				}
 			});
+			$('#articolo').removeAttr('disabled');
+			$('#articolo').selectpicker('refresh');
 
 		} else {
 			$('#agente option').removeAttr('selected');
@@ -630,6 +744,8 @@ $(document).ready(function() {
 			$('#puntoConsegna').empty();
 			$('#puntoConsegna').attr('disabled', true);
 			$('#loadingDiv').addClass('d-none');
+			$('#articolo').removeAttr('disabled');
+			$('#articolo').selectpicker('refresh');
 		}
 	});
 
@@ -681,6 +797,42 @@ $(document).ready(function() {
 	}
 
 });
+
+$.fn.emptyArticoli = function(){
+	$('#ordineClienteArticoliTable').DataTable().rows()
+		.remove()
+		.draw();
+}
+
+$.fn.loadOrdineClienteArticoliTable = function() {
+	$('#ordineClienteArticoliTable').DataTable({
+		"searching": false,
+		"language": {
+			"paginate": {
+				"first": "Inizio",
+				"last": "Fine",
+				"next": "Succ.",
+				//"previous": "<i class=\"fa fa-backward\" aria-hidden=\"true\"></i>"
+				"previous": "Prec."
+			},
+			"emptyTable": "",
+			"zeroRecords": ""
+		},
+		"pageLength": 50,
+		"lengthChange": false,
+		"info": false,
+		"autoWidth": false,
+		"columns": [
+			{ "width": "20%" },
+			{ "width": "20%" },
+			{ "width": "10%" },
+			{ "width": "2%" }
+		],
+		"order": [
+			[0, 'asc']
+		]
+	});
+}
 
 $.fn.loadOrdiniClientiTable = function(url){
 	if($('#ordiniClientiTable') != null && $('#ordiniClientiTable') != undefined && $('#ordiniClientiTable').length > 0){
@@ -920,6 +1072,16 @@ $.fn.extractIdTelefonataFromUrl = function(){
 	}
 }
 
+$.fn.normalizeIfEmptyOrNullVariable = function(variable){
+	if(variable != null && variable != undefined && variable != ''){
+		return variable;
+	}
+	if(variable == null || variable == undefined){
+		return '';
+	}
+	return '';
+}
+
 $.fn.getClienti = function(){
 
 	return $.Deferred(function() {
@@ -947,6 +1109,8 @@ $.fn.getClienti = function(){
 					});
 				}
 				$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
+
+				console.log("GET CLIENTI");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -970,6 +1134,8 @@ $.fn.getAutisti = function(){
 						$('#autista').append('<option value="'+item.id+'">'+label+'</option>');
 					});
 				}
+
+				console.log("GET AUTISTI");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -992,6 +1158,34 @@ $.fn.getAgenti = function(){
 						$('#agente').append('<option value="'+item.id+'">'+label+'</option>');
 					});
 				}
+
+				console.log("GET AGENTI");
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+	});
+}
+
+$.fn.getArticoli = function(){
+
+	return $.Deferred(function() {
+		$.ajax({
+			url: baseUrl + "articoli?attivo=true",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var dataPrezzoBase = item.prezzoListinoBase;
+						$('#articolo').append('<option value="'+item.id+'" data-prezzo-base="'+dataPrezzoBase+'" >'+item.codice+' '+item.descrizione+'</option>');
+
+						$('#articolo').selectpicker('refresh');
+					});
+				}
+
+				console.log("GET ARTICOLI");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -1045,7 +1239,6 @@ $.fn.preloadSearchFields = function(){
 		}
 	});
 }
-
 
 $.fn.getOrdineCliente = function(idOrdineCliente){
 
@@ -1161,6 +1354,9 @@ $.fn.getTelefonata = function(idTelefonata){
 	alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+	$('#articolo option[value=""]').prop('selected', true);
+	$('#pezzi').val('');
+
 	$.ajax({
 		url: baseUrl + "telefonate/" + idTelefonata,
 		type: 'GET',
@@ -1199,6 +1395,8 @@ $.fn.getTelefonata = function(idTelefonata){
 						}
 					});
 				}
+				$('#articolo').removeAttr('disabled');
+				$('#articolo').selectpicker('refresh');
 
 			} else{
 				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero della telefonata'));
@@ -1223,13 +1421,13 @@ $.fn.loadStatisticheSettimana = function(idCliente, idPuntoConsegna, alertConten
 				if(result != null && result != undefined && result != ''){
 					$('.statisticheSettimanaList').empty();
 					$.each(result, function(i, item){
-						var listHtml = '<li class="list-group-item">';
+						var listHtml = '<li class="list-group-item pl-0 pr-0">';
 						listHtml += '<a href="" class="statsArticolo" data-id-articolo="'+item.id+'" data-codice-articolo="'+item.codice+'" data-descrizione-articolo="'+item.descrizione+'" data-prezzo-listino-base-articolo="'+item.prezzoListinoBase+'">'+item.codice+' '+item.descrizione+'</a></li>';
 
 						$('.statisticheSettimanaList').append(listHtml);
 					});
 				} else {
-					$('.statisticheSettimanaList').empty().append('<li class="list-group-item statisticheSettimanaEmptyList">Nessuna statistica</li>');
+					$('.statisticheSettimanaList').empty().append('<li class="list-group-item statisticheSettimanaEmptyList pl-0 pr-0">Nessuna statistica</li>');
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -1253,13 +1451,13 @@ $.fn.loadStatisticheMese = function(idCliente, idPuntoConsegna, alertContent){
 				if(result != null && result != undefined && result != ''){
 					$('.statisticheMeseList').empty();
 					$.each(result, function(i, item){
-						var listHtml = '<li class="list-group-item">';
+						var listHtml = '<li class="list-group-item pl-0 pr-0">';
 						listHtml += '<a href="" class="statsArticolo" data-id-articolo="'+item.id+'" data-codice-articolo="'+item.codice+'" data-descrizione-articolo="'+item.descrizione+'" data-prezzo-listino-base-articolo="'+item.prezzoListinoBase+'">'+item.codice+' '+item.descrizione+'</a></li>';
 
 						$('.statisticheMeseList').append(listHtml);
 					});
 				} else {
-					$('.statisticheMeseList').empty().append('<li class="list-group-item statisticheMeseEmptyList">Nessuna statistica</li>');
+					$('.statisticheMeseList').empty().append('<li class="list-group-item statisticheMeseEmptyList pl-0 pr-0">Nessuna statistica</li>');
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -1335,48 +1533,67 @@ $.fn.addArticoloFromStats = function(articolo){
 	var idArticolo = articolo.attr('data-id-articolo');
 	var codiceArticolo = articolo.attr('data-codice-articolo');
 	var descrizioneArticolo = articolo.attr('data-descrizione-articolo');
-	var prezzoListinoBaseArticolo = articolo.attr('data-prezzo-listino-base-articolo');
-	var pezziArticolo = 1;
+	var prezzoListinoBase = articolo.attr('data-prezzo-listino-base-articolo');
+	var pezzi = 1;
+	var articolo = codiceArticolo + ' ' +descrizioneArticolo;
+
+	var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center pezzi" value="'+pezzi+'">';
 
 	var found = 0;
-	var currentIdArticolo = 0;
+	var currentRowIndex;
+	var currentIdArticolo;
 	var currentPezzi = 0;
 
-	var articoliLength = $('.formRowArticolo').length;
+	var articoliLength = $('.rowArticolo').length;
 	if(articoliLength != null && articoliLength != undefined && articoliLength != 0) {
-		$('.formRowArticolo').each(function(i, item){
+		$('.rowArticolo').each(function(i, item){
 
 			if(found != 1){
+				currentRowIndex = $(this).attr('data-row-index');
 				currentIdArticolo = $(this).attr('data-id');
 
 				if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(idArticolo)){
 					found = 1;
-					currentPezzi = $(this).children().eq(3).find('input').val();
+					currentPezzi = $(this).children().eq(2).children().eq(0).val();
 				}
 			}
 		});
 	}
 
+	var table = $('#ordineClienteArticoliTable').DataTable();
+
 	if(found == 1){
-		var newPezzi = $.fn.parseValue(currentPezzi,'int') + $.fn.parseValue(pezziArticolo,'int');
-		$('.formRowArticolo[data-id='+idArticolo+']').children().eq(3).find('input').val(newPezzi);
+		var newPezzi = $.fn.parseValue(pezzi,'int') + $.fn.parseValue(currentPezzi,'int');
+
+		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center pezzi" value="'+newPezzi+'">';
+
+		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
+		rowData[2] = newPezziHtml;
+
+		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 
 	} else {
-		var alreadyAddedRows = $('.formRowArticolo').length;
-		if(alreadyAddedRows == null || alreadyAddedRows == undefined){
-			alreadyAddedRows = 0;
-		}
-		if(alreadyAddedRows != 0){
-			var rowsIdPresent = [];
-			$('.formRowArticolo').each(function(i,item){
-				var itemId = item.id;
-				rowsIdPresent.push(itemId.replace('formRowArticolo_',''));
-			});
-		}
+		var deleteLink = '<a class="deleteOrdineClienteArticolo" data-id="'+idArticolo+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
-		var rowHtml = $.fn.createArticoloRow(idArticolo, codiceArticolo, descrizioneArticolo, prezzoListinoBaseArticolo, pezziArticolo, 0, alreadyAddedRows);
+		var rowsCount = table.rows().count();
 
-		$('#formRowArticoli').append(rowHtml);
+		var rowNode = table.row.add( [
+			articolo,
+			prezzoListinoBase,
+			pezziHtml,
+			deleteLink
+		] ).draw( false ).node();
+		$(rowNode).css('text-align', 'center').css('color','#080707');
+		$(rowNode).addClass('rowArticolo');
+		$(rowNode).attr('data-id', idArticolo);
+		$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
 
 	}
+	$('#articolo option[value=""]').prop('selected',true);
+	$('#pezzi').val('');
+
+	$('#articolo').focus();
+	$('#articolo').selectpicker('refresh');
+
+
 }

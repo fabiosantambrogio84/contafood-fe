@@ -47,9 +47,12 @@
   <script>
     var idDdt = $.fn.extractIdDdtFromUrl();
     if(idDdt != null && idDdt != undefined){
+      $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getTipologieTrasporto()).then($.fn.getDdt(idDdt));
+      /*
       $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getTipologieTrasporto()).then(function(f1,f2,f3){
         $.fn.getDdt(idDdt);
       });
+      */
     }
   </script>
 
@@ -188,7 +191,8 @@
                       <th>Scadenza</th>
                       <th>UdM</th>
                       <th>Q.ta</th>
-                      <th>Pezzi</th>
+                      <th>P.zi</th>
+                      <th>P.zi ordinati</th>
                       <th>Prezzo (€)</th>
                       <th>Sconto (%)</th>
                       <th>Tot. (€)</th>
@@ -243,7 +247,10 @@
           </div>
 
           <input type="hidden" id="hiddenIdDdt"/>
-          <button type="submit" class="btn btn-primary mt-4" id="updateDdtButton">Salva</button>
+          <input type="hidden" id="hiddenModificaGiacenze"/>
+
+          <a href="#" class="btn btn-primary mt-4" id="updateDdtButton">Salva</a>
+          <!--<button type="submit" class="btn btn-primary mt-4" id="updateDdtButton">Salva</button>-->
           <button type="submit" class="btn btn-primary mt-4" id="updateAndPrintDdtButton" disabled>Salva e Stampa</button>
           <a href="ddt.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
@@ -271,6 +278,45 @@
 
       </div>
       <!-- /.container-fluid -->
+
+      <!-- Modal Confirm Update -->
+      <div class="modal fade" id="updateDdtModal" tabindex="-1" role="dialog" aria-labelledby="updateDdtModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updateDdtModalTitle">ATTENZIONE - Modifica DDT</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div>
+                <h5>La modifica del DDT potrebbe modificare le giacenze.</h5>
+              </div>
+              <div class="mt-4">
+                <h6>Vuoi modificare le giacenze?</h6>
+                <div class="form-row">
+                  <div class="form-group" style="margin-left: 0.5rem;">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="modificaGiacenze" id="modificaGiacenzeSi" value="si" checked>
+                      <label class="form-check-label" for="modificaGiacenzeSi">Si</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="modificaGiacenze" id="modificaGiacenzeNo" value="no">
+                      <label class="form-check-label" for="modificaGiacenzeNo">No</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+              <button type="button" class="btn btn-primary" id="confirmUpdateDdt">Conferma</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
     </div>
     <!-- End of Main Content -->

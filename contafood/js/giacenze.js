@@ -44,15 +44,20 @@ $.fn.loadGiacenzeTable = function(url) {
 			}},
 			{"name": "articolo", "data": null, render: function ( data, type, row ) {
 				var articolo = data.articolo;
+				var ricetta = data.ricetta;
 				if(articolo != null){
 					var articoloHtml = articolo.codice + ' '+articolo.descrizione;
 					return articoloHtml;
+				} else if(ricetta != null){
+					var ricettaHtml = ricetta.codice + ' '+ricetta.nome;
+					return ricettaHtml;
 				} else {
 					return '';
 				}
 			}},
 			{"name": "attivo", "data": null, render: function ( data, type, row ) {
 				var articolo = data.articolo;
+				var ricetta = data.ricetta;
 				if(articolo != null){
 					var attivo = articolo.attivo;
 					if(attivo != null){
@@ -61,15 +66,20 @@ $.fn.loadGiacenzeTable = function(url) {
 					} else {
 						return '';
 					}
-				} else{
+				} else if(ricetta != null){
+					return 'Si';
+				} else {
 					return '';
 				}
 			}},
 			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
 				var articolo = data.articolo;
+				var ricetta = data.ricetta;
 				if(articolo != null){
 					var fornitore = articolo.fornitore;
 					return fornitore.ragioneSociale;
+				} else if(ricetta != null){
+					return 'URBANI GIUSEPPE';
 				} else {
 					return '';
 				}
@@ -90,12 +100,15 @@ $.fn.loadGiacenzeTable = function(url) {
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
-			//$(row).css('font-size', '12px');
+			$(row).css('font-size', '12px');
 			$(cells[1]).css('text-align','left');
 			$(cells[2]).css('text-align','left');
 			$(cells[3]).css('text-align','left');
 			$(cells[4]).css('text-align','left');
 			$(cells[6]).css('font-weight','bold');
+			if(data.quantita == 0){
+				$(row).css('background-color', '#dedcd7');
+			}
 		}
 	});
 }
@@ -158,9 +171,18 @@ $(document).ready(function() {
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
 					var articolo = result.articolo;
-					$('#articolo').text(articolo.codice+' '+articolo.descrizione);
+					var ricetta = result.ricetta;
+					if(articolo != null){
+						$('#articolo').text(articolo.codice+' '+articolo.descrizione);
+					} else if(ricetta != null){
+						$('#ricetta').text(ricetta.codice+' '+ricetta.nome);
+					}
 					$('#lotto').text(result.lotto);
-					$('#scadenza').text(moment(result.scadenza).format('DD/MM/YYYY'));
+					if(result.scadenza != null){
+						$('#scadenza').text(moment(result.scadenza).format('DD/MM/YYYY'));
+					} else {
+						$('#scadenza').text("");
+					}
 					$('#quantita').text(result.quantita);
 
 					if(result.movimentazioni != null && result.movimentazioni != undefined){
@@ -180,11 +202,13 @@ $(document).ready(function() {
 							"pageLength": 100,
 							"lengthChange": false,
 							"info": false,
-							"order": [
-								[0, 'asc']
-							],
 							"autoWidth": false,
+							"searching": false,
+							"order": [
+								[0, 'desc']
+							],
 							"columns": [
+								{"name": "data", "data": "data", "visible":false},
 								{"name": "movimentazione", "data": null, render: function (data, type, row) {
 									var result = '';
 									if (data.descrizione != null) {

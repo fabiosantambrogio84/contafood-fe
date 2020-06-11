@@ -37,7 +37,7 @@ $.fn.loadDdtAcquistoTable = function(url) {
 		"autoWidth": false,
 		"order": [
 			[2, 'desc'],
-			[1, 'desc']
+			[3, 'asc']
 		],
 		"columns": [
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {

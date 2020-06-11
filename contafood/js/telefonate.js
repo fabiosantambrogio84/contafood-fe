@@ -123,6 +123,9 @@ $(document).ready(function() {
 				return links;
 			}}
 		],
+		"createdRow": function(row, data, dataIndex,cells){
+			$(row).css('font-size', '12px');
+		},
 		"initComplete": function( settings, json ) {
         	$('[data-toggle="tooltip"]').tooltip();
 		}
@@ -374,6 +377,13 @@ $(document).ready(function() {
 				data: telefonataJson,
 				success: function(result) {
 					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Telefonata modificata con successo').replace('@@alertResult@@', 'success'));
+
+					$('#updateTelefonataButton').attr("disabled", true);
+
+					// Returns to the list of 'Telefonate'
+					setTimeout(function() {
+						window.location.href = "telefonate.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della telefonata').replace('@@alertResult@@', 'danger'));
@@ -453,6 +463,13 @@ $(document).ready(function() {
 				data: telefonataJson,
 				success: function(result) {
 					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Telefonata creata con successo').replace('@@alertResult@@', 'success'));
+
+					$('#newTelefonataButton').attr("disabled", true);
+
+					// Returns to the list of 'Telefonate'
+					setTimeout(function() {
+						window.location.href = "telefonate.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della telefonata').replace('@@alertResult@@', 'danger'));

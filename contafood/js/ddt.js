@@ -167,10 +167,7 @@ $.fn.loadDdtTable = function(url) {
 	});
 }
 
-$(document).ready(function() {
-
-	$.fn.loadDdtTable(baseUrl + "ddts");
-
+$.fn.loadDdtArticoliTable = function() {
 	$('#ddtArticoliTable').DataTable({
 		"searching": false,
 		"language": {
@@ -206,6 +203,15 @@ $(document).ready(function() {
 			[0, 'asc']
 		]
 	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadDdtTable(baseUrl + "ddts");
+
+	if(window.location.search.substring(1).indexOf('idDdt') == -1){
+		$.fn.loadDdtArticoliTable();
+	}
 
 	$(document).on('click','#resetSearchDdtButton', function(){
 		$('#searchDdtForm :input').val(null);
@@ -401,13 +407,25 @@ $(document).ready(function() {
 	$(document).on('click','#confirmDeleteDdt', function(){
 		$('#deleteDdtModal').modal('hide');
 		var idDdt = $(this).attr('data-id');
+		var modificaGiacenze = $("input[name='modificaGiacenze']:checked").val();
 
 		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>@@alertText@@\n' +
 			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+		var url = baseUrl + "ddts/" + idDdt;
+		if(modificaGiacenze != null && modificaGiacenze != ''){
+			if(modificaGiacenze == 'si'){
+				url += "?modificaGiacenze=true";
+			} else {
+				url += "?modificaGiacenze=false";
+			}
+		} else {
+			url += "?modificaGiacenze=false";
+		}
+
 		$.ajax({
-			url: baseUrl + "ddts/" + idDdt,
+			url: url,
 			type: 'DELETE',
 			success: function() {
 
@@ -489,6 +507,22 @@ $(document).ready(function() {
 		return validLotto;
 	}
 
+	$.fn.validateDataTrasporto = function(){
+		var valid = true;
+
+		var dataDdt = $('#data').val();
+		var dataTrasporto = $('#dataTrasporto').val();
+		if(dataDdt != null && dataTrasporto != null){
+			var dataDdt_d = new Date(dataDdt);
+			var dataTrasporto_d = new Date(dataTrasporto);
+			if(dataTrasporto_d < dataDdt_d){
+				valid = false;
+			}
+		}
+
+		return valid;
+	}
+
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined && $('#newDdtButton').length > 0){
 
 		$('#articolo').selectpicker();
@@ -504,6 +538,12 @@ $(document).ready(function() {
 			var validLotto = $.fn.validateLotto();
 			if(!validLotto){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var validDataTrasporto = $.fn.validateDataTrasporto();
+			if(!validDataTrasporto){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
 				return false;
 			}
 
@@ -608,6 +648,18 @@ $(document).ready(function() {
 		$('#articolo').selectpicker();
 		$('#cliente').selectpicker();
 
+		$(document).on('click','#updateDdtButton', function(event){
+			event.preventDefault();
+			$('#updateDdtModal').modal('show');
+		});
+
+		$(document).on('click','#confirmUpdateDdt', function(){
+			var modificaGiacenze = $("input[name='modificaGiacenze']:checked").val();
+			$('#hiddenModificaGiacenze').attr('value', modificaGiacenze);
+			$('#updateDdtModal').modal('hide');
+			$('#updateDdtForm').submit();
+		});
+
 		$(document).on('submit','#updateDdtForm', function(event){
 			event.preventDefault();
 
@@ -618,6 +670,12 @@ $(document).ready(function() {
 			var validLotto = $.fn.validateLotto();
 			if(!validLotto){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var validDataTrasporto = $.fn.validateDataTrasporto();
+			if(!validDataTrasporto){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
 				return false;
 			}
 
@@ -682,6 +740,12 @@ $(document).ready(function() {
 			ddt.trasportatore = $('#trasportatore').val();
 			ddt.note = $('#note').val();
 			ddt.scannerLog = $('#scannerLog').val();
+			var modificaGiacenze = $('#hiddenModificaGiacenze').val();
+			if(modificaGiacenze != null && modificaGiacenze != '' && modificaGiacenze == 'si'){
+				ddt.modificaGiacenze = true;
+			} else {
+				ddt.modificaGiacenze = false;
+			}
 
 			var ddtJson = JSON.stringify(ddt);
 
@@ -1473,6 +1537,13 @@ $.fn.getDdt = function(idDdt){
 				$('#note').val(result.note);
 
 				if(result.ddtArticoli != null && result.ddtArticoli != undefined && result.ddtArticoli.length != 0){
+
+					var table = $('#ddtArticoliTable').DataTable();
+					if(table != null){
+						table.destroy();
+						$.fn.loadDdtArticoliTable();
+					}
+
 					result.ddtArticoli.forEach(function(item, i){
 						var articolo = item.articolo;
 						var articoloId = item.id.articoloId;
@@ -1508,7 +1579,6 @@ $.fn.getDdt = function(idDdt){
 
 						var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
-						var table = $('#ddtArticoliTable').DataTable();
 						var rowNode = table.row.add( [
 							articoloDesc,
 							lottoHtml,
@@ -1769,7 +1839,7 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
 
 	var idStatoOrdineEvaso = $.fn.getStatoOrdineClienteEvaso();
 
-	var dataConsegna = $('#data').val();
+	var dataConsegna = $('#dataTrasporto').val();
 	var idCliente = $('#cliente option:selected').val();
 	var idPuntoConsegna = $('#puntoConsegna option:selected').val();
 
@@ -1834,7 +1904,7 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
 									}
 									var lotto = '';
 									var scadenza = '';
-									var quantita = articolo.quantitaPredefinita;
+									var quantita = '';
 									var pezzi = 0;
 									var prezzo;
 									if(!$.fn.checkVariableIsNull(prezzoListino)){
