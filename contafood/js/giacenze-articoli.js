@@ -44,20 +44,15 @@ $.fn.loadGiacenzeTable = function(url) {
 			}},
 			{"name": "articolo", "data": null, render: function ( data, type, row ) {
 				var articolo = data.articolo;
-				var ricetta = data.ricetta;
 				if(articolo != null){
 					var articoloHtml = articolo.codice + ' '+articolo.descrizione;
 					return articoloHtml;
-				} else if(ricetta != null){
-					var ricettaHtml = ricetta.codice + ' '+ricetta.nome;
-					return ricettaHtml;
 				} else {
 					return '';
 				}
 			}},
 			{"name": "attivo", "data": null, render: function ( data, type, row ) {
 				var articolo = data.articolo;
-				var ricetta = data.ricetta;
 				if(articolo != null){
 					var attivo = articolo.attivo;
 					if(attivo != null){
@@ -66,20 +61,15 @@ $.fn.loadGiacenzeTable = function(url) {
 					} else {
 						return '';
 					}
-				} else if(ricetta != null){
-					return 'Si';
 				} else {
 					return '';
 				}
 			}},
 			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
 				var articolo = data.articolo;
-				var ricetta = data.ricetta;
 				if(articolo != null){
 					var fornitore = articolo.fornitore;
 					return fornitore.ragioneSociale;
-				} else if(ricetta != null){
-					return 'URBANI GIUSEPPE';
 				} else {
 					return '';
 				}
@@ -115,7 +105,7 @@ $.fn.loadGiacenzeTable = function(url) {
 
 $(document).ready(function() {
 
-	$.fn.loadGiacenzeTable(baseUrl + "giacenze");
+	$.fn.loadGiacenzeTable(baseUrl + "giacenze-articoli");
 
 	$(document).on('click','#deleteGiacenzeBulk', function(){
 		$('#deleteGiacenzeBulkModal').modal('show');
@@ -141,7 +131,7 @@ $(document).ready(function() {
 				giacenzeIds.push(id);
 			});
 			$.ajax({
-				url: baseUrl + "giacenze/operations/delete",
+				url: baseUrl + "giacenze-articoli/operations/delete",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
@@ -165,17 +155,14 @@ $(document).ready(function() {
 		alertContent = alertContent + '<strong>Errore nel recupero della giacenza.</strong></div>';
 
 		$.ajax({
-			url: baseUrl + "giacenze/" + idGiacenza,
+			url: baseUrl + "giacenze-articoli/" + idGiacenza,
 			type: 'GET',
 			dataType: 'json',
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
 					var articolo = result.articolo;
-					var ricetta = result.ricetta;
 					if(articolo != null){
 						$('#articolo').text(articolo.codice+' '+articolo.descrizione);
-					} else if(ricetta != null){
-						$('#ricetta').text(ricetta.codice+' '+ricetta.nome);
 					}
 					$('#lotto').text(result.lotto);
 					if(result.scadenza != null){
@@ -337,9 +324,9 @@ $(document).ready(function() {
 				success: function(result) {
 					$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Giacenza creata con successo').replace('@@alertResult@@', 'success'));
 
-					// Returns to giacenze-html
+					// Returns to giacenze-articoli.html
 					setTimeout(function() {
-						window.location.href = "giacenze.html";
+						window.location.href = "giacenze-articoli.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -357,25 +344,9 @@ $.fn.printVariable = function(variable){
 	return "";
 }
 
-$.fn.extractIdGiacenzaFromUrl = function(){
-    var pageUrl = window.location.search.substring(1);
-
-	var urlVariables = pageUrl.split('&'),
-        paramNames,
-        i;
-
-    for (i = 0; i < urlVariables.length; i++) {
-        paramNames = urlVariables[i].split('=');
-
-        if (paramNames[0] === 'idGiacenza') {
-        	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
-        }
-    }
-}
-
 $.fn.preloadSearchFields = function(){
 	$.ajax({
-		url: baseUrl + "fornitori",
+		url: baseUrl + "fornitori?codiceTipo=FORNITORE_ARTICOLI",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -409,68 +380,4 @@ $.fn.getArticoli = function(){
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
-}
-
-$.fn.getTelefonata = function(idTelefonata){
-
-	var alertContent = '<div id="alertGiacenzaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-	alertContent = alertContent + '<strong>Errore nel recupero della telefonata.</strong>\n' +
-    					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-    $.ajax({
-        url: baseUrl + "telefonate/" + idTelefonata,
-        type: 'GET',
-        dataType: 'json',
-        success: function(result) {
-          if(result != null && result != undefined && result != ''){
-
-			$('#hiddenIdTelefonata').attr('value', result.id);
-			if(result.autista != null){
-				$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
-			}
-			$('#telefono').attr('value', result.telefono);
-			$('#telefono2').attr('value', result.telefonoTwo);
-			$('#telefono3').attr('value', result.telefonoThree);
-			$('#giorno option[value="' + result.giornoOrdinale +'"]').attr('selected', true);
-			$('#ora').attr('value', result.ora);
-			$('#giornoConsegna option[value="' + result.giornoConsegnaOrdinale +'"]').attr('selected', true);
-			$('#oraConsegna').attr('value', result.oraConsegna);
-			$('#note').val(result.note);
-			if(result.cliente != null){
-				$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
-				$.ajax({
-					url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
-					type: 'GET',
-					dataType: 'json',
-					success: function(result) {
-						if(result != null && result != undefined && result != ''){
-							$.each(result, function(i, item){
-								var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
-								var selected = '';
-								if(result.puntoConsegna != null){
-									if(result.puntoConsegna.id == item.id){
-										selected = 'selected';
-									}
-								}
-								$('#puntoConsegna').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
-							});
-						}
-						$('#puntoConsegna').removeAttr('disabled');
-					},
-					error: function(jqXHR, textStatus, errorThrown) {
-						$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
-					}
-				});
-			}
-          } else{
-            $('#alertGiacenza').empty().append(alertContent);
-          }
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertGiacenza').empty().append(alertContent);
-            $('#updateTelefonataButton').attr('disabled', true);
-            console.log('Response text: ' + jqXHR.responseText);
-        }
-    });
-
 }

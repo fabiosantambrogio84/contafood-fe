@@ -36,7 +36,10 @@
 
   <script>
 	var idFornitore = $.fn.extractIdFornitoreFromUrl();
-    $.fn.getFornitore(idFornitore);
+    if(idFornitore != null && idFornitore != undefined){
+      $.when($.fn.getTipologieFornitore()).then($.fn.getFornitore(idFornitore));
+    }
+
   </script>
 
 </head>
@@ -73,6 +76,14 @@
               <div class="form-group col-md-2">
                 <label for="codiceFornitore">Codice*</label>
                 <input type="text" class="form-control" id="codiceFornitore" placeholder="" required disabled>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="tipoFornitore">Tipo*</label>
+                <select id="tipoFornitore" class="form-control" required>
+                </select>
+                <div class="invalid-feedback">
+                  Seleziona una tipologia
+                </div>
               </div>
             </div>
             <div class="form-row">

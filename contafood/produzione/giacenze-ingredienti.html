@@ -79,7 +79,7 @@
             </div>
           </div>
 
-          <div id="alertGiacenzaIngredienti"></div>
+          <div id="alertGiacenzaIngrediente"></div>
 
           <!-- DataTales Example -->
           <div class="card shadow mb-4" id="giacenzeIngredientiMainDiv">
@@ -114,19 +114,19 @@
                   </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-0" id="searchGiacenzaButton">Cerca</button>
-                <a href="#" id="resetSearchGiacenzaButton" class="btn btn-secondary mt-0">Svuota</a>
+                <button type="submit" class="btn btn-primary mt-0" id="searchGiacenzaIngredientiButton">Cerca</button>
+                <a href="#" id="resetSearchGiacenzaIngredientiButton" class="btn btn-secondary mt-0">Svuota</a>
               </form>
             </div>
 
 
             <div class="card-body">
               <div class="table-responsive">
-                <table class="table table-bordered" id="giacenzeTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+                <table class="table table-bordered" id="giacenzeIngredientiTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                   <thead>
         		    <tr>
                       <th></th>
-                      <th>Articolo</th>
+                      <th>Ingrediente</th>
                       <th>Attivo</th>
                       <th>Fornitore</th>
                       <th>Lotto</th>
@@ -141,11 +141,11 @@
           </div>
 
           <!-- Modal Confirm BULK Delete-->
-          <div class="modal fade" id="deleteGiacenzeBulkModal" tabindex="-1" role="dialog" aria-labelledby="deleteGiacenzeBulkModal" aria-hidden="true">
+          <div class="modal fade" id="deleteGiacenzeIngredientiBulkModal" tabindex="-1" role="dialog" aria-labelledby="deleteGiacenzeIngredientiBulkModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteGiacenzeBulkModalTitle">Conferma rimozione giacenze selezionate</h5>
+                  <h5 class="modal-title" id="deleteGiacenzeIngredientiBulkModalTitle">Conferma rimozione giacenze selezionate</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -155,30 +155,30 @@
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteGiacenzeBulk">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteGiacenzeIngredientiBulk">Conferma</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Modal Details-->
-          <div class="modal fade" id="detailsGiacenzaModal" tabindex="-1" role="dialog" aria-labelledby="detailsGiacenzaModal" aria-hidden="true">
+          <div class="modal fade" id="detailsGiacenzaIngredientiModal" tabindex="-1" role="dialog" aria-labelledby="detailsGiacenzaIngredientiModal" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="detailsGiacenzaModalTitle">Dettagli Giacenza</h5>
-                  <button type="button" class="close closeGiacenza" data-dismiss="modal" aria-label="Close">
+                  <h5 class="modal-title" id="detailsGiacenzaIngredientiModalTitle">Dettagli Giacenza</h5>
+                  <button type="button" class="close closeGiacenzaIngredienti" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body" id="detailsGiacenzaMainDiv">
+                <div class="modal-body" id="detailsGiacenzaIngredientiMainDiv">
                   <div class="container">
                     <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Articolo</h6>
-                            <p class="card-text" id="articolo"></p>
+                            <h6 class="card-title mb-0 font-weight-bold">Ingrediente</h6>
+                            <p class="card-text" id="ingrediente"></p>
                           </div>
                         </div>
                       </div>
@@ -213,14 +213,13 @@
                   <hr class="my-4">
 
                   <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsGiacenzaModalTable">
+                    <table class="table table-bordered" id="detailsGiacenzaIngredientiModalTable">
                       <thead style="text-align:center">
                       <th></th>
                       <th>Movimentazioni</th>
                       </thead>
                     </table>
                   </div>
-
 
                 </div>
               </div>

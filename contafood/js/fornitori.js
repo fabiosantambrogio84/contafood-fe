@@ -34,7 +34,7 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'asc']
+			[1, 'asc']
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
@@ -46,7 +46,19 @@ $(document).ready(function() {
 				links = links + '<a class="deleteFornitore" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			$(row).css('font-size', '12px');
+			if(data.tipoFornitore != null){
+				var backgroundColor = '';
+				if(data.tipoFornitore.codice == 'FORNITORE_INGREDIENTI'){
+					backgroundColor = '#cee2f2';
+				} else {
+					backgroundColor = 'trasparent';
+				}
+				$(row).css('background-color', backgroundColor);
+			}
+		}
 	});
 
 	$(document).on('click','.detailsFornitore', function(){
@@ -61,7 +73,9 @@ $(document).ready(function() {
             dataType: 'json',
             success: function(result) {
               if(result != null && result != undefined && result != ''){
-              	var contentDetails = '<p><strong>Codice fornitore: </strong>'+$.fn.printVariable(result.codice)+'</p>';
+              	var tipo = result.tipoFornitore != null ? result.tipoFornitore.descrizione : '';
+              	var contentDetails = '<p><strong>Tipo: </strong>'+$.fn.printVariable(tipo)+'</p>';
+              	  contentDetails += '<p><strong>Codice fornitore: </strong>'+$.fn.printVariable(result.codice)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Ragione sociale: </strong>'+$.fn.printVariable(result.ragioneSociale)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Ragione sociale 2: </strong>'+$.fn.printVariable(result.ragioneSociale2)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Indirizzo: </strong>'+$.fn.printVariable(result.indirizzo)+'</p>';
@@ -144,8 +158,12 @@ $(document).ready(function() {
 		$(document).on('submit','#updateFornitoreForm', function(event){
 			event.preventDefault();
 
+			var tipoFornitore = new Object();
+			tipoFornitore.id = $('#tipoFornitore option:selected').val();
+
 			var fornitore = new Object();
 			fornitore.id = $('#hiddenIdFornitore').val();
+			fornitore.tipoFornitore = tipoFornitore;
 			fornitore.codice = $('#codiceFornitore').val();
 			fornitore.ragioneSociale = $('#ragioneSociale').val();
 			fornitore.ragioneSociale2 = $('#ragioneSociale2').val();
@@ -192,7 +210,11 @@ $(document).ready(function() {
 		$(document).on('submit','#newFornitoreForm', function(event){
 			event.preventDefault();
 
+			var tipoFornitore = new Object();
+			tipoFornitore.id = $('#tipoFornitore option:selected').val();
+
 			var fornitore = new Object();
+			fornitore.tipoFornitore = tipoFornitore;
 			fornitore.ragioneSociale = $('#ragioneSociale').val();
 			fornitore.ragioneSociale2 = $('#ragioneSociale2').val();
 			fornitore.indirizzo = $('#indirizzo').val();
@@ -253,6 +275,27 @@ $.fn.getProvince = function(){
 	});
 }
 
+$.fn.getTipologieFornitore = function(){
+	$.ajax({
+		url: baseUrl + "tipi-fornitore",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					if(item != null ){
+						$('#tipoFornitore').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+					}
+
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.extractIdFornitoreFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -293,6 +336,10 @@ $.fn.getFornitore = function(idFornitore){
           if(result != null && result != undefined && result != ''){
 
 			$('#hiddenIdFornitore').attr('value', result.id);
+			var tipoFornitore = result.tipoFornitore;
+			if(tipoFornitore != null){
+				$('#tipoFornitore option[value="' + tipoFornitore.id +'"]').attr('selected', true);
+			}
 			$('#codiceFornitore').attr('value', result.codice);
             $('#ragioneSociale').attr('value', result.ragioneSociale);
             $('#ragioneSociale2').attr('value', result.ragioneSociale2);

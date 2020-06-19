@@ -36,7 +36,9 @@
 
   <script>
 	var idIngrediente = $.fn.extractIdIngredienteFromUrl();
-    $.fn.getIngrediente(idIngrediente);
+    if(idIngrediente != null && idIngrediente != undefined){
+      $.when($.fn.getFornitori(), $.fn.getAliquoteIva(), $.fn.getUnitaMisura()).then($.fn.getIngrediente(idIngrediente));
+    }
   </script>
 
 </head>
@@ -90,7 +92,10 @@
               </div>
               <div class="form-group col-md-2">
                 <label for="unitaDiMisura">Unit&agrave; di misura*</label>
-                <input type="text" class="form-control" id="unitaDiMisura">
+                <select id="unitaDiMisura" class="form-control" required></select>
+                <div class="invalid-feedback">
+                  Seleziona una unità di misura
+                </div>
               </div>
             </div>
             <div class="form-row">
@@ -99,6 +104,13 @@
                 <select id="fornitore" class="form-control" required></select>
                 <div class="invalid-feedback">
                   Seleziona un fornitore
+                </div>
+              </div>
+              <div class="form-group col-md-2">
+                <label for="aliquotaIva">Aliquota Iva*</label>
+                <select id="aliquotaIva" class="form-control" required></select>
+                <div class="invalid-feedback">
+                  Seleziona una aliquota iva
                 </div>
               </div>
             </div>

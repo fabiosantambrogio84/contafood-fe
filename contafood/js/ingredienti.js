@@ -108,10 +108,15 @@ $(document).ready(function() {
 			ingrediente.codice = $('#codice').val();
 			ingrediente.descrizione = $('#descrizione').val();
 			ingrediente.prezzo = $('#prezzo').val();
-			ingrediente.unitaDiMisura = $('#unitaDiMisura').val();
+			var unitaMisura = new Object();
+			unitaMisura.id = $('#unitaDiMisura option:selected').val();
+			ingrediente.unitaMisura = unitaMisura;
 			var fornitore = new Object();
-            fornitore.id = $('#fornitore option:selected').val();
-            ingrediente.fornitore = fornitore;
+			fornitore.id = $('#fornitore option:selected').val();
+			ingrediente.fornitore = fornitore;
+			var aliquotaIva = new Object();
+			aliquotaIva.id = $('#aliquotaIva option:selected').val();
+			ingrediente.aliquotaIva = aliquotaIva;
             if($('#attivo').prop('checked') === true){
                 ingrediente.attivo = true;
             }else{
@@ -150,10 +155,16 @@ $(document).ready(function() {
 			ingrediente.codice = $('#codice').val();
 			ingrediente.descrizione = $('#descrizione').val();
 			ingrediente.prezzo = $('#prezzo').val();
-			ingrediente.unitaDiMisura = $('#unitaDiMisura').val();
+			var unitaMisura = new Object();
+			unitaMisura.id = $('#unitaDiMisura option:selected').val();
+			ingrediente.unitaMisura = unitaMisura;
 			var fornitore = new Object();
             fornitore.id = $('#fornitore option:selected').val();
-            ingrediente.fornitore = fornitore;
+			ingrediente.fornitore = fornitore;
+            var aliquotaIva = new Object();
+			aliquotaIva.id = $('#aliquotaIva option:selected').val();
+			ingrediente.aliquotaIva = aliquotaIva;
+
 			if($('#attivo').prop('checked') === true){
                 ingrediente.attivo = true;
             }else{
@@ -215,6 +226,42 @@ $.fn.getFornitori = function(){
 	});
 }
 
+$.fn.getUnitaMisura = function(){
+	$.ajax({
+		url: baseUrl + "unita-misura",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#unitaDiMisura').append('<option value="'+item.id+'">'+item.etichetta+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getAliquoteIva = function(){
+	$.ajax({
+		url: baseUrl + "aliquote-iva",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#aliquotaIva').append('<option value="'+item.id+'">'+item.valore+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.extractIdIngredienteFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -237,9 +284,6 @@ $.fn.getIngrediente = function(idIngrediente){
 	alertContent = alertContent + '<strong>Errore nel recupero degli ingredienti.</strong>\n' +
     					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-    // load fornitori
-    $.fn.getFornitori();
-
     $.ajax({
         url: baseUrl + "ingredienti/" + idIngrediente,
         type: 'GET',
@@ -252,8 +296,9 @@ $.fn.getIngrediente = function(idIngrediente){
 			$('#codice').attr('value', result.codice);
             $('#descrizione').attr('value', result.descrizione);
             $('#prezzo').attr('value', result.prezzo);
-            $('#unitaDiMisura').attr('value', result.unitaDiMisura);
             $('#fornitore option[value="' + result.fornitore.id +'"]').attr('selected', true);
+            $('#unitaDiMisura option[value="' + result.unitaMisura.id +'"]').attr('selected', true);
+            $('#aliquotaIva option[value="' + result.aliquotaIva.id +'"]').attr('selected', true);
             if(result.attivo === true){
                 $('#attivo').prop('checked', true);
             }
