@@ -83,11 +83,9 @@ $.fn.loadDdtAcquistoTable = function(url) {
 	});
 }
 
-$(document).ready(function() {
-
-	$.fn.loadDdtAcquistoTable(baseUrl + "ddts-acquisto");
-
+$.fn.loadDdtAcquistoProdottiTable = function() {
 	$('#ddtAcquistoProdottiTable').DataTable({
+		"retrieve": true,
 		"searching": false,
 		"language": {
 			"paginate": {
@@ -107,6 +105,13 @@ $(document).ready(function() {
 			[0, 'asc']
 		]
 	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadDdtAcquistoTable(baseUrl + "ddts-acquisto");
+
+	$.fn.loadDdtAcquistoProdottiTable();
 
 	$(document).on('click','.detailsDdtAcquisto', function(){
 		var idDdtAcquisto = $(this).attr('data-id');
@@ -143,6 +148,7 @@ $(document).ready(function() {
 							$('#detailsDdtAcquistoArticoliModalDiv').removeClass("d-none");
 
 							$('#detailsDdtAcquistoArticoliModalTable').DataTable({
+								"retrieve": true,
 								"data": result.ddtAcquistoArticoli,
 								"language": {
 									"paginate": {
@@ -192,6 +198,7 @@ $(document).ready(function() {
 							$('#detailsDdtAcquistoIngredientiModalDiv').removeClass("d-none");
 
 							$('#detailsDdtAcquistoIngredientiModalTable').DataTable({
+								"retrieve": true,
 								"data": result.ddtAcquistoIngredienti,
 								"language": {
 									"paginate": {
@@ -263,9 +270,21 @@ $(document).ready(function() {
 	$(document).on('click','#confirmDeleteDdtAcquisto', function(){
 		$('#deleteDdtAcquistoModal').modal('hide');
 		var idDdtAcquisto = $(this).attr('data-id');
+		var modificaGiacenze = $("input[name='modificaGiacenze']:checked").val();
+
+		var url = baseUrl + "ddts-acquisto/" + idDdtAcquisto;
+		if(modificaGiacenze != null && modificaGiacenze != ''){
+			if(modificaGiacenze == 'si'){
+				url += "?modificaGiacenze=true";
+			} else {
+				url += "?modificaGiacenze=false";
+			}
+		} else {
+			url += "?modificaGiacenze=false";
+		}
 
 		$.ajax({
-			url: baseUrl + "ddts-acquisto/" + idDdtAcquisto,
+			url: url,
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<div id="alertDdtAcquistoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
@@ -417,6 +436,18 @@ $(document).ready(function() {
 		$('#articolo').selectpicker();
 		$('#fornitore').selectpicker();
 
+		$(document).on('click','#updateDdtAcquistoButton', function(event){
+			event.preventDefault();
+			$('#updateDdtAcquistoModal').modal('show');
+		});
+
+		$(document).on('click','#confirmUpdateDdtAcquisto', function(){
+			var modificaGiacenze = $("input[name='modificaGiacenze']:checked").val();
+			$('#hiddenModificaGiacenze').attr('value', modificaGiacenze);
+			$('#updateDdtAcquistoModal').modal('hide');
+			$('#updateDdtAcquistoForm').submit();
+		});
+
 		$(document).on('submit','#updateDdtAcquistoForm', function(event){
 			event.preventDefault();
 
@@ -476,6 +507,12 @@ $(document).ready(function() {
 			}
 			ddtAcquisto.numeroColli = $('#colli').val();
 			ddtAcquisto.note = $('#note').val();
+			var modificaGiacenze = $('#hiddenModificaGiacenze').val();
+			if(modificaGiacenze != null && modificaGiacenze != '' && modificaGiacenze == 'si'){
+				ddtAcquisto.modificaGiacenze = true;
+			} else {
+				ddtAcquisto.modificaGiacenze = false;
+			}
 
 			var ddtAcquistoJson = JSON.stringify(ddtAcquisto);
 
@@ -827,7 +864,7 @@ $.fn.getIngredienti = function(idFornitore){
 					if(iva != null && iva != undefined){
 						dataIva = iva.valore;
 					}
-					$('#prodotto').append('<option value="'+item.id+'" data-tipo="ingrediente" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="" data-prezzo-acquisto="">'+item.codice+' '+item.descrizione+'</option>');
+					$('#prodotto').append('<option value="'+item.id+'" data-tipo="ingrediente" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="" data-prezzo-acquisto="'+item.prezzo+'">'+item.codice+' '+item.descrizione+'</option>');
 
 					$('#prodotto').selectpicker('refresh');
 				});
@@ -918,9 +955,11 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 						var scontoValue = (sconto/100)*quantitaPerPrezzo;
 						imponibile = $.fn.formatNumber((quantitaPerPrezzo - scontoValue));
 
-						var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+						var deleteLink = '<a class="deleteDdtProdotto" data-id="'+articoloId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
-						var table = $('#ddtAcquistoArticoliTable').DataTable();
+						$.fn.loadDdtAcquistoProdottiTable();
+						var table = $('#ddtAcquistoProdottiTable').DataTable();
+
 						var rowNode = table.row.add( [
 							articoloDesc,
 							lottoHtml,
@@ -932,13 +971,73 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 							deleteLink
 						] ).draw( false ).node();
 						$(rowNode).css('text-align', 'center');
-						$(rowNode).addClass('rowArticolo');
+						$(rowNode).addClass('rowProdotto');
 						$(rowNode).attr('data-id', articoloId);
+						$(rowNode).attr('data-tipo', 'articolo');
 
 						$.fn.computeTotale();
 
 					});
 				}
+
+				if(result.ddtAcquistoIngredienti != null && result.ddtAcquistoIngredienti != undefined && result.ddtAcquistoIngredienti.length != 0){
+					result.ddtAcquistoIngredienti.forEach(function(item, i){
+						var ingrediente = item.ingrediente;
+						var ingredienteId = item.id.ingredienteId;
+						var ingredienteDesc = ingrediente.codice+' '+ingrediente.descrizione;
+						var udm = ingrediente.unitaMisura.etichetta;
+						var iva = ingrediente.aliquotaIva.valore;
+						var quantita = item.quantita;
+						var prezzo = item.prezzo;
+						var sconto = item.sconto;
+						var dataScadenza = item.dataScadenza;
+						var lotto = item.lotto;
+
+						if(lotto != null && lotto != undefined && lotto != ''){
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'">';
+						} else {
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="">';
+						}
+
+						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
+						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale" value="'+dataScadenza+'">';
+						var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
+						var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+sconto+'">';
+
+						var imponibile = 0;
+						quantita = $.fn.parseValue(quantita, 'float');
+						prezzo = $.fn.parseValue(prezzo, 'float');
+						sconto = $.fn.parseValue(sconto, 'float');
+						var quantitaPerPrezzo = (quantita * prezzo);
+						var scontoValue = (sconto/100)*quantitaPerPrezzo;
+						imponibile = $.fn.formatNumber((quantitaPerPrezzo - scontoValue));
+
+						var deleteLink = '<a class="deleteDdtProdotto" data-id="'+ingredienteId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+						$.fn.loadDdtAcquistoProdottiTable();
+						var table = $('#ddtAcquistoProdottiTable').DataTable();
+
+						var rowNode = table.row.add( [
+							ingredienteDesc,
+							lottoHtml,
+							scadenzaHtml,
+							udm,
+							quantitaHtml,
+							prezzoHtml,
+							scontoHtml,
+							deleteLink
+						] ).draw( false ).node();
+						$(rowNode).css('text-align', 'center');
+						$(rowNode).addClass('rowProdotto');
+						$(rowNode).attr('data-id', ingredienteId);
+						$(rowNode).attr('data-tipo', 'ingrediente');
+
+						$.fn.computeTotale();
+
+					});
+				}
+
+
 			} else{
 				$('#alertDdtAcquisto').empty().append(alertContent);
 			}

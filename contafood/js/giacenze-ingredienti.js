@@ -39,52 +39,26 @@ $.fn.loadGiacenzeIngredientiTable = function(url) {
 		],
 		"columns": [
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="deleteGiacenzaIngredienteCheckbox">';
+				var checkboxHtml = '<input type="checkbox" data-id="'+data.idIngrediente+'" id="checkbox_'+data.idIngrediente+'" class="deleteGiacenzaIngredienteCheckbox">';
 				return checkboxHtml;
 			}},
 			{"name": "ingrediente", "data": null, render: function ( data, type, row ) {
-				var ingrediente = data.ingrediente;
-				if(ingrediente != null){
-					var ingredienteHtml = ingrediente.codice + ' '+ingrediente.descrizione;
-					return ingredienteHtml;
-				} else {
-					return '';
-				}
+				return data.ingrediente;
 			}},
 			{"name": "attivo", "data": null, render: function ( data, type, row ) {
-				var ingrediente = data.ingrediente;
-				if(ingrediente != null){
-					var attivo = ingrediente.attivo;
-					if(attivo != null){
-						return attivo == true ? 'Si' : 'No';
-					} else {
-						return '';
-					}
+				var attivo = data.attivo;
+				if(attivo){
+					return 'Si';
 				} else {
-					return '';
+					return 'No';
 				}
 			}},
 			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
-				var ingrediente = data.ingrediente;
-				if(ingrediente != null){
-					var fornitore = ingrediente.fornitore;
-					return fornitore.ragioneSociale;
-				} else {
-					return '';
-				}
-			}},
-			{"name": "lotto", "data": "lotto"},
-			{"name": "scadenza", "data": null, "width":"8%", render: function ( data, type, row ) {
-				if(data.scadenza != null){
-					var a = moment(data.scadenza);
-					return a.format('DD/MM/YYYY');
-				} else {
-					return '';
-				}
+				return data.fornitore;
 			}},
 			{"name": "quantita", "data": "quantita"},
 			{"data": null, "orderable":false, "width":"4%", render: function ( data, type, row ) {
-				var links = '<a class="detailsGiacenzaIngrediente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+				var links = '<a class="detailsGiacenzaIngrediente pr-2" data-id="'+data.idIngrediente+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 				return links;
 			}}
 		],
@@ -159,20 +133,12 @@ $(document).ready(function() {
 			dataType: 'json',
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
-					var ingrediente = result.ingrediente;
-					if(ingrediente != null){
-						$('#ingrediente').text(ingrediente.codice+' '+ingrediente.descrizione);
-					}
-					$('#lotto').text(result.lotto);
-					if(result.scadenza != null){
-						$('#scadenza').text(moment(result.scadenza).format('DD/MM/YYYY'));
-					} else {
-						$('#scadenza').text("");
-					}
+					$('#ingrediente').text(result.ingrediente);
 					$('#quantita').text(result.quantita);
 
 					if(result.movimentazioni != null && result.movimentazioni != undefined){
 						$('#detailsGiacenzaIngredientiModalTable').DataTable({
+							"retrieve": true,
 							"data": result.movimentazioni,
 							"language": {
 								"paginate": {
@@ -268,10 +234,10 @@ $(document).ready(function() {
 			if(scadenza != null && scadenza != undefined && scadenza != ''){
 				params.scadenza = scadenza;
 			}
-			var url = baseUrl + "giacenze?" + $.param( params );
+			var url = baseUrl + "giacenze-ingredienti?" + $.param( params );
 
-			$('#giacenzeTable').DataTable().destroy();
-			$.fn.loadGiacenzeTable(url);
+			$('#giacenzeIngredientiTable').DataTable().destroy();
+			$.fn.loadGiacenzeIngredientiTable(url);
 
 		});
 	}

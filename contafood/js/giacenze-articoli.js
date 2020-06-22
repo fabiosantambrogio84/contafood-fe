@@ -39,53 +39,26 @@ $.fn.loadGiacenzeTable = function(url) {
 		],
 		"columns": [
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="deleteGiacenzaCheckbox">';
+				var checkboxHtml = '<input type="checkbox" data-id="'+data.idArticolo+'" id="checkbox_'+data.idArticolo+'" class="deleteGiacenzaCheckbox">';
 				return checkboxHtml;
 			}},
 			{"name": "articolo", "data": null, render: function ( data, type, row ) {
-				var articolo = data.articolo;
-				if(articolo != null){
-					var articoloHtml = articolo.codice + ' '+articolo.descrizione;
-					return articoloHtml;
-				} else {
-					return '';
-				}
+				return data.articolo;
 			}},
 			{"name": "attivo", "data": null, render: function ( data, type, row ) {
-				var articolo = data.articolo;
-				if(articolo != null){
-					var attivo = articolo.attivo;
-					if(attivo != null){
-						//return attivo;
-						return attivo == true ? 'Si' : 'No';
-					} else {
-						return '';
-					}
+				var attivo = data.attivo;
+				if(attivo){
+					return 'Si';
 				} else {
-					return '';
+					return 'No';
 				}
 			}},
 			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
-				var articolo = data.articolo;
-				if(articolo != null){
-					var fornitore = articolo.fornitore;
-					return fornitore.ragioneSociale;
-				} else {
-					return '';
-				}
-			}},
-			{"name": "lotto", "data": "lotto"},
-			{"name": "scadenza", "data": null, "width":"8%", render: function ( data, type, row ) {
-				if(data.scadenza != null){
-					var a = moment(data.scadenza);
-					return a.format('DD/MM/YYYY');
-				} else {
-					return '';
-				}
+				return data.fornitore;
 			}},
 			{"name": "quantita", "data": "quantita"},
 			{"data": null, "orderable":false, "width":"4%", render: function ( data, type, row ) {
-				var links = '<a class="detailsGiacenza pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+				var links = '<a class="detailsGiacenza pr-2" data-id="'+data.idArticolo+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 				return links;
 			}}
 		],
@@ -94,8 +67,7 @@ $.fn.loadGiacenzeTable = function(url) {
 			$(cells[1]).css('text-align','left');
 			$(cells[2]).css('text-align','left');
 			$(cells[3]).css('text-align','left');
-			$(cells[4]).css('text-align','left');
-			$(cells[6]).css('font-weight','bold');
+			$(cells[4]).css('font-weight','bold');
 			if(data.quantita == 0){
 				$(row).css('background-color', '#dedcd7');
 			}
@@ -125,17 +97,17 @@ $(document).ready(function() {
 				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 			$('#alertGiacenza').empty().append(alertContent);
 		} else{
-			var giacenzeIds = [];
+			var idArticoli = [];
 			$('.deleteGiacenzaCheckbox:checkbox:checked').each(function(i, item) {
 				var id = item.id.replace('checkbox_', '');
-				giacenzeIds.push(id);
+				idArticoli.push(id);
 			});
 			$.ajax({
 				url: baseUrl + "giacenze-articoli/operations/delete",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: JSON.stringify(giacenzeIds),
+				data: JSON.stringify(idArticoli),
 				success: function(result) {
 					$('#alertGiacenza').empty().append(alertContent.replace('@@alertText@@','Giacenze cancellate con successo').replace('@@alertResult@@', 'success'));
 
@@ -149,31 +121,23 @@ $(document).ready(function() {
 	});
 
 	$(document).on('click','.detailsGiacenza', function(){
-		var idGiacenza = $(this).attr('data-id');
+		var idArticolo = $(this).attr('data-id');
 
 		var alertContent = '<div id="alertGiacenzaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>Errore nel recupero della giacenza.</strong></div>';
 
 		$.ajax({
-			url: baseUrl + "giacenze-articoli/" + idGiacenza,
+			url: baseUrl + "giacenze-articoli/" + idArticolo,
 			type: 'GET',
 			dataType: 'json',
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
-					var articolo = result.articolo;
-					if(articolo != null){
-						$('#articolo').text(articolo.codice+' '+articolo.descrizione);
-					}
-					$('#lotto').text(result.lotto);
-					if(result.scadenza != null){
-						$('#scadenza').text(moment(result.scadenza).format('DD/MM/YYYY'));
-					} else {
-						$('#scadenza').text("");
-					}
+					$('#articolo').text(result.articolo);
 					$('#quantita').text(result.quantita);
 
 					if(result.movimentazioni != null && result.movimentazioni != undefined){
 						$('#detailsGiacenzaModalTable').DataTable({
+							"retrieve": true,
 							"data": result.movimentazioni,
 							"language": {
 								"paginate": {
@@ -253,7 +217,7 @@ $(document).ready(function() {
 		$('#searchGiacenzaForm select option[value=""]').attr('selected', true);
 
 		$('#giacenzeTable').DataTable().destroy();
-		$.fn.loadGiacenzeTable(baseUrl + "giacenze");
+		$.fn.loadGiacenzeTable(baseUrl + "giacenze-articoli");
 	});
 
 	if($('#searchGiacenzaButton') != null && $('#searchGiacenzaButton') != undefined) {
@@ -282,7 +246,7 @@ $(document).ready(function() {
 			if(scadenza != null && scadenza != undefined && scadenza != ''){
 				params.scadenza = scadenza;
 			}
-			var url = baseUrl + "giacenze?" + $.param( params );
+			var url = baseUrl + "giacenze-articoli?" + $.param( params );
 
 			$('#giacenzeTable').DataTable().destroy();
 			$.fn.loadGiacenzeTable(url);
@@ -316,7 +280,7 @@ $(document).ready(function() {
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			$.ajax({
-				url: baseUrl + "giacenze",
+				url: baseUrl + "giacenze-articoli",
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',

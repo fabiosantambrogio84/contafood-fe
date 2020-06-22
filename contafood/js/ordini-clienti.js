@@ -2,7 +2,7 @@ var baseUrl = "/contafood-be/";
 
 $(document).ready(function() {
 
-	$.fn.preloadFields();
+	$.fn.preloadStatistiche();
 
 	$.fn.loadOrdiniClientiTable(baseUrl + "ordini-clienti");
 
@@ -286,8 +286,9 @@ $(document).ready(function() {
 
 			var ordineCliente = new Object();
 			ordineCliente.id = $('#hiddenIdOrdineCliente').val();
-			ordineCliente.progressivo = $('#hiddenProgressivoOrdineCliente').val();
-            ordineCliente.annoContabile = $('#hiddenAnnoContabileOrdineCliente').val();
+			ordineCliente.progressivo = $('#progressivo').val();
+            ordineCliente.annoContabile = $('#annoContabile').val();
+			ordineCliente.data = $('#data').val();
 
 			var statoOrdine = new Object();
 			statoOrdine.id = $('#hiddenStatoOrdineCliente').val();
@@ -323,16 +324,16 @@ $(document).ready(function() {
 			ordineCliente.dataConsegna = $('#dataConsegna').val();
 			ordineCliente.note = $('#note').val();
 
-			var articoliLength = $('.formRowArticolo').length;
+			var articoliLength = $('.rowArticolo').length;
 			if(articoliLength != null && articoliLength != undefined && articoliLength != 0){
 				var ordineClienteArticoli = [];
-				$('.formRowArticolo').each(function(i, item){
+				$('.rowArticolo').each(function(i, item){
 					var ordineClienteArticolo = {};
 					var ordineClienteArticoloId = new Object();
-					var articoloId = item.id.replace('formRowArticolo_','');
+					var articoloId = $(this).attr('data-id');
 					ordineClienteArticoloId.articoloId = articoloId;
 					ordineClienteArticolo.id = ordineClienteArticoloId;
-					ordineClienteArticolo.numeroPezziOrdinati = $('#pezziArticolo_'+articoloId).val();
+					ordineClienteArticolo.numeroPezziOrdinati = $(this).children().eq(2).children().eq(0).val();
 
 					ordineClienteArticoli.push(ordineClienteArticolo);
 				});
@@ -353,6 +354,11 @@ $(document).ready(function() {
 				data: ordineClienteJson,
 				success: function(result) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Ordine cliente modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list of OrdineCliente
+					setTimeout(function() {
+						window.location.href = "ordini-clienti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell ordine cliente').replace('@@alertResult@@', 'danger'));
@@ -369,6 +375,10 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var ordineCliente = new Object();
+
+			ordineCliente.progressivo = $('#progressivo').val();
+			ordineCliente.annoContabile = $('#annoContabile').val();
+			ordineCliente.data = $('#data').val();
 
 			var clienteId = $('#cliente option:selected').val();
 			if(clienteId != null && clienteId != ''){
@@ -400,16 +410,16 @@ $(document).ready(function() {
 			ordineCliente.dataConsegna = $('#dataConsegna').val();
 			ordineCliente.note = $('#note').val();
 
-			var articoliLength = $('.formRowArticolo').length;
+			var articoliLength = $('.rowArticolo').length;
 			if(articoliLength != null && articoliLength != undefined && articoliLength != 0){
 				var ordineClienteArticoli = [];
-				$('.formRowArticolo').each(function(i, item){
+				$('.rowArticolo').each(function(i, item){
 					var ordineClienteArticolo = {};
 					var ordineClienteArticoloId = new Object();
-					var articoloId = item.id.replace('formRowArticolo_','');
+					var articoloId = $(this).attr('data-id');
 					ordineClienteArticoloId.articoloId = articoloId;
 					ordineClienteArticolo.id = ordineClienteArticoloId;
-					ordineClienteArticolo.numeroPezziOrdinati = $('#pezziArticolo_'+articoloId).val();
+					ordineClienteArticolo.numeroPezziOrdinati = $(this).children().eq(2).children().eq(0).val();
 
 					ordineClienteArticoli.push(ordineClienteArticolo);
 				});
@@ -455,7 +465,17 @@ $(document).ready(function() {
 					*/
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ordine cliente').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nella creazione dell ordine cliente';
+					if(jqXHR != null && jqXHR != undefined){
+						var jqXHRResponseJson = jqXHR.responseJSON;
+						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+								errorMessage = jqXHRResponseJsonMessage;
+							}
+						}
+					}
+					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -806,6 +826,7 @@ $.fn.emptyArticoli = function(){
 
 $.fn.loadOrdineClienteArticoliTable = function() {
 	$('#ordineClienteArticoliTable').DataTable({
+		"retrieve": true,
 		"searching": false,
 		"language": {
 			"paginate": {
@@ -879,13 +900,20 @@ $.fn.loadOrdiniClientiTable = function(url){
 					"info": false,
 					"autoWidth": false,
 					"order": [
-						[0, 'desc']
+						[4, 'desc'],
+						[5, 'desc']
 					],
 					"columns": [
-						{"name":"codice", "data": null, render: function ( data, type, row ) {
+						{"name":"codice", "width":"8%", "data": null, render: function ( data, type, row ) {
 							return data.progressivo + '/' + data.annoContabile;
 						}},
-						{"name":"cliente", "data": null, render: function ( data, type, row ) {
+						{"name":"data", "width":"10%", "data": null, render: function ( data, type, row ) {
+							if(data.data != null){
+								return moment(data.data).format('YYYY-MM-DD')
+							}
+							return '';
+						}},
+						{"name":"cliente", "width":"12%", "data": null, render: function ( data, type, row ) {
 							if(data.cliente != null){
 								var clienteHtml = '';
 
@@ -899,7 +927,7 @@ $.fn.loadOrdiniClientiTable = function(url){
 								return '';
 							}
 						}},
-						{"name":"puntoConsegna", "data": null, render: function ( data, type, row ) {
+						{"name":"puntoConsegna", "width":"12%", "data": null, render: function ( data, type, row ) {
 							if(data.puntoConsegna != null){
 								var puntoConsegnaHtml = '';
 
@@ -914,7 +942,7 @@ $.fn.loadOrdiniClientiTable = function(url){
 								return '';
 							}
 						}},
-						{"name": "dataConsegna", "data": null, render: function ( data, type, row ) {
+						{"name": "dataConsegna", "width":"10%", "data": null, render: function ( data, type, row ) {
 							var ordineClienteId = data.id;
 							var inputId = "dataConsegna_" + ordineClienteId;
 							var dataConsegnaInput = '<input type="date" class="form-control form-control-sm dataConsegnaOrdineCliente" id="'+inputId+'" data-id="'+ordineClienteId+'"';
@@ -926,7 +954,7 @@ $.fn.loadOrdiniClientiTable = function(url){
 							dataConsegnaInput += '>';
 							return dataConsegnaInput;
 						}},
-						{"name":"autista", "data": null, render: function ( data, type, row ) {
+						{"name":"autista", "width":"12%", "data": null, render: function ( data, type, row ) {
 							var ordineClienteId = data.id;
 							var selectId = "autista_" + ordineClienteId;
 
@@ -953,7 +981,7 @@ $.fn.loadOrdiniClientiTable = function(url){
 							return autistaSelect;
 
 						}},
-						{"name":"agente", "data": null, render: function ( data, type, row ) {
+						{"name":"agente", "width":"12%", "data": null, render: function ( data, type, row ) {
 							if(data.agente != null){
 								var agenteHtml = '';
 
@@ -1195,6 +1223,24 @@ $.fn.getArticoli = function(){
 }
 
 $.fn.preloadFields = function(){
+	$.ajax({
+		url: baseUrl + "ordini-clienti/progressivo",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$('#progressivo').attr('value', result.progressivo);
+				$('#annoContabile').attr('value', result.annoContabile);
+				$('#data').val(moment().format('YYYY-MM-DD'));
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.preloadStatistiche = function(){
 	var lastWeekStart = moment().subtract(1, 'weeks').startOf('isoWeek');
 	var lastWeekEnd = moment(lastWeekStart).add(6, 'days');
 
@@ -1254,8 +1300,9 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
           if(result != null && result != undefined && result != ''){
 
 			$('#hiddenIdOrdineCliente').attr('value', result.id);
-			$('#hiddenProgressivoOrdineCliente').attr('value', result.progressivo);
-            $('#hiddenAnnoContabileOrdineCliente').attr('value', result.annoContabile);
+			$('#progressivo').attr('value', result.progressivo);
+            $('#annoContabile').attr('value', result.annoContabile);
+            $('#data').attr('value', result.data);
 			$('#hiddenStatoOrdineCliente').attr('value', result.statoOrdine.id);
 
 			if(result.cliente != null && result.cliente != undefined){
@@ -1296,7 +1343,47 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
 			$('#dataConsegna').attr('value', result.dataConsegna);
 			$('#note').val(result.note);
 
-			if(result.ordineClienteArticoli != null && result.ordineClienteArticoli != undefined && result.ordineClienteArticoli.length != 0){
+			  if(result.ordineClienteArticoli != null && result.ordineClienteArticoli != undefined && result.ordineClienteArticoli.length != 0){
+
+				  //var table = $('#ordineClienteArticoliTable').DataTable();
+				  //if(table != null){
+					//  table.destroy();
+					//  $.fn.loadOrdineClienteArticoliTable();
+				  //}
+				  $.fn.loadOrdineClienteArticoliTable();
+				  var table = $('#ordineClienteArticoliTable').DataTable();
+
+				  result.ordineClienteArticoli.forEach(function(item, i){
+					  var articolo = item.articolo;
+					  var articoloId = item.id.articoloId;
+					  var articoloDesc = articolo.codice+' '+articolo.descrizione;
+					  var pezzi = item.numeroPezziOrdinati;
+					  var prezzoListinoBase = articolo.prezzoListinoBase;
+
+					  var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center" value="'+pezzi+'">';
+
+					  var deleteLink = '<a class="deleteOrdineClienteArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+					  var rowNode = table.row.add( [
+						  articoloDesc,
+						  prezzoListinoBase,
+						  pezziHtml,
+						  deleteLink
+					  ] ).draw( false ).node();
+					  $(rowNode).css('text-align', 'center').css('color','#080707');
+					  $(rowNode).addClass('rowArticolo');
+					  $(rowNode).attr('data-id', articoloId);
+
+					  $('#articolo option[value=""]').prop('selected',true);
+					  $('#pezzi').val('');
+
+					  $('#articolo').focus();
+					  $('#articolo').selectpicker('refresh');
+
+				  });
+			  }
+
+			/*if(result.ordineClienteArticoli != null && result.ordineClienteArticoli != undefined && result.ordineClienteArticoli.length != 0){
 				result.ordineClienteArticoli.forEach(function(item, i){
 					var id = item.id.articoloId;
 					var codice = item.articolo.codice;
@@ -1336,7 +1423,7 @@ $.fn.getOrdineCliente = function(idOrdineCliente){
 
 					$('#formRowArticoli').append(rowHtml);
 				});
-			}
+			}*/
           } else{
             $('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero dell ordine cliente.'));
           }
@@ -1537,7 +1624,7 @@ $.fn.addArticoloFromStats = function(articolo){
 	var pezzi = 1;
 	var articolo = codiceArticolo + ' ' +descrizioneArticolo;
 
-	var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center pezzi" value="'+pezzi+'">';
+	var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center" value="'+pezzi+'">';
 
 	var found = 0;
 	var currentRowIndex;

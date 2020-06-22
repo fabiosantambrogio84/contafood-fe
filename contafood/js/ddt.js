@@ -1,5 +1,6 @@
 var baseUrl = "/contafood-be/";
-var rowBackgroundPezziLessOrdinati = '#ff4f4f';
+var rowBackgroundPezziZero = '#fc9088';
+var rowBackgroundPezziLessOrdinati = '#facad2';
 var rowBackgroundPezziGreaterOrdinati = '#c9c5c5';
 
 $.fn.loadDdtTable = function(url) {
@@ -169,6 +170,7 @@ $.fn.loadDdtTable = function(url) {
 
 $.fn.loadDdtArticoliTable = function() {
 	$('#ddtArticoliTable').DataTable({
+		"retrieve": true,
 		"searching": false,
 		"language": {
 			"paginate": {
@@ -283,6 +285,7 @@ $(document).ready(function() {
 
 					if(result.ddtArticoli != null && result.ddtArticoli != undefined){
 						$('#detailsDdtArticoliModalTable').DataTable({
+							"retrieve": true,
 							"data": result.ddtArticoli,
 							"language": {
 								"paginate": {
@@ -328,6 +331,7 @@ $(document).ready(function() {
 
 					if(result.ddtPagamenti != null && result.ddtPagamenti != undefined){
 						$('#detailsDdtPagamentiModalTable').DataTable({
+							"retrieve": true,
 							"data": result.ddtPagamenti,
 							"language": {
 								"paginate": {
@@ -536,10 +540,12 @@ $(document).ready(function() {
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			var validLotto = $.fn.validateLotto();
+			/*
 			if(!validLotto){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
 				return false;
 			}
+			*/
 
 			var validDataTrasporto = $.fn.validateDataTrasporto();
 			if(!validDataTrasporto){
@@ -668,10 +674,12 @@ $(document).ready(function() {
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			var validLotto = $.fn.validateLotto();
+			/*
 			if(!validLotto){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
 				return false;
 			}
+			 */
 
 			var validDataTrasporto = $.fn.validateDataTrasporto();
 			if(!validDataTrasporto){
@@ -915,9 +923,13 @@ $(document).ready(function() {
 		var cliente = $('#cliente option:selected').val();
 		if(data != null && data != undefined && data != '' && cliente != null && cliente != undefined && cliente != ''){
 			$.fn.loadScontiArticoli(data, cliente);
-
-			$.fn.loadArticoliFromOrdiniClienti();
 		}
+	});
+
+	$(document).on('change','#dataTrasporto', function(){
+		$.fn.emptyArticoli();
+
+		$.fn.loadArticoliFromOrdiniClienti();
 	});
 
 	$(document).on('change','#puntoConsegna', function(){
@@ -925,6 +937,9 @@ $(document).ready(function() {
 	});
 
 	$(document).on('change','.pezzi', function(){
+		$.fn.computeArticoliBackground();
+
+		/*
 		var pezzi = $(this).val();
 		var pezziDaEvadere = $(this).parent().parent().children().eq(6).children().eq(0).val();
 
@@ -940,7 +955,7 @@ $(document).ready(function() {
 			$(this).parent().parent().css('background-color', rowBackgroundPezziGreaterOrdinati);
 		} else {
 			$(this).parent().parent().css('background-color', 'transparent');
-		}
+		}*/
 	});
 
 	$(document).on('change','.pezziDaEvadere', function(){
@@ -953,7 +968,10 @@ $(document).ready(function() {
 		if(pezziDaEvadere == null || pezziDaEvadere == ''){
 			pezziDaEvadere = 0;
 		}
-		if(pezzi < pezziDaEvadere){
+
+		if(pezzi == 0){
+			$(this).parent().parent().css('background-color', rowBackgroundPezziZero);
+		} else if(pezzi > 0 && pezzi < pezziDaEvadere){
 			$(this).parent().parent().css('background-color', rowBackgroundPezziLessOrdinati);
 		} else if(pezzi > pezziDaEvadere){
 			$(this).parent().parent().css('background-color', rowBackgroundPezziGreaterOrdinati);
@@ -1069,6 +1087,7 @@ $(document).ready(function() {
 		// check if a same articolo was already added
 		var found = 0;
 		var currentRowIndex;
+		var currentIdOrdineCliente;
 		var currentIdArticolo;
 		var currentLotto;
 		var currentPrezzo;
@@ -1084,22 +1103,37 @@ $(document).ready(function() {
 
 				if(found != 1){
 					currentRowIndex = $(this).attr('data-row-index');
+					currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
+					currentQuantita = $(this).children().eq(4).children().eq(0).val();
+					currentPezzi = $(this).children().eq(5).children().eq(0).val();
 					currentPrezzo = $(this).children().eq(7).children().eq(0).val();
 					currentSconto = $(this).children().eq(8).children().eq(0).val();
 					currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 
-					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
-						found = 1;
-						currentQuantita = $(this).children().eq(4).children().eq(0).val();
-						currentPezzi = $(this).children().eq(5).children().eq(0).val();
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+
+						if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+
+							found = 1;
+						} else if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)){
+							found = 2;
+						}
+
+					} else {
+						if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+							found = 1;
+						}
 					}
+
 				}
 			});
 		}
@@ -1115,65 +1149,47 @@ $(document).ready(function() {
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		var table = $('#ddtArticoliTable').DataTable();
-		if(found == 1){
-			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(3).children().eq(0).val(quantita + $.fn.parseValue(currentQuantita,'float'));
-			//$('tr[data-id="'+currentIdArticolo+'"]').children().eq(7).text(totale);
+		if(found >= 1){
 
-			var newPezzi = pezzi + $.fn.parseValue(currentPezzi,'int');
+			if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+				// controllo lotto e scadenza
+				// se uguali -> aggiorno la riga
+				// se diversi -> inserisco nuova riga ed aggiorno i pezzi della riga
+				if($.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+				 && $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 
-			var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+					// aggiorno la riga
+					$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+						quantita,pezzi,codiceFornitore,totale);
 
-			var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
-			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
+				} else {
+					pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+currentPezziDaEvadere+'">';
 
-			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
-			rowData[4] = newQuantitaHtml;
-			rowData[5] = newPezziHtml;
-			rowData[9] = totale;
-			if(newPezzi < currentPezziDaEvadere){
-				$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
-			} else if(newPezzi > currentPezziDaEvadere){
-				$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
+					// inserisco nuova riga
+					$.fn.inserisciRigaArticolo(table,currentIdOrdineCliente,articoloId,articolo,
+						lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,pezziDaEvadereHtml,prezzoHtml,scontoHtml,
+						totale,iva,pezzi,currentPezziDaEvadere);
+
+					// aggiorno la riga
+					//$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+					//	quantita,pezzi,codiceFornitore,totale);
+				}
+
 			} else {
-				$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+				// aggiorno la riga
+				$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+					quantita,pezzi,codiceFornitore,totale);
 			}
-
-			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
-			//$('#ddtArticoliTable').DataTable().row(currentRowIndex)
 
 		} else {
-			var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
-
-			var rowsCount = table.rows().count();
-
-			var rowNode = table.row.add( [
-				articolo,
-				lottoHtml,
-				scadenzaHtml,
-				udm,
-				quantitaHtml,
-				pezziHtml,
-				pezziDaEvadereHtml,
-				prezzoHtml,
-				scontoHtml,
-				totale,
-				iva,
-				deleteLink
-			] ).draw( false ).node();
-			$(rowNode).css('text-align', 'center').css('color','#080707');
-			$(rowNode).addClass('rowArticolo');
-			$(rowNode).attr('data-id', articoloId);
-			$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
-
-			if(pezzi < currentPezziDaEvadere){
-				$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
-			} else if(pezzi > currentPezziDaEvadere){
-				$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
-			} else {
-				$(rowNode).css('background-color', 'transparent');
-			}
+			// inserisco nuova riga
+			$.fn.inserisciRigaArticolo(table,null,articoloId,articolo,
+				lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,pezziDaEvadereHtml,prezzoHtml,scontoHtml,
+				totale,iva,pezzi,currentPezziDaEvadere);
 		}
 		$.fn.computeTotale();
+
+		$.fn.computeArticoliBackground();
 
 		$('#articolo option[value=""]').prop('selected',true);
 		$('#udm').val('');
@@ -1189,6 +1205,86 @@ $(document).ready(function() {
 		$('#articolo').selectpicker('refresh');
 	});
 
+	$.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,lotto,scadenza,prezzo,sconto,pezziDaEvadere,
+										 quantita,pezzi,codiceFornitore,totale){
+
+		var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+		var newPezzi = pezzi + $.fn.parseValue(currentPezzi,'int');
+
+		var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
+		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
+
+		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+lotto+'" data-codice-fornitore="'+codiceFornitore+'">';
+		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
+
+		var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
+		var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
+		var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
+
+		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
+		rowData[1] = lottoHtml;
+		rowData[2] = scadenzaHtml;
+		rowData[4] = newQuantitaHtml;
+		rowData[5] = newPezziHtml;
+		rowData[6] = pezziDaEvadereHtml;
+		rowData[7] = prezzoHtml;
+		rowData[8] = scontoHtml;
+		rowData[9] = totale;
+
+		if(newPezzi == 0){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziZero);
+		} else if(newPezzi > 0 && newPezzi < currentPezziDaEvadere){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(newPezzi > currentPezziDaEvadere){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+		}
+
+		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+	}
+
+	$.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,articolo,
+										  lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,pezziDaEvadereHtml,prezzoHtml,scontoHtml,
+										  totale,iva,pezzi,currentPezziDaEvadere){
+
+		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+		var rowsCount = table.rows().count();
+
+		var rowNode = table.row.add( [
+			articolo,
+			lottoHtml,
+			scadenzaHtml,
+			udm,
+			quantitaHtml,
+			pezziHtml,
+			pezziDaEvadereHtml,
+			prezzoHtml,
+			scontoHtml,
+			totale,
+			iva,
+			deleteLink
+		] ).draw( false ).node();
+		$(rowNode).css('text-align', 'center').css('color','#080707');
+		$(rowNode).addClass('rowArticolo');
+		$(rowNode).attr('data-id', articoloId);
+		$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
+		if(currentIdOrdineCliente != null && currentIdOrdineCliente != ''){
+			$(rowNode).attr('data-id-ordine-cliente', currentIdOrdineCliente);
+		}
+
+		if(pezzi == 0){
+			$(rowNode).css('background-color', rowBackgroundPezziZero);
+		} else if(pezzi > 0 && pezzi < currentPezziDaEvadere){
+			$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(pezzi > currentPezziDaEvadere){
+			$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$(rowNode).css('background-color', 'transparent');
+		}
+	}
+
 	$(document).on('click','.deleteDdtArticolo', function(){
 		$('#ddtArticoliTable').DataTable().row( $(this).parent().parent() )
 			.remove()
@@ -1196,6 +1292,8 @@ $(document).ready(function() {
 		$('#ddtArticoliTable').focus();
 
 		$.fn.computeTotale();
+
+		$.fn.computeArticoliBackground();
 	});
 
 	$(document).on('change','.compute-totale', function(){
@@ -1538,11 +1636,13 @@ $.fn.getDdt = function(idDdt){
 
 				if(result.ddtArticoli != null && result.ddtArticoli != undefined && result.ddtArticoli.length != 0){
 
+					//var table = $('#ddtArticoliTable').DataTable();
+					//if(table != null){
+					//	table.destroy();
+					//	$.fn.loadDdtArticoliTable();
+					//}
+					$.fn.loadDdtArticoliTable();
 					var table = $('#ddtArticoliTable').DataTable();
-					if(table != null){
-						table.destroy();
-						$.fn.loadDdtArticoliTable();
-					}
 
 					result.ddtArticoli.forEach(function(item, i){
 						var articolo = item.articolo;
@@ -1597,7 +1697,9 @@ $.fn.getDdt = function(idDdt){
 						$(rowNode).addClass('rowArticolo');
 						$(rowNode).attr('data-id', articoloId);
 
-						if(pezzi < pezziDaEvadere){
+						if(pezzi == 0){
+							$(rowNode).css('background-color', rowBackgroundPezziZero);
+						} else if(pezzi > 0 && pezzi < pezziDaEvadere){
 							$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
 						} else if(pezzi > pezziDaEvadere){
 							$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
@@ -1676,6 +1778,55 @@ $.fn.computeTotale = function() {
 	$('#totale').val(Number(Math.round(totaleDocumento+'e2')+'e-2'));
 }
 
+$.fn.computeArticoliBackground = function() {
+	var articoliPezziMap = new Map();
+	var articoliPezziOrdinatiMap = new Map();
+
+	$('.rowArticolo').each(function(i, item){
+		var idArticolo = $(this).attr('data-id');
+
+		var pezzi = $(this).children().eq(5).children().eq(0).val();
+		pezzi = $.fn.parseValue(pezzi, 'int');
+		var pezziOrdinati = $(this).children().eq(6).children().eq(0).val()
+		pezziOrdinati = $.fn.parseValue(pezziOrdinati, 'int');
+
+		var articoliPezzi;
+		if(articoliPezziMap.has(idArticolo)){
+			articoliPezzi = articoliPezziMap.get(idArticolo);
+		} else {
+			articoliPezzi = [];
+		}
+		articoliPezzi.push(pezzi);
+		articoliPezziMap.set(idArticolo, articoliPezzi);
+
+		var articoliPezziOrdinati;
+		if(articoliPezziOrdinatiMap.has(idArticolo)){
+			articoliPezziOrdinati = articoliPezziOrdinatiMap.get(idArticolo);
+		} else {
+			articoliPezziOrdinati = [];
+		}
+		articoliPezziOrdinati.push(pezziOrdinati);
+		articoliPezziOrdinatiMap.set(idArticolo, articoliPezziOrdinati);
+
+	});
+	articoliPezziMap.forEach( (value, key, map) => {
+		var totalePezzi = value.reduce((a, b) => a + b, 0);
+
+		var pezziOrdinati = articoliPezziOrdinatiMap.get(key);
+		var totalePezziOrdinati = pezziOrdinati.reduce((a, b) => a + b, 0);
+
+		if(totalePezzi == 0){
+			$('.rowArticolo[data-id="'+key+'"]').css('background-color', rowBackgroundPezziZero);
+		} else if(totalePezzi > 0 && totalePezzi < totalePezziOrdinati){
+			$('.rowArticolo[data-id="'+key+'"]').css('background-color', rowBackgroundPezziLessOrdinati);
+		} else if(totalePezzi > totalePezziOrdinati){
+			$('.rowArticolo[data-id="'+key+'"]').css('background-color', rowBackgroundPezziGreaterOrdinati);
+		} else {
+			$('.rowArticolo[data-id="'+key+'"]').css('background-color', 'transparent');
+		}
+	});
+}
+
 $.fn.checkVariableIsNull = function(variable){
 	if(variable == null || variable == undefined || variable == ''){
 		return true;
@@ -1695,17 +1846,18 @@ $.fn.normalizeIfEmptyOrNullVariable = function(variable){
 
 $.fn.groupArticoloRow = function(insertedRow){
 	var insertedRowIndex = insertedRow.attr("data-row-index");
-	var insertedArticoloId = insertedRow.attr("data-id");
-	var	insertedLotto = insertedRow.children().eq(1).children().eq(0).val();
-	var	insertedScadenza = insertedRow.children().eq(2).children().eq(0).val();
-	var insertedQuantita = insertedRow.children().eq(4).children().eq(0).val();
-	var insertedPezzi = insertedRow.children().eq(5).children().eq(0).val();
-	var insertedPezziDaEvadere = insertedRow.children().eq(6).children().eq(0).val();
-	var	insertedPrezzo = insertedRow.children().eq(7).children().eq(0).val();
-	var	insertedSconto = insertedRow.children().eq(8).children().eq(0).val();
+	var articoloId = insertedRow.attr("data-id");
+	var	lotto = insertedRow.children().eq(1).children().eq(0).val();
+	var	scadenza = insertedRow.children().eq(2).children().eq(0).val();
+	var quantita = insertedRow.children().eq(4).children().eq(0).val();
+	var pezzi = insertedRow.children().eq(5).children().eq(0).val();
+	var pezziDaEvadere = insertedRow.children().eq(6).children().eq(0).val();
+	var	prezzo = insertedRow.children().eq(7).children().eq(0).val();
+	var	sconto = insertedRow.children().eq(8).children().eq(0).val();
 
 	var found = 0;
 	var currentRowIndex = 0;
+	var currentIdOrdineCliente;
 	var currentIdArticolo;
 	var currentLotto;
 	var currentScadenza;
@@ -1722,70 +1874,80 @@ $.fn.groupArticoloRow = function(insertedRow){
 			if(found != 1){
 				currentRowIndex = $(this).attr('data-row-index');
 				if(currentRowIndex != insertedRowIndex){
+					currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
+					currentQuantita = $(this).children().eq(4).children().eq(0).val();
+					currentPezzi = $(this).children().eq(5).children().eq(0).val();
 					currentPrezzo = $(this).children().eq(7).children().eq(0).val();
 					currentSconto = $(this).children().eq(8).children().eq(0).val();
 					currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 
-					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(insertedArticoloId)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(insertedLotto)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(insertedPrezzo)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(insertedSconto)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(insertedScadenza)){
-						found = 1;
-						currentQuantita = $(this).children().eq(4).children().eq(0).val();
-						currentPezzi = $(this).children().eq(5).children().eq(0).val();
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+
+						if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+
+							found = 1;
+						} else if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)){
+							found = 2;
+						}
+
+					} else {
+						if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
+							&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+							found = 1;
+						}
 					}
+
 				}
 			}
 		});
 	}
-	var table = $('#ddtArticoliTable').DataTable();
-	if(found == 1){
-		var totale = 0;
-		sconto = $.fn.parseValue(sconto, 'float');
 
-		var quantitaPerPrezzo = (($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float')) * $.fn.parseValue(insertedPrezzo, 'float'));
-		var scontoValue = ($.fn.parseValue(insertedSconto, 'float')/100)*quantitaPerPrezzo;
+	var table = $('#ddtArticoliTable').DataTable();
+	if(found >= 1){
+
+		var totale = 0;
+		quantita = $.fn.parseValue(quantita, 'float');
+		prezzo = $.fn.parseValue(prezzo, 'float');
+		sconto = $.fn.parseValue(sconto, 'float');
+		pezzi = $.fn.parseValue(pezzi, 'int');
+
+		var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
+		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var newQuantita = ($.fn.parseValue(insertedQuantita,'float') + $.fn.parseValue(currentQuantita,'float'));
-		var newPezzi = ($.fn.parseValue(insertedPezzi,'int') + $.fn.parseValue(currentPezzi,'int'));
+		if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+			// controllo lotto e scadenza
+			// se uguali -> aggiorno la riga
+			// se diversi -> inserisco nuova riga ed aggiorno i pezzi della riga
+			if($.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+				&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 
-		var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+newPezzi+'">';
-		var newPezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+insertedPezziDaEvadere+'">';
-		var newLottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner lotto group" value="'+insertedLotto+'">';
-		var newScadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(insertedScadenza).format('YYYY-MM-DD')+'">';
-		var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
-		var newPrezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedPrezzo+'">';
-		var newScontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+insertedSconto+'">';
+				// aggiorno la riga
+				$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,lotto,scadenza,prezzo,sconto,pezziDaEvadere,
+					quantita,pezzi,null,totale);
+				table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
 
-		var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
-		rowData[1] = newLottoHtml;
-		rowData[2] = newScadenzaHtml;
-		rowData[4] = newQuantitaHtml;
-		rowData[5] = newPezziHtml;
-		rowData[6] = newPezziDaEvadereHtml;
-		rowData[7] = newPrezzoHtml;
-		rowData[9] = newScontoHtml;
-		rowData[8] = totale;
+			}
 
-		if(newPezzi < currentPezziDaEvadere){
-			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
-		} else if(newPezzi > currentPezziDaEvadere){
-			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
 		} else {
-			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+			// aggiorno la riga
+			$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,lotto,scadenza,prezzo,sconto,pezziDaEvadere,
+				quantita,pezzi,null,totale);
+			table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
 		}
-
-		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
-		table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
-
 	}
 
 	$.fn.computeTotale();
+
+	$.fn.computeArticoliBackground();
 }
 
 $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
@@ -1843,223 +2005,288 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
 	var idCliente = $('#cliente option:selected').val();
 	var idPuntoConsegna = $('#puntoConsegna option:selected').val();
 
-	var url = baseUrl + "ordini-clienti?idCliente="+idCliente;
-	url += "&idPuntoConsegna="+idPuntoConsegna;
-	url += "&dataConsegnaLessOrEqual="+moment(dataConsegna).format('YYYY-MM-DD');
-	url += "&idStatoNot="+idStatoOrdineEvaso;
+	if($.fn.normalizeIfEmptyOrNullVariable(idCliente) != ''
+		&& $.fn.normalizeIfEmptyOrNullVariable(idPuntoConsegna) != ''
+		&& $.fn.normalizeIfEmptyOrNullVariable(dataConsegna) != ''){
 
-	$.ajax({
-		url: url,
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					var idOrdineCliente = item.id;
-					var ordineClienteArticoli = item.ordineClienteArticoli;
+		var url = baseUrl + "ordini-clienti?idCliente="+idCliente;
+		url += "&idPuntoConsegna="+idPuntoConsegna;
+		url += "&dataConsegnaLessOrEqual="+moment(dataConsegna).format('YYYY-MM-DD');
+		url += "&idStatoNot="+idStatoOrdineEvaso;
 
-					if(ordineClienteArticoli != null && ordineClienteArticoli != undefined && ordineClienteArticoli.length != 0){
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var idOrdineCliente = item.id;
+						var ordineClienteArticoli = item.ordineClienteArticoli;
 
-						ordineClienteArticoli.forEach(function(item, j){
-							var ordineClienteArticolo = item;
-							var pezziOrdinati = ordineClienteArticolo.numeroPezziOrdinati;
-							var pezziDaEvadere = ordineClienteArticolo.numeroPezziDaEvadere;
+						if(ordineClienteArticoli != null && ordineClienteArticoli != undefined && ordineClienteArticoli.length != 0){
 
-							// controllo sul numero di pezzi ordinati e il numero di pezzi da evadere
-							if(pezziOrdinati == null || pezziOrdinati == ''){
-								pezziOrdinati = 0;
-							} else {
-								pezziOrdinati = $.fn.parseValue(pezziOrdinati, 'int');
-							}
-							if(pezziDaEvadere == null || pezziDaEvadere == ''){
-								pezziDaEvadere = 0;
-							} else {
-								pezziDaEvadere = $.fn.parseValue(pezziDaEvadere, 'int');
-							}
+							ordineClienteArticoli.forEach(function(item, j){
+								var ordineClienteArticolo = item;
+								var pezziOrdinati = ordineClienteArticolo.numeroPezziOrdinati;
+								var pezziDaEvadere = ordineClienteArticolo.numeroPezziDaEvadere;
 
-							if(pezziOrdinati > 0 && pezziDaEvadere > 0){
-								var articolo = ordineClienteArticolo.articolo;
-								if(articolo != null && articolo != ''){
-									var idArticolo = articolo.id;
+								// controllo sul numero di pezzi ordinati e il numero di pezzi da evadere
+								if(pezziOrdinati == null || pezziOrdinati == ''){
+									pezziOrdinati = 0;
+								} else {
+									pezziOrdinati = $.fn.parseValue(pezziOrdinati, 'int');
+								}
+								if(pezziDaEvadere == null || pezziDaEvadere == ''){
+									pezziDaEvadere = 0;
+								} else {
+									pezziDaEvadere = $.fn.parseValue(pezziDaEvadere, 'int');
+								}
 
-									// get sconto articolo
-									var sconto;
-									if(!$.fn.checkVariableIsNull(dataConsegna) && !$.fn.checkVariableIsNull(idCliente)){
-										sconto = $.fn.getScontoArticolo(idArticolo, dataConsegna, idCliente);
-										console.log('SCONTO: '+sconto);
-									}
+								if(pezziOrdinati > 0 && pezziDaEvadere > 0){
+									var articolo = ordineClienteArticolo.articolo;
+									if(articolo != null && articolo != ''){
+										var idArticolo = articolo.id;
 
-									// get articolo prezzo listino cliente
-									var prezzoListino;
-									var idListino = $('#cliente option:selected').attr('data-id-listino');
-									if(!$.fn.checkVariableIsNull(idListino)){
-										prezzoListino = $.fn.getPrezzoListinoClienteArticolo(idArticolo, idListino);
-										console.log('PREZZO LISTINO: '+prezzoListino);
-									}
+										// get sconto articolo
+										var sconto;
+										if(!$.fn.checkVariableIsNull(dataConsegna) && !$.fn.checkVariableIsNull(idCliente)){
+											sconto = $.fn.getScontoArticolo(idArticolo, dataConsegna, idCliente);
+											console.log('SCONTO: '+sconto);
+										}
 
-									var articoloLabel = articolo.codice + ' - ' + articolo.descrizione;
-									var udm;
-									if(!$.fn.checkVariableIsNull(articolo.unitaMisura)){
-										udm = articolo.unitaMisura.etichetta;
-									}
-									var lotto = '';
-									var scadenza = '';
-									var quantita = '';
-									var pezzi = 0;
-									var prezzo;
-									if(!$.fn.checkVariableIsNull(prezzoListino)){
-										prezzo = prezzoListino;
-									} else {
-										prezzo = articolo.prezzoListinoBase;
-									}
-									var sconto = sconto;
-									var iva;
-									if(!$.fn.checkVariableIsNull(articolo.aliquotaIva)){
-										iva = articolo.aliquotaIva.valore;
-									}
-									var codiceFornitore = articolo.fornitore.codice;
+										// get articolo prezzo listino cliente
+										var prezzoListino;
+										var idListino = $('#cliente option:selected').attr('data-id-listino');
+										if(!$.fn.checkVariableIsNull(idListino)){
+											prezzoListino = $.fn.getPrezzoListinoClienteArticolo(idArticolo, idListino);
+											console.log('PREZZO LISTINO: '+prezzoListino);
+										}
 
-									var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="" data-codice-fornitore="'+codiceFornitore+'">';
-									var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="">';
-									var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
-									var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
-									var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
-									var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
-									var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
+										var articoloLabel = articolo.codice + ' ' + articolo.descrizione;
+										var udm;
+										if(!$.fn.checkVariableIsNull(articolo.unitaMisura)){
+											udm = articolo.unitaMisura.etichetta;
+										}
+										var lotto = '';
+										var scadenza = '';
+										var quantita = '';
+										var pezzi = 0;
+										var prezzo;
+										if(!$.fn.checkVariableIsNull(prezzoListino)){
+											prezzo = prezzoListino;
+										} else {
+											prezzo = articolo.prezzoListinoBase;
+										}
+										var sconto = sconto;
+										var iva;
+										if(!$.fn.checkVariableIsNull(articolo.aliquotaIva)){
+											iva = articolo.aliquotaIva.valore;
+										}
+										var codiceFornitore = articolo.fornitore.codice;
 
-									// check if a same articolo was already added
-									var found = 0;
-									var currentRowIndex;
-									var currentIdArticolo;
-									var currentLotto;
-									var currentPrezzo;
-									var currentSconto;
-									var currentScadenza;
-									var currentPezzi = 0;
-									var currentPezziDaEvadere = 0;
-									var currentQuantita= 0;
-									var currentIdOrdineCliente;
+										var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="" data-codice-fornitore="'+codiceFornitore+'">';
+										var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="">';
+										var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
+										var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+										var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
+										var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
+										var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
 
-									var ddtArticoliLength = $('.rowArticolo').length;
-									if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
-										$('.rowArticolo').each(function(i, item){
+										// check if a same articolo was already added
+										var found = 0;
+										var currentRowIndex;
+										var currentIdOrdineCliente;
+										var currentIdArticolo;
+										var currentLotto;
+										var currentPrezzo;
+										var currentSconto;
+										var currentScadenza;
+										var currentPezzi = 0;
+										var currentPezziDaEvadere = 0;
+										var currentQuantita= 0;
+										var currentIdOrdineCliente;
 
-											if(found != 1){
-												currentRowIndex = $(this).attr('data-row-index');
-												currentIdArticolo = $(this).attr('data-id');
-												currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
-												currentLotto = $(this).children().eq(1).children().eq(0).val();
-												currentScadenza = $(this).children().eq(2).children().eq(0).val();
-												currentPrezzo = $(this).children().eq(7).children().eq(0).val();
-												currentSconto = $(this).children().eq(8).children().eq(0).val();
-												currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
+										var ddtArticoliLength = $('.rowArticolo').length;
+										if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
+											$('.rowArticolo').each(function(i, item){
 
-												if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(idArticolo)
-													&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
-													&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
-													&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
-													&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
-													found = 1;
+												if(found != 1){
+													currentRowIndex = $(this).attr('data-row-index');
+													currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
+													currentIdArticolo = $(this).attr('data-id');
+													currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
+													currentLotto = $(this).children().eq(1).children().eq(0).val();
+													currentScadenza = $(this).children().eq(2).children().eq(0).val();
 													currentQuantita = $(this).children().eq(4).children().eq(0).val();
 													currentPezzi = $(this).children().eq(5).children().eq(0).val();
 													currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
+													currentPrezzo = $(this).children().eq(7).children().eq(0).val();
+													currentSconto = $(this).children().eq(8).children().eq(0).val();
+
+													if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+
+														if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+															&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+															&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+
+															found = 1;
+														} else if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)){
+															found = 2;
+														}
+
+													} else {
+														if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(idArticolo)
+															&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+															&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+															&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
+															&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+															found = 1;
+														}
+													}
 												}
+											});
+										}
+
+										var totale = 0;
+										quantita = $.fn.parseValue(quantita, 'float');
+										prezzo = $.fn.parseValue(prezzo, 'float');
+										sconto = $.fn.parseValue(sconto, 'float');
+										pezzi = $.fn.parseValue(pezzi, 'int');
+
+										var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
+										var scontoValue = (sconto/100)*quantitaPerPrezzo;
+										totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+										var table = $('#ddtArticoliTable').DataTable();
+
+										if(found >= 1){
+
+											if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+												// controllo lotto e scadenza
+												// se uguali -> aggiorno la riga
+												// se diversi -> inserisco nuova riga ed aggiorno i pezzi della riga
+												if($.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+													&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+
+													// aggiorno la riga
+													$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+														quantita,pezzi,codiceFornitore,totale);
+
+												} else {
+													// inserisco nuova riga
+													$.fn.inserisciRigaArticolo(table,idOrdineCliente,idArticolo,articoloLabel,
+														lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,pezziDaEvadereHtml,prezzoHtml,scontoHtml,
+														totale,iva,pezzi,pezziDaEvadere);
+
+													// aggiorno la riga
+													//$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+													//	quantita,pezzi,codiceFornitore,totale);
+												}
+
+											} else {
+												// aggiorno la riga
+												$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+													quantita,pezzi,codiceFornitore,totale);
 											}
-										});
+
+										} else {
+											// inserisco nuova riga
+											$.fn.inserisciRigaArticolo(table,idOrdineCliente,idArticolo,articoloLabel,
+												lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,pezziDaEvadereHtml,prezzoHtml,scontoHtml,
+												totale,iva,pezzi,pezziDaEvadere);
+										}
+										/*
+										if(found >= 1){
+											var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+											var newPezzi = (pezzi + $.fn.parseValue(currentPezzi,'int'));
+											var newPezziDaEvadere = (pezziDaEvadere + $.fn.parseValue(currentPezziDaEvadere,'int'));
+
+											var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
+											var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
+											var newPezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+newPezziDaEvadere+'">';
+
+											var newIdOrdiniClienti;
+											if(currentIdOrdineCliente != null && currentIdOrdineCliente != ''){
+												newIdOrdiniClienti = currentIdOrdineCliente+';'+idOrdineCliente;
+											} else {
+												newIdOrdiniClienti = ''+idOrdineCliente;
+											}
+
+											var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
+											rowData[4] = newQuantitaHtml;
+											rowData[5] = newPezziHtml;
+											rowData[6] = newPezziDaEvadereHtml;
+											rowData[9] = totale;
+
+											if(newPezzi == 0){
+												$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziZero);
+											} else if(newPezzi > 0 && newPezzi < newPezziDaEvadere){
+												$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
+											} else if(newPezzi > newPezziDaEvadere){
+												$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
+											} else {
+												$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
+											}
+											$(table.row("[data-row-index='"+currentRowIndex+"']").node()).attr('data-id-ordine-cliente', newIdOrdiniClienti);
+
+											table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+
+										} else {
+											var deleteLink = '<a class="deleteDdtArticolo" data-id="'+idArticolo+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+											var rowsCount = table.rows().count();
+											var newRowindex = parseInt(rowsCount) + 1;
+
+											var rowNode = table.row.add( [
+												articoloLabel,
+												lottoHtml,
+												scadenzaHtml,
+												udm,
+												quantitaHtml,
+												pezziHtml,
+												pezziDaEvadereHtml,
+												prezzoHtml,
+												scontoHtml,
+												totale,
+												iva,
+												deleteLink
+											] ).draw( false ).node();
+											$(rowNode).css('text-align', 'center').css('color','#080707');
+											$(rowNode).addClass('rowArticolo');
+											$(rowNode).attr('data-id', idArticolo);
+											$(rowNode).attr('data-id-ordine-cliente', idOrdineCliente);
+											$(rowNode).attr('data-row-index', newRowindex);
+
+											if(pezzi == 0){
+												$(rowNode).css('background-color', rowBackgroundPezziZero);
+											} else if(pezzi > 0 && pezzi < pezziDaEvadere){
+												$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
+											} else if(pezzi > pezziDaEvadere){
+												$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
+											} else {
+												$(rowNode).css('background-color', 'transparent');
+											}
+
+										}
+										 */
+										$.fn.computeTotale();
+
 									}
-
-									var totale = 0;
-									quantita = $.fn.parseValue(quantita, 'float');
-									prezzo = $.fn.parseValue(prezzo, 'float');
-									sconto = $.fn.parseValue(sconto, 'float');
-									pezzi = $.fn.parseValue(pezzi, 'int');
-
-									var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
-									var scontoValue = (sconto/100)*quantitaPerPrezzo;
-									totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
-
-									var table = $('#ddtArticoliTable').DataTable();
-
-									if(found == 1){
-										var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
-										var newPezzi = (pezzi + $.fn.parseValue(currentPezzi,'int'));
-										var newPezziDaEvadere = (pezziDaEvadere + $.fn.parseValue(currentPezziDaEvadere,'int'));
-
-										var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
-										var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
-										var newPezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+newPezziDaEvadere+'">';
-
-										var newIdOrdiniClienti;
-										if(currentIdOrdineCliente != null && currentIdOrdineCliente != ''){
-											newIdOrdiniClienti = currentIdOrdineCliente+';'+idOrdineCliente;
-										} else {
-											newIdOrdiniClienti = ''+idOrdineCliente;
-										}
-
-										var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
-										rowData[4] = newQuantitaHtml;
-										rowData[5] = newPezziHtml;
-										rowData[6] = newPezziDaEvadereHtml;
-										rowData[9] = totale;
-										if(newPezzi < newPezziDaEvadere){
-											$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
-										} else if(newPezzi > newPezziDaEvadere){
-											$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
-										} else {
-											$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', 'transparent');
-										}
-										$(table.row("[data-row-index='"+currentRowIndex+"']").node()).attr('data-id-ordine-cliente', newIdOrdiniClienti);
-
-										table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
-
-									} else {
-										var deleteLink = '<a class="deleteDdtArticolo" data-id="'+idArticolo+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
-
-										var rowsCount = table.rows().count();
-										var newRowindex = parseInt(rowsCount) + 1;
-
-										var rowNode = table.row.add( [
-											articoloLabel,
-											lottoHtml,
-											scadenzaHtml,
-											udm,
-											quantitaHtml,
-											pezziHtml,
-											pezziDaEvadereHtml,
-											prezzoHtml,
-											scontoHtml,
-											totale,
-											iva,
-											deleteLink
-										] ).draw( false ).node();
-										$(rowNode).css('text-align', 'center').css('color','#080707');
-										$(rowNode).addClass('rowArticolo');
-										$(rowNode).attr('data-id', idArticolo);
-										$(rowNode).attr('data-id-ordine-cliente', idOrdineCliente);
-										$(rowNode).attr('data-row-index', newRowindex);
-										if(pezzi < pezziDaEvadere){
-											$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
-										} else if(pezzi > pezziDaEvadere){
-											$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
-										} else {
-											$(rowNode).css('background-color', 'transparent');
-										}
-
-									}
-									$.fn.computeTotale();
-
 								}
-							}
-						});
-					}
-				});
-			}
+							});
+						}
+					});
+					$.fn.computeArticoliBackground();
+				}
 
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Errore nel recupero degli ordini clienti');
-		}
-	});
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Errore nel recupero degli ordini clienti');
+			}
+		});
+
+	}
 
 }
 
@@ -2116,7 +2343,7 @@ $.fn.getPrezzoListinoClienteArticolo = function(idArticolo, idListino){
 $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, scadenza, prezzoListino, sconto){
 	var articoloId = articolo.id;
 
-	var articoloLabel = articolo.codice + ' - ' + articolo.descrizione;
+	var articoloLabel = articolo.codice + ' ' + articolo.descrizione;
 	var udm;
 	if(!$.fn.checkVariableIsNull(articolo.unitaMisura)){
 		udm = articolo.unitaMisura.etichetta;
@@ -2157,6 +2384,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	// check if a same articolo was already added
 	var found = 0;
 	var currentRowIndex;
+	var currentIdOrdineCliente;
 	var currentIdArticolo;
 	var currentLotto;
 	var currentPrezzo;
@@ -2172,21 +2400,35 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 
 			if(found != 1){
 				currentRowIndex = $(this).attr('data-row-index');
+				currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
 				currentIdArticolo = $(this).attr('data-id');
 				currentLotto = $(this).children().eq(1).children().eq(0).val();
 				currentScadenza = $(this).children().eq(2).children().eq(0).val();
+				currentQuantita = $(this).children().eq(4).children().eq(0).val();
+				currentPezzi = $(this).children().eq(5).children().eq(0).val();
+				currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 				currentPrezzo = $(this).children().eq(7).children().eq(0).val();
 				currentSconto = $(this).children().eq(8).children().eq(0).val();
-				currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 
-				if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
-					&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
-					&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
-					&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
-					&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
-					found = 1;
-					currentPezzi = $(this).children().eq(5).children().eq(0).val();
-					currentQuantita = $(this).children().eq(4).children().eq(0).val();
+				if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+
+						found = 1;
+					} else if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)){
+						found = 2;
+					}
+
+				} else {
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+						found = 1;
+					}
 				}
 			}
 		});
@@ -2203,8 +2445,46 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 	var table = $('#ddtArticoliTable').DataTable();
-	var rowIndex;
-	if(found == 1){
+
+	if(found >= 1){
+
+		if($.fn.normalizeIfEmptyOrNullVariable(currentIdOrdineCliente) != ''){
+			// controllo lotto e scadenza
+			// se uguali -> aggiorno la riga
+			// se diversi -> inserisco nuova riga ed aggiorno i pezzi della riga
+			if($.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+				&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+
+				// aggiorno la riga
+				$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+					quantita,pezzi,codiceFornitore,totale);
+
+			} else {
+				// inserisco nuova riga
+				$.fn.inserisciRigaArticolo(table,currentIdOrdineCliente,articoloId,articoloLabel,
+					lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,pezziDaEvadereHtml,prezzoHtml,scontoHtml,
+					totale,iva,pezzi,currentPezziDaEvadere);
+
+				// aggiorno la riga
+				//$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+				//	quantita,pezzi,codiceFornitore,totale);
+			}
+
+		} else {
+			// aggiorno la riga
+			$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentPezziDaEvadere,currentLotto,currentScadenza,currentPrezzo,currentSconto,currentPezziDaEvadere,
+				quantita,pezzi,codiceFornitore,totale);
+		}
+
+	} else {
+		// inserisco nuova riga
+		$.fn.inserisciRigaArticolo(table,null,articoloId,articoloLabel,
+			lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,pezziDaEvadereHtml,prezzoHtml,scontoHtml,
+			totale,iva,pezzi,currentPezziDaEvadere);
+	}
+
+	/*
+	if(found >= 1){
 		var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
 		var newPezzi = (pezzi + $.fn.parseValue(currentPezzi,'int'));
 
@@ -2215,7 +2495,10 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		rowData[4] = newQuantitaHtml;
 		rowData[5] = newPezziHtml;
 		rowData[9] = totale;
-		if(newPezzi < currentPezziDaEvadere){
+
+		if(newPezzi == 0){
+			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziZero);
+		} else if(newPezzi > 0 && newPezzi < currentPezziDaEvadere){
 			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziLessOrdinati);
 		} else if(newPezzi > currentPezziDaEvadere){
 			$(table.row("[data-row-index='"+currentRowIndex+"']").node()).css('background-color', rowBackgroundPezziGreaterOrdinati);
@@ -2224,7 +2507,6 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		}
 
 		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
-		rowIndex = currentRowIndex;
 
 	} else {
 		var deleteLink = '<a class="deleteDdtArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
@@ -2250,7 +2532,10 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		$(rowNode).addClass('rowArticolo');
 		$(rowNode).attr('data-id', articoloId);
 		$(rowNode).attr('data-row-index', newRowindex);
-		if(pezzi < pezziDaEvadere){
+
+		if(pezzi == 0){
+			$(rowNode).css('background-color', rowBackgroundPezziZero);
+		} else if(pezzi > 0 && pezzi < pezziDaEvadere){
 			$(rowNode).css('background-color', rowBackgroundPezziLessOrdinati);
 		} else if(pezzi > pezziDaEvadere){
 			$(rowNode).css('background-color', rowBackgroundPezziGreaterOrdinati);
@@ -2258,9 +2543,11 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 			$(rowNode).css('background-color', 'transparent');
 		}
 
-		rowIndex = newRowindex;
 	}
+	*/
 	$.fn.computeTotale();
+
+	$.fn.computeArticoliBackground();
 
 	$('tr[data-row-index='+rowIndex+']').children().eq(1).children().eq(0).focus();
 }

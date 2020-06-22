@@ -37,6 +37,10 @@
   <script src="../js/bootstrap-select/bootstrap-select-1.13.12.js"></script>
   <script src="../js/bootstrap-select/i18n/defaults-it_IT.js"></script>
 
+  <!-- Page level plugins -->
+  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
   <script src="../js/core/moment.js"></script>
   <script src="../js/commons.js"></script>
 
@@ -82,7 +86,25 @@
             <div class="w-50">
 
               <form id="updateOrdineClienteForm" class="needs-validation" novalidate>
-
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="progressivo" class="">Progressivo</label>
+                    <div class="input-group input-group-sm mb-2">
+                      <input type="number" class="form-control form-control-sm text-right" id="progressivo" step="1" min="0">
+                      <div class="input-group-prepend">
+                        <div class="input-group-text">/</div>
+                      </div>
+                      <input type="number" class="form-control form-control-sm text-right" id="annoContabile" step="1" min="0">
+                    </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="data" class="">Data*</label>
+                    <input type="date" class="form-control form-control-sm" id="data" placeholder="" required>
+                    <div class="invalid-feedback">
+                      Inserisci una data
+                    </div>
+                  </div>
+                </div>
                 <div class="form-row">
                   <div class="form-group col-md-10">
                     <label for="cliente">Cliente*</label>
@@ -136,11 +158,42 @@
                   </div>
                 </div>
 
-                <div class="form-row" id="formRowArticoli">
-                  <div class="form-group col-md-12" id="formRowArticoliBody">
-                    <label for="articoli">Articoli</label>
-                    <div id="articoli" class="mb-2">
-                      <a id="addArticolo" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
+                <div class="card mt-2 mb-2">
+                  <h6 class="card-header text-center font-weight-bold" style="background-color: #baddf5;">Aggiungi articolo</h6>
+                  <div class="card-body" style="font-size: 0.9rem;">
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="articolo" class="mb-0">Articolo</label>
+                        <select id="articolo" class="form-control form-control-sm" data-live-search="true">
+                          <option value=""></option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-2 mb-0">
+                        <label for="pezzi" class="mb-0">Pezzi</label>
+                        <input type="number" class="form-control form-control-sm text-right " id="pezzi" step="1" min="0">
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-2">
+                        <button type="submit" class="btn btn-primary btn-sm mt-2" id="addArticolo">Aggiungi</button>
+                      </div>
+                    </div>
+
+                    <div id="addOrdineClienteArticoloAlert"></div>
+
+                    <div class="card-body pl-0 pt-0 pb-0">
+                      <div class="table-responsive">
+                        <table class="table table-bordered table-sm" id="ordineClienteArticoliTable" width="100%" cellspacing="0">
+                          <thead class="text-center" style="background-color: #baddf5;">
+                          <tr>
+                            <th>Articolo</th>
+                            <th>Prezzo listino base (€)</th>
+                            <th>Pezzi</th>
+                            <th></th>
+                          </tr>
+                          </thead>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -276,9 +329,7 @@
   <!-- Custom scripts for all pages-->
   <script src="../js/sb-admin-2.min.js"></script>
 
-  <!-- Page level plugins -->
-  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
 
 </body>
 

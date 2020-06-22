@@ -45,9 +45,9 @@
   <script>
     var idTelefonata = $.fn.extractIdTelefonataFromUrl();
     if(idTelefonata != null && idTelefonata != undefined){
-      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then($.fn.getTelefonata(idTelefonata));
+      $.when($.fn.preloadFields(), $.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then($.fn.getTelefonata(idTelefonata));
     } else {
-      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then();
+      $.when($.fn.preloadFields(), $.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then();
     }
   </script>
 </head>
@@ -83,6 +83,25 @@
             <div class="w-50">
 
               <form id="newOrdineClienteForm" class="needs-validation" novalidate>
+                <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="progressivo" class="">Progressivo</label>
+                    <div class="input-group input-group-sm mb-2">
+                      <input type="number" class="form-control form-control-sm text-right" id="progressivo" step="1" min="0">
+                      <div class="input-group-prepend">
+                        <div class="input-group-text">/</div>
+                      </div>
+                      <input type="number" class="form-control form-control-sm text-right" id="annoContabile" step="1" min="0">
+                    </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="data" class="">Data*</label>
+                    <input type="date" class="form-control form-control-sm" id="data" placeholder="" required>
+                    <div class="invalid-feedback">
+                      Inserisci una data
+                    </div>
+                  </div>
+                </div>
                 <div class="form-row">
                   <div class="form-group col-md-10">
                     <label for="cliente">Cliente*</label>
@@ -155,7 +174,7 @@
                           <option value=""></option>
                         </select>
                       </div>
-                      <div class="form-group col-md-1 mb-0">
+                      <div class="form-group col-md-2 mb-0">
                         <label for="pezzi" class="mb-0">Pezzi</label>
                         <input type="number" class="form-control form-control-sm text-right " id="pezzi" step="1" min="0">
                       </div>

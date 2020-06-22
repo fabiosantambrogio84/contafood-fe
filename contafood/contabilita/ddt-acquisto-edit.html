@@ -203,6 +203,8 @@
           </div>
 
           <input type="hidden" id="hiddenIdDdtAcquisto"/>
+          <input type="hidden" id="hiddenModificaGiacenze"/>
+
           <button type="submit" class="btn btn-primary mt-4" id="updateDdtAcquistoButton">Salva</button>
           <a href="ddt-acquisto.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
@@ -230,6 +232,44 @@
 
       </div>
       <!-- /.container-fluid -->
+
+      <!-- Modal Confirm Update -->
+      <div class="modal fade" id="updateDdtAcquistoModal" tabindex="-1" role="dialog" aria-labelledby="updateDdtAcquistoModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updateDdtAcquistoModalTitle">ATTENZIONE - Modifica DDT</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div>
+                <h5>La modifica del DDT potrebbe modificare le giacenze.</h5>
+              </div>
+              <div class="mt-4">
+                <h6>Vuoi modificare le giacenze?</h6>
+                <div class="form-row">
+                  <div class="form-group" style="margin-left: 0.5rem;">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="modificaGiacenze" id="modificaGiacenzeSi" value="si" checked>
+                      <label class="form-check-label" for="modificaGiacenzeSi">Si</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="modificaGiacenze" id="modificaGiacenzeNo" value="no">
+                      <label class="form-check-label" for="modificaGiacenzeNo">No</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+              <button type="button" class="btn btn-primary" id="confirmUpdateDdtAcquisto">Conferma</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
     <!-- End of Main Content -->
