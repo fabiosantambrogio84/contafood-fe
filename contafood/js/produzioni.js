@@ -36,7 +36,7 @@ $(document).ready(function() {
 			[0, 'desc']
 		],
 		"columns": [
-			{"name": "codice", "data": "codice", "width":"10%"},
+			{"name": "codice", "data": "codiceProduzione", "width":"10%"},
 			{"name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var a = moment(data.dataProduzione);
 				return a.format('DD/MM/YYYY');
@@ -46,14 +46,14 @@ $(document).ready(function() {
 				var a = moment(data.scadenza);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
-				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
-				return ricettaResult;
+			{"name": "articolo", "data": null, "orderable":false, render: function ( data, type, row ) {
+				var result = data.codiceArticolo+' - '+data.descrizioneArticolo;
+				return result;
 			}},
-			{"name": "numeroConfezioni", "data": "numeroConfezioni", "width":"8%", "className": "tdAlignRight" },
+			{"name": "numeroConfezioni", "data": "numConfezioniProdotte", "width":"12%", "className": "tdAlignRight" },
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
-				var links = '<a class="detailsProduzione pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
-				links = links + '<a class="deleteProduzione" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+				var links = '<a class="detailsProduzione pr-2" data-id="'+data.idProduzione+'" href="#"><i class="fas fa-info-circle"></i></a>';
+				links = links + '<a class="deleteProduzione" data-id="'+data.idProduzione+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		]
@@ -98,6 +98,7 @@ $(document).ready(function() {
 					if(result.produzioneConfezioni != null && result.produzioneConfezioni != undefined){
 						$('#detailsProduzioneConfezioniModalTable').DataTable({
 							"data": result.produzioneConfezioni,
+							"retrieve": true,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -119,17 +120,21 @@ $(document).ready(function() {
 							"autoWidth": false,
 							"columns": [
 								{"data": null, "orderable":false, render: function ( data, type, row ) {
-									return data.confezione.tipo;
-
+									var articolo = data.articolo;
+									if(articolo != null && articolo != undefined){
+										return articolo.codice+" - "+articolo.descrizione;
+									} else {
+										return "";
+									}
 								}},
 								{"data": null, "orderable":false, render: function ( data, type, row ) {
 									return data.lotto;
 								}},
 								{"data": null, "orderable":false, render: function ( data, type, row ) {
-									return data.peso;
+									return data.numConfezioni;
 								}},
 								{"data": null, "orderable":false, render: function ( data, type, row ) {
-									return data.numConfezioni;
+									return data.numConfezioniProdotte;
 								}}
 							]
 						});
@@ -138,6 +143,7 @@ $(document).ready(function() {
 					if(result.produzioneIngredienti != null && result.produzioneIngredienti != undefined){
 						$('#detailsProduzioneIngredientiModalTable').DataTable({
 							"data": result.produzioneIngredienti,
+							"retrieve": true,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -350,7 +356,7 @@ $(document).ready(function() {
 					produzioneConfezione.id = produzioneConfezioneId;
 					produzioneConfezione.numConfezioni = $(this).find('.confezioneNum').val();
 					produzioneConfezione.lotto = $(this).find('.confezioneLotto').val();
-					produzioneConfezione.peso = $(this).find('.confezionePesoFinale').val();
+					produzioneConfezione.numConfezioniProdotte = $(this).find('.confezioneNumProdotte').val();
 
 					produzioneConfezioni.push(produzioneConfezione);
 				});
