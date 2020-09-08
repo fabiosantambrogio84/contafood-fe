@@ -39,11 +39,14 @@ $.fn.loadGiacenzeIngredientiTable = function(url) {
 		],
 		"columns": [
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-				var checkboxHtml = '<input type="checkbox" data-id="'+data.idIngrediente+'" id="checkbox_'+data.idIngrediente+'" class="deleteGiacenzaIngredienteCheckbox">';
+				var checkboxHtml = '<input type="checkbox" data-id="'+data.idIngrediente+'" id="checkbox_'+data.idIngredientedetailsGiacenzaIngredientiModal+'" class="deleteGiacenzaIngredienteCheckbox">';
 				return checkboxHtml;
 			}},
 			{"name": "ingrediente", "data": null, render: function ( data, type, row ) {
 				return data.ingrediente;
+			}},
+			{"name": "udm", "data": null, render: function ( data, type, row ) {
+				return data.udm;
 			}},
 			{"name": "attivo", "data": null, render: function ( data, type, row ) {
 				var attivo = data.attivo;
@@ -134,6 +137,7 @@ $(document).ready(function() {
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
 					$('#ingrediente').text(result.ingrediente);
+					$('#udm').text(result.udm);
 					$('#quantita').text(result.quantita);
 
 					if(result.movimentazioni != null && result.movimentazioni != undefined){

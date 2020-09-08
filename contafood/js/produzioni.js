@@ -421,6 +421,9 @@ $(document).ready(function() {
 			newConfezioneRow.find('.confezioneNum').each(function( index ) {
 			  $(this).val(null);
 			});
+			newConfezioneRow.find('.confezioneNumProdotte').each(function( index ) {
+				$(this).val(null);
+			});
 			newConfezioneRow.find('.addConfezione').each(function( index ) {
 			  $(this).remove();
 			});
