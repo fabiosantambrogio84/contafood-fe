@@ -900,10 +900,13 @@ $.fn.loadOrdiniClientiTable = function(url){
 					"info": false,
 					"autoWidth": false,
 					"order": [
-						[4, 'desc'],
-						[5, 'desc']
+						[0, 'asc'],
+						[1, 'desc']
+						//[6, 'desc']
 					],
 					"columns": [
+						{"name":"stato", "data": "statoOrdine.ordine", "width":"5%", "visible": false},
+						{"name":"dataConsegna", "data": "dataConsegna", "width":"5%", "visible": false},
 						{"name":"codice", "width":"8%", "data": null, render: function ( data, type, row ) {
 							return data.progressivo + '/' + data.annoContabile;
 						}},
