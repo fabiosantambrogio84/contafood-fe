@@ -39,7 +39,7 @@ $.fn.loadGiacenzeIngredientiTable = function(url) {
 		],
 		"columns": [
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-				var checkboxHtml = '<input type="checkbox" data-id="'+data.idIngrediente+'" id="checkbox_'+data.idIngredientedetailsGiacenzaIngredientiModal+'" class="deleteGiacenzaIngredienteCheckbox">';
+				var checkboxHtml = '<input type="checkbox" data-id="'+data.idIngrediente+'" id="checkbox_'+data.idIngrediente+'" class="deleteGiacenzaIngredienteCheckbox">';
 				return checkboxHtml;
 			}},
 			{"name": "ingrediente", "data": null, render: function ( data, type, row ) {
@@ -202,6 +202,30 @@ $(document).ready(function() {
 	$(document).on('click','.closeGiacenzaIngredienti', function(){
 		$('#detailsGiacenzaIngredientiModalTable').DataTable().destroy();
 		$('#detailsGiacenzaIngredientiModal').modal('hide');
+	});
+
+	$(document).on('click','#printGiacenzeIngredienti', function(event){
+		event.preventDefault();
+
+		var alertContent = '<div id="alertGiacenzaIngredienteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		var checkedLength = $(".deleteGiacenzaIngredienteCheckbox:checked").length;
+
+		if(checkedLength != null && checkedLength > 0){
+			var ids = "";
+
+			$(".deleteGiacenzaIngredienteCheckbox:checked").each(function(i, item){
+				var id = $(this).attr('data-id');
+				ids += id+",";
+			});
+
+			window.open(baseUrl + "stampe/giacenze-ingredienti?ids="+ids, '_blank');
+		} else {
+			$('#alertGiacenzaIngrediente').empty().append(alertContent.replace('@@alertText@@','Selezionare almeno una giacenza').replace('@@alertResult@@', 'danger'));
+		}
+
 	});
 
 	$(document).on('click','#resetSearchGiacenzaIngredientiButton', function(){

@@ -122,11 +122,31 @@ $(document).ready(function() {
 						var links = '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
 						return links;
 					}}
-				]
+				],
+				"createdRow": function(row, data, dataIndex,cells){
+					$(row).addClass('rowOrdine');
+					$(row).attr('data-id-ordine', data.id);
+				}
 			});
 
 		});
 	}
+
+	$(document).on('click','#printOrdiniAutisti', function(event){
+		event.preventDefault();
+
+		var idAutista = $('#autista option:selected').val();
+		var dataConsegna = $('#dataConsegna').val();
+		var ids = "";
+
+		$(".rowOrdine").each(function(i, item){
+			var id = $(this).attr('data-id-ordine');
+			ids += id+",";
+		});
+
+		window.open(baseUrl + "stampe/ordini-autisti?idAutista="+idAutista+"&dataConsegna="+dataConsegna+"&ids="+ids, '_blank');
+
+	});
 
 	/*
 	$(document).on('click','#emptyOrdineAutisti', function(event){

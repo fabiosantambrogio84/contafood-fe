@@ -102,7 +102,8 @@ $.fn.loadPagamentiTable = function(url) {
 			$('[data-toggle="tooltip"]').tooltip();
 		},
 		"createdRow": function(row, data, dataIndex,cells){
-			$(row).css('font-size', '12px');
+			$(row).css('font-size', '12px').addClass('rowPagamento');
+			$(row).attr('data-id-pagamento', data.id);
 			$(cells[3]).css('text-align','right');
 		}
 	});
@@ -153,6 +154,20 @@ $(document).ready(function() {
                 $('#pagamentiTable').DataTable().ajax.reload();
 			}
 		});
+	});
+
+	$(document).on('click','#printPagamenti', function(event){
+		event.preventDefault();
+
+		var ids = "";
+
+		$(".rowPagamento").each(function(i, item){
+			var id = $(this).attr('data-id-pagamento');
+			ids += id+",";
+		});
+
+		window.open(baseUrl + "stampe/pagamenti?ids="+ids, '_blank');
+
 	});
 
 	if($('#searchPagamentoButton') != null && $('#searchPagamentoButton') != undefined) {

@@ -445,6 +445,15 @@ $(document).ready(function() {
 		});
 	});
 
+	$(document).on('click','.printDdt', function(){
+		var idDdt = $(this).attr('data-id');
+
+		var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nella stampa del DDT.</strong></div>';
+
+		window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
+	});
+
 	if($('#searchDdtButton') != null && $('#searchDdtButton') != undefined) {
 		$(document).on('submit', '#searchDdtForm', function (event) {
 			event.preventDefault();
@@ -528,6 +537,160 @@ $(document).ready(function() {
 		return valid;
 	}
 
+	$.fn.createDdt = function(print){
+
+		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		var validLotto = $.fn.validateLotto();
+		/*
+        if(!validLotto){
+            $('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
+            return false;
+        }
+        */
+
+		var validDataTrasporto = $.fn.validateDataTrasporto();
+		if(!validDataTrasporto){
+			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
+		var ddt = new Object();
+		ddt.progressivo = $('#progressivo').val();
+		ddt.annoContabile = $('#annoContabile').val();
+		ddt.data = $('#data').val();
+
+		var cliente = new Object();
+		cliente.id = $('#cliente option:selected').val();
+		ddt.cliente = cliente;
+
+		var puntoConsegna = new Object();
+		puntoConsegna.id = $('#puntoConsegna option:selected').val();
+		ddt.puntoConsegna = puntoConsegna;
+
+		var ddtArticoliLength = $('.rowArticolo').length;
+		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
+			var ddtArticoli = [];
+			$('.rowArticolo').each(function(i, item){
+				var articoloId = $(this).attr('data-id');
+
+				var ddtArticolo = {};
+				var ddtArticoloId = new Object();
+				ddtArticoloId.articoloId = articoloId;
+				ddtArticolo.id = ddtArticoloId;
+
+				ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
+				ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
+				ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
+				ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
+				ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
+				ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+
+				ddtArticoli.push(ddtArticolo);
+			});
+			ddt.ddtArticoli = ddtArticoli;
+		}
+		ddt.fatturato = false;
+		ddt.numeroColli = $('#colli').val();
+		ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();
+		ddt.dataTrasporto = $('#dataTrasporto').val();
+
+		var regex = /:/g;
+		var oraTrasporto = $('#oraTrasporto').val();
+		if(oraTrasporto != null && oraTrasporto != ''){
+			var count = oraTrasporto.match(regex);
+			count = (count) ? count.length : 0;
+			if(count == 1){
+				ddt.oraTrasporto = $('#oraTrasporto').val() + ':00';
+			} else {
+				ddt.oraTrasporto = $('#oraTrasporto').val();
+			}
+		}
+		ddt.trasportatore = $('#trasportatore').val();
+		ddt.note = $('#note').val();
+		ddt.scannerLog = $('#scannerLog').val();
+
+		var ddtJson = JSON.stringify(ddt);
+
+		$.ajax({
+			url: baseUrl + "ddts",
+			type: 'POST',
+			contentType: "application/json",
+			dataType: 'json',
+			data: ddtJson,
+			success: function(result) {
+
+				$('#newDdtButton').attr("disabled", true);
+
+				// Update ordini clienti
+				var articoliOrdiniClienti = [];
+				$('.ordineClienteArticolo').each(function(i, item){
+					var idArticolo = $(this).attr('data-id-articolo');
+					var idsOrdiniClienti = $(this).attr('data-ids-ordini');
+					var numeroPezziDaEvadere = $(this).parent().parent().attr('data-num-pezzi-evasi');
+
+					var articoloOrdiniClienti = new Object();
+					articoloOrdiniClienti.idArticolo = idArticolo;
+					articoloOrdiniClienti.numeroPezziDaEvadere = numeroPezziDaEvadere;
+					articoloOrdiniClienti.idsOrdiniClienti = idsOrdiniClienti;
+
+					articoliOrdiniClienti.push(articoloOrdiniClienti);
+				});
+
+				if(articoliOrdiniClienti.length != 0){
+
+					var articoliOrdiniClientiJson = JSON.stringify(articoliOrdiniClienti);
+
+					$.ajax({
+						url: baseUrl + "ordini-clienti/aggregate",
+						type: 'POST',
+						contentType: "application/json",
+						dataType: 'json',
+						data: articoliOrdiniClientiJson,
+						success: function(result) {
+							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
+
+							// Returns to the same page
+							setTimeout(function() {
+								window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
+							}, 1000);
+
+							if(print){
+								window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
+							}
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "DDT creato con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
+						}
+					});
+
+				} else {
+					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the same page
+					setTimeout(function() {
+						window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
+					}, 1000);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var errorMessage = 'Errore nella creazione del DDT';
+				if(jqXHR != null && jqXHR != undefined){
+					var jqXHRResponseJson = jqXHR.responseJSON;
+					if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+						var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+						if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+							errorMessage = jqXHRResponseJsonMessage;
+						}
+					}
+				}
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+			}
+		});
+	}
+
 	if($('#newDdtButton') != null && $('#newDdtButton') != undefined && $('#newDdtButton').length > 0){
 
 		$('#articolo').selectpicker();
@@ -536,153 +699,18 @@ $(document).ready(function() {
 		$(document).on('submit','#newDdtForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$.fn.createDdt(false);
+		});
+	}
 
-			var validLotto = $.fn.validateLotto();
-			/*
-			if(!validLotto){
-				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
-				return false;
-			}
-			*/
+	if($('#newAndPrintDdtButton') != null && $('#newAndPrintDdtButton') != undefined && $('#newAndPrintDdtButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#cliente').selectpicker();
 
-			var validDataTrasporto = $.fn.validateDataTrasporto();
-			if(!validDataTrasporto){
-				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
-				return false;
-			}
+		$(document).on('submit','#newAndPrintDdtButton', function(event){
+			event.preventDefault();
 
-			var ddt = new Object();
-			ddt.progressivo = $('#progressivo').val();
-			ddt.annoContabile = $('#annoContabile').val();
-			ddt.data = $('#data').val();
-
-			var cliente = new Object();
-			cliente.id = $('#cliente option:selected').val();
-			ddt.cliente = cliente;
-
-			var puntoConsegna = new Object();
-			puntoConsegna.id = $('#puntoConsegna option:selected').val();
-			ddt.puntoConsegna = puntoConsegna;
-
-			var ddtArticoliLength = $('.rowArticolo').length;
-			if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
-				var ddtArticoli = [];
-				$('.rowArticolo').each(function(i, item){
-					var articoloId = $(this).attr('data-id');
-
-					var ddtArticolo = {};
-					var ddtArticoloId = new Object();
-					ddtArticoloId.articoloId = articoloId;
-					ddtArticolo.id = ddtArticoloId;
-
-					ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-					ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
-					ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-					ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-					ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-					ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
-
-					ddtArticoli.push(ddtArticolo);
-				});
-				ddt.ddtArticoli = ddtArticoli;
-			}
-			ddt.fatturato = false;
-			ddt.numeroColli = $('#colli').val();
-			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();
-			ddt.dataTrasporto = $('#dataTrasporto').val();
-
-			var regex = /:/g;
-			var oraTrasporto = $('#oraTrasporto').val();
-			if(oraTrasporto != null && oraTrasporto != ''){
-				var count = oraTrasporto.match(regex);
-				count = (count) ? count.length : 0;
-				if(count == 1){
-					ddt.oraTrasporto = $('#oraTrasporto').val() + ':00';
-				} else {
-					ddt.oraTrasporto = $('#oraTrasporto').val();
-				}
-			}
-			ddt.trasportatore = $('#trasportatore').val();
-			ddt.note = $('#note').val();
-			ddt.scannerLog = $('#scannerLog').val();
-
-			var ddtJson = JSON.stringify(ddt);
-
-			$.ajax({
-				url: baseUrl + "ddts",
-				type: 'POST',
-				contentType: "application/json",
-				dataType: 'json',
-				data: ddtJson,
-				success: function(result) {
-
-					$('#newDdtButton').attr("disabled", true);
-
-					// Update ordini clienti
-					var articoliOrdiniClienti = [];
-					$('.ordineClienteArticolo').each(function(i, item){
-						var idArticolo = $(this).attr('data-id-articolo');
-						var idsOrdiniClienti = $(this).attr('data-ids-ordini');
-						var numeroPezziDaEvadere = $(this).parent().parent().attr('data-num-pezzi-evasi');
-
-						var articoloOrdiniClienti = new Object();
-						articoloOrdiniClienti.idArticolo = idArticolo;
-						articoloOrdiniClienti.numeroPezziDaEvadere = numeroPezziDaEvadere;
-						articoloOrdiniClienti.idsOrdiniClienti = idsOrdiniClienti;
-
-						articoliOrdiniClienti.push(articoloOrdiniClienti);
-					});
-
-					if(articoliOrdiniClienti.length != 0){
-
-						var articoliOrdiniClientiJson = JSON.stringify(articoliOrdiniClienti);
-
-						$.ajax({
-							url: baseUrl + "ordini-clienti/aggregate",
-							type: 'POST',
-							contentType: "application/json",
-							dataType: 'json',
-							data: articoliOrdiniClientiJson,
-							success: function(result) {
-								$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
-
-								// Returns to the same page
-								setTimeout(function() {
-									window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
-								}, 1000);
-							},
-							error: function(jqXHR, textStatus, errorThrown) {
-								$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "DDT creato con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
-							}
-						});
-
-					} else {
-						$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo').replace('@@alertResult@@', 'success'));
-
-						// Returns to the same page
-						setTimeout(function() {
-							window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
-						}, 1000);
-					}
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nella creazione del DDT';
-					if(jqXHR != null && jqXHR != undefined){
-						var jqXHRResponseJson = jqXHR.responseJSON;
-						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
-							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
-							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
-								errorMessage = jqXHRResponseJsonMessage;
-							}
-						}
-					}
-					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
-				}
-			});
-
+			$.fn.createDdt(true);
 		});
 	}
 
@@ -1130,8 +1158,8 @@ $(document).ready(function() {
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
 					currentQuantita = $(this).children().eq(4).children().eq(0).val();
 					currentPezzi = $(this).children().eq(5).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(7).children().eq(0).val();
-					currentSconto = $(this).children().eq(8).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+					currentSconto = $(this).children().eq(7).children().eq(0).val();
 					//currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 
 					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
@@ -1257,9 +1285,9 @@ $(document).ready(function() {
 		$.row = $(this).parent().parent();
 		var quantita = $.row.children().eq(4).children().eq(0).val();
 		quantita = $.fn.parseValue(quantita, 'float');
-		var prezzo = $.row.children().eq(7).children().eq(0).val();
+		var prezzo = $.row.children().eq(6).children().eq(0).val();
 		prezzo = $.fn.parseValue(prezzo, 'float');
-		var sconto = $.row.children().eq(8).children().eq(0).val();
+		var sconto = $.row.children().eq(7).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
 
 		var quantitaPerPrezzo = (quantita * prezzo);
@@ -1267,7 +1295,7 @@ $(document).ready(function() {
 		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 		//var totale = Number(Math.round(((quantita * prezzo) - sconto) + 'e2') + 'e-2');
-		$.row.children().eq(9).text(totale);
+		$.row.children().eq(8).text(totale);
 
 		$.fn.computeTotale();
 	});
@@ -1875,6 +1903,8 @@ $.fn.groupArticoloRow = function(insertedRow){
 
 	$.fn.computeTotale();
 
+	$.fn.checkPezziOrdinati();
+
 }
 
 $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
@@ -2231,6 +2261,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	}
 
 	$.fn.computeTotale();
+
+	$.fn.checkPezziOrdinati();
 
 	$('tr[data-row-index='+rowIndex+']').children().eq(1).children().eq(0).focus();
 }

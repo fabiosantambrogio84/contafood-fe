@@ -164,6 +164,7 @@ $(document).ready(function() {
 					// populate table of articoli
 					if(result.ordineClienteArticoli != null && result.ordineClienteArticoli != undefined){
 						$('#detailsOrdineClienteArticoliModalTable').DataTable({
+							"retrieve": true,
 							"data": result.ordineClienteArticoli,
 							"language": {
 								"paginate": {
