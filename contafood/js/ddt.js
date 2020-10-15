@@ -2011,16 +2011,16 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
 			],
 			"columns": [
 				{"name": "codiciOrdiniClienti", "data": "codiciOrdiniClienti", "width":"10%"},
-				{"name": "articolo", "data": null, "width":"15%", render: function ( data, type, row ) {
+				{"name": "articolo", "data": null, "width":"20%", render: function ( data, type, row ) {
 					var articolo = data.articolo;
 					var span = '<span class="ordineClienteArticolo "';
 					span += 'data-id-articolo="'+data.idArticolo+'" data-ids-ordini="'+data.idsOrdiniClienti+'"';
 					span += '>'+articolo+'</span>';
 					return span;
 				}},
-				{"name": "prezzoListinoBase", "data": "prezzoListinoBase", "width":"8%"},
-				{"name": "numeroPezziDaEvadere", "data": "numeroPezziOrdinati", "width":"5%"},
-				{"name": "numeroPezziEvasi", "data": "numeroPezziEvasi", "width":"5%"}
+				{"name": "prezzoListinoBase", "data": "prezzoListinoBase", "width":"5%"},
+				{"name": "numeroPezziDaEvadere", "data": "numeroPezziOrdinati", "width":"3%"},
+				{"name": "numeroPezziEvasi", "data": "numeroPezziEvasi", "width":"3%"}
 			],
 			"createdRow": function(row, data, dataIndex,cells){
 				$(row).css('background-color',rowBackgroundVerde).css('font-size', 'smaller');
