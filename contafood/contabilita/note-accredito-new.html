@@ -115,12 +115,48 @@
           <div class="card mt-2">
             <h6 class="card-header text-center font-weight-bold" style="background-color: #baddf5;">Aggiungi riga</h6>
             <div class="card-body" style="font-size: 0.9rem;">
+              <div class="form-row pl-2 pb-4">
+                <div class="form-group col-md-4 row">
+                  <label for="riferimento" class="mb-0">Riferimento</label>
+                  <div class="col-sm-8">
+                    <select id="riferimento" class="form-control form-control-sm ">
+                      <option value="ns. DDT" selected>ns. DDT</option>
+                      <option value="vs. DDT reso">vs. DDT reso</option>
+                      <option value="ns. fatt. accom.">ns. fatt. accom.</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group col-md-2 row">
+                  <label for="numeroDocumento" class="mb-0">N.</label>
+                  <div class="col-sm-10">
+                    <input type="text" class="form-control form-control-sm text-right" id="numeroDocumento">
+                  </div>
+                </div>
+                <div class="form-group col-md-2 row">
+                  <label for="dataDocumento" class="mb-0">del</label>
+                  <div class="col-sm-10">
+                    <input type="date" class="form-control form-control-sm text-right" id="dataDocumento">
+                  </div>
+                </div>
+              </div>
+
               <div class="form-row">
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-1">
+                  <label for="inserimento" class="mb-0">Inserimento</label>
+                  <select id="inserimento" class="form-control form-control-sm ">
+                    <option value="articolo" selected>Cod. articolo</option>
+                    <option value="manuale">Manuale</option>
+                  </select>
+                </div>
+                <div class="form-group col-md-4" id="articoloDiv">
                   <label for="articolo" class="mb-0">Articolo</label>
                   <select id="articolo" class="form-control form-control-sm " data-live-search="true" disabled>
                     <option value=""></option>
                   </select>
+                </div>
+                <div class="form-group col-md-4 d-none" id="articoloManualeDiv">
+                  <label for="articoloManuale" class="mb-0">Articolo</label>
+                  <input type="text" class="form-control form-control-sm text-right" id="articoloManuale">
                 </div>
                 <div class="form-group col-md-1">
                   <label for="udm" class="mb-0">UdM</label>
@@ -221,7 +257,7 @@
           </div>
 
           <button type="submit" class="btn btn-primary mt-4" id="newNotaAccreditoButton">Salva</button>
-          <button type="submit" class="btn btn-primary mt-4" id="newAndPrintNotaAccreditoButton" disabled>Salva e Stampa</button>
+          <button type="button" class="btn btn-primary mt-4" id="newAndPrintNotaAccreditoButton">Salva e Stampa</button>
           <a href="note-accredito.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 

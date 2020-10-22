@@ -100,7 +100,8 @@ $.fn.loadNoteAccreditoTable = function(url) {
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
-			$(row).css('font-size', '12px');
+			$(row).css('font-size', '12px').addClass('rowNotaAccredito');
+			$(row).attr('data-id-nota-accredito', data.id);
 			if(data.statoNotaAccredito != null){
 				var backgroundColor = '';
 				if(data.statoNotaAccredito.codice == 'DA_PAGARE'){
@@ -274,6 +275,10 @@ $(document).ready(function() {
 						$('#stato').text(stato.descrizione);
 					}
 					$('#note').text(result.note);
+					$('#riferimento').text(result.tipoRiferimento);
+					$('#documentoRiferimento').text(result.documentoRiferimento);
+					$('#dataDocumentoRiferimento').text(moment(result.dataDocumentoRiferimento).format('DD/MM/YYYY'));
+
 					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
 					var dataAggiornamento = result.dataAggiornamento;
 					if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
@@ -456,6 +461,134 @@ $(document).ready(function() {
 		});
 	});
 
+	$(document).on('click','.printNotaAccredito', function(){
+		var idNotaAccredito = $(this).attr('data-id');
+
+		window.open(baseUrl + "stampe/note-accredito/"+idNotaAccredito, '_blank');
+	});
+
+	$.fn.createNotaAccredito = function(print){
+
+		var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		var notaAccredito = new Object();
+		notaAccredito.progressivo = $('#progressivo').val();
+		notaAccredito.anno = $('#anno').val();
+		notaAccredito.data = $('#data').val();
+
+		var cliente = new Object();
+		cliente.id = $('#cliente option:selected').val();
+		notaAccredito.cliente = cliente;
+
+		notaAccredito.tipoRiferimento = $('#riferimento option:selected').val();
+		notaAccredito.documentoRiferimento = $('#numeroDocumento').val();
+		notaAccredito.dataDocumentoRiferimento = $('#dataDocumento').val();
+		notaAccredito.note = $('#note').val();
+
+		var notaAccreditoRigheLength = $('.rowArticolo').length;
+		if(notaAccreditoRigheLength != null && notaAccreditoRigheLength != undefined && notaAccreditoRigheLength != 0){
+			var notaAccreditoRighe = [];
+			$('.rowArticolo').each(function(i, item){
+				var articoloId = $(this).attr('data-id');
+
+				var notaAccreditoRiga = {};
+
+				var notaAccreditoRigaId = new Object();
+				notaAccreditoRiga.id = notaAccreditoRigaId;
+
+				notaAccreditoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
+				notaAccreditoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
+				notaAccreditoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
+
+				var udm = $(this).children().eq(3).children().eq(0).val();
+				if(udm != null && udm != ""){
+					var unitaMisura = new Object();
+					unitaMisura.id = udm;
+					notaAccreditoRiga.unitaMisura = unitaMisura;
+				}
+				notaAccreditoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
+				notaAccreditoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
+				notaAccreditoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
+
+				var iva = $(this).children().eq(8).children().eq(0).val();
+				if(iva != null && iva != ""){
+					var aliquotaIva = new Object();
+					aliquotaIva.id = iva;
+					notaAccreditoRiga.aliquotaIva = aliquotaIva;
+				}
+
+				if(articoloId != null && articoloId != ""){
+					var articolo = new Object();
+					articolo.id = articoloId;
+					notaAccreditoRiga.articolo = articolo;
+				}
+
+				notaAccreditoRighe.push(notaAccreditoRiga);
+			});
+			notaAccredito.notaAccreditoRighe = notaAccreditoRighe;
+		}
+
+		var notaAccreditoTotaliLength = $('.rowTotaliByIva').length;
+		if(notaAccreditoTotaliLength != null && notaAccreditoTotaliLength != undefined && notaAccreditoTotaliLength != 0){
+			var notaAccreditoTotali = [];
+			$('.rowTotaliByIva').each(function(i, item){
+				var aliquotaIvaId = $(this).attr('data-id');
+
+				var notaAccreditoTotale = {};
+				var notaAccreditoTotaleId = new Object();
+				notaAccreditoTotaleId.aliquotaIvaId = aliquotaIvaId;
+				notaAccreditoTotale.id = notaAccreditoTotaleId;
+
+				notaAccreditoTotale.totaleIva = $(this).find('td').eq(1).text();
+				notaAccreditoTotale.totaleImponibile = $(this).find('td').eq(2).text();
+
+				notaAccreditoTotali.push(notaAccreditoTotale);
+			});
+			notaAccredito.notaAccreditoTotali = notaAccreditoTotali;
+		}
+
+		var notaAccreditoJson = JSON.stringify(notaAccredito);
+
+		$.ajax({
+			url: baseUrl + "note-accredito",
+			type: 'POST',
+			contentType: "application/json",
+			dataType: 'json',
+			data: notaAccreditoJson,
+			success: function(result) {
+				$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@','Nota Accredito creata con successo').replace('@@alertResult@@', 'success'));
+
+				$('#newNotaAccreditoButton').attr("disabled", true);
+				$('#newAndPrintNotaAccreditoButton').attr("disabled", true);
+
+				// Returns to the page with the list of Nota Accredito
+				setTimeout(function() {
+					window.location.href = "note-accredito.html";
+				}, 1000);
+
+				if(print){
+					window.open(baseUrl + "stampe/note-accredito/"+result.id, '_blank');
+				}
+
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var errorMessage = 'Errore nella creazione della Nota Accredito';
+				if(jqXHR != null && jqXHR != undefined){
+					var jqXHRResponseJson = jqXHR.responseJSON;
+					if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+						var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+						if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+							errorMessage = jqXHRResponseJsonMessage;
+						}
+					}
+				}
+				$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+			}
+		});
+	}
+
 	if($('#searchNoteAccreditoButton') != null && $('#searchNoteAccreditoButton') != undefined) {
 		$(document).on('submit', '#searchNoteAccreditoForm', function (event) {
 			event.preventDefault();
@@ -523,116 +656,19 @@ $(document).ready(function() {
 		$(document).on('submit','#newNotaAccreditoForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$.fn.createNotaAccredito(false);
 
-			var notaAccredito = new Object();
-			notaAccredito.progressivo = $('#progressivo').val();
-			notaAccredito.anno = $('#anno').val();
-			notaAccredito.data = $('#data').val();
+		});
+	}
 
-			var cliente = new Object();
-			cliente.id = $('#cliente option:selected').val();
-			notaAccredito.cliente = cliente;
+	if($('#newAndPrintNotaAccreditoButton') != null && $('#newAndPrintNotaAccreditoButton') != undefined && $('#newAndPrintNotaAccreditoButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#cliente').selectpicker();
 
-			notaAccredito.note = $('#note').val();
+		$(document).on('click','#newAndPrintNotaAccreditoButton', function(event){
+			event.preventDefault();
 
-			var notaAccreditoRigheLength = $('.rowArticolo').length;
-			if(notaAccreditoRigheLength != null && notaAccreditoRigheLength != undefined && notaAccreditoRigheLength != 0){
-				var notaAccreditoRighe = [];
-				$('.rowArticolo').each(function(i, item){
-					var articoloId = $(this).attr('data-id');
-
-					var notaAccreditoRiga = {};
-
-					var notaAccreditoRigaId = new Object();
-					notaAccreditoRiga.id = notaAccreditoRigaId;
-
-					notaAccreditoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
-					notaAccreditoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
-					notaAccreditoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
-
-					var udm = $(this).children().eq(3).children().eq(0).val();
-					if(udm != null && udm != ""){
-						var unitaMisura = new Object();
-						unitaMisura.id = udm;
-						notaAccreditoRiga.unitaMisura = unitaMisura;
-					}
-					notaAccreditoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
-					notaAccreditoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
-					notaAccreditoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
-
-					var iva = $(this).children().eq(8).children().eq(0).val();
-					if(iva != null && iva != ""){
-						var aliquotaIva = new Object();
-						aliquotaIva.id = iva;
-						notaAccreditoRiga.aliquotaIva = aliquotaIva;
-					}
-
-					if(articoloId != null && articoloId != ""){
-						var articolo = new Object();
-						articolo.id = articoloId;
-						notaAccreditoRiga.articolo = articolo;
-					}
-
-					notaAccreditoRighe.push(notaAccreditoRiga);
-				});
-				notaAccredito.notaAccreditoRighe = notaAccreditoRighe;
-			}
-
-			var notaAccreditoTotaliLength = $('.rowTotaliByIva').length;
-			if(notaAccreditoTotaliLength != null && notaAccreditoTotaliLength != undefined && notaAccreditoTotaliLength != 0){
-				var notaAccreditoTotali = [];
-				$('.rowTotaliByIva').each(function(i, item){
-					var aliquotaIvaId = $(this).attr('data-id');
-
-					var notaAccreditoTotale = {};
-					var notaAccreditoTotaleId = new Object();
-					notaAccreditoTotaleId.aliquotaIvaId = aliquotaIvaId;
-					notaAccreditoTotale.id = notaAccreditoTotaleId;
-
-					notaAccreditoTotale.totaleIva = $(this).find('td').eq(1).text();
-					notaAccreditoTotale.totaleImponibile = $(this).find('td').eq(2).text();
-
-					notaAccreditoTotali.push(notaAccreditoTotale);
-				});
-				notaAccredito.notaAccreditoTotali = notaAccreditoTotali;
-			}
-
-			var notaAccreditoJson = JSON.stringify(notaAccredito);
-
-			$.ajax({
-				url: baseUrl + "note-accredito",
-				type: 'POST',
-				contentType: "application/json",
-				dataType: 'json',
-				data: notaAccreditoJson,
-				success: function(result) {
-					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@','Nota Accredito creata con successo').replace('@@alertResult@@', 'success'));
-
-					$('#newNotaAccreditoButton').attr("disabled", true);
-
-					// Returns to the page with the list of Nota Accredito
-					setTimeout(function() {
-						window.location.href = "note-accredito.html";
-					}, 1000);
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nella creazione della Nota Accredito';
-					if(jqXHR != null && jqXHR != undefined){
-						var jqXHRResponseJson = jqXHR.responseJSON;
-						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
-							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
-							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
-								errorMessage = jqXHRResponseJsonMessage;
-							}
-						}
-					}
-					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
-				}
-			});
-
+			$.fn.createNotaAccredito(true);
 		});
 	}
 
@@ -658,6 +694,9 @@ $(document).ready(function() {
 			cliente.id = $('#cliente option:selected').val();
 			notaAccredito.cliente = cliente;
 
+			notaAccredito.tipoRiferimento = $('#riferimento option:selected').val();
+			notaAccredito.documentoRiferimento = $('#numeroDocumento').val();
+			notaAccredito.dataDocumentoRiferimento = $('#dataDocumento').val();
 			notaAccredito.note = $('#note').val();
 
 			var notaAccreditoRigheLength = $('.rowArticolo').length;
@@ -756,6 +795,17 @@ $(document).ready(function() {
 			});
 		});
 	}
+
+	$(document).on('change','#inserimento', function(){
+		var inserimento = $(this).val();
+		if(inserimento == 'manuale'){
+			$('#articoloDiv').addClass("d-none");
+			$('#articoloManualeDiv').removeClass("d-none");
+		} else {
+			$('#articoloDiv').removeClass("d-none");
+			$('#articoloManualeDiv').addClass("d-none");
+		}
+	});
 
 	$(document).on('change','#cliente', function(){
 		$('#articolo option[value=""]').prop('selected', true);
@@ -897,7 +947,13 @@ $(document).ready(function() {
 
 		$('#addNotaAccreditoArticoloAlert').empty();
 
-		var articolo = $('#articolo option:selected').text();
+		var inserimento = $('#inserimento option:selected').val();
+		var articolo = '';
+		if(inserimento == 'manuale'){
+			articolo = $('#articoloManuale').val();
+		} else {
+			articolo = $('#articolo option:selected').text();
+		}
 		var udm = $('#udm').val();
 		var lotto = $('#lotto').val();
 		var scadenza = $('#scadenza').val();
@@ -985,6 +1041,7 @@ $(document).ready(function() {
 		$.fn.computeTotale();
 
 		$('#articolo option[value=""]').prop('selected',true);
+		$('#articoloManuale').val('')
 		$('#udm').val('');
 		$('#iva').val('');
 		$('#lotto').val('');
@@ -1290,6 +1347,10 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 
 					$('#log').append('Preseleziona cliente\n');
 				}
+
+				$('#tipoRiferimento option[value="' + result.tipoRiferimento +'"]').attr('selected', true);
+				$('#numeroDocumento').val(result.documentoRiferimento);
+				$('#dataDocumento').val(result.dataDocumentoRiferimento);
 				$('#note').val(result.note);
 
 				if(result.notaAccreditoRighe != null && result.notaAccreditoRighe != undefined && result.notaAccreditoRighe.length != 0){

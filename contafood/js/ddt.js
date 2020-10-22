@@ -145,7 +145,8 @@ $.fn.loadDdtTable = function(url) {
 					}}
 				],
 				"createdRow": function(row, data, dataIndex,cells){
-					$(row).css('font-size', '12px');
+					$(row).css('font-size', '12px').addClass('rowDdt');
+					$(row).attr('data-id-ddt', data.id);
 					if(data.statoDdt != null){
 						var backgroundColor = '';
 						if(data.statoDdt.codice == 'DA_PAGARE'){
@@ -454,6 +455,20 @@ $(document).ready(function() {
 		window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
 	});
 
+	$(document).on('click','#printDdts', function(event){
+		event.preventDefault();
+
+		var ids = "";
+
+		$(".rowDdt").each(function(i, item){
+			var id = $(this).attr('data-id-ddt');
+			ids += id+",";
+		});
+
+		window.open(baseUrl + "stampe/ddts?ids="+ids, '_blank');
+
+	});
+
 	if($('#searchDdtButton') != null && $('#searchDdtButton') != undefined) {
 		$(document).on('submit', '#searchDdtForm', function (event) {
 			event.preventDefault();
@@ -623,6 +638,7 @@ $(document).ready(function() {
 			success: function(result) {
 
 				$('#newDdtButton').attr("disabled", true);
+				$('#newAndPrintDdtButton').attr("disabled", true);
 
 				// Update ordini clienti
 				var articoliOrdiniClienti = [];
@@ -658,7 +674,7 @@ $(document).ready(function() {
 							}, 1000);
 
 							if(print){
-								window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
+								window.open(baseUrl + "stampe/ddts/"+result.id, '_blank');
 							}
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
@@ -707,7 +723,7 @@ $(document).ready(function() {
 		$('#articolo').selectpicker();
 		$('#cliente').selectpicker();
 
-		$(document).on('submit','#newAndPrintDdtButton', function(event){
+		$(document).on('click','#newAndPrintDdtButton', function(event){
 			event.preventDefault();
 
 			$.fn.createDdt(true);
@@ -1109,12 +1125,24 @@ $(document).ready(function() {
 			$('#addDdtArticoloAlert').empty();
 		}
 
+		var pezzi = $('#pezzi').val();
+		if(pezzi == null || pezzi == undefined || pezzi == ''){
+			var alertContent = '<div class="alert alert-danger alert-dismissable">\n' +
+				'                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>\n' +
+				'                Inserisci il numero di pezzi\n' +
+				'              </div>';
+
+			$('#addDdtArticoloAlert').empty().append(alertContent);
+			return;
+		} else {
+			$('#addDdtArticoloAlert').empty();
+		}
+
 		var articolo = $('#articolo option:selected').text();
 		var udm = $('#udm').val();
 		var lotto = $('#lotto').val();
 		var scadenza = $('#scadenza').val();
 		var quantita = $('#quantita').val();
-		var pezzi = $('#pezzi').val();
 		var prezzo = $('#prezzo').val();
 		var sconto = $('#sconto').val();
 		var iva = $('#iva').val();
@@ -1156,8 +1184,6 @@ $(document).ready(function() {
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentQuantita = $(this).children().eq(4).children().eq(0).val();
-					currentPezzi = $(this).children().eq(5).children().eq(0).val();
 					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
 					currentSconto = $(this).children().eq(7).children().eq(0).val();
 					//currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
@@ -1168,6 +1194,8 @@ $(document).ready(function() {
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 						found = 1;
+						currentQuantita = $(this).children().eq(4).children().eq(0).val();
+						currentPezzi = $(this).children().eq(5).children().eq(0).val();
 					}
 
 				}
@@ -1863,8 +1891,6 @@ $.fn.groupArticoloRow = function(insertedRow){
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentQuantita = $(this).children().eq(4).children().eq(0).val();
-					currentPezzi = $(this).children().eq(5).children().eq(0).val();
 					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
 					currentSconto = $(this).children().eq(7).children().eq(0).val();
 					//currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
@@ -1875,6 +1901,8 @@ $.fn.groupArticoloRow = function(insertedRow){
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 						found = 1;
+						currentQuantita = $(this).children().eq(4).children().eq(0).val();
+						currentPezzi = $(this).children().eq(5).children().eq(0).val();
 					}
 
 				}
@@ -2218,8 +2246,6 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 				currentIdArticolo = $(this).attr('data-id');
 				currentLotto = $(this).children().eq(1).children().eq(0).val();
 				currentScadenza = $(this).children().eq(2).children().eq(0).val();
-				currentQuantita = $(this).children().eq(4).children().eq(0).val();
-				currentPezzi = $(this).children().eq(5).children().eq(0).val();
 				//currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
 				currentPrezzo = $(this).children().eq(6).children().eq(0).val();
 				currentSconto = $(this).children().eq(7).children().eq(0).val();
@@ -2230,6 +2256,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 					found = 1;
+					currentQuantita = $(this).children().eq(4).children().eq(0).val();
+					currentPezzi = $(this).children().eq(5).children().eq(0).val();
 				}
 			}
 		});
