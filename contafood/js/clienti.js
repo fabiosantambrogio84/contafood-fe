@@ -1,11 +1,10 @@
 
 var baseUrl = "/contafood-be/";
 
-$(document).ready(function() {
-
+$.fn.loadClientiTable = function(url) {
 	$('#clientiTable').DataTable({
 		"ajax": {
-			"url": baseUrl + "clienti",
+			"url": url,
 			"type": "GET",
 			"content-type": "json",
 			"cache": false,
@@ -38,24 +37,45 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "codice", "data": "codice"},
-			{"name": "ragioneSociale", "data": "ragioneSociale"},
+			{"name": "ragioneSocialeNomeCognome", "data": null, render: function ( data, type, row ) {
+					if(data.privato){
+						return data.nome+' '+data.cognome;
+					} else {
+						return data.ragioneSociale;
+					}
+				}},
 			{"name": "indirizzo", "data": "indirizzo"},
 			{"name": "citta", "data": "citta"},
 			{"name": "provincia", "data": "provincia"},
 			{"data": null, "orderable":false, "width":"12%", render: function ( data, type, row ) {
-				var links = '<a class="detailsCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-				links = links + '<a class="updateCliente pr-2" data-id="'+data.id+'" href="clienti-edit.html?idCliente=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
-				links = links + '<a class="manageClientePuntiConsegna pr-2" data-id="'+data.id+'" href="cliente-punti-consegna.html?idCliente=' + data.id + '"><i class="fas fa-truck-moving" title="Punti di consegna"></i></a>';
-				//links = links + '<a class="manageClienteListini pr-2" data-id="'+data.id+'" href="cliente-listini-associati.html?idCliente=' + data.id + '"><i class="fas fa-list-ul" title="Listini"></i></a>';
-				links = links + '<a class="deleteCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
-				return links;
-			}}
+					var links = '<a class="detailsCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+					links = links + '<a class="updateCliente pr-2" data-id="'+data.id+'" href="clienti-edit.html?idCliente=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
+					links = links + '<a class="manageClientePuntiConsegna pr-2" data-id="'+data.id+'" href="cliente-punti-consegna.html?idCliente=' + data.id + '"><i class="fas fa-truck-moving" title="Punti di consegna"></i></a>';
+					//links = links + '<a class="manageClienteListini pr-2" data-id="'+data.id+'" href="cliente-listini-associati.html?idCliente=' + data.id + '"><i class="fas fa-list-ul" title="Listini"></i></a>';
+					links = links + '<a class="deleteCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
+					return links;
+				}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			if(data.bloccaDdt){
 				$(row).css('background-color', '#d2d4d2');
 			}
+			if(data.privato){
+				$(row).css('background-color', '#d4e6fa');
+			}
 		}
+	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadClientiTable(baseUrl + "clienti");
+
+	$(document).on('click','#resetSearchClientiButton', function(){
+		$('#searchClientiForm select option[value=""]').attr('selected', true);
+
+		$('#clientiTable').DataTable().destroy();
+		$.fn.loadClientiTable(baseUrl + "clienti");
 	});
 
 	$(document).on('click','.detailsCliente', function(){
@@ -183,6 +203,87 @@ $(document).ready(function() {
 		});
 	}
 
+	if($('#privato') != null && $('#privato') != undefined){
+		$(document).on('change','#privato', function(){
+			var isChecked = $('#privato').prop('checked');
+			if(isChecked){
+				$('#ragioneSociale').val(null).attr('disabled', true);
+				$('#ragioneSociale2').val(null).attr('disabled', true);
+				$('#dittaIndividuale').prop('checked', false).attr('disabled', true);
+				$('#nome').val(null).attr('disabled', false);
+				$('#cognome').val(null).attr('disabled', false);
+				$('#indirizzo').val(null).attr('disabled', false);
+				$('#citta').val(null).attr('disabled', false);
+				$('#provincia').attr('disabled', false);
+				$('#cap').val(null).attr('disabled', false);
+				$('#partitaIva').val(null).attr('disabled', true);
+				$('#codiceFiscale').val(null).attr('disabled', false);
+				$('#listinoApplicato').attr('disabled', false);
+				$('#email').val(null).attr('disabled', false);
+				$('#emailPec').val(null).attr('disabled', true);
+				$('#telefono').val(null).attr('disabled', false);
+				$('#banca').val(null).attr('disabled', false);
+				$('#contoCorrente').val(null).attr('disabled', false);
+				$('#tipoPagamento').attr('disabled', false);
+				$('#agente').val(null).attr('disabled', true);
+				$('#estrazioneConad').val(null).attr('disabled', true);
+				$('#bloccaDdt').prop('checked', false).attr('disabled', false);
+				$('#nascondiPrezzi').prop('checked', false).attr('disabled', false);
+				$('#raggruppaRiba').prop('checked', false).attr('disabled', true);
+				$('#nomeGruppoRiba').val(null).attr('disabled', true);
+				$('#codiceUnivocoSdi').val(null).attr('disabled', false);
+				$('#note').val(null).attr('disabled', false);
+
+			} else{
+				$('#ragioneSociale').val(null).attr('disabled', false);
+				$('#ragioneSociale2').val(null).attr('disabled', false);
+				$('#dittaIndividuale').prop('checked', false).attr('disabled', false);
+				$('#nome').val(null).attr('disabled', true);
+				$('#cognome').val(null).attr('disabled', true);
+				$('#indirizzo').val(null).attr('disabled', false);
+				$('#citta').val(null).attr('disabled', false);
+				$('#provincia').attr('disabled', false);
+				$('#cap').val(null).attr('disabled', false);
+				$('#partitaIva').val(null).attr('disabled', false);
+				$('#codiceFiscale').val(null).attr('disabled', false);
+				$('#listinoApplicato').attr('disabled', false);
+				$('#email').val(null).attr('disabled', false);
+				$('#emailPec').val(null).attr('disabled', false);
+				$('#telefono').val(null).attr('disabled', false);
+				$('#banca').val(null).attr('disabled', false);
+				$('#contoCorrente').val(null).attr('disabled', false);
+				$('#tipoPagamento').attr('disabled', false);
+				$('#agente').val(null).attr('disabled', false);
+				$('#estrazioneConad').val(null).attr('disabled', false);
+				$('#bloccaDdt').prop('checked', false).attr('disabled', false);
+				$('#nascondiPrezzi').prop('checked', false).attr('disabled', false);
+				$('#raggruppaRiba').prop('checked', false).attr('disabled', false);
+				$('#nomeGruppoRiba').val(null).attr('disabled', false);
+				$('#codiceUnivocoSdi').val(null).attr('disabled', false);
+				$('#note').val(null).attr('disabled', false);
+			}
+		});
+	}
+
+	if($('#searchClienteButton') != null && $('#searchClienteButton') != undefined) {
+		$(document).on('submit', '#searchClienteForm', function (event) {
+			event.preventDefault();
+
+			var privato = $('#searchPrivato option:selected').val();
+
+			var params = {};
+
+			if(privato != null && privato != undefined && privato != ''){
+				params.privato = privato;
+			}
+			var url = baseUrl + "clienti?" + $.param( params );
+
+			$('#clientiTable').DataTable().destroy();
+			$.fn.loadClientiTable(url);
+
+		});
+	}
+
 	if($('#updateClienteButton') != null && $('#updateClienteButton') != undefined){
 		$(document).on('submit','#updateClienteForm', function(event){
 			event.preventDefault();
@@ -190,6 +291,11 @@ $(document).ready(function() {
 			var cliente = new Object();
 			cliente.id = $('#hiddenIdCliente').val();
 			cliente.codice = $('#codice').val();
+			if($('#privato').prop('checked') === true){
+				cliente.privato = true;
+			}else{
+				cliente.privato = false;
+			}
 			cliente.ragioneSociale = $('#ragioneSociale').val();
 			cliente.ragioneSociale2 = $('#ragioneSociale2').val();
 			if($('#dittaIndividuale').prop('checked') === true){
@@ -208,7 +314,7 @@ $(document).ready(function() {
 			cliente.email = $('#email').val();
 			cliente.emailPec = $('#emailPec').val();
 			cliente.telefono = $('#telefono').val();
-			if($('#banca option:selected').val() != -1){
+			if($('#banca option:selected').val() && $('#banca option:selected').val() != -1){
 			    var banca = new Object();
                 banca.id = $('#banca option:selected').val();
                 cliente.banca = banca;
@@ -217,12 +323,12 @@ $(document).ready(function() {
 			var tipoPagamento = new Object();
 			tipoPagamento.id = $('#tipoPagamento option:selected').val();
 			cliente.tipoPagamento = tipoPagamento;
-			if($('#agente option:selected').val() != -1){
+			if($('#agente option:selected').val() && $('#agente option:selected').val() != -1){
 			    var agente = new Object();
                 agente.id = $('#agente option:selected').val();
                 cliente.agente = agente;
 			}
-			if($('#listinoApplicato option:selected').val() != -1){
+			if($('#listinoApplicato option:selected').val() && $('#listinoApplicato option:selected').val() != -1){
 				var listino = new Object();
 				listino.id = $('#listinoApplicato option:selected').val();
 				cliente.listino = listino;
@@ -278,6 +384,11 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var cliente = new Object();
+			if($('#privato').prop('checked') === true){
+				cliente.privato = true;
+			}else{
+				cliente.privato = false;
+			}
 			cliente.ragioneSociale = $('#ragioneSociale').val();
 			cliente.ragioneSociale2 = $('#ragioneSociale2').val();
 			if($('#dittaIndividuale').prop('checked') === true){
@@ -296,7 +407,7 @@ $(document).ready(function() {
 			cliente.email = $('#email').val();
 			cliente.emailPec = $('#emailPec').val();
 			cliente.telefono = $('#telefono').val();
-			if($('#banca option:selected').val() != -1){
+			if($('#banca option:selected').val() != undefined && $('#banca option:selected').val() != -1){
                 var banca = new Object();
                 banca.id = $('#banca option:selected').val();
                 cliente.banca = banca;
@@ -305,12 +416,12 @@ $(document).ready(function() {
 			var tipoPagamento = new Object();
 			tipoPagamento.id = $('#tipoPagamento option:selected').val();
 			cliente.tipoPagamento = tipoPagamento;
-			if($('#agente option:selected').val() != -1){
+			if($('#agente option:selected').val() && $('#agente option:selected').val() != -1){
                 var agente = new Object();
                 agente.id = $('#agente option:selected').val();
                 cliente.agente = agente;
             }
-			if($('#listinoApplicato option:selected').val() != -1){
+			if($('#listinoApplicato option:selected').val() && $('#listinoApplicato option:selected').val() != -1){
 				var listino = new Object();
 				listino.id = $('#listinoApplicato option:selected').val();
 				cliente.listino = listino;
@@ -542,6 +653,36 @@ $.fn.getCliente = function(idCliente){
 			$('#nomeGruppoRiba').attr('value', result.nomeGruppoRiba);
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#note').val(result.note);
+
+			if(result.privato === true){
+				$('#privato').prop('checked', true);
+				$('#ragioneSociale').attr('disabled', true);
+				$('#ragioneSociale2').attr('disabled', true);
+				$('#dittaIndividuale').prop('checked', false).attr('disabled', true);
+				$('#nome').attr('disabled', false);
+				$('#cognome').attr('disabled', false);
+				$('#indirizzo').attr('disabled', false);
+				$('#citta').attr('disabled', false);
+				$('#provincia').attr('disabled', false);
+				$('#cap').attr('disabled', false);
+				$('#partitaIva').attr('disabled', true);
+				$('#codiceFiscale').attr('disabled', false);
+				$('#listinoApplicato').attr('disabled', false);
+				$('#email').attr('disabled', false);
+				$('#emailPec').attr('disabled', true);
+				$('#telefono').attr('disabled', false);
+				$('#banca').attr('disabled', false);
+				$('#contoCorrente').attr('disabled', false);
+				$('#tipoPagamento').attr('disabled', false);
+				$('#agente').attr('disabled', true);
+				$('#estrazioneConad').attr('disabled', true);
+				$('#bloccaDdt').prop('checked', false).attr('disabled', false);
+				$('#nascondiPrezzi').prop('checked', false).attr('disabled', false);
+				$('#raggruppaRiba').prop('checked', false).attr('disabled', true);
+				$('#nomeGruppoRiba').attr('disabled', true);
+				$('#codiceUnivocoSdi').attr('disabled', false);
+				$('#note').attr('disabled', false);
+			}
 
           } else{
             $('#alertCliente').empty().append(alertContent);

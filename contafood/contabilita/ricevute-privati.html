@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Note accredito</title>
+  <title>ContaFood - Ricevute Privati</title>
 
   <link rel="icon" href="../img/favicon.png" type="image/png" />
 
@@ -33,7 +33,9 @@
   <script src="../js/commons.js"></script>
   <script src="../js/core/moment.js"></script>
 
-  <script src="../js/note-accredito.js"></script>
+  <script src="../js/ricevute-privati.js"></script>
+
+  <script src="../js/barcode-scanner/onscan.js"></script>
 
   <script>
     $.fn.preloadSearchFields();
@@ -46,7 +48,7 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="contabilita"></ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion toggled" id="accordionSidebar" data-page-type="contabilita"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -60,25 +62,25 @@
         <!-- End of Topbar -->
 
         <!-- Begin Page Content -->
-        <div class="container-fluid" id="containernoteAccredito">
+        <div class="container-fluid" id="containerRicevutePrivati">
 
           <!-- Page Heading -->
           <div class="row">
-            <div class="col-md-6">
-              <h1 class="h3 mb-4 text-gray-800">Elenco Note Accredito</h1>
+            <div class="col-md-10">
+              <h1 class="h3 mb-4 text-gray-800">Elenco Ricevute Privati</h1>
             </div>
-            <div class="col-md-6 text-right">
-              <a href="note-accredito-new.html" class="btn btn-primary mr-2">Nuova</a>
-              <a href="" class="btn btn-primary" id="printNoteAccredito">Stampa</a>
+            <div class="col-md-2">
+              <a href="ricevute-privati-new.html" class="btn btn-primary">Nuovo</a>
+              <a href="" class="btn btn-primary" id="printRicevutePrivati">Stampa</a>
             </div>
           </div>
 
-          <div id="alertNoteAccredito"></div>
+          <div id="alertRicevutaPrivato"></div>
 
           <!-- DataTales Example -->
-          <div class="card shadow mb-4" id="noteAccreditoMainDiv">
+          <div class="card shadow mb-4" id="ricevutePrivatiMainDiv">
             <div class="card-body">
-              <form id="searchNoteAccreditoForm">
+              <form id="searchRicevutePrivatiForm">
                 <div class="form-row">
                   <div class="form-group col-md-2">
                     <label for="searchDataFrom" class="mb-0">Data da</label>
@@ -93,13 +95,14 @@
                     <input type="text" class="form-control form-control-sm" id="searchCliente">
                   </div>
                   <div class="form-group col-md-2">
-                    <label for="searchProgressivo" class="mb-0">Numero</label>
+                    <label for="searchProgressivo" class="mb-0">Progressivo</label>
                     <input type="number" class="form-control form-control-sm" id="searchProgressivo" step="1" min="0">
                   </div>
                   <div class="form-group col-md-2">
                     <label for="searchImporto" class="mb-0">Importo</label>
                     <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
                   </div>
+
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-2">
@@ -109,30 +112,53 @@
                     </select>
                   </div>
                   <div class="form-group col-md-2">
+                    <label for="searchTipoPagamento" class="mb-0">Tipo pagamento</label>
+                    <select id="searchTipoPagamento" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-2">
                     <label for="searchAgente" class="mb-0">Agente</label>
                     <select id="searchAgente" class="form-control form-control-sm" >
                       <option value=""></option>
                     </select>
                   </div>
+                  <div class="form-group col-md-2">
+                    <label for="searchAutista" class="mb-0">Autista</label>
+                    <select id="searchAutista" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <label for="searchArticolo" class="mb-0">Articolo</label>
+                    <select id="searchArticolo" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-0" id="searchNoteAccreditoButton">Cerca</button>
-                <a href="#" id="resetSearchNoteAccreditoButton" class="btn btn-secondary mt-0">Svuota</a>
+                <button type="submit" class="btn btn-primary mt-0" id="searchRicevutePrivatiButton">Cerca</button>
+                <a href="#" id="resetSearchRicevutePrivatiButton" class="btn btn-secondary mt-0">Svuota</a>
               </form>
             </div>
 
             <div class="card-body" style="font-size: 0.9rem;">
               <div class="table-responsive">
-                <table class="table table-bordered" id="noteAccreditoTable" width="100%" cellspacing="0" style="color: #080707 !important;">
+                <table class="table table-bordered" id="ricevutePrivatiTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                   <thead>
-        		    <tr>
-                      <th>Spedito A.d.E.</th>
+        		    <tr style="font-size:12px;">
                       <th>Num.</th>
                       <th>Data</th>
+                      <th>Fatt.</th>
                       <th>Cliente</th>
                       <th>Agente</th>
+                      <th>Autista</th>
                       <th>Acconto</th>
                       <th>Importo</th>
+                      <th>Imponibile</th>
+                      <th>Costo</th>
+                      <th>Guadagno</th>
                       <th></th>
                     </tr>
 
@@ -143,37 +169,54 @@
           </div>
 
           <!-- Modal Confirm Delete-->
-          <div class="modal fade" id="deleteNoteAccreditoModal" tabindex="-1" role="dialog" aria-labelledby="deleteNoteAccreditoModal" aria-hidden="true">
+          <div class="modal fade" id="deleteRicevutaPrivatoModal" tabindex="-1" role="dialog" aria-labelledby="deleteRicevutaPrivatoModal" aria-hidden="true">
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="deleteNoteAccreditoModalTitle">Conferma rimozione nota accredito</h5>
+                  <h5 class="modal-title" id="deleteRicevutaPrivatoModalTitle">Conferma rimozione Ricevuta Privato</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
                 <div class="modal-body">
-                  Sei sicuro di voler rimuovere la nota accredito?
+                  <div>
+                    <h6>Sei sicuro di voler rimuovere la Ricevuta Privato?</h6>
+                  </div>
+                  <div class="mt-4">
+                    <h6>Vuoi modificare le giacenze?</h6>
+                    <div class="form-row">
+                      <div class="form-group" style="margin-left: 0.5rem;">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="modificaGiacenze" id="modificaGiacenzeSi" value="si" checked>
+                          <label class="form-check-label" for="modificaGiacenzeSi">Si</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" name="modificaGiacenze" id="modificaGiacenzeNo" value="no">
+                          <label class="form-check-label" for="modificaGiacenzeNo">No</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                  <button type="button" class="btn btn-primary" id="confirmDeleteNoteAccredito">Conferma</button>
+                  <button type="button" class="btn btn-primary" id="confirmDeleteRicevutaPrivato">Conferma</button>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Modal Details-->
-          <div class="modal fade" id="detailsNoteAccreditoModal" tabindex="-1" role="dialog" aria-labelledby="detailsNoteAccreditoModal" aria-hidden="true">
+          <div class="modal fade" id="detailsRicevutaPrivatoModal" tabindex="-1" role="dialog" aria-labelledby="detailsRicevutaPrivatoModal" aria-hidden="true">
             <div class="modal-dialog modal-xl" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="detailsNoteAccreditoModalTitle">Dettagli nota accredito</h5>
-                  <button type="button" class="close closeNoteAccredito" data-dismiss="modal" aria-label="Close">
+                  <h5 class="modal-title" id="detailsRicevutaPrivatoModalTitle">Dettagli Ricevuta Privato</h5>
+                  <button type="button" class="close closeRicevutaPrivato" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
                 </div>
-                <div class="modal-body" id="detailsNoteAccreditoMainDiv">
+                <div class="modal-body" id="detailsRicevutaPrivatoMainDiv">
                   <div class="container">
                     <div class="row">
                       <div class="col-sm">
@@ -208,38 +251,11 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Cliente</h6>
-                            <p class="card-text" id="cliente"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Agente</h6>
-                            <p class="card-text" id="agente"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
-                            <p class="card-text" id="totale"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
-                            <p class="card-text" id="totaleAcconto"></p>
+                            <h6 class="card-title mb-0 font-weight-bold">Fatturato</h6>
+                            <p class="card-text" id="fatturato"></p>
                           </div>
                         </div>
                       </div>
@@ -257,11 +273,104 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Spedito A.d.E</h6>
-                            <p class="card-text" id="speditoAde"></p>
+                            <h6 class="card-title mb-0 font-weight-bold">Cliente</h6>
+                            <p class="card-text" id="cliente"></p>
                           </div>
                         </div>
                       </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Punto consegna</h6>
+                            <p class="card-text" id="puntoConsegna"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Autista</h6>
+                            <p class="card-text" id="autista"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Agente</h6>
+                            <p class="card-text" id="agente"></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tipo trasporto</h6>
+                            <p class="card-text" id="tipoTrasporto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data trasporto</h6>
+                            <p class="card-text" id="dataTrasporto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Ora trasporto</h6>
+                            <p class="card-text" id="oraTrasporto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Trasportatore</h6>
+                            <p class="card-text" id="trasportatore"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Num. colli</h6>
+                            <p class="card-text" id="colli"></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
+                            <p class="card-text" id="totaleAcconto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
+                            <p class="card-text" id="totale"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
+                    </div>
+
+                    <div class="row">
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -271,51 +380,26 @@
                         </div>
                       </div>
                       <div class="col-sm">&nbsp;</div>
-                    </div>
-
-                    <div class="row">
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Riferimento</h6>
-                            <p class="card-text" id="riferimento"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Numero documento</h6>
-                            <p class="card-text" id="documentoRiferimento"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Data documento</h6>
-                            <p class="card-text" id="dataDocumentoRiferimento"></p>
-                          </div>
-                        </div>
-                      </div>
+                      <div class="col-sm">&nbsp;</div>
+                      <div class="col-sm">&nbsp;</div>
                       <div class="col-sm">&nbsp;</div>
                     </div>
-
                   </div>
 
                   <hr class="my-4">
 
-                  <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsNoteAccreditoRigheModalTable">
+                  <div class="table-responsive mt-4" style="font-size: 14px;">
+                    <table class="table table-bordered" id="detailsRicevutaPrivatoArticoliModalTable">
                       <thead>
-                      <th>Descrizione</th>
-                      <th>Lotto</th>
-                      <th>UdM</th>
-                      <th>Quantita</th>
-                      <th>Prezzo (€)</th>
-                      <th>Sconto (€)</th>
-                      <th>Imponibile (€)</th>
-                      <th>Iva (%)</th>
+                        <th>Articolo</th>
+                        <th>Lotto</th>
+                        <th>Scadenza</th>
+                        <th>Quantita</th>
+                        <th>Pezzi</th>
+                        <th>Prezzo (€)</th>
+                        <th>Sconto (€)</th>
+                        <th>Imponibile (€)</th>
+                        <th>Costo (€)</th>
                       </thead>
                     </table>
                   </div>
@@ -323,7 +407,7 @@
                   <hr class="my-4">
 
                   <div class="table-responsive mt-4">
-                    <table class="table table-bordered" id="detailsNoteAccreditoTotaliModalTable">
+                    <table class="table table-bordered" id="detailsRicevutaPrivatoTotaliModalTable">
                       <thead>
                       <th>Iva</th>
                       <th>Totale Iva (€)</th>
@@ -335,11 +419,12 @@
                   <hr class="my-4">
 
                   <div class="table-responsive mt-4" style="font-size: 14px;">
-                    <table class="table table-bordered" id="detailsNoteAccreditoPagamentiModalTable">
+                    <table class="table table-bordered" id="detailsRicevutaPrivatoPagamentiModalTable">
                       <thead>
                       <th>Data</th>
                       <th>Descrizione</th>
                       <th>Importo (€)</th>
+                      <th>Pagamento</th>
                       <th>Note</th>
                       </thead>
                     </table>

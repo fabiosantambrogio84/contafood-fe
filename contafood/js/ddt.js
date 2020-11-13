@@ -637,6 +637,8 @@ $(document).ready(function() {
 			data: ddtJson,
 			success: function(result) {
 
+				var idDdt = result.id;
+
 				$('#newDdtButton').attr("disabled", true);
 				$('#newAndPrintDdtButton').attr("disabled", true);
 
@@ -668,14 +670,61 @@ $(document).ready(function() {
 						success: function(result) {
 							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
 
+							if(print){
+
+								w = window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
+								w.focus();
+								w.print();
+
+								/*
+								fetch(baseUrl + "stampe/ddts/"+idDdt)
+									.then(function(response) {
+										return response.blob();
+									}).then(function(pdfBlob) {
+										var objectURL = URL.createObjectURL(pdfBlob);
+										document.querySelector('#pdf-frame').src = '';
+										document.querySelector('#pdf-frame').src = objectURL;
+										objectURL = URL.revokeObjectURL(pdfBlob);
+									}).then(function() {
+										window.setTimeout(function() {
+											document.querySelector('#pdf-frame').contentWindow.print();
+										}, 1000)
+									}).catch((error) => {
+										console.error('Error:', error);
+										$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nella cancellazione del DDT').replace('@@alertResult@@', 'danger'));
+									});
+								*/
+
+								/*
+								$.ajax({
+									url: baseUrl + "stampe/ddts/"+idDdt,
+									dataType: 'arraybuffer',
+									success: function(data) {
+										var pdfFile = new Blob([data], {
+											type: "application/pdf"
+										});
+										var pdfUrl = URL.createObjectURL(pdfFile);
+										document.querySelector('#pdf-frame').src = '';
+										document.querySelector('#pdf-frame').src = pdfUrl;
+										objectURL = URL.revokeObjectURL(pdfFile);
+
+										//printJS(pdfUrl);
+									},
+									error: function(jqXHR, textStatus, errorThrown){
+										$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nella cancellazione del DDT').replace('@@alertResult@@', 'danger'));
+									}
+								});
+								*/
+
+								//window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
+							}
+
 							// Returns to the same page
 							setTimeout(function() {
 								window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
-							}, 1000);
+							}, 2000);
 
-							if(print){
-								window.open(baseUrl + "stampe/ddts/"+result.id, '_blank');
-							}
+
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "DDT creato con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
@@ -685,10 +734,59 @@ $(document).ready(function() {
 				} else {
 					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo').replace('@@alertResult@@', 'success'));
 
+					if(print){
+
+						/*fetch(baseUrl + "stampe/ddts/"+idDdt)
+							.then(function(response) {
+								return response.blob();
+							}).then(function(pdfBlob) {
+							var objectURL = URL.createObjectURL(pdfBlob);
+							document.querySelector('#pdf-frame').src = '';
+							document.querySelector('#pdf-frame').src = objectURL;
+							objectURL = URL.revokeObjectURL(pdfBlob);
+						}).then(function() {
+							window.setTimeout(function() {
+								document.querySelector('#pdf-frame').contentWindow.print();
+							}, 1000)
+						}).catch((error) => {
+							console.error('Error:', error);
+							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nella cancellazione del DDT').replace('@@alertResult@@', 'danger'));
+						});*/
+
+						w = window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
+						/*w.onunload = function(){
+							console.log('closed!');
+						}*/
+						w.focus();
+						w.print();
+						//w.close();
+
+						/*
+						$.ajax({
+							url: baseUrl + "stampe/ddts/"+idDdt,
+							//dataType: 'arraybuffer',
+							success: function(data) {
+								var pdfFile = new Blob([data], {
+									type: "application/pdf"
+								});
+								var pdfUrl = URL.createObjectURL(pdfFile);
+								//window.open(pdfUrl);
+								printJS(pdfUrl);
+							},
+							error: function(jqXHR, textStatus, errorThrown){
+								$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nella cancellazione del DDT').replace('@@alertResult@@', 'danger'));
+							}
+						});
+						*/
+
+						//window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
+					}
+
 					// Returns to the same page
 					setTimeout(function() {
 						window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
 					}, 1000);
+
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -1454,7 +1552,7 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 
 $.fn.getClienti = function(){
 	$.ajax({
-		url: baseUrl + "clienti?bloccaDdt=false",
+		url: baseUrl + "clienti?bloccaDdt=false&privato=false",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

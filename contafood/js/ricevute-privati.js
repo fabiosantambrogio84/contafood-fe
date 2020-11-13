@@ -3,16 +3,183 @@ var rowBackgroundVerde = '#96ffb2';
 var rowBackgroundRosa = '#fcd1ff';
 var rowBackgroundGiallo = '#fffca3';
 
+$.fn.loadRicevutaPrivatoTable = function(url) {
+	$.ajax({
+		url: baseUrl + "autisti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(autistiResult) {
+			$('#ricevutePrivatiTable').DataTable({
+				"ajax": {
+					"url": url,
+					"type": "GET",
+					"content-type": "json",
+					"cache": false,
+					"dataSrc": "",
+					"error": function(jqXHR, textStatus, errorThrown) {
+						console.log('Response text: ' + jqXHR.responseText);
+						var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+						alertContent = alertContent + '<strong>Errore nel recupero delle Ricevute Privati</strong>\n' +
+							'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+						$('#alertRicevutaPrivato').empty().append(alertContent);
+					}
+				},
+				"language": {
+					// "search": "Cerca",
+					"paginate": {
+						"first": "Inizio",
+						"last": "Fine",
+						"next": "Succ.",
+						"previous": "Prec."
+					},
+					"emptyTable": "Nessuna ricevuta a privato disponibile",
+					"zeroRecords": "Nessuna ricevuta a privato disponibile"
+				},
+				"searching": false,
+				"responsive":true,
+				"pageLength": 20,
+				"lengthChange": false,
+				"info": false,
+				"autoWidth": false,
+				"order": [
+					[0, 'desc']
+				],
+				"columns": [
+					{"name": "numero", "data": "progressivo", "width":"5%"},
+					{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
+						var a = moment(data.data);
+						return a.format('DD/MM/YYYY');
+					}},
+					{"name": "fatturato", "data": null, "width":"5%", render: function ( data, type, row ) {
+						if(data.fatturato){
+							return 'Si';
+						} else {
+							return 'No';
+						}
+					}},
+					{"name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
+						var cliente = data.cliente;
+						if(cliente != null){
+							return cliente.nome+" "+cliente.cognome;
+						}
+						return '';
+					}},
+					{"name": "agente", "data": null, "width":"10%", render: function ( data, type, row ) {
+						var cliente = data.cliente;
+						if(cliente != null){
+							var agente = cliente.agente;
+							if(agente != null){
+								return agente.nome + ' ' + agente.cognome;
+							}
+						}
+						return '';
+					}},
+					{"name":"autista", "data": null, "width":"13%", render: function ( data, type, row ) {
+						var ricevutaPrivatoId = data.id;
+						var selectId = "autista_" + ricevutaPrivatoId;
+
+						var autistaId = null;
+						if(data.autista != null){
+							autistaId = data.autista.id;
+						}
+
+						var autistaSelect = '<select id="'+selectId+'" class="form-control form-control-sm autistaDdt" data-id="'+ricevutaPrivatoId+'">';
+						autistaSelect += '<option value=""> - </option>';
+						if(autistiResult != null && autistiResult != undefined && autistiResult != ''){
+							$.each(autistiResult, function(i, item){
+								var label = item.nome + ' ' + item.cognome;
+								var optionHtml = '<option value="'+item.id+'"';
+								if(autistaId != null && autistaId != undefined){
+									if(autistaId == item.id){
+										optionHtml += ' selected';
+									}
+								}
+								optionHtml += '>'+label+'</option>';
+								autistaSelect += optionHtml;
+							});
+						}
+						autistaSelect += '</select';
+						return autistaSelect;
+					}},
+					{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleAcconto);
+					}},
+					{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totale);
+					}},
+					{"name": "imponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleImponibile);
+					}},
+					{"name": "costo", "data": null, "width":"6%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleCosto);
+					}},
+					{"name": "guadagno", "data": null, "width":"8%", render: function ( data, type, row ) {
+						var guadagno = data.totaleImponibile - data.totaleCosto;
+						return $.fn.formatNumber(guadagno);
+					}},
+					{"data": null, "orderable":false, "width":"17%", render: function ( data, type, row ) {
+						var acconto = data.totaleAcconto;
+						if(acconto == null || acconto == undefined || acconto == ''){
+							acconto = 0;
+						}
+						var totale = data.totale;
+						if(totale == null || totale == undefined || totale == ''){
+							totale = 0;
+						}
+						var stato = data.statoRicevutaPrivato;
+
+						var links = '<a class="detailsRicevutaPrivato pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+						//if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')){
+						//	links += '<a class="updateRicevutaPrivato pr-1" data-id="'+data.id+'" href="ricevuta-privato-edit.html?idRicevutaPrivato=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+						//}
+						if((totale - acconto) != 0){
+							links += '<a class="payRicevutaPrivato pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idRicevutaPrivato=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+						}
+						links += '<a class="emailRicevutaPrivato pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
+						links += '<a class="printRicevutaPrivato pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')) {
+							links += '<a class="deleteRicevutaPrivato" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+						}
+						return links;
+					}}
+				],
+				"createdRow": function(row, data, dataIndex,cells){
+					$(row).css('font-size', '12px').addClass('rowRicevutaPrivato');
+					$(row).attr('data-id-ricevuta-privato', data.id);
+					if(data.statoRicevutaPrivato != null){
+						var backgroundColor = '';
+						if(data.statoRicevutaPrivato.codice == 'DA_PAGARE'){
+							backgroundColor = '#fcf456';
+						} else if(data.statoRicevutaPrivato.codice == 'PARZIALMENTE_PAGATA'){
+							backgroundColor = '#fcc08b';
+						} else {
+							backgroundColor = 'trasparent';
+						}
+						$(row).css('background-color', backgroundColor);
+					}
+					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
+					$(cells[6]).css('text-align','right');
+					$(cells[7]).css('font-weight','bold').css('text-align','right');
+					$(cells[8]).css('text-align','right');
+					$(cells[9]).css('text-align','right');
+					$(cells[10]).css('text-align','right');
+				}
+			});
+		}
+	});
+}
+
 $(document).ready(function() {
 
-	$('#fatturaAccompagnatoriaArticoliTable').DataTable({
+	$.fn.loadRicevutaPrivatoTable(baseUrl + "ricevute-privati");
+
+	$('#ricevutaPrivatoArticoliTable').DataTable({
 		"searching": false,
 		"language": {
 			"paginate": {
 				"first": "Inizio",
 				"last": "Fine",
 				"next": "Succ.",
-				//"previous": "<i class=\"fa fa-backward\" aria-hidden=\"true\"></i>"
 				"previous": "Prec."
 			},
 			"emptyTable": "",
@@ -40,7 +207,7 @@ $(document).ready(function() {
 		]
 	});
 
-	$('#fatturaAccompagnatoriaTotaliTable').DataTable({
+	$('#ricevutaPrivatoTotaliTable').DataTable({
 		"ajax": {
 			"url": baseUrl + "aliquote-iva",
 			"type": "GET",
@@ -49,10 +216,10 @@ $(document).ready(function() {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Errore nel recupero delle aliquote iva</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertFattureAccompagnatorie').empty().append(alertContent);
+				$('#alertRicevutaPrivato').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -95,6 +262,334 @@ $(document).ready(function() {
 		}
 	});
 
+	$(document).on('click','#resetSearchRicevutePrivatiButton', function(){
+		$('#searchRicevutePrivatiForm :input').val(null);
+		$('#searchRicevutePrivatiForm select option[value=""]').attr('selected', true);
+
+		$('#ricevutePrivatiTable').DataTable().destroy();
+		$.fn.loadRicevutaPrivatoTable(baseUrl + "ricevute-privati");
+	});
+
+	$(document).on('click','.detailsRicevutaPrivato', function(){
+		var idRicevutaPrivato = $(this).attr('data-id');
+
+		var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della ricevuta a privato.</strong></div>';
+
+		$.ajax({
+			url: baseUrl + "ricevute-privati/" + idRicevutaPrivato,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != '') {
+					$('#numero').text(result.progressivo);
+					$('#data').text(moment(result.data).format('DD/MM/YYYY'));
+					var cliente = result.cliente;
+					if(cliente != null && cliente != undefined && cliente != ''){
+						$('#cliente').text(cliente.nome+" "+cliente.cognome);
+						var agente = cliente.agente;
+						if(agente != null){
+							$('#agente').text(agente.nome + ' ' + agente.cognome);
+						}
+					}
+					var puntoConsegna = result.puntoConsegna;
+					if(puntoConsegna != null && puntoConsegna != undefined && puntoConsegna != ''){
+						$('#puntoConsegna').text(puntoConsegna.nome);
+					}
+					var autista = result.autista;
+					if(autista != null && autista != undefined && autista != ''){
+						$('#autista').text(autista.nome+' '+autista.cognome);
+					}
+					var stato = result.statoRicevutaPrivato;
+					if(stato != null && stato != undefined && stato != ''){
+						$('#stato').text(stato.descrizione);
+					}
+					$('#tipoTrasporto').text(result.tipoTrasporto);
+					$('#dataTrasporto').text(moment(result.dataTrasporto).format('DD/MM/YYYY'));
+					$('#oraTrasporto').text(result.oraTrasporto);
+					$('#trasportatore').text(result.trasportatore);
+					$('#colli').text(result.numeroColli);
+					$('#totaleAcconto').text(result.totaleAcconto);
+					$('#totale').text(result.totale);
+					if(result.fatturato){
+						$('#fatturato').text("Si");
+					} else {
+						$('#fatturato').text("No");
+					}
+					$('#note').text(result.note);
+					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
+					var dataAggiornamento = result.dataAggiornamento;
+					if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
+						$('#dataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
+					}
+
+					if(result.ricevutaPrivatoArticoli != null && result.ricevutaPrivatoArticoli != undefined){
+						$('#detailsRicevutaPrivatoArticoliModalTable').DataTable({
+							"data": result.ricevutaPrivatoArticoli,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun articolo presente",
+								"zeroRecords": "Nessun articolo presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'desc'],
+								[1, 'desc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "articolo", "data": null, render: function (data, type, row) {
+									var result = '';
+									if (data.articolo != null) {
+										result = data.articolo.codice+' - '+data.articolo.descrizione;
+									}
+									return result;
+								}},
+								{"name": "lotto", "data": "lotto"},
+								{"name": "scadenza", "data": null, render: function (data, type, row) {
+									var a = moment(data.scadenza);
+									return a.format('DD/MM/YYYY');
+								}},
+								{"name": "quantita", "data": "quantita"},
+								{"name": "pezzi", "data": "numeroPezzi"},
+								{"name": "prezzo", "data": "prezzo"},
+								{"name": "sconto", "data": "sconto"},
+								{"name": "imponibile", "data": "imponibile"},
+								{"name": "costo", "data": "costo"}
+							]
+						});
+					}
+
+					if(result.ricevutaPrivatoTotali != null && result.ricevutaPrivatoTotali != undefined){
+						$('#detailsRicevutaPrivatoTotaliModalTable').DataTable({
+							"data": result.ricevutaPrivatoTotali,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun totale presente",
+								"zeroRecords": "Nessun totale presente"
+							},
+							"paging": false,
+							"searching": false,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'asc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "aliquotaIva", "data": null, render: function (data, type, row) {
+									var result = '';
+									if (data.aliquotaIva != null) {
+										result = data.aliquotaIva.valore;
+									}
+									return result;
+								}},
+								{"name": "totaleIva", "data": "totaleIva"},
+								{"name": "totaleImponibile", "data": "totaleImponibile"}
+							]
+						});
+					}
+
+					if(result.ricevutaPrivatoPagamenti != null && result.ricevutaPrivatoPagamenti != undefined){
+						$('#detailsRicevutaPrivatoPagamentiModalTable').DataTable({
+							"retrieve": true,
+							"data": result.ricevutaPrivatoPagamenti,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun pagamento presente",
+								"zeroRecords": "Nessun pagamento presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'desc'],
+								[1, 'asc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "data", "data": null, "width":"8%", render: function (data, type, row) {
+									var a = moment(data.data);
+									return a.format('DD/MM/YYYY');
+								}},
+								{"name": "descrizione", "data": "descrizione", "width":"15%"},
+								{"name": "importo", "data": null, "width":"8%", render: function ( data, type, row ) {
+									return $.fn.formatNumber(data.importo);
+								}},
+								{"name": "tipoPagamento", "data": null, "width":"12%", render: function ( data, type, row ) {
+									var tipoPagamento = data.tipoPagamento;
+									if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+										return tipoPagamento.descrizione;
+									}
+									return '';
+								}},
+								{"name": "note", "data": null, "width":"15%", render: function ( data, type, row ) {
+									var note = data.note;
+									var noteTrunc = note;
+									var noteHtml = '<div>'+noteTrunc+'</div>';
+									if(note.length > 100){
+										noteTrunc = note.substring(0, 100)+'...';
+										noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
+									}
+
+									return noteHtml;
+								}}
+							]
+						});
+					}
+
+				} else{
+					$('#detailsRicevutaPrivatoMainDiv').empty().append(alertContent);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#detailsRicevutaPrivatoMainDiv').empty().append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		})
+
+		$('#detailsRicevutaPrivatoModal').modal('show');
+
+
+	});
+
+	$(document).on('click','.closeRicevutaPrivato', function(){
+		$('#detailsRicevutaPrivatoArticoliModalTable').DataTable().destroy();
+		$('#detailsRicevutaPrivatoTotaliModalTable').DataTable().destroy();
+		$('#detailsRicevutaPrivatoPagamentiModalTable').DataTable().destroy();
+		$('#detailsRicevutaPrivatoModal').modal('hide');
+	});
+
+	$(document).on('click','.deleteRicevutaPrivato', function(){
+		var idRicevutaPrivato = $(this).attr('data-id');
+		$('#confirmDeleteRicevutaPrivato').attr('data-id', idRicevutaPrivato);
+		$('#deleteRicevutaPrivatoModal').modal('show');
+	});
+
+	$(document).on('click','#confirmDeleteRicevutaPrivato', function(){
+		$('#deleteRicevutaPrivatoModal').modal('hide');
+		var idRicevutaPrivato = $(this).attr('data-id');
+
+		var url = baseUrl + "ricevute-privati/" + idRicevutaPrivato;
+		var successText = '<strong>Ricevuta a privato </strong> cancellata con successo.\n';
+		var errorText = '<strong>Errore nella cancellazione della ricevuta a privato.</strong>\n';
+
+		$.ajax({
+			url: url,
+			type: 'DELETE',
+			success: function() {
+				var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + successText +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertRicevutaPrivato').empty().append(alertContent);
+
+				$('#ricevutePrivatiTable').DataTable().ajax.reload();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + errorText +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertRicevutaPrivato').empty().append(alertContent);
+			}
+		});
+
+	});
+
+	$(document).on('click','.printRicevutaPrivato', function(){
+		var idRicevutaPrivato = $(this).attr('data-id');
+
+		window.open(baseUrl + "stampe/ricevute-privati/"+idRicevutaPrivato, '_blank');
+	});
+
+	$(document).on('click','#printRicevutePrivati', function(event){
+		event.preventDefault();
+
+		var ids = "";
+
+		$(".rowRicevutaPrivato").each(function(i, item){
+			var id = $(this).attr('data-id-ricevuta-privato');
+			ids += id+",";
+		});
+
+		window.open(baseUrl + "stampe/ricevute-privati?ids="+ids, '_blank');
+
+	});
+
+	if($('#searchRicevutePrivatiButton') != null && $('#searchRicevutePrivatiButton') != undefined) {
+		$(document).on('submit', '#searchRicevutePrivatiForm', function (event) {
+			event.preventDefault();
+
+			var dataDa = $('#searchDataFrom').val();
+			var dataA = $('#searchDataTo').val();
+			var cliente = $('#searchCliente').val();
+			var agente = $('#searchAgente option:selected').val();
+			var progressivo = $('#searchProgressivo').val();
+			var importo = $('#searchImporto').val();
+			var tipoPagamento = $('#searchTipoPagamento option:selected').val();
+			var articolo = $('#searchArticolo option:selected').val();
+			var stato = $('#searchStato option:selected').val();
+			var tipo = $('#searchTipo option:selected').val();
+
+			var params = {};
+			if(dataDa != null && dataDa != undefined && dataDa != ''){
+				params.dataDa = dataDa;
+			}
+			if(dataA != null && dataA != undefined && dataA != ''){
+				params.dataA = dataA;
+			}
+			if(progressivo != null && progressivo != undefined && progressivo != ''){
+				params.progressivo = progressivo;
+			}
+			if(importo != null && importo != undefined && importo != ''){
+				params.importo = importo;
+			}
+			if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+				params.tipoPagamento = tipoPagamento;
+			}
+			if(cliente != null && cliente != undefined && cliente != ''){
+				params.cliente = cliente;
+			}
+			if(agente != null && agente != undefined && agente != ''){
+				params.agente = agente;
+			}
+			if(articolo != null && articolo != undefined && articolo != ''){
+				params.articolo = articolo;
+			}
+			if(stato != null && stato != undefined && stato != ''){
+				params.stato = stato;
+			}
+			if(tipo != null && tipo != undefined && tipo != ''){
+				params.tipo = tipo;
+			}
+			var url = baseUrl + "ricevute-privati?" + $.param( params );
+
+			$('#ricevutePrivatiTable').DataTable().destroy();
+			$.fn.loadRicevutaPrivatoTable(url);
+
+		});
+	}
+
 	$.fn.validateLotto = function(){
 		var validLotto = true;
 		// check if all input fields 'lotto' are not empty
@@ -124,9 +619,9 @@ $(document).ready(function() {
 		return valid;
 	}
 
-	$.fn.createFatturaAccompagnatoria = function(print){
+	$.fn.createRicevutaPrivato = function(print){
 
-		var alertContent = '<div id="alertFattureAccompagnatorieContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
@@ -139,67 +634,67 @@ $(document).ready(function() {
          */
 		var validDataTrasporto = $.fn.validateDataTrasporto();
 		if(!validDataTrasporto){
-			$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data della Fattura Accompagnatoria").replace('@@alertResult@@', 'danger'));
+			$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data della Ricevuta Privato").replace('@@alertResult@@', 'danger'));
 			return false;
 		}
 
-		var fatturaAccompagnatoria = new Object();
-		fatturaAccompagnatoria.progressivo = $('#progressivo').val();
-		fatturaAccompagnatoria.anno = $('#anno').val();
-		fatturaAccompagnatoria.data = $('#data').val();
+		var ricevutaPrivato = new Object();
+		ricevutaPrivato.progressivo = $('#progressivo').val();
+		ricevutaPrivato.anno = $('#anno').val();
+		ricevutaPrivato.data = $('#data').val();
 
 		var cliente = new Object();
 		cliente.id = $('#cliente option:selected').val();
-		fatturaAccompagnatoria.cliente = cliente;
+		ricevutaPrivato.cliente = cliente;
 
 		var puntoConsegna = new Object();
 		puntoConsegna.id = $('#puntoConsegna option:selected').val();
-		fatturaAccompagnatoria.puntoConsegna = puntoConsegna;
+		ricevutaPrivato.puntoConsegna = puntoConsegna;
 
-		var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
-		if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0){
-			var fatturaAccompagnatoriaArticoli = [];
+		var ricevutaPrivatoArticoliLength = $('.rowArticolo').length;
+		if(ricevutaPrivatoArticoliLength != null && ricevutaPrivatoArticoliLength != undefined && ricevutaPrivatoArticoliLength != 0){
+			var ricevutaPrivatoArticoli = [];
 			$('.rowArticolo').each(function(i, item){
 				var articoloId = $(this).attr('data-id');
 
-				var fatturaAccompagnatoriaArticolo = {};
-				var fatturaAccompagnatoriaArticoloId = new Object();
-				fatturaAccompagnatoriaArticoloId.articoloId = articoloId;
-				fatturaAccompagnatoriaArticolo.id = fatturaAccompagnatoriaArticoloId;
+				var ricevutaPrivatoArticolo = {};
+				var ricevutaPrivatoArticoloId = new Object();
+				ricevutaPrivatoArticoloId.articoloId = articoloId;
+				ricevutaPrivatoArticolo.id = ricevutaPrivatoArticoloId;
 
-				fatturaAccompagnatoriaArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+				ricevutaPrivatoArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
+				ricevutaPrivatoArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
+				ricevutaPrivatoArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
+				ricevutaPrivatoArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
+				ricevutaPrivatoArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
+				ricevutaPrivatoArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
 
-				fatturaAccompagnatoriaArticoli.push(fatturaAccompagnatoriaArticolo);
+				ricevutaPrivatoArticoli.push(ricevutaPrivatoArticolo);
 			});
-			fatturaAccompagnatoria.fatturaAccompagnatoriaArticoli = fatturaAccompagnatoriaArticoli;
+			ricevutaPrivato.ricevutaPrivatoArticoli = ricevutaPrivatoArticoli;
 		}
-		var fatturaAccompagnatoriaTotaliLength = $('.rowTotaliByIva').length;
-		if(fatturaAccompagnatoriaTotaliLength != null && fatturaAccompagnatoriaTotaliLength != undefined && fatturaAccompagnatoriaTotaliLength != 0){
-			var fatturaAccompagnatoriaTotali = [];
+		var ricevutaPrivatoTotaliLength = $('.rowTotaliByIva').length;
+		if(ricevutaPrivatoTotaliLength != null && ricevutaPrivatoTotaliLength != undefined && ricevutaPrivatoTotaliLength != 0){
+			var ricevutaPrivatoTotali = [];
 			$('.rowTotaliByIva').each(function(i, item){
 				var aliquotaIvaId = $(this).attr('data-id');
 
-				var fatturaAccompagnatoriaTotale = {};
-				var fatturaAccompagnatoriaTotaleId = new Object();
-				fatturaAccompagnatoriaTotaleId.aliquotaIvaId = aliquotaIvaId;
-				fatturaAccompagnatoriaTotale.id = fatturaAccompagnatoriaTotaleId;
+				var ricevutaPrivatoTotale = {};
+				var ricevutaPrivatoTotaleId = new Object();
+				ricevutaPrivatoTotaleId.aliquotaIvaId = aliquotaIvaId;
+				ricevutaPrivatoTotale.id = ricevutaPrivatoTotaleId;
 
-				fatturaAccompagnatoriaTotale.totaleIva = $(this).find('td').eq(1).text();
-				fatturaAccompagnatoriaTotale.totaleImponibile = $(this).find('td').eq(2).text();
+				ricevutaPrivatoTotale.totaleIva = $(this).find('td').eq(1).text();
+				ricevutaPrivatoTotale.totaleImponibile = $(this).find('td').eq(2).text();
 
-				fatturaAccompagnatoriaTotali.push(fatturaAccompagnatoriaTotale);
+				ricevutaPrivatoTotali.push(ricevutaPrivatoTotale);
 			});
-			fatturaAccompagnatoria.fatturaAccompagnatoriaTotali = fatturaAccompagnatoriaTotali;
+			ricevutaPrivato.ricevutaPrivatoTotali = ricevutaPrivatoTotali;
 		}
 
-		fatturaAccompagnatoria.numeroColli = $('#colli').val();
-		fatturaAccompagnatoria.tipoTrasporto = $('#tipoTrasporto option:selected').val();
-		fatturaAccompagnatoria.dataTrasporto = $('#dataTrasporto').val();
+		ricevutaPrivato.numeroColli = $('#colli').val();
+		ricevutaPrivato.tipoTrasporto = $('#tipoTrasporto option:selected').val();
+		ricevutaPrivato.dataTrasporto = $('#dataTrasporto').val();
 
 		var regex = /:/g;
 		var oraTrasporto = $('#oraTrasporto').val();
@@ -207,28 +702,28 @@ $(document).ready(function() {
 			var count = oraTrasporto.match(regex);
 			count = (count) ? count.length : 0;
 			if(count == 1){
-				fatturaAccompagnatoria.oraTrasporto = $('#oraTrasporto').val() + ':00';
+				ricevutaPrivato.oraTrasporto = $('#oraTrasporto').val() + ':00';
 			} else {
-				fatturaAccompagnatoria.oraTrasporto = $('#oraTrasporto').val();
+				ricevutaPrivato.oraTrasporto = $('#oraTrasporto').val();
 			}
 		}
-		fatturaAccompagnatoria.trasportatore = $('#trasportatore').val();
-		fatturaAccompagnatoria.note = $('#note').val();
+		ricevutaPrivato.trasportatore = $('#trasportatore').val();
+		ricevutaPrivato.note = $('#note').val();
 
-		var fatturaAccompagnatoriaJson = JSON.stringify(fatturaAccompagnatoria);
+		var ricevutaPrivatoJson = JSON.stringify(ricevutaPrivato);
 
 		$.ajax({
-			url: baseUrl + "fatture-accompagnatorie",
+			url: baseUrl + "ricevute-privati",
 			type: 'POST',
 			contentType: "application/json",
 			dataType: 'json',
-			data: fatturaAccompagnatoriaJson,
+			data: ricevutaPrivatoJson,
 			success: function(result) {
-				var idFatturaAccompagnatoria = result.id;
+				var idRicevutaPrivato = result.id;
 
-				$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria creata con successo').replace('@@alertResult@@', 'success'));
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Ricevuta privato creata con successo').replace('@@alertResult@@', 'success'));
 
-				$('#newFatturaAccompagnatoriaButton').attr("disabled", true);
+				$('#newRicevutaPrivatoButton').attr("disabled", true);
 
 				// Update ordini clienti
 				var articoliOrdiniClienti = [];
@@ -256,38 +751,38 @@ $(document).ready(function() {
 						dataType: 'json',
 						data: articoliOrdiniClientiJson,
 						success: function(result) {
-							$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria creata con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
+							$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Ricevuta privato creata con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
 
 							// Returns to the same page
 							setTimeout(function() {
-								window.location.href = "fatture-accompagnatorie-new.html?dt="+fatturaAccompagnatoria.dataTrasporto+"&ot="+oraTrasporto;
+								window.location.href = "ricevute-privati-new.html?dt="+ricevutaPrivato.dataTrasporto+"&ot="+oraTrasporto;
 							}, 1000);
 
 							if(print){
-								window.open(baseUrl + "stampe/fatture-accompagnatorie/"+idFatturaAccompagnatoria, '_blank');
+								window.open(baseUrl + "stampe/ricevute-privati/"+idRicevutaPrivato, '_blank');
 							}
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
-							$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', "Fattura accompagnatoria creata con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
+							$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Ricevuta privato creata con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
 						}
 					});
 
 				} else {
-					$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria creata con successo').replace('@@alertResult@@', 'success'));
+					$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Ricevuta privato creata con successo').replace('@@alertResult@@', 'success'));
 
 					// Returns to the same page
 					setTimeout(function() {
-						window.location.href = "fatture-accompagnatorie-new.html?dt="+fatturaAccompagnatoria.dataTrasporto+"&ot="+oraTrasporto;
+						window.location.href = "ricevute-privati-new.html?dt="+ricevutaPrivato.dataTrasporto+"&ot="+oraTrasporto;
 					}, 1000);
 
 					if(print){
-						window.open(baseUrl + "stampe/fatture-accompagnatorie/"+idFatturaAccompagnatoria, '_blank');
+						window.open(baseUrl + "stampe/ricevute-privati/"+idRicevutaPrivato, '_blank');
 					}
 				}
 
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				var errorMessage = 'Errore nella creazione della fattura accompagnatoria';
+				var errorMessage = 'Errore nella creazione della ricevuta privato';
 				if(jqXHR != null && jqXHR != undefined){
 					var jqXHRResponseJson = jqXHR.responseJSON;
 					if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
@@ -297,32 +792,32 @@ $(document).ready(function() {
 						}
 					}
 				}
-				$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 			}
 		});
 	}
 
-	if($('#newFatturaAccompagnatoriaButton') != null && $('#newFatturaAccompagnatoriaButton') != undefined && $('#newFatturaAccompagnatoriaButton').length > 0){
+	if($('#newRicevutaPrivatoButton') != null && $('#newRicevutaPrivatoButton') != undefined && $('#newRicevutaPrivatoButton').length > 0){
 
 		$('#articolo').selectpicker();
 		$('#cliente').selectpicker();
 
-		$(document).on('submit','#newFatturaAccompagnatoriaForm', function(event){
+		$(document).on('submit','#newRicevutaPrivatoForm', function(event){
 			event.preventDefault();
 
-			$.fn.createFatturaAccompagnatoria(false);
+			$.fn.createRicevutaPrivato(false);
 
 		});
 	}
 
-	if($('#newAndPrintFatturaAccompagnatoriaButton') != null && $('#newAndPrintFatturaAccompagnatoriaButton') != undefined && $('#newAndPrintFatturaAccompagnatoriaButton').length > 0){
+	if($('#newAndPrintRicevutaPrivatoButton') != null && $('#newAndPrintRicevutaPrivatoButton') != undefined && $('#newAndPrintRicevutaPrivatoButton').length > 0){
 		$('#articolo').selectpicker();
 		$('#cliente').selectpicker();
 
-		$(document).on('click','#newAndPrintFatturaAccompagnatoriaButton', function(event){
+		$(document).on('click','#newAndPrintRicevutaPrivatoButton', function(event){
 			event.preventDefault();
 
-			$.fn.createFatturaAccompagnatoria(true);
+			$.fn.createRicevutaPrivato(true);
 		});
 	}
 
@@ -337,11 +832,11 @@ $(document).ready(function() {
 		$('#prezzo').val('');
 		$('#sconto').val('');
 
-		var alertContent = '<div id="alertFatturaAccompagnatoriaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-		$('#alertFattureAccompagnatorie').empty();
+		$('#alertRicevutaPrivato').empty();
 
 		$.fn.emptyArticoli();
 
@@ -383,7 +878,7 @@ $(document).ready(function() {
 								});
 							},
 							error: function(jqXHR, textStatus, errorThrown) {
-								$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
+								$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
 							}
 						});
 					} else {
@@ -402,7 +897,7 @@ $(document).ready(function() {
 					$.fn.loadArticoliFromOrdiniClienti();
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
+					$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 				}
 			});
 			$('#articolo').removeAttr('disabled');
@@ -456,7 +951,7 @@ $(document).ready(function() {
 				});
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
 			}
 		});
 	}
@@ -508,10 +1003,10 @@ $(document).ready(function() {
 				'                Seleziona un articolo\n' +
 				'              </div>';
 
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty().append(alertContent);
+			$('#addRicevutaPrivatoArticoloAlert').empty().append(alertContent);
 			return;
 		} else {
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty();
+			$('#addRicevutaPrivatoArticoloAlert').empty();
 		}
 
 		var pezzi = $('#pezzi').val();
@@ -521,10 +1016,10 @@ $(document).ready(function() {
 				'                Inserisci il numero di pezzi\n' +
 				'              </div>';
 
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty().append(alertContent);
+			$('#addRicevutaPrivatoArticoloAlert').empty().append(alertContent);
 			return;
 		} else {
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty();
+			$('#addRicevutaPrivatoArticoloAlert').empty();
 		}
 
 		var articolo = $('#articolo option:selected').text();
@@ -552,7 +1047,6 @@ $(document).ready(function() {
 		// check if a same articolo was already added
 		var found = 0;
 		var currentRowIndex;
-		var currentIdOrdineCliente;
 		var currentIdArticolo;
 		var currentLotto;
 		var currentPrezzo;
@@ -560,8 +1054,6 @@ $(document).ready(function() {
 		var currentScadenza;
 		var currentQuantita = 0;
 		var currentPezzi = 0;
-		var currentPezziDaEvadere = 0;
-
 		var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
 		if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0) {
 			$('.rowArticolo').each(function(i, item){
@@ -597,7 +1089,7 @@ $(document).ready(function() {
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+		var table = $('#ricevutaPrivatoArticoliTable').DataTable();
 		if(found >= 1){
 
 			var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
@@ -623,7 +1115,7 @@ $(document).ready(function() {
 			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 
 		} else {
-			var deleteLink = '<a class="deleteFatturaAccompagnatoriaArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+			var deleteLink = '<a class="deleteRicevutaPrivatoArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 			var rowsCount = table.rows().count();
 
@@ -664,11 +1156,11 @@ $(document).ready(function() {
 		$('#articolo').selectpicker('refresh');
 	});
 
-	$(document).on('click','.deleteFatturaAccompagnatoriaArticolo', function(){
-		$('#fatturaAccompagnatoriaArticoliTable').DataTable().row( $(this).parent().parent() )
+	$(document).on('click','.deleteRicevutaPrivatoArticolo', function(){
+		$('#ricevutaPrivatoArticoliTable').DataTable().row( $(this).parent().parent() )
 			.remove()
 			.draw();
-		$('#fatturaAccompagnatoriaArticoliTable').focus();
+		$('#ricevutaPrivatoArticoliTable').focus();
 
 		$.fn.computeTotale();
 	});
@@ -692,6 +1184,88 @@ $(document).ready(function() {
 	});
 
 });
+
+$.fn.preloadSearchFields = function(){
+	$.ajax({
+		url: baseUrl + "tipi-pagamento",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchTipoPagamento').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "agenti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchAgente').append('<option value="'+item.id+'" >'+item.nome+' '+item.cognome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "autisti",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchAutista').append('<option value="'+item.id+'" >'+item.nome+' '+item.cognome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "articoli?attivo=true",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchArticolo').append('<option value="'+item.id+'" >'+item.codice+' '+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+
+	$.ajax({
+		url: baseUrl + "stati-ricevuta-privato",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchStato').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
 
 $.fn.extractDataTrasportoFromUrl = function(){
 	var pageUrl = window.location.search.substring(1);
@@ -727,7 +1301,7 @@ $.fn.extractOraTrasportoFromUrl = function(){
 
 $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 	$.ajax({
-		url: baseUrl + "fatture-accompagnatorie/progressivo",
+		url: baseUrl + "ricevute-privati/progressivo",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -766,18 +1340,14 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 
 $.fn.getClienti = function(){
 	$.ajax({
-		url: baseUrl + "clienti?bloccaDdt=false",
+		url: baseUrl + "clienti?bloccaDdt=false&privato=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
 					var label = '';
-					if(item.dittaIndividuale){
-						label += item.cognome + ' - ' + item.nome;
-					} else {
-						label += item.ragioneSociale;
-					}
+					label += item.cognome + ' - ' + item.nome;
 					label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
 
 					var agente = item.agente;
@@ -954,8 +1524,8 @@ $.fn.groupArticoloRow = function(insertedRow){
 	var currentPezzi = 0;
 	var currentQuantita = 0;
 
-	var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
-	if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0) {
+	var ricevutaPrivatoArticoliLength = $('.rowArticolo').length;
+	if(ricevutaPrivatoArticoliLength != null && ricevutaPrivatoArticoliLength != undefined && ricevutaPrivatoArticoliLength != 0) {
 		$('.rowArticolo').each(function(i, item){
 
 			if(found != 1){
@@ -981,7 +1551,7 @@ $.fn.groupArticoloRow = function(insertedRow){
 			}
 		});
 	}
-	var table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+	var table = $('#ricevutaPrivatoArticoliTable').DataTable();
 	if(found >= 1){
 		var totale = 0;
 
@@ -1037,7 +1607,7 @@ $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
 }
 
 $.fn.emptyArticoli = function(){
-	$('#fatturaAccompagnatoriaArticoliTable').DataTable().rows()
+	$('#ricevutaPrivatoArticoliTable').DataTable().rows()
 		.remove()
 		.draw();
 }
@@ -1093,10 +1663,10 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
 				"dataSrc": "",
 				"error": function(jqXHR, textStatus, errorThrown) {
 					console.log('Response text: ' + jqXHR.responseText);
-					var alertContent = '<div id="alertFattureAccompagnatorieContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+					var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 					alertContent = alertContent + '<strong>Errore nel recupero degli ordini clienti</strong>\n' +
 						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-					$('#alertFattureAccompagnatorie').empty().append(alertContent);
+					$('#alertRicevutaPrivato').empty().append(alertContent);
 				}
 			},
 			"language": {
@@ -1313,8 +1883,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var currentPezzi = 0;
 	var currentQuantita= 0;
 
-	var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
-	if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0) {
+	var ricevutaPrivatoArticoliLength = $('.rowArticolo').length;
+	if(ricevutaPrivatoArticoliLength != null && ricevutaPrivatoArticoliLength != undefined && ricevutaPrivatoArticoliLength != 0) {
 		$('.rowArticolo').each(function(i, item){
 
 			if(found != 1){
@@ -1348,7 +1918,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var scontoValue = (sconto/100)*quantitaPerPrezzo;
 	totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-	var table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+	var table = $('#ricevutaPrivatoArticoliTable').DataTable();
 	var rowIndex;
 	if(found >= 1){
 		var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
@@ -1374,7 +1944,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 
 	} else {
-		var deleteLink = '<a class="deleteFatturaAccompagnatoriaArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+		var deleteLink = '<a class="deleteRicevutaPrivatoArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 		var rowsCount = table.rows().count();
 		var newRowindex = parseInt(rowsCount) + 1;
@@ -1419,14 +1989,14 @@ $(document).ready(function() {
 			var scannerLog = '--------------------------------------------------\n';
 			scannerLog += 'Barcode: '+barcode+', numero pezzi: '+numeroPezzi+'\n';
 
-			var alertContent = '<div id="alertFatturaAccompagnatoriaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			var cliente = $('#cliente option:selected').val();
 			if($.fn.checkVariableIsNull(cliente)){
 				var alertText = "Selezionare un cliente prima di effettuare la lettura del barcode";
-				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger'));
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger'));
 				return;
 			}
 
@@ -1548,13 +2118,13 @@ $(document).ready(function() {
 									var fornitore = item.fornitore;
 									if($.fn.checkVariableIsNull(fornitore)){
 										var alertText = "Errore nel recupero del fornitore.";
-										$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+										$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 										return;
 									}
 									var codiceFornitore = fornitore.codice;
 									if($.fn.checkVariableIsNull(codiceFornitore)){
 										var alertText = "Codice fornitore non presente. Impossibile gestire il barcode ean128.";
-										$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+										$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 										return;
 									}
 
@@ -1634,7 +2204,7 @@ $(document).ready(function() {
 
 									} else {
 										var alertText = "Codice fornitore '"+codiceFornitore+"' non gestito.";
-										$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+										$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 										return;
 									}
 								}
@@ -1651,7 +2221,7 @@ $(document).ready(function() {
 						} else {
 							var barcodeTruncate = barcode.substring(0, 6);
 							var alertText = "Nessun articolo trovato con barcode completo '"+barcode+"' o barcode '"+barcodeTruncate+"'";
-							$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+							$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 
 							scannerLog += '--------------------------------------------------\n';
 							$('#scannerLog').append(scannerLog);
@@ -1661,7 +2231,7 @@ $(document).ready(function() {
 					error: function(jqXHR, textStatus, errorThrown) {
 						var barcodeTruncate = barcode.substring(0, 6);
 						var alertText = "Nessun articolo trovato con barcode completo '"+barcode+"' o barcode '"+barcodeTruncate+"'";
-						$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
+						$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 
 						scannerLog += '--------------------------------------------------\n';
 						$('#scannerLog').append(scannerLog);

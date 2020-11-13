@@ -83,12 +83,36 @@ $.fn.loadFattureTable = function(url) {
 				return $.fn.formatNumber(data.totale);
 			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
+				var acconto = data.totaleAcconto;
+				if(acconto == null || acconto == undefined || acconto == ''){
+					acconto = 0;
+				}
+				var totale = data.totale;
+				if(totale == null || totale == undefined || totale == ''){
+					totale = 0;
+				}
+				var tipo = data.tipoFattura;
+				var pagamentoUrl = "pagamenti-new.html?";
+				if(tipo != null){
+					if(tipo.id != null && tipo.id != undefined && tipo.id != '' && tipo.id == 1){
+						pagamentoUrl += "idFatturaAccompagnatoria="+data.id;
+					} else {
+						pagamentoUrl += "idFattura="+data.id;
+					}
+				}
+
 				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+				if((totale - acconto) != 0){
+					links += '<a class="payFattura pr-1" data-id="'+data.id+'" href="' + pagamentoUrl + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+				}
+				links += '<a class="printFattura pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 				links += '<a class="deleteFatture" data-id="' + data.id + '" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
+			$(row).css('font-size', '12px').addClass('rowFattura');
+			$(row).attr('data-id-fattura', data.id);
 			if(data.statoFattura != null){
 				var backgroundColor = '';
 				if(data.statoFattura.codice == 'DA_PAGARE'){
@@ -488,6 +512,32 @@ $(document).ready(function() {
 				$('#alertFatture').empty().append(alertContent);
 			}
 		});
+
+	});
+
+	$(document).on('click','.printFattura', function(){
+		var idFattura = $(this).attr('data-id');
+		var tipoFattura = $(this).attr('data-tipo');
+
+		if(tipoFattura == 'VENDITA'){
+			window.open(baseUrl + "stampe/fatture/"+idFattura, '_blank');
+		} else {
+			// fattura accompagnatoria
+			window.open(baseUrl + "stampe/fatture-accompagnatorie/"+idFattura, '_blank');
+		}
+	});
+
+	$(document).on('click','#printFatture', function(event){
+		event.preventDefault();
+
+		var ids = "";
+
+		$(".rowFattura").each(function(i, item){
+			var id = $(this).attr('data-id-fattura');
+			ids += id+",";
+		});
+
+		window.open(baseUrl + "stampe/fatture?ids="+ids, '_blank');
 
 	});
 

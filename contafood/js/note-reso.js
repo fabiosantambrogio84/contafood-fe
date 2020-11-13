@@ -90,7 +90,8 @@ $.fn.loadNoteResoTable = function(url) {
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
-			$(row).css('font-size', '12px');
+			$(row).css('font-size', '12px').addClass('rowNotaReso');
+			$(row).attr('data-id-nota-reso', data.id);
 			if(data.statoNotaReso != null){
 				var backgroundColor = '';
 				if(data.statoNotaReso.codice == 'DA_PAGARE'){
@@ -437,6 +438,12 @@ $(document).ready(function() {
 		});
 	});
 
+	$(document).on('click','.printNotaReso', function(){
+		var idNotaReso = $(this).attr('data-id');
+
+		window.open(baseUrl + "stampe/note-reso/"+idNotaReso, '_blank');
+	});
+
 	if($('#searchNoteResoButton') != null && $('#searchNoteResoButton') != undefined) {
 		$(document).on('submit', '#searchNoteResoForm', function (event) {
 			event.preventDefault();
@@ -487,116 +494,19 @@ $(document).ready(function() {
 		$(document).on('submit','#newNotaResoForm', function(event){
 			event.preventDefault();
 
-			var alertContent = '<div id="alertNotaResoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$.fn.createNotaReso(false);
 
-			var notaReso = new Object();
-			notaReso.progressivo = $('#progressivo').val();
-			notaReso.anno = $('#anno').val();
-			notaReso.data = $('#data').val();
+		});
+	}
 
-			var fornitore = new Object();
-			fornitore.id = $('#fornitore option:selected').val();
-			notaReso.fornitore = fornitore;
+	if($('#newAndPrintNotaResoButton') != null && $('#newAndPrintNotaResoButton') != undefined && $('#newAndPrintNotaResoButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#fornitore').selectpicker();
 
-			notaReso.note = $('#note').val();
+		$(document).on('click','#newAndPrintNotaResoButton', function(event){
+			event.preventDefault();
 
-			var notaResoRigheLength = $('.rowArticolo').length;
-			if(notaResoRigheLength != null && notaResoRigheLength != undefined && notaResoRigheLength != 0){
-				var notaResoRighe = [];
-				$('.rowArticolo').each(function(i, item){
-					var articoloId = $(this).attr('data-id');
-
-					var notaResoRiga = {};
-
-					var notaResoRigaId = new Object();
-					notaResoRiga.id = notaResoRigaId;
-
-					notaResoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
-					notaResoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
-					notaResoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
-
-					var udm = $(this).children().eq(3).children().eq(0).val();
-					if(udm != null && udm != ""){
-						var unitaMisura = new Object();
-						unitaMisura.id = udm;
-						notaResoRiga.unitaMisura = unitaMisura;
-					}
-					notaResoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
-					notaResoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
-					notaResoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
-
-					var iva = $(this).children().eq(8).children().eq(0).val();
-					if(iva != null && iva != ""){
-						var aliquotaIva = new Object();
-						aliquotaIva.id = iva;
-						notaResoRiga.aliquotaIva = aliquotaIva;
-					}
-
-					if(articoloId != null && articoloId != ""){
-						var articolo = new Object();
-						articolo.id = articoloId;
-						notaResoRiga.articolo = articolo;
-					}
-
-					notaResoRighe.push(notaResoRiga);
-				});
-				notaReso.notaResoRighe = notaResoRighe;
-			}
-
-			var notaResoTotaliLength = $('.rowTotaliByIva').length;
-			if(notaResoTotaliLength != null && notaResoTotaliLength != undefined && notaResoTotaliLength != 0){
-				var notaResoTotali = [];
-				$('.rowTotaliByIva').each(function(i, item){
-					var aliquotaIvaId = $(this).attr('data-id');
-
-					var notaResoTotale = {};
-					var notaResoTotaleId = new Object();
-					notaResoTotaleId.aliquotaIvaId = aliquotaIvaId;
-					notaResoTotale.id = notaResoTotaleId;
-
-					notaResoTotale.totaleIva = $(this).find('td').eq(1).text();
-					notaResoTotale.totaleImponibile = $(this).find('td').eq(2).text();
-
-					notaResoTotali.push(notaResoTotale);
-				});
-				notaReso.notaResoTotali = notaResoTotali;
-			}
-
-			var notaResoJson = JSON.stringify(notaReso);
-
-			$.ajax({
-				url: baseUrl + "note-reso",
-				type: 'POST',
-				contentType: "application/json",
-				dataType: 'json',
-				data: notaResoJson,
-				success: function(result) {
-					$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@','Nota Reso creata con successo').replace('@@alertResult@@', 'success'));
-
-					$('#newNotaAccreditoButton').attr("disabled", true);
-
-					// Returns to the page with the list of Nota Reso
-					setTimeout(function() {
-						window.location.href = "note-reso.html";
-					}, 1000);
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					var errorMessage = 'Errore nella creazione della Nota Reso';
-					if(jqXHR != null && jqXHR != undefined){
-						var jqXHRResponseJson = jqXHR.responseJSON;
-						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
-							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
-							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
-								errorMessage = jqXHRResponseJsonMessage;
-							}
-						}
-					}
-					$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
-				}
-			});
-
+			$.fn.createNotaReso(true);
 		});
 	}
 
@@ -1522,4 +1432,123 @@ $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
 	}
 
 	return quantitaFixed;
+}
+
+$.fn.createNotaReso = function(print){
+
+	var alertContent = '<div id="alertNotaResoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+	var notaReso = new Object();
+	notaReso.progressivo = $('#progressivo').val();
+	notaReso.anno = $('#anno').val();
+	notaReso.data = $('#data').val();
+
+	var fornitore = new Object();
+	fornitore.id = $('#fornitore option:selected').val();
+	notaReso.fornitore = fornitore;
+
+	notaReso.note = $('#note').val();
+
+	var notaResoRigheLength = $('.rowArticolo').length;
+	if(notaResoRigheLength != null && notaResoRigheLength != undefined && notaResoRigheLength != 0){
+		var notaResoRighe = [];
+		$('.rowArticolo').each(function(i, item){
+			var articoloId = $(this).attr('data-id');
+
+			var notaResoRiga = {};
+
+			var notaResoRigaId = new Object();
+			notaResoRiga.id = notaResoRigaId;
+
+			notaResoRiga.descrizione = $(this).children().eq(0).children().eq(0).val();
+			notaResoRiga.lotto = $(this).children().eq(1).children().eq(0).val();
+			notaResoRiga.scadenza = $(this).children().eq(2).children().eq(0).val();
+
+			var udm = $(this).children().eq(3).children().eq(0).val();
+			if(udm != null && udm != ""){
+				var unitaMisura = new Object();
+				unitaMisura.id = udm;
+				notaResoRiga.unitaMisura = unitaMisura;
+			}
+			notaResoRiga.quantita = $(this).children().eq(4).children().eq(0).val();
+			notaResoRiga.prezzo = $(this).children().eq(5).children().eq(0).val();
+			notaResoRiga.sconto = $(this).children().eq(6).children().eq(0).val();
+
+			var iva = $(this).children().eq(8).children().eq(0).val();
+			if(iva != null && iva != ""){
+				var aliquotaIva = new Object();
+				aliquotaIva.id = iva;
+				notaResoRiga.aliquotaIva = aliquotaIva;
+			}
+
+			if(articoloId != null && articoloId != ""){
+				var articolo = new Object();
+				articolo.id = articoloId;
+				notaResoRiga.articolo = articolo;
+			}
+
+			notaResoRighe.push(notaResoRiga);
+		});
+		notaReso.notaResoRighe = notaResoRighe;
+	}
+
+	var notaResoTotaliLength = $('.rowTotaliByIva').length;
+	if(notaResoTotaliLength != null && notaResoTotaliLength != undefined && notaResoTotaliLength != 0){
+		var notaResoTotali = [];
+		$('.rowTotaliByIva').each(function(i, item){
+			var aliquotaIvaId = $(this).attr('data-id');
+
+			var notaResoTotale = {};
+			var notaResoTotaleId = new Object();
+			notaResoTotaleId.aliquotaIvaId = aliquotaIvaId;
+			notaResoTotale.id = notaResoTotaleId;
+
+			notaResoTotale.totaleIva = $(this).find('td').eq(1).text();
+			notaResoTotale.totaleImponibile = $(this).find('td').eq(2).text();
+
+			notaResoTotali.push(notaResoTotale);
+		});
+		notaReso.notaResoTotali = notaResoTotali;
+	}
+
+	var notaResoJson = JSON.stringify(notaReso);
+
+	$.ajax({
+		url: baseUrl + "note-reso",
+		type: 'POST',
+		contentType: "application/json",
+		dataType: 'json',
+		data: notaResoJson,
+		success: function(result) {
+			var idNotaReso = result.id;
+
+			$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@','Nota Reso creata con successo').replace('@@alertResult@@', 'success'));
+
+			$('#newNotaAccreditoButton').attr("disabled", true);
+
+			// Returns to the page with the list of Nota Reso
+			setTimeout(function() {
+				window.location.href = "note-reso.html";
+			}, 1000);
+
+			if(print){
+				window.open(baseUrl + "stampe/note-reso/"+idNotaReso, '_blank');
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			var errorMessage = 'Errore nella creazione della Nota Reso';
+			if(jqXHR != null && jqXHR != undefined){
+				var jqXHRResponseJson = jqXHR.responseJSON;
+				if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+					var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+					if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+						errorMessage = jqXHRResponseJsonMessage;
+					}
+				}
+			}
+			$('#alertNoteReso').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+		}
+	});
 }

@@ -210,7 +210,7 @@ $.fn.loadNoteAccreditoRigheTable = function(){
 			{ "width": "5%" }
 		],
 		"order": [
-			[0, 'asc']
+			//[0, 'asc']
 		]
 	});
 
@@ -286,8 +286,15 @@ $(document).ready(function() {
 					}
 
 					if(result.notaAccreditoRighe != null && result.notaAccreditoRighe != undefined){
+						var notaAccreditoRighe = result.notaAccreditoRighe;
+						notaAccreditoRighe.sort(function(a, b){
+							var a1= a.numRiga, b1= b.numRiga;
+							if(a1==b1) return 0;
+							return a1> b1? 1: -1;
+						});
+
 						$('#detailsNoteAccreditoRigheModalTable').DataTable({
-							"data": result.notaAccreditoRighe,
+							"data": notaAccreditoRighe,
 							"language": {
 								"paginate": {
 									"first": "Inizio",
@@ -304,7 +311,7 @@ $(document).ready(function() {
 							"lengthChange": false,
 							"info": false,
 							"order": [
-								[0, 'asc']
+								//[0, 'asc']
 							],
 							"autoWidth": false,
 							"columns": [
@@ -467,6 +474,20 @@ $(document).ready(function() {
 		window.open(baseUrl + "stampe/note-accredito/"+idNotaAccredito, '_blank');
 	});
 
+	$(document).on('click','#printNoteAccredito', function(event){
+		event.preventDefault();
+
+		var ids = "";
+
+		$(".rowNotaAccredito").each(function(i, item){
+			var id = $(this).attr('data-id-nota-accredito');
+			ids += id+",";
+		});
+
+		window.open(baseUrl + "stampe/note-accredito?ids="+ids, '_blank');
+
+	});
+
 	$.fn.createNotaAccredito = function(print){
 
 		var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
@@ -524,6 +545,7 @@ $(document).ready(function() {
 					articolo.id = articoloId;
 					notaAccreditoRiga.articolo = articolo;
 				}
+				notaAccreditoRiga.numRiga = $(this).attr('data-row-index');
 
 				notaAccreditoRighe.push(notaAccreditoRiga);
 			});
@@ -736,6 +758,7 @@ $(document).ready(function() {
 						articolo.id = articoloId;
 						notaAccreditoRiga.articolo = articolo;
 					}
+					notaAccreditoRiga.numRiga = $(this).attr('data-row-index');
 
 					notaAccreditoRighe.push(notaAccreditoRiga);
 				});
@@ -1361,7 +1384,14 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 						table = $.fn.loadNoteAccreditoRigheTable();
 					}
 
-					result.notaAccreditoRighe.forEach(function(item, i){
+					var notaAccreditoRighe = result.notaAccreditoRighe;
+					notaAccreditoRighe.sort(function(a, b){
+						var a1= a.numRiga, b1= b.numRiga;
+						if(a1==b1) return 0;
+						return a1> b1? 1: -1;
+					});
+
+					notaAccreditoRighe.forEach(function(item, i){
 						var articolo = item.articolo;
 						var articoloId;
 						var codiceFornitore;

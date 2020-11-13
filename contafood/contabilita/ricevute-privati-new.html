@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fattura Accompagnatoria Nuovo</title>
+  <title>ContaFood - Ricevuta Privato Nuovo</title>
 
   <link rel="icon" href="../img/favicon.png" type="image/png" />
 
@@ -40,7 +40,7 @@
   <script src="../js/commons.js"></script>
   <script src="../js/core/moment.js"></script>
 
-  <script src="../js/fatture-accompagnatorie.js"></script>
+  <script src="../js/ricevute-privati.js"></script>
 
   <script src="../js/barcode-scanner/onscan.js"></script>
 
@@ -78,11 +78,11 @@
       <div class="container-fluid" id="containerDdt">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800">Nuova Fattura Accompagnatoria</h1>
+        <h1 class="h3 mb-4 text-gray-800">Nuova Ricevuta Privato</h1>
 
-        <div id="alertFattureAccompagnatorie"></div>
+        <div id="alertRicevutaPrivato"></div>
 
-        <form id="newFatturaAccompagnatoriaForm" class="needs-validation" novalidate>
+        <form id="newRicevutaPrivatoForm" class="needs-validation" novalidate>
           <div class="form-row">
             <div class="form-group col-md-2">
               <label for="progressivo" class="mb-0">Progressivo*</label>
@@ -104,7 +104,7 @@
           </div>
           <div class="form-row">
             <div class="form-group col-md-6 mb-0">
-              <label for="cliente" class="mb-0">Cliente*</label>
+              <label for="cliente" class="mb-0">Cliente privato*</label>
               <select id="cliente" class="form-control form-control-sm ignore-barcode-scanner" required data-live-search="true">
                 <option value=""></option>
               </select>
@@ -176,7 +176,7 @@
                   </div>
                 </div>
 
-                <div id="addFatturaAccompagnatoriaArticoloAlert"></div>
+                <div id="addRicevutaPrivatoArticoloAlert"></div>
 
               </div>
 
@@ -198,7 +198,7 @@
 
               <div class="card-body pl-0 pt-0 pb-0">
                 <div class="table-responsive">
-                  <table class="table table-bordered table-sm" id="fatturaAccompagnatoriaArticoliTable" width="100%" cellspacing="0">
+                  <table class="table table-bordered table-sm" id="ricevutaPrivatoArticoliTable" width="100%" cellspacing="0">
                     <thead class="text-center" style="background-color: #baddf5;">
                     <tr>
                       <th>Articolo</th>
@@ -221,7 +221,7 @@
 
               <div class="card-body pl-0">
                 <div class="table-responsive w-50">
-                  <table class="table table-bordered table-sm" id="fatturaAccompagnatoriaTotaliTable" width="50%" cellspacing="0">
+                  <table class="table table-bordered table-sm" id="ricevutaPrivatoTotaliTable" width="50%" cellspacing="0">
                     <thead class="text-center" style="background-color: #baddf5;">
                     <tr>
                       <th>Aliquota Iva (%)</th>
@@ -276,9 +276,9 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary mt-4" id="newFatturaAccompagnatoriaButton">Salva</button>
-          <button type="button" class="btn btn-primary mt-4" id="newAndPrintFatturaAccompagnatoriaButton">Salva e Stampa</button>
-          <a href="fatture.html" class="btn btn-secondary mt-4">Annulla</a>
+          <button type="submit" class="btn btn-primary mt-4" id="newRicevutaPrivatoButton">Salva</button>
+          <button type="button" class="btn btn-primary mt-4" id="newAndPrintRicevutaPrivatoButton">Salva e Stampa</button>
+          <a href="ricevute-privati.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 
         <script>

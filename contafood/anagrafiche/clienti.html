@@ -71,12 +71,31 @@
           <!-- DataTales Example -->
           <div class="card shadow mb-4" id="clientiMainDiv">
             <div class="card-body">
+              <form id="searchClienteForm">
+                <div class="form-row">
+                  <div class="form-group col-md-2">
+                    <label for="searchPrivato" class="mb-0">Privato</label>
+                    <select id="searchPrivato" class="form-control form-control-sm" >
+                      <option value="">Tutti</option>
+                      <option value="1">Si</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-0" id="searchClienteButton">Cerca</button>
+                <a href="#" id="resetSearchClienteButton" class="btn btn-secondary mt-0">Svuota</a>
+              </form>
+            </div>
+
+
+            <div class="card-body" style="font-size: 0.9rem;">
               <div class="table-responsive">
                 <table class="table table-bordered" id="clientiTable" width="100%" cellspacing="0">
                   <thead>
         		    <tr>
         			  <th>Codice</th>
-        			  <th>Ragione sociale</th>
+        			  <th>Rag. sociale/Nome cognome</th>
                       <th>Indirizzo</th>
                       <th>Citt&agrave;</th>
                       <th>Provincia</th>

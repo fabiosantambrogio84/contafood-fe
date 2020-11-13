@@ -39,14 +39,33 @@
     var idDdt = $.fn.extractIdDdtFromUrl();
     var idNotaAccredito = $.fn.extractIdNotaAccreditoFromUrl();
     var idNotaReso = $.fn.extractIdNotaResoFromUrl();
+    var idRicevutaPrivato = $.fn.extractIdRicevutaPrivatoFromUrl();
+    var idFattura = $.fn.extractIdFatturaFromUrl();
+    var idFatturaAccompagnatoria = $.fn.extractIdFatturaAccompagnatoriaFromUrl();
     if(idDdt != null && idDdt != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
         $.fn.getDdt(idDdt);
       });
     } else if(idNotaAccredito != null && idNotaAccredito != ""){
-      $.fn.getNotaAccredito(idNotaAccredito);
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getNotaAccredito(idNotaAccredito);
+      });
     } else if(idNotaReso != null && idNotaReso != ""){
-      $.fn.getNotaReso(idNotaReso);
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getNotaReso(idNotaReso);
+      });
+    } else if(idRicevutaPrivato != null && idRicevutaPrivato != ""){
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getRicevutaPrivato(idRicevutaPrivato);
+      });
+    } else if(idFattura != null && idFattura != ""){
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getFattura(idFattura);
+      });
+    } else if(idFatturaAccompagnatoria != null && idFatturaAccompagnatoria != ""){
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getFatturaAccompagnatoria(idFatturaAccompagnatoria);
+      });
     } else {
       $.fn.getTipiPagamento();
     }
@@ -127,6 +146,9 @@
           <input type="hidden" id="hiddenIdDdt"/>
           <input type="hidden" id="hiddenIdNotaAccredito"/>
           <input type="hidden" id="hiddenIdNotaReso"/>
+          <input type="hidden" id="hiddenIdRicevutaPrivato"/>
+          <input type="hidden" id="hiddenIdFattura"/>
+          <input type="hidden" id="hiddenIdFatturaAccompagnatoria"/>
 
           <button type="submit" class="btn btn-primary" id="newPagamentoButton">Salva</button>
           <a href="" class="btn btn-secondary" id="annullaPagamentoButton">Annulla</a>
