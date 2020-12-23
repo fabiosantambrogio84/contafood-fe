@@ -263,6 +263,10 @@ $(document).ready(function() {
 					if(stato != null && stato != undefined && stato != ''){
 						$('#stato').text(stato.descrizione);
 					}
+					var causale = result.causale;
+					if(causale != null && causale != undefined && causale != ''){
+						$('#causale').text(causale.descrizione);
+					}
 					$('#tipoTrasporto').text(result.tipoTrasporto);
 					$('#dataTrasporto').text(moment(result.dataTrasporto).format('DD/MM/YYYY'));
 					$('#oraTrasporto').text(result.oraTrasporto);
@@ -585,6 +589,10 @@ $(document).ready(function() {
 		puntoConsegna.id = $('#puntoConsegna option:selected').val();
 		ddt.puntoConsegna = puntoConsegna;
 
+		var causale = new Object();
+		causale.id = $('#causale option:selected').val();
+		ddt.causale = causale;
+
 		var ddtArticoliLength = $('.rowArticolo').length;
 		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
 			var ddtArticoli = [];
@@ -878,6 +886,10 @@ $(document).ready(function() {
 			var puntoConsegna = new Object();
 			puntoConsegna.id = $('#puntoConsegna option:selected').val();
 			ddt.puntoConsegna = puntoConsegna;
+
+			var causale = new Object();
+			causale.id = $('#causale option:selected').val();
+			ddt.causale = causale;
 
 			var ddtArticoliLength = $('.rowArticolo').length;
 			if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
@@ -1611,6 +1623,30 @@ $.fn.getTipologieTrasporto = function(){
 	});
 }
 
+$.fn.getCausali = function(){
+	$.ajax({
+		url: baseUrl + "causali",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					if(item != null && item != ''){
+						if(item.descrizione == 'Vendita'){
+							$('#causale').append('<option value="'+item.id+'" selected>'+item.descrizione+'</option>');
+						} else{
+							$('#causale').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+						}
+					}
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.getArticoli = function(){
 	$.ajax({
 		url: baseUrl + "articoli?attivo=true",
@@ -1738,6 +1774,7 @@ $.fn.getDdt = function(idDdt){
 
 					$('#cliente').selectpicker('refresh');
 				}
+				$('#causale option[value="' + result.causale.id +'"]').attr('selected', true);
 				$('#colli').attr('value', result.numeroColli);
 				$('#dataTrasporto').attr('value', result.dataTrasporto);
 				$('#oraTrasporto').attr('value', result.oraTrasporto);

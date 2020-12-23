@@ -37,14 +37,29 @@ $.fn.loadFattureTable = function(url) {
 			[2, 'desc']
 		],
 		"columns": [
-			{"name": "speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
+			{"name":"speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var speditoAde = data.speditoAde;
+				var fatturaId = data.id;
+				var selectId = "speditoAde_" + fatturaId;
+
+				var speditoAdeSelect = '<select id="'+selectId+'" class="form-control form-control-sm speditoAdeFattura" data-id="'+fatturaId+'" data-value="'+speditoAde+'" data-tipo="'+data.tipoFattura.codice+'">';
+				var optionHtml = '<option value="si"';
 				if(speditoAde){
-					return "Si";
-				} else {
-					return "No";
+					optionHtml += ' selected'
 				}
+				optionHtml += '>Si</option>';
+				speditoAdeSelect += optionHtml;
+				optionHtml = '<option value="no"';
+				if(!speditoAde){
+					optionHtml += ' selected'
+				}
+				optionHtml += '>No</option>';
+				speditoAdeSelect += optionHtml;
+
+				speditoAdeSelect += '</select';
+				return speditoAdeSelect;
 			}},
+
 			{"name": "tipo", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var tipo = data.tipoFattura;
 				if(tipo != null){
@@ -108,6 +123,7 @@ $.fn.loadFattureTable = function(url) {
 					links += '<a class="payFattura pr-1" data-id="'+data.id+'" href="' + pagamentoUrl + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 				}
 				links += '<a class="printFattura pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+				links += '<a class="downloadAdeXml pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Download XML AdE"><i class="fa fa-download"></i></a>';
 				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE') {
 					links += '<a class="deleteFatture" data-id="' + data.id + '" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				}
@@ -167,6 +183,62 @@ $(document).ready(function() {
 
 	$.fn.loadEmptyFatturaDdtTable();
 
+	$(document).on('change','.speditoAdeFattura', function(){
+		var originalValue = $(this).attr("data-value");
+		if(originalValue == "true"){
+			originalValue = "si";
+		} else {
+			originalValue = "no";
+		}
+		var fatturaId = $(this).attr("data-id");
+		var tipoFattura = $(this).attr("data-tipo");
+
+		confirmResult = confirm("Sei sicuro di voler aggiornare il flag 'Spedito A.d.E.'?");
+
+		if(confirmResult){
+			var speditoAde = $(this).val();
+			if(speditoAde == "si"){
+				speditoAde = true;
+			} else {
+				speditoAde = false;
+			}
+
+			var fatturaPatched = new Object();
+			fatturaPatched.id = parseInt(fatturaId);
+			fatturaPatched.speditoAde = speditoAde;
+
+			var fatturaPatchedJson = JSON.stringify(fatturaPatched);
+
+			var alertContent = '<div id="alertFatturaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			url = baseUrl + "fatture/" + fatturaId;
+			if(tipoFattura == "ACCOMPAGNATORIA"){
+				url = baseUrl + "fatture-accompagnatorie/" + fatturaId;
+			}
+
+			$.ajax({
+				url: url,
+				type: 'PATCH',
+				contentType: "application/json",
+				dataType: 'json',
+				data: fatturaPatchedJson,
+				success: function(result) {
+					$('#alertFatture').empty().append(alertContent.replace('@@alertText@@',"Flag 'Spedito A.d.E.' modificato con successo").replace('@@alertResult@@', 'success'));
+					$('#fattureTable').DataTable().ajax.reload();
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertFatture').empty().append(alertContent.replace('@@alertText@@',"Errore nella modifica del flag 'Spedito A.d.E.'").replace('@@alertResult@@', 'danger'));
+					$('#fattureTable').DataTable().ajax.reload();
+				}
+			});
+
+		} else {
+			$("#speditoAde_" + fatturaId).val(originalValue).prop('selected', true);
+		}
+	});
+
 	$(document).on('click','#resetSearchFattureButton', function(){
 		$('#searchFattureForm :input').val(null);
 		$('#searchFattureForm select option[value=""]').attr('selected', true);
@@ -222,6 +294,10 @@ $(document).ready(function() {
 							if(agente != null){
 								$('#agente').text(agente.nome + ' ' + agente.cognome);
 							}
+						}
+						var causale = result.causale;
+						if(causale != null && causale != undefined && causale != ''){
+							$('#causale').text(causale.descrizione);
 						}
 						$('#totaleAcconto').text(result.totaleAcconto);
 						$('#totale').text(result.totale);
@@ -357,6 +433,10 @@ $(document).ready(function() {
 						var puntoConsegna = result.puntoConsegna;
 						if(puntoConsegna != null && puntoConsegna != undefined && puntoConsegna != ''){
 							$('#fatturaAccompagnatoriaPuntoConsegna').text(puntoConsegna.nome);
+						}
+						var causale = result.causale;
+						if(causale != null && causale != undefined && causale != ''){
+							$('#fatturaAccompagnatoriaCausale').text(causale.descrizione);
 						}
 						$('#fatturaAccompagnatoriaTotaleAcconto').text(result.totaleAcconto);
 						$('#fatturaAccompagnatoriaTotale').text(result.totale);
@@ -545,6 +625,18 @@ $(document).ready(function() {
 
 	});
 
+	$(document).on('click','.downloadAdeXml', function(){
+		var idFattura = $(this).attr('data-id');
+		var tipoFattura = $(this).attr('data-tipo');
+
+		if(tipoFattura == 'VENDITA'){
+			window.open(baseUrl + "export-ade/fatture/"+idFattura);
+		} else {
+			// fattura accompagnatoria
+			window.open(baseUrl + "export-ade/fatture-accompagnatorie/"+idFattura);
+		}
+	});
+
 	if($('#searchFattureButton') != null && $('#searchFattureButton') != undefined) {
 		$(document).on('submit', '#searchFattureForm', function (event) {
 			event.preventDefault();
@@ -619,6 +711,10 @@ $(document).ready(function() {
 				var cliente = new Object();
 				cliente.id = $('#cliente option:selected').val();
 				fattura.cliente = cliente;
+
+				var causale = new Object();
+				causale.id = $('#causale option:selected').val();
+				fattura.causale = causale;
 
 				var fatturaDdts = [];
 				$('.fatturaDdtCheckbox:checkbox:checked').each(function(i, item) {
@@ -901,6 +997,30 @@ $.fn.getClienti = function(){
 						idListino = listino.id;
 					}
 					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getCausali = function(){
+	$.ajax({
+		url: baseUrl + "causali",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					if(item != null && item != ''){
+						if(item.descrizione == 'Vendita'){
+							$('#causale').append('<option value="'+item.id+'" selected>'+item.descrizione+'</option>');
+						} else{
+							$('#causale').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+						}
+					}
 				});
 			}
 		},

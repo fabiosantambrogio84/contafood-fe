@@ -47,7 +47,7 @@
   <script>
     var idDdt = $.fn.extractIdDdtFromUrl();
     if(idDdt != null && idDdt != undefined){
-      $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getTipologieTrasporto()).then($.fn.getDdt(idDdt));
+      $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getTipologieTrasporto(), $.fn.getCausali()).then($.fn.getDdt(idDdt));
       /*
       $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getTipologieTrasporto()).then(function(f1,f2,f3){
         $.fn.getDdt(idDdt);
@@ -230,6 +230,11 @@
             <div class="form-group col-md-2">
               <label for="tipoTrasporto" class="mb-0">Trasporto a cura del</label>
               <select id="tipoTrasporto" class="form-control form-control-sm" >
+              </select>
+            </div>
+            <div class="form-group col-md-2">
+              <label for="causale" class="mb-0">Causale</label>
+              <select id="causale" class="form-control form-control-sm ignore-barcode-scanner" >
               </select>
             </div>
           </div>

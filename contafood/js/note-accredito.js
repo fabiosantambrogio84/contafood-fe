@@ -39,13 +39,27 @@ $.fn.loadNoteAccreditoTable = function(url) {
 			[1, 'desc']
 		],
 		"columns": [
-			{"name": "speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
+			{"name":"speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var speditoAde = data.speditoAde;
+				var notaAccreditoId = data.id;
+				var selectId = "speditoAde_" + notaAccreditoId;
+
+				var speditoAdeSelect = '<select id="'+selectId+'" class="form-control form-control-sm speditoAdeNotaAccredito" data-id="'+notaAccreditoId+'" data-value="'+speditoAde+'">';
+				var optionHtml = '<option value="si"';
 				if(speditoAde){
-					return "Si";
-				} else {
-					return "No";
+					optionHtml += ' selected'
 				}
+				optionHtml += '>Si</option>';
+				speditoAdeSelect += optionHtml;
+				optionHtml = '<option value="no"';
+				if(!speditoAde){
+					optionHtml += ' selected'
+				}
+				optionHtml += '>No</option>';
+				speditoAdeSelect += optionHtml;
+
+				speditoAdeSelect += '</select';
+				return speditoAdeSelect;
 			}},
 			{"name": "numero", "data": "progressivo", "width":"5%"},
 			{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
@@ -95,6 +109,7 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				}
 				links += '<a class="emailNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 				links += '<a class="printNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+				links += '<a class="downloadAdeXml pr-1" data-id="' + data.id + '" href="#" title="Download XML AdE"><i class="fa fa-download"></i></a>';
 				links += '<a class="deleteNotaAccredito" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -227,6 +242,56 @@ $(document).ready(function() {
 		$.fn.loadNoteAccreditoRigheTable();
 	}
 
+	$(document).on('change','.speditoAdeNotaAccredito', function(){
+		var originalValue = $(this).attr("data-value");
+		if(originalValue == "true"){
+			originalValue = "si";
+		} else {
+			originalValue = "no";
+		}
+		var notaAccreditoId = $(this).attr("data-id");
+
+		confirmResult = confirm("Sei sicuro di voler aggiornare il flag 'Spedito A.d.E.'?");
+
+		if(confirmResult){
+			var speditoAde = $(this).val();
+			if(speditoAde == "si"){
+				speditoAde = true;
+			} else {
+				speditoAde = false;
+			}
+
+			var notaAccreditoPatched = new Object();
+			notaAccreditoPatched.id = parseInt(notaAccreditoId);
+			notaAccreditoPatched.speditoAde = speditoAde;
+
+			var notaAccreditoPatchedJson = JSON.stringify(notaAccreditoPatched);
+
+			var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			$.ajax({
+				url: baseUrl + "note-accredito/" + notaAccreditoId,
+				type: 'PATCH',
+				contentType: "application/json",
+				dataType: 'json',
+				data: notaAccreditoPatchedJson,
+				success: function(result) {
+					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@',"Flag 'Spedito A.d.E.' modificato con successo").replace('@@alertResult@@', 'success'));
+					$('#noteAccreditoTable').DataTable().ajax.reload();
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@',"Errore nella modifica del flag 'Spedito A.d.E.'").replace('@@alertResult@@', 'danger'));
+					$('#noteAccreditoTable').DataTable().ajax.reload();
+				}
+			});
+
+		} else {
+			$("#speditoAde_" + notaAccreditoId).val(originalValue).prop('selected', true);
+		}
+	});
+
 	$(document).on('click','#resetSearchNoteAccreditoButton', function(){
 		$('#searchNoteAccreditoForm :input').val(null);
 		$('#searchNoteAccreditoForm select option[value=""]').attr('selected', true);
@@ -273,6 +338,10 @@ $(document).ready(function() {
 					var stato = result.statoNotaAccredito;
 					if(stato != null && stato != undefined && stato != ''){
 						$('#stato').text(stato.descrizione);
+					}
+					var causale = result.causale;
+					if(causale != null && causale != undefined && causale != ''){
+						$('#causale').text(causale.descrizione);
 					}
 					$('#note').text(result.note);
 					$('#riferimento').text(result.tipoRiferimento);
@@ -488,6 +557,12 @@ $(document).ready(function() {
 
 	});
 
+	$(document).on('click','.downloadAdeXml', function(){
+		var idNotaAccredito = $(this).attr('data-id');
+
+		window.open(baseUrl + "export-ade/note-accredito/"+idNotaAccredito);
+	});
+
 	$.fn.createNotaAccredito = function(print){
 
 		var alertContent = '<div id="alertNotaAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
@@ -502,6 +577,10 @@ $(document).ready(function() {
 		var cliente = new Object();
 		cliente.id = $('#cliente option:selected').val();
 		notaAccredito.cliente = cliente;
+
+		var causale = new Object();
+		causale.id = $('#causale option:selected').val();
+		notaAccredito.causale = causale;
 
 		notaAccredito.tipoRiferimento = $('#riferimento option:selected').val();
 		notaAccredito.documentoRiferimento = $('#numeroDocumento').val();
@@ -715,6 +794,10 @@ $(document).ready(function() {
 			var cliente = new Object();
 			cliente.id = $('#cliente option:selected').val();
 			notaAccredito.cliente = cliente;
+
+			var causale = new Object();
+			causale.id = $('#causale option:selected').val();
+			notaAccredito.causale = causale;
 
 			notaAccredito.tipoRiferimento = $('#riferimento option:selected').val();
 			notaAccredito.documentoRiferimento = $('#numeroDocumento').val();
@@ -1232,6 +1315,31 @@ $.fn.getClienti = function(){
 
 	});
 }
+
+$.fn.getCausali = function(){
+	$.ajax({
+		url: baseUrl + "causali",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					if(item != null && item != ''){
+						if(item.descrizione == 'Sconto merce'){
+							$('#causale').append('<option value="'+item.id+'" selected>'+item.descrizione+'</option>');
+						} else{
+							$('#causale').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+						}
+					}
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 
 $.fn.getArticoli = function(){
 

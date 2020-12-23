@@ -17,6 +17,8 @@ $(document).ready(function() {
             $('#accordionSidebar').load('../commons/sidebar-contabilita.html');
         } else if(pageType == 'lotti-statistiche'){
             $('#accordionSidebar').load('../commons/sidebar-lotti-statistiche.html');
+        } else if(pageType == 'stampe'){
+            $('#accordionSidebar').load('../commons/sidebar-stampe.html');
         }
 
     } else{

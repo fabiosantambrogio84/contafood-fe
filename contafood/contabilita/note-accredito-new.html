@@ -48,7 +48,7 @@
       $.fn.preloadFields();
     });
     */
-    $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva()).then($.fn.preloadFields(), null);
+    $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva(), $.fn.getCausali()).then($.fn.preloadFields(), null);
   </script>
 
 </head>
@@ -242,6 +242,14 @@
                 </div>
               </div>
 
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-2">
+              <label for="causale" class="mb-0">Causale</label>
+              <select id="causale" class="form-control form-control-sm ignore-barcode-scanner" >
+              </select>
             </div>
           </div>
 

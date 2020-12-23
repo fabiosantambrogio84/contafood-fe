@@ -156,6 +156,10 @@ $(document).ready(function() {
 		puntoConsegna.id = $('#puntoConsegna option:selected').val();
 		fatturaAccompagnatoria.puntoConsegna = puntoConsegna;
 
+		var causale = new Object();
+		causale.id = $('#causale option:selected').val();
+		fatturaAccompagnatoria.causale = causale;
+
 		var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
 		if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0){
 			var fatturaAccompagnatoriaArticoli = [];
@@ -817,6 +821,30 @@ $.fn.getTipologieTrasporto = function(){
 						$('#tipoTrasporto').append('<option value="'+item+'">'+item+'</option>');
 					}
 
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getCausali = function(){
+	$.ajax({
+		url: baseUrl + "causali",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					if(item != null && item != ''){
+						if(item.descrizione == 'Vendita'){
+							$('#causale').append('<option value="'+item.id+'" selected>'+item.descrizione+'</option>');
+						} else{
+							$('#causale').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+						}
+					}
 				});
 			}
 		},

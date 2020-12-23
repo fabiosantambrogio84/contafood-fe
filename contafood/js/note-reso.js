@@ -255,6 +255,10 @@ $(document).ready(function() {
 					if(stato != null && stato != undefined && stato != ''){
 						$('#stato').text(stato.descrizione);
 					}
+					var causale = result.causale;
+					if(causale != null && causale != undefined && causale != ''){
+						$('#causale').text(causale.descrizione);
+					}
 					$('#note').text(result.note);
 					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
 					var dataAggiornamento = result.dataAggiornamento;
@@ -531,6 +535,10 @@ $(document).ready(function() {
 			var fornitore = new Object();
 			fornitore.id = $('#fornitore option:selected').val();
 			notaReso.fornitore = fornitore;
+
+			var causale = new Object();
+			causale.id = $('#causale option:selected').val();
+			notaReso.causale = causale;
 
 			notaReso.note = $('#note').val();
 
@@ -983,6 +991,34 @@ $.fn.getFornitori = function(){
 	});
 }
 
+$.fn.getCausali = function(){
+
+	return $.Deferred(function() {
+
+		$.ajax({
+			url: baseUrl + "causali",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						if(item != null && item != ''){
+							if(item.descrizione == 'Reso merce'){
+								$('#causale').append('<option value="'+item.id+'" selected>'+item.descrizione+'</option>');
+							} else{
+								$('#causale').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+							}
+						}
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+	});
+}
+
 $.fn.getArticoli = function(idFornitore){
 
 	return $.Deferred(function() {
@@ -1125,6 +1161,7 @@ $.fn.getNotaReso = function(idNotaReso){
 
 					$.fn.getArticoli(result.fornitore.id);
 				}
+				$('#causale option[value="' + result.causale.id +'"]').attr('selected', true);
 				$('#note').val(result.note);
 
 				if(result.notaResoRighe != null && result.notaResoRighe != undefined && result.notaResoRighe.length != 0){
@@ -1448,6 +1485,10 @@ $.fn.createNotaReso = function(print){
 	var fornitore = new Object();
 	fornitore.id = $('#fornitore option:selected').val();
 	notaReso.fornitore = fornitore;
+
+	var causale = new Object();
+	causale.id = $('#causale option:selected').val();
+	notaReso.causale = causale;
 
 	notaReso.note = $('#note').val();
 
