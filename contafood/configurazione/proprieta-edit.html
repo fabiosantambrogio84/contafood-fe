@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>ContaFood - Parametro Modifica</title>
+    <title>ContaFood - Proprieta Modifica</title>
 
     <link rel="icon" href="../img/favicon.png" type="image/png" />
 
@@ -32,13 +32,13 @@
 
     <script src="../js/core/crypto.js"></script>
     <script src="../js/commons.js"></script>
-    <script src="../js/parametri.js"></script>
+    <script src="../js/proprieta.js"></script>
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>-->
 
     <script>
-        var idParametro = $.fn.extractIdParametroFromUrl();
+        var idProprieta = $.fn.extractIdProprietaFromUrl();
         var token = $.fn.extractTokenFromUrl();
-        $.fn.getParametro(idParametro, token);
+        $.fn.getProprieta(idProprieta, token);
     </script>
 </head>
 
@@ -62,45 +62,41 @@
             <!-- End of Topbar -->
 
             <!-- Begin Page Content -->
-            <div class="container-fluid" id="containerParametri">
+            <div class="container-fluid" id="containerProprieta">
 
                 <!-- Page Heading -->
                 <div class="row">
                     <div class="col-md-10">
-                        <h1 class="h3 mb-4 text-gray-800">Modifica parametro</h1>
+                        <h1 class="h3 mb-4 text-gray-800">Modifica proprieta</h1>
                     </div>
                 </div>
 
-                <div id="alertParametri"></div>
+                <div id="alertProprieta"></div>
 
-                <form id="updateParametroForm" class="needs-validation" novalidate>
+                <form id="updateProprietaForm" class="needs-validation" novalidate>
                     <div class="form-row">
                         <div class="form-group col-md-4">
                             <label for="nome">Nome</label>
                             <input type="text" class="form-control" id="nome" placeholder="" disabled>
                         </div>
-                        <div class="form-group col-md-2">
+                        <div class="form-group col-md-4">
+                            <label for="descrizione">Descrizione</label>
+                            <input type="text" class="form-control" id="descrizione" placeholder="">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
                             <label for="valore">Valore*</label>
                             <input type="text" class="form-control" id="valore" placeholder="" required>
                             <div class="invalid-feedback">
                                 Inserisci un valore
                             </div>
                         </div>
-                        <div class="form-group col-md-2">
-                            <label for="unitaDiMisura">Unit&agrave; di misura</label>
-                            <input type="text" class="form-control" id="unitaDiMisura" placeholder="">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="descrizione">Descrizione</label>
-                            <textarea class="form-control" id="descrizione"></textarea>
-                        </div>
                     </div>
 
-                    <input type="hidden" id="hiddenIdParametro"/>
-                    <button type="submit" class="btn btn-primary" id="updateParametroButton">Salva</button>
-                    <a href="#" class="btn btn-secondary" id="annullaParametroButton">Annulla</a>
+                    <input type="hidden" id="hiddenIdProprieta"/>
+                    <button type="submit" class="btn btn-primary" id="updateProprietaButton">Salva</button>
+                    <a href="#" class="btn btn-secondary" id="annullaProprietaButton">Annulla</a>
                 </form>
 
                 <script>

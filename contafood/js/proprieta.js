@@ -8,7 +8,7 @@ $(document).ready(function() {
             var bytes  = CryptoJS.AES.decrypt(token.toString(), 'contafood');
             var auth = bytes.toString(CryptoJS.enc.Utf8);
 
-            $.fn.loadParametriTable(auth);
+            $.fn.loadProprietaTable(auth);
         } else {
             $('#authorizationModal').modal('show');
         }
@@ -20,7 +20,7 @@ $(document).on('click','.annullaAuthorizationModal', function(){
 
     var alertContent = '<div id="alertParametroContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
     alertContent = alertContent + '<strong>Accesso negato</strong>\n' + '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-    $('#alertParametro').empty().append(alertContent);
+    $('#alertProprieta').empty().append(alertContent);
 });
 
 $(document).on('submit','#authorizationForm', function(event){
@@ -30,13 +30,13 @@ $(document).on('submit','#authorizationForm', function(event){
     var password = $('#password').val();
     var auth = "Basic " + btoa(username + ":" + password);
 
-    $.fn.loadParametriTable(auth);
+    $.fn.loadProprietaTable(auth);
 });
 
-$.fn.loadParametriTable = function(auth){
-    $('#parametriTable').DataTable({
+$.fn.loadProprietaTable = function(auth){
+    $('#proprietaTable').DataTable({
         "ajax": {
-            "url": baseUrl + "configurazione/parametri",
+            "url": baseUrl + "configurazione/proprieta",
             "type": "GET",
             "content-type": "json",
             "cache": false,
@@ -46,7 +46,7 @@ $.fn.loadParametriTable = function(auth){
             },
             "dataSrc": function(data) {
                 $('#authorizationModal').modal('hide');
-                $('#parametriMainDiv').removeClass('d-none');
+                $('#proprietaMainDiv').removeClass('d-none');
                 return data;
             },
             "error": function(jqXHR, textStatus, errorThrown) {
@@ -54,10 +54,10 @@ $.fn.loadParametriTable = function(auth){
 
                 $('#authorizationModal').modal('hide');
 
-                var alertContent = '<div id="alertParametroContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+                var alertContent = '<div id="alertProprietaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
                 alertContent = alertContent + '<strong>Accesso negato</strong>\n' +
                     '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-                $('#alertParametro').empty().append(alertContent);
+                $('#alertProprieta').empty().append(alertContent);
             }
         },
         "language": {
@@ -68,8 +68,8 @@ $.fn.loadParametriTable = function(auth){
                 "next": "Succ.",
                 "previous": "Prec."
             },
-            "emptyTable": "Nessun parametro disponibile",
-            "zeroRecords": "Nessun parametro disponibile"
+            "emptyTable": "Nessuna proprieta disponibile",
+            "zeroRecords": "Nessuna proprieta disponibile"
         },
         "pageLength": 20,
         "lengthChange": false,
@@ -82,7 +82,6 @@ $.fn.loadParametriTable = function(auth){
             {"name": "nome", "data": "nome"},
             {"name": "descrizione", "data": "descrizione"},
             {"name": "valore", "data": "valore"},
-            {"name": "unitaDiMisura", "data": "unitaDiMisura"},
             {"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
                 /*
                 // Encrypt
@@ -93,14 +92,14 @@ $.fn.loadParametriTable = function(auth){
                 var plaintext = bytes.toString(CryptoJS.enc.Utf8);
                 */
                 var token = CryptoJS.AES.encrypt(auth, 'contafood');
-                var links = '<a class="updateParametro pr-2" data-id="'+data.id+'" href="parametri-edit.html?idParametro=' + data.id + '&token=' + token +'"><i class="far fa-edit"></i></a>';
+                var links = '<a class="updateProprieta pr-2" data-id="'+data.id+'" href="proprieta-edit.html?idProprieta=' + data.id + '&token=' + token +'"><i class="far fa-edit"></i></a>';
                 return links;
             }}
         ]
     });
 }
 
-$.fn.extractIdParametroFromUrl = function(){
+$.fn.extractIdProprietaFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
 	var urlVariables = pageUrl.split('&'),
@@ -110,7 +109,7 @@ $.fn.extractIdParametroFromUrl = function(){
     for (i = 0; i < urlVariables.length; i++) {
         paramNames = urlVariables[i].split('=');
 
-        if (paramNames[0] === 'idParametro') {
+        if (paramNames[0] === 'idProprieta') {
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
@@ -132,14 +131,14 @@ $.fn.extractTokenFromUrl = function(){
     }
 }
 
-$.fn.getParametro = function(idParametro, token){
-    var alertContent = '<div id="alertParametroContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-    alertContent = alertContent +  '<strong>Errore nel recupero del parametro.</strong>\n' +
+$.fn.getProprieta = function(idProprieta, token){
+    var alertContent = '<div id="alertProprietaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+    alertContent = alertContent +  '<strong>Errore nel recupero della proprietà.</strong>\n' +
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
     var bytes  = CryptoJS.AES.decrypt(token.toString(), 'contafood');
     var auth = bytes.toString(CryptoJS.enc.Utf8);
-    console.log(auth);
+    //console.log(auth);
 
     // remove the token parameter from the url
     /*var uri = window.location.toString();
@@ -149,7 +148,7 @@ $.fn.getParametro = function(idParametro, token){
     }*/
 
     $.ajax({
-        url: baseUrl + "configurazione/parametri/" + idParametro,
+        url: baseUrl + "configurazione/proprieta/" + idProprieta,
         type: 'GET',
         dataType: 'json',
         headers: {
@@ -159,52 +158,50 @@ $.fn.getParametro = function(idParametro, token){
         success: function (result) {
             if (result != null && result != undefined && result != '') {
 
-                $('#hiddenIdParametro').attr('value', result.id);
+                $('#hiddenIdProprieta').attr('value', result.id);
                 $('#nome').attr('value', result.nome);
-                $('#valore').attr('value', result.valore);
-                $('#unitaDiMisura').attr('value', result.unitaDiMisura);
                 $('#descrizione').val(result.descrizione);
+                $('#valore').attr('value', result.valore);
 
-                $('#annullaParametroButton').attr('data-auth', token);
+                $('#annullaProprietaButton').attr('data-auth', token);
             };
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertParametro').append(alertContent);
-            $('#updateParametroButton').attr('disabled', true);
+            $('#alertProprieta').append(alertContent);
+            $('#updateProprietaButton').attr('disabled', true);
             console.log('Response text: ' + jqXHR.responseText);
         }
     });
 }
 
-$(document).on('click','#annullaParametroButton', function(event){
+$(document).on('click','#annullaProprietaButton', function(event){
     event.preventDefault();
 
-    window.location = 'parametri.html?token=' + $(this).attr('data-auth');
+    window.location = 'proprieta.html?token=' + $(this).attr('data-auth');
     //$.fn.loadParametriTable(auth);
 });
 
-$(document).on('submit','#updateParametroForm', function(event) {
+$(document).on('submit','#updateProprietaForm', function(event) {
     event.preventDefault();
 
-    var token = $('#annullaParametroButton').attr('data-auth');
+    var token = $('#annullaProprietaButton').attr('data-auth');
     var bytes  = CryptoJS.AES.decrypt(token.toString(), 'contafood');
     var auth = bytes.toString(CryptoJS.enc.Utf8);
 
-    var parametro = new Object();
-    parametro.id = $('#hiddenIdParametro').val();
-    parametro.nome = $('#nome').val();
-    parametro.descrizione = $('#descrizione').val();
-    parametro.unitaDiMisura = $('#unitaDiMisura').val();
-    parametro.valore = $('#valore').val();
+    var proprieta = new Object();
+    proprieta.id = $('#hiddenIdProprieta').val();
+    proprieta.nome = $('#nome').val();
+    proprieta.descrizione = $('#descrizione').val();
+    proprieta.valore = $('#valore').val();
 
-    var parametroJson = JSON.stringify(parametro);
+    var proprietaJson = JSON.stringify(proprieta);
 
-    var alertContent = '<div id="alertParametroContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+    var alertContent = '<div id="alertProprietaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
     alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
         '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
     $.ajax({
-        url: baseUrl + "configurazione/parametri/" + $('#hiddenIdParametro').val(),
+        url: baseUrl + "configurazione/proprieta/" + $('#hiddenIdProprieta').val(),
         type: 'PUT',
         contentType: "application/json",
         headers: {
@@ -212,18 +209,18 @@ $(document).on('submit','#updateParametroForm', function(event) {
             "Authorization": auth
         },
         dataType: 'json',
-        data: parametroJson,
+        data: proprietaJson,
         success: function(result) {
-            $('#alertParametri').empty().append(alertContent.replace('@@alertText@@','Parametro modificato con successo').replace('@@alertResult@@', 'success'));
+            $('#alertProprieta').empty().append(alertContent.replace('@@alertText@@','Proprietà modificata con successo').replace('@@alertResult@@', 'success'));
 
             // Returns to the list page
             setTimeout(function() {
-                window.location.href = "parametri.html?token=" + token;
+                window.location.href = "proprieta.html?token=" + token;
             }, 1000);
 
         },
         error: function(jqXHR, textStatus, errorThrown) {
-            $('#alertParametri').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del parametro').replace('@@alertResult@@', 'danger'));
+            $('#alertProprieta').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della proprietà').replace('@@alertResult@@', 'danger'));
         }
     });
 });

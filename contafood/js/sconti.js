@@ -420,7 +420,7 @@ $.fn.getFornitori = function(){
 
 $.fn.getArticoli = function(){
 	$.ajax({
-		url: baseUrl + "articoli",
+		url: baseUrl + "articoli?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

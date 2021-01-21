@@ -40,6 +40,7 @@ $.fn.loadDdtAcquistoTable = function(url) {
 			[3, 'asc']
 		],
 		"columns": [
+			//{"name": "dataHidden", "data": "data", "width":"1%", "visible":false},
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
 				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="ddtAcquistoCheckbox">';
 				return checkboxHtml;
@@ -47,7 +48,8 @@ $.fn.loadDdtAcquistoTable = function(url) {
 			{"name": "numero", "data": "numero", "width":"5%"},
 			{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var a = moment(data.data);
-				return a.format('DD/MM/YYYY');
+				var contentHtml = '<span class="d-none">'+data.data+'</span>'+a.format('DD/MM/YYYY');
+				return contentHtml;
 			}},
 			{"name": "fornitore", "data": null, "width":"10%", render: function ( data, type, row ) {
 				var fornitore = data.fornitore;

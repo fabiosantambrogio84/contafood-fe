@@ -34,6 +34,8 @@ $(document).ready(function() {
 		$(document).on('submit','#updateClientePuntoConsegnaForm', function(event){
 			event.preventDefault();
 
+			var idCliente = $('#hiddenIdCliente').val();
+
 			var puntoConsegna = new Object();
 			puntoConsegna.id = $('#hiddenIdPuntoConsegna').val();
 			puntoConsegna.nome = $('#nome').val();
@@ -43,7 +45,7 @@ $(document).ready(function() {
 			puntoConsegna.provincia = $('#provincia option:selected').text();
 			puntoConsegna.codiceConad = $('#codiceConad').val();
 			var cliente = new Object();
-			cliente.id = $('#hiddenIdCliente').val();
+			cliente.id = idCliente;
 			puntoConsegna.cliente = cliente;
 
 			var puntoConsegnaJson = JSON.stringify(puntoConsegna);
@@ -60,6 +62,12 @@ $(document).ready(function() {
 				data: puntoConsegnaJson,
 				success: function(result) {
 					$('#alertClientePuntoConsegna').empty().append(alertContent.replace('@@alertText@@','Punto di consegna modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list page
+					setTimeout(function() {
+						window.location.href = "cliente-punti-consegna.html?idCliente="+idCliente;
+					}, 1000);
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertClientePuntoConsegna').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del punto di consegna').replace('@@alertResult@@', 'danger'));
@@ -72,6 +80,8 @@ $(document).ready(function() {
 		$(document).on('submit','#newClientePuntoConsegnaForm', function(event){
 			event.preventDefault();
 
+			var idCliente = $('#hiddenIdCliente').val();
+
 			var puntoConsegna = new Object();
 			puntoConsegna.nome = $('#nome').val();
 			puntoConsegna.indirizzo = $('#indirizzo').val();
@@ -80,7 +90,7 @@ $(document).ready(function() {
 			puntoConsegna.provincia = $('#provincia option:selected').text();
 			puntoConsegna.codiceConad = $('#codiceConad').val();
 			var cliente = new Object();
-			cliente.id = $('#hiddenIdCliente').val();
+			cliente.id = idCliente;
 			puntoConsegna.cliente = cliente;
 
 			var puntoConsegnaJson = JSON.stringify(puntoConsegna);
@@ -97,6 +107,12 @@ $(document).ready(function() {
 				data: puntoConsegnaJson,
 				success: function(result) {
 					$('#alertClientePuntoConsegna').empty().append(alertContent.replace('@@alertText@@','Punto di consegna creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list page
+					setTimeout(function() {
+						window.location.href = "cliente-punti-consegna.html?idCliente="+idCliente;
+					}, 1000);
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertClientePuntoConsegna').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del punto di consegna').replace('@@alertResult@@', 'danger'));

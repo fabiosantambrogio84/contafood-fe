@@ -198,6 +198,11 @@ $(document).ready(function() {
 				data: fornitoreJson,
 				success: function(result) {
 					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list page
+					setTimeout(function() {
+						window.location.href = "fornitori.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore').replace('@@alertResult@@', 'danger'));
@@ -248,6 +253,11 @@ $(document).ready(function() {
 				data: fornitoreJson,
 				success: function(result) {
 					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Fornitore creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list page
+					setTimeout(function() {
+						window.location.href = "fornitori.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore').replace('@@alertResult@@', 'danger'));

@@ -444,9 +444,14 @@ $(document).ready(function() {
 
 					$('#newOrdineClienteButton').attr("disabled", true);
 
-					// Returns to the page with the list of OrdineCliente
+					var locationHref = "ordini-clienti.html";
+					var idTelefonata = $('#hiddenIdTelefonata').attr('value');
+					if(idTelefonata != null && idTelefonata != undefined && idTelefonata != ""){
+						locationHref = "telefonate.html";
+					}
+
 					setTimeout(function() {
-						window.location.href = "ordini-clienti.html";
+						window.location.href = locationHref;
 					}, 2000);
 
 					// Empty all fields in order to immediately create a new OrdineCliente
@@ -1142,7 +1147,6 @@ $.fn.getClienti = function(){
 				}
 				$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
 
-				console.log("GET CLIENTI");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -1167,7 +1171,6 @@ $.fn.getAutisti = function(){
 					});
 				}
 
-				console.log("GET AUTISTI");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -1191,7 +1194,6 @@ $.fn.getAgenti = function(){
 					});
 				}
 
-				console.log("GET AGENTI");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -1217,7 +1219,6 @@ $.fn.getArticoli = function(){
 					});
 				}
 
-				console.log("GET ARTICOLI");
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -1454,6 +1455,9 @@ $.fn.getTelefonata = function(idTelefonata){
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
+
+				$('#hiddenIdTelefonata').attr('value', idTelefonata);
+				$('#annullaOrdineClienteButton').attr('href', "telefonate.html");
 
 				if(result.autista != null){
 					$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);

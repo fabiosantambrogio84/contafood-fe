@@ -23,12 +23,23 @@
   <!-- Custom styles for this page -->
   <link href="../vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+  <!-- Bootstrap-select -->
+  <link rel="stylesheet" href="../css/bootstrap-select-1.13.12.css">
+
   <!-- Bootstrap core JavaScript-->
   <script src="../vendor/jquery/jquery.js"></script>
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
+
+  <!-- Bootstrap-select -->
+  <script src="../js/bootstrap-select/bootstrap-select-1.13.12.js"></script>
+  <script src="../js/bootstrap-select/i18n/defaults-it_IT.js"></script>
+
+  <!-- Page level plugins -->
+  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
   <script src="../js/commons.js"></script>
 
@@ -37,9 +48,11 @@
   <script>
     var idCliente = $.fn.extractIdClienteFromUrl();
     if(idCliente != null && idCliente != undefined){
-      $.when($.fn.getProvince(), $.fn.getBanche(), $.fn.getAgenti(), $.fn.getTipiPagamento(), $.fn.getListini(false)).then(function(f1,f2,f3,f4,f5){
+      $.when($.fn.getProvince(), $.fn.getBanche(), $.fn.getAgenti(), $.fn.getTipiPagamento(), $.fn.getListini(false), $.fn.getArticoli()).done(function(f1,f2,f3,f4,f5,f6){
         $.fn.getCliente(idCliente);
       });
+      //$.when($.fn.getProvince(), $.fn.getBanche(), $.fn.getAgenti(), $.fn.getTipiPagamento(), $.fn.getListini(false), $.fn.getArticoli()).then($.fn.getCliente(idCliente));
+
     }
   </script>
 </head>
@@ -161,6 +174,13 @@
               </div>
             </div>
             <div class="form-row">
+              <div class="form-group col-md-4" id="articoloDiv">
+                <label for="articolo">Articoli associati</label>
+                <select id="articolo" class="form-control" multiple="multiple">
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
               <div class="form-group col-md-3">
                 <label for="email">Email*</label>
                 <input type="email" class="form-control" id="email" placeholder="" required>
@@ -210,6 +230,15 @@
               <div class="form-group col-md-3">
                 <label for="estrazioneConad">Estrazione Conad</label>
                 <input type="text" class="form-control" id="estrazioneConad" placeholder="">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="modalitaInvioFatture">Spedizione fatture</label>
+                <select id="modalitaInvioFatture" class="form-control">
+                  <option value=""> - </option>
+                  <option value="cartaceo">Cartaceo</option>
+                  <option value="mail">Mail</option>
+                  <option value="pec">Pec</option>
+                </select>
               </div>
             </div>
             <div class="form-row">
@@ -314,10 +343,6 @@
 
   <!-- Custom scripts for all pages-->
   <script src="../js/sb-admin-2.min.js"></script>
-
-  <!-- Page level plugins -->
-  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 </body>
 

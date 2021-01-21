@@ -1089,6 +1089,8 @@ $(document).ready(function() {
 						$.fn.loadScontiArticoli(data, cliente);
 					}
 
+					$.fn.getArticoli(cliente);
+
 					$.fn.loadArticoliFromOrdiniClienti();
 
 				},
@@ -1647,9 +1649,12 @@ $.fn.getCausali = function(){
 	});
 }
 
-$.fn.getArticoli = function(){
+$.fn.getArticoli = function(idCliente){
+
+	$('#articolo').empty().append('<option value=""></option>');
+
 	$.ajax({
-		url: baseUrl + "articoli?attivo=true",
+		url: baseUrl + "articoli?attivo=true&idCliente="+idCliente,
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -1771,6 +1776,8 @@ $.fn.getDdt = function(idDdt){
 							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 						}
 					});
+
+					$.fn.getArticoli(result.cliente.id);
 
 					$('#cliente').selectpicker('refresh');
 				}

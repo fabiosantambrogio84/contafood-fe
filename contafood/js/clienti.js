@@ -127,12 +127,26 @@ $(document).ready(function() {
 					  contentDetails = contentDetails + '<p><strong>Agente: </strong></p>';
 				  }
                   contentDetails = contentDetails + '<p><strong>Estrazione Conad: </strong>'+$.fn.printVariable(result.estrazioneConad)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Modalita invio fatture: </strong>'+$.fn.printVariable(result.modalitaInvioFatture)+'</p>';
                   contentDetails = contentDetails + '<p><strong>Blocca DDT: </strong>'+$.fn.printVariable(result.bloccaDdt)+'</p>';
                   contentDetails = contentDetails + '<p><strong>Nascondi prezzi: </strong>'+$.fn.printVariable(result.nascondiPrezzi)+'</p>';
                   contentDetails = contentDetails + '<p><strong>Raggruppa RiBa: </strong>'+$.fn.printVariable(result.raggruppaRiba)+'</p>';
                   contentDetails = contentDetails + '<p><strong>Nome gruppo RiBa: </strong>'+$.fn.printVariable(result.nomeGruppoRiba)+'</p>';
                   contentDetails = contentDetails + '<p><strong>Codice univoco SDI: </strong>'+$.fn.printVariable(result.codiceUnivocoSdi)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
+
+				  var articoli = "";
+				  if(result.clienteArticoli != null && result.clienteArticoli != undefined && result.clienteArticoli.length != 0){
+
+					  $.each(result.clienteArticoli, function(i, item){
+						  var articolo = item.articolo;
+						  if(articolo != null && articolo != undefined){
+						  	 var descrArticolo = articolo.codice + " "+articolo.descrizione + "; ";
+						  	 articoli += descrArticolo
+						  }
+					  });
+				  }
+				  contentDetails += '<p><strong>Articoli: </strong>'+$.fn.printVariable(articoli)+'</p>';
 
 				  $('#detailsClienteMainDiv').empty().append(contentDetails);
 
@@ -285,6 +299,8 @@ $(document).ready(function() {
 	}
 
 	if($('#updateClienteButton') != null && $('#updateClienteButton') != undefined){
+		$('#articolo').selectpicker();
+
 		$(document).on('submit','#updateClienteForm', function(event){
 			event.preventDefault();
 
@@ -334,6 +350,7 @@ $(document).ready(function() {
 				cliente.listino = listino;
 			}
 			cliente.estrazioneConad = $('#estrazioneConad').val();
+			cliente.modalitaInvioFatture = $('#modalitaInvioFatture option:selected').val();
 			if($('#bloccaDdt').prop('checked') === true){
 				cliente.bloccaDdt = true;
 			}else{
@@ -352,6 +369,20 @@ $(document).ready(function() {
 			cliente.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			cliente.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			cliente.note = $('#note').val();
+
+			var articoli = $('#articolo').val();
+			if(articoli != null && articoli.length != 0){
+				var clienteArticoli = [];
+				$.each(articoli, function(i, item){
+					var clienteArticolo = {};
+					var clienteArticoloId = new Object();
+					clienteArticoloId.articoloId = item;
+					clienteArticolo.id = clienteArticoloId;
+
+					clienteArticoli.push(clienteArticolo);
+				})
+				cliente.clienteArticoli = clienteArticoli;
+			}
 
 			var clienteJson = JSON.stringify(cliente);
 
@@ -380,6 +411,8 @@ $(document).ready(function() {
 	}
 
 	if($('#newClienteButton') != null && $('#newClienteButton') != undefined){
+		$('#articolo').selectpicker();
+
 		$(document).on('submit','#newClienteForm', function(event){
 			event.preventDefault();
 
@@ -427,6 +460,7 @@ $(document).ready(function() {
 				cliente.listino = listino;
 			}
 			cliente.estrazioneConad = $('#estrazioneConad').val();
+			cliente.modalitaInvioFatture = $('#modalitaInvioFatture option:selected').val();
 			if($('#bloccaDdt').prop('checked') === true){
 				cliente.bloccaDdt = true;
 			}else{
@@ -445,6 +479,20 @@ $(document).ready(function() {
 			cliente.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			cliente.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			cliente.note = $('#note').val();
+
+			var articoli = $('#articolo').val();
+			if(articoli != null && articoli.length != 0){
+				var clienteArticoli = [];
+				$.each(articoli, function(i, item){
+					var clienteArticolo = {};
+					var clienteArticoloId = new Object();
+					clienteArticoloId.articoloId = item;
+					clienteArticolo.id = clienteArticoloId;
+
+					clienteArticoli.push(clienteArticolo);
+				})
+				cliente.clienteArticoli = clienteArticoli;
+			}
 
 			var clienteJson = JSON.stringify(cliente);
 
@@ -474,100 +522,140 @@ $(document).ready(function() {
 });
 
 $.fn.getProvince = function(){
-	$.ajax({
-		url: baseUrl + "utils/province",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#provincia').append('<option value="'+item+'">'+item+'</option>');
-				});
+
+	//return $.Deferred(function() {
+		return $.ajax({
+			url: baseUrl + "utils/province",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						$('#provincia').append('<option value="'+item+'">'+item+'</option>');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+		});
+	//});
+
 }
 
 $.fn.getBanche = function(){
-	$.ajax({
-		url: baseUrl + "banche",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#banca').append('<option value="'+item.id+'">'+item.nome+'</option>');
-				});
+
+	//return $.Deferred(function() {
+		return $.ajax({
+			url: baseUrl + "banche",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						$('#banca').append('<option value="'+item.id+'">'+item.nome+'</option>');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+		});
+	//});
 }
 
 $.fn.getAgenti = function(){
-	$.ajax({
-		url: baseUrl + "agenti",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#agente').append('<option value="'+item.id+'">'+item.nome+'</option>');
-				});
+
+	//return $.Deferred(function() {
+		return $.ajax({
+			url: baseUrl + "agenti",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						$('#agente').append('<option value="'+item.id+'">'+item.nome+'</option>');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+		});
+	//});
 }
 
 $.fn.getTipiPagamento = function(){
-	$.ajax({
-		url: baseUrl + "tipi-pagamento",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					$('#tipoPagamento').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
-				});
+
+	//return $.Deferred(function() {
+		return $.ajax({
+			url: baseUrl + "tipi-pagamento",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						$('#tipoPagamento').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+		});
+	//});
 }
 
 $.fn.getListini = function(newListino){
-	$.ajax({
-		url: baseUrl + "listini",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$.each(result, function(i, item){
-					var option = '<option value="'+item.id+'" data-tipologia="'+item.tipologia+'" ';
-					if(newListino){
-						if(item.tipologia ==  'BASE'){
-							option += 'selected';
+
+	//return $.Deferred(function() {
+		return $.ajax({
+			url: baseUrl + "listini",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						var option = '<option value="'+item.id+'" data-tipologia="'+item.tipologia+'" ';
+						if(newListino){
+							if(item.tipologia ==  'BASE'){
+								option += 'selected';
+							}
 						}
-					}
-					option += '>'+item.nome+'</option>';
-					$('#listinoApplicato').append(option);
-				});
+						option += '>'+item.nome+'</option>';
+						$('#listinoApplicato').append(option);
+					});
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
 			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+		});
+	//});
+}
+
+$.fn.getArticoli = function(){
+
+	//return $.Deferred(function() {
+		return $.ajax({
+			url: baseUrl + "articoli?attivo=true",
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != ''){
+					$.each(result, function(i, item){
+						$('#articolo').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
+						$('#articolo').selectpicker('refresh');
+					});
+				}
+				console.log("GET_ARTICOLI");
+
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		});
+	//});
 }
 
 $.fn.extractIdClienteFromUrl = function(){
@@ -640,6 +728,7 @@ $.fn.getCliente = function(idCliente){
 				$('#listinoApplicato option[value="' + result.listino.id +'"]').attr('selected', true);
 			}
 			$('#estrazioneConad').attr('value', result.estrazioneConad);
+			$('#modalitaInvioFatture option[value="' + result.modalitaInvioFatture +'"]').attr('selected', true);
 			if(result.bloccaDdt === true){
 				$('#bloccaDdt').prop('checked', true);
 			}
@@ -653,6 +742,19 @@ $.fn.getCliente = function(idCliente){
 			$('#nomeGruppoRiba').attr('value', result.nomeGruppoRiba);
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#note').val(result.note);
+
+			console.log("GET_CLIENTE")
+
+			if(result.clienteArticoli != null && result.clienteArticoli != undefined && result.clienteArticoli.length != 0){
+				$.each(result.clienteArticoli, function(i, item){
+					var id = item.id;
+					if(id != null && id != undefined){
+						var idArticolo = id.articoloId;
+						$('#articolo option[value="' + idArticolo +'"]').attr('selected', true);
+					}
+				});
+				$('#articolo').selectpicker('refresh');
+			}
 
 			if(result.privato === true){
 				$('#privato').prop('checked', true);

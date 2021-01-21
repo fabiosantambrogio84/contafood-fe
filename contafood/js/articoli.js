@@ -253,6 +253,12 @@ $(document).ready(function() {
 				data: articoloJson,
 				success: function(result) {
 					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@','Articolo creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the same page
+					setTimeout(function() {
+						window.location.href = "articoli-new.html";
+					}, 1000);
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell articolo').replace('@@alertResult@@', 'danger'));
