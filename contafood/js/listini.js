@@ -185,9 +185,9 @@ $(document).ready(function() {
     });
 
     $(document).on('click','.closeDetailsListino', function(){
-    		$('#detailsListinoModalTable').DataTable().destroy();
-    		$('#detailsListinoModal').modal('hide');
-    	});
+        $('#detailsListinoModalTable').DataTable().destroy();
+        $('#detailsListinoModal').modal('hide');
+    });
 
 	if($('#updateListinoButton') != null && $('#updateListinoButton') != undefined){
 		$('#articoloVariazione').selectpicker();

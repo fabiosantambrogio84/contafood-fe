@@ -183,6 +183,11 @@ $(document).ready(function() {
 
 	$.fn.loadEmptyFatturaDdtTable();
 
+	var pageTitle = $("title").text();
+	if(pageTitle != null && pageTitle != "" && pageTitle == "ContaFood - Fatture"){
+		$('#searchTipoPagamento').selectpicker();
+	}
+
 	$(document).on('change','.speditoAdeFattura', function(){
 		var originalValue = $(this).attr("data-value");
 		if(originalValue == "true"){
@@ -242,6 +247,8 @@ $(document).ready(function() {
 	$(document).on('click','#resetSearchFattureButton', function(){
 		$('#searchFattureForm :input').val(null);
 		$('#searchFattureForm select option[value=""]').attr('selected', true);
+
+		$('#searchTipoPagamento').selectpicker('refresh');
 
 		$('#fattureTable').DataTable().destroy();
 		$.fn.loadFattureTable(baseUrl + "fatture");
@@ -637,6 +644,93 @@ $(document).ready(function() {
 		}
 	});
 
+	$(document).on('click','#exportRiba', function(event){
+
+		event.preventDefault();
+
+		var alertContent = '<div id="alertFattureContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		$('#alertFatture').empty().append(alertContent.replace('@@alertText@@','Generazione file in corso...').replace('@@alertResult@@', 'warning'));
+
+		var dataDa = $('#searchDataFrom').val();
+		var dataA = $('#searchDataTo').val();
+		var tipoPagamento = $('#searchTipoPagamento').val().filter(Number).toString();
+		var stato = $('#searchStato option:selected').val();
+
+		var params = {};
+		if(dataDa != null && dataDa != undefined && dataDa != ''){
+			params.dataDa = dataDa;
+		}
+		if(dataA != null && dataA != undefined && dataA != ''){
+			params.dataA = dataA;
+		}
+		if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+			params.tipoPagamento = tipoPagamento;
+		}
+		if(stato != null && stato != undefined && stato != ''){
+			params.stato = stato;
+		}
+		var url = baseUrl + "export-riba?" + $.param( params );
+
+		$.ajax({
+			type : "GET",
+			url : url,
+			//xhrFields: {
+			//	responseType: 'blob'
+			//},
+			xhr: function() {
+				var xhr = new XMLHttpRequest();
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 2) {
+						if (xhr.status == 200) {
+							xhr.responseType = "blob";
+						} else {
+							xhr.responseType = "text";
+						}
+					}
+				};
+				return xhr;
+			},
+			success: function(response, status, xhr){
+				//console.log(response);
+
+				var contentDisposition = xhr.getResponseHeader("Content-Disposition");
+				var fileName = contentDisposition.substring(contentDisposition.indexOf("; ") + 1);
+				fileName = fileName.replace("filename=","").trim();
+
+				var blob = new Blob([response], { type: "application/text" });
+				var downloadUrl = URL.createObjectURL(blob);
+				var a = document.createElement("a");
+				a.href = downloadUrl;
+				a.download = fileName;
+				document.body.appendChild(a);
+				a.click();
+				a.remove();
+				window.URL.revokeObjectURL(url);
+
+				$('#alertFatture').empty();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var errorMessage = 'Errore nella creazione del file TXT';
+				if(jqXHR != null && jqXHR != undefined){
+					var jqXHRResponseJson = jqXHR.responseJSON;
+					if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+						var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+						if(jqXHRResponseJsonMessage != null
+							&& jqXHRResponseJsonMessage != undefined
+							&& jqXHRResponseJsonMessage != ''){
+							errorMessage = jqXHRResponseJsonMessage;
+						}
+					}
+				}
+				$('#alertFatture').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+			}
+		});
+
+	});
+
 	if($('#searchFattureButton') != null && $('#searchFattureButton') != undefined) {
 		$(document).on('submit', '#searchFattureForm', function (event) {
 			event.preventDefault();
@@ -647,7 +741,7 @@ $(document).ready(function() {
 			var agente = $('#searchAgente option:selected').val();
 			var progressivo = $('#searchProgressivo').val();
 			var importo = $('#searchImporto').val();
-			var tipoPagamento = $('#searchTipoPagamento option:selected').val();
+			var tipoPagamento = $('#searchTipoPagamento').val().filter(Number).toString();
 			var articolo = $('#searchArticolo option:selected').val();
 			var stato = $('#searchStato option:selected').val();
 			var tipo = $('#searchTipo option:selected').val();
