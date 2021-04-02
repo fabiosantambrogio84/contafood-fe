@@ -98,9 +98,12 @@ $.fn.loadPagamentiTable = function(url) {
 			}},
 			{"name": "note", "data": null, "width": "12%", render: function ( data, type, row ) {
 				var note = data.note;
+				if(note == null || note == undefined){
+					note = "";
+				}
 				var noteTrunc = note;
 				var noteHtml = '<div>'+noteTrunc+'</div>';
-				if(note.length > 100){
+				if(note != null && note != undefined && note != "" && note.length > 100){
 					noteTrunc = note.substring(0, 100)+'...';
 					noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
 				}
