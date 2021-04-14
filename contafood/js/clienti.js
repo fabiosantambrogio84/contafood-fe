@@ -553,7 +553,7 @@ $.fn.getBanche = function(){
 			success: function(result) {
 				if(result != null && result != undefined && result != ''){
 					$.each(result, function(i, item){
-						$('#banca').append('<option value="'+item.id+'">'+item.nome+'</option>');
+						$('#banca').append('<option value="'+item.id+'">'+item.nome+' '+item.abi+'/'+item.cab+'</option>');
 					});
 				}
 			},
