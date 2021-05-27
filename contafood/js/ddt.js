@@ -136,7 +136,13 @@ $.fn.loadDdtTable = function(url) {
 						if((totale - acconto) != 0){
 							links += '<a class="payDdt pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 						}
-						links += '<a class="emailDdt pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
+						var cliente = data.cliente;
+						if(cliente != null){
+						    var email = cliente.email;
+						    if(email != null && email != undefined && email != ""){
+						        links += '<a class="emailDdt pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+						    }
+						}
 						links += '<a class="printDdt pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')) {
 							links += '<a class="deleteDdt" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
@@ -472,6 +478,40 @@ $(document).ready(function() {
 		window.open(baseUrl + "stampe/ddts?ids="+ids, '_blank');
 
 	});
+
+    $(document).on('click','.emailDdt', function(){
+        var idDdt = $(this).attr('data-id');
+        var email = $(this).attr('data-email-to');
+        $('#confirmSendEmailDdt').attr('data-id', idDdt);
+        $('#sendEmailDdtModalBody').html("Il DDT verrà inviato a <b>"+email+"</b>. Confermi?");
+        $('#sendEmailDdtModal').modal('show');
+    });
+
+    $(document).on('click','#confirmSendEmailDdt', function(){
+        $('#sendEmailDdtModal').modal('hide');
+        var idDdt = $(this).attr('data-id');
+
+        var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+        alertContent = alertContent + '<strong>@@alertText@@\n' +
+            '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+        var url = baseUrl + "emails/ddts/" + idDdt;
+
+        $('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Invio email in corso').replace('@@alertResult@@', 'warning'));
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function() {
+                $('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Email inviata con successo.').replace('@@alertResult@@', 'success'));
+                $('#ddtTable').DataTable().ajax.reload();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Response text: ' + jqXHR.responseText);
+                $('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Errore nell'invio dell'email").replace('@@alertResult@@', 'danger'));
+            }
+        });
+    });
 
 	if($('#searchDdtButton') != null && $('#searchDdtButton') != undefined) {
 		$(document).on('submit', '#searchDdtForm', function (event) {
