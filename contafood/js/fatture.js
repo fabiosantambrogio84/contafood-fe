@@ -124,6 +124,20 @@ $.fn.loadFattureTable = function(url) {
 				}
 				links += '<a class="printFattura pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 				links += '<a class="downloadAdeXml pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Download XML AdE"><i class="fa fa-download"></i></a>';
+
+				var tipo = data.tipoFattura;
+                if(tipo != null){
+                    if(tipo.id != null && tipo.id != undefined && tipo.id != '' && tipo.id == 0){
+                        var cliente = data.cliente;
+                        if(cliente != null){
+                            var email = cliente.email;
+                            if(email != null && email != undefined && email != ""){
+                                links += '<a class="emailFattura pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+                            }
+                        }
+                    }
+                }
+
 				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE') {
 					links += '<a class="deleteFatture" data-id="' + data.id + '" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				}
@@ -728,8 +742,41 @@ $(document).ready(function() {
 				$('#alertFatture').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 			}
 		});
-
 	});
+
+	$(document).on('click','.emailFattura', function(){
+        var idFattura = $(this).attr('data-id');
+        var email = $(this).attr('data-email-to');
+        $('#confirmSendEmailFattura').attr('data-id', idFattura);
+        $('#sendEmailFatturaModalBody').html("La fattura verrà inviata a <b>"+email+"</b>. Confermi?");
+        $('#sendEmailFatturaModal').modal('show');
+    });
+
+    $(document).on('click','#confirmSendEmailFattura', function(){
+        $('#sendEmailFatturaModal').modal('hide');
+        var idFattura = $(this).attr('data-id');
+
+        var alertContent = '<div id="alertFattureContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+        alertContent = alertContent + '<strong>@@alertText@@\n' +
+            '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+        var url = baseUrl + "emails/fatture/" + idFattura;
+
+        $('#alertFatture').empty().append(alertContent.replace('@@alertText@@', 'Invio email in corso...').replace('@@alertResult@@', 'warning'));
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function() {
+                $('#alertFatture').empty().append(alertContent.replace('@@alertText@@', 'Email inviata con successo.').replace('@@alertResult@@', 'success'));
+                $('#fattureTable').DataTable().ajax.reload();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Response text: ' + jqXHR.responseText);
+                $('#alertFatture').empty().append(alertContent.replace('@@alertText@@', "Errore nell'invio dell'email").replace('@@alertResult@@', 'danger'));
+            }
+        });
+    });
 
 	if($('#searchFattureButton') != null && $('#searchFattureButton') != undefined) {
 		$(document).on('submit', '#searchFattureForm', function (event) {

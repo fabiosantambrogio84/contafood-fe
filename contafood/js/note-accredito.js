@@ -90,15 +90,15 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				return $.fn.formatNumber(data.totale);
 			}},
 			{"data": null, "orderable":false, "width":"12%", render: function ( data, type, row ) {
-					var acconto = data.totaleAcconto;
-					if(acconto == null || acconto == undefined || acconto == ''){
-						acconto = 0;
-					}
-					var totale = data.totale;
-					if(totale == null || totale == undefined || totale == ''){
-						totale = 0;
-					}
-					var stato = data.statoNotaAccredito;
+                var acconto = data.totaleAcconto;
+                if(acconto == null || acconto == undefined || acconto == ''){
+                    acconto = 0;
+                }
+                var totale = data.totale;
+                if(totale == null || totale == undefined || totale == ''){
+                    totale = 0;
+                }
+                var stato = data.statoNotaAccredito;
 
 				var links = '<a class="detailsNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
 				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE'){
@@ -110,6 +110,13 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				links += '<a class="emailNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 				links += '<a class="printNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 				links += '<a class="downloadAdeXml pr-1" data-id="' + data.id + '" href="#" title="Download XML AdE"><i class="fa fa-download"></i></a>';
+				var cliente = data.cliente;
+                if(cliente != null){
+                    var email = cliente.email;
+                    if(email != null && email != undefined && email != ""){
+                        links += '<a class="emailNotaAccredito pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+                    }
+                }
 				links += '<a class="deleteNotaAccredito" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -689,6 +696,40 @@ $(document).ready(function() {
 			}
 		});
 	}
+
+    $(document).on('click','.emailNotaAccredito', function(){
+        var idNotaAccredito = $(this).attr('data-id');
+        var email = $(this).attr('data-email-to');
+        $('#confirmSendEmailNotaAccredito').attr('data-id', idNotaAccredito);
+        $('#sendEmailNotaAccreditoModalBody').html("La nota accredito verrà inviata a <b>"+email+"</b>. Confermi?");
+        $('#sendEmailNotaAccreditoModal').modal('show');
+    });
+
+    $(document).on('click','#confirmSendEmailNotaAccredito', function(){
+        $('#sendEmailNotaAccreditoModal').modal('hide');
+        var idNotaAccredito = $(this).attr('data-id');
+
+        var alertContent = '<div id="alertNoteAccreditoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+        alertContent = alertContent + '<strong>@@alertText@@\n' +
+            '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+        var url = baseUrl + "emails/note-accredito/" + idNotaAccredito;
+
+        $('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', 'Invio email in corso...').replace('@@alertResult@@', 'warning'));
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            success: function() {
+                $('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', 'Email inviata con successo.').replace('@@alertResult@@', 'success'));
+                $('#noteAccreditoTable').DataTable().ajax.reload();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Response text: ' + jqXHR.responseText);
+                $('#alertNoteAccredito').empty().append(alertContent.replace('@@alertText@@', "Errore nell'invio dell'email").replace('@@alertResult@@', 'danger'));
+            }
+        });
+    });
 
 	if($('#searchNoteAccreditoButton') != null && $('#searchNoteAccreditoButton') != undefined) {
 		$(document).on('submit', '#searchNoteAccreditoForm', function (event) {

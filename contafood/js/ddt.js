@@ -136,14 +136,14 @@ $.fn.loadDdtTable = function(url) {
 						if((totale - acconto) != 0){
 							links += '<a class="payDdt pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 						}
-						var cliente = data.cliente;
-						if(cliente != null){
-						    var email = cliente.email;
-						    if(email != null && email != undefined && email != ""){
-						        links += '<a class="emailDdt pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
-						    }
-						}
 						links += '<a class="printDdt pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+						var cliente = data.cliente;
+                        if(cliente != null){
+                            var email = cliente.email;
+                            if(email != null && email != undefined && email != ""){
+                                links += '<a class="emailDdt pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+                            }
+                        }
 						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')) {
 							links += '<a class="deleteDdt" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 						}
@@ -497,7 +497,7 @@ $(document).ready(function() {
 
         var url = baseUrl + "emails/ddts/" + idDdt;
 
-        $('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Invio email in corso').replace('@@alertResult@@', 'warning'));
+        $('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Invio email in corso...').replace('@@alertResult@@', 'warning'));
 
         $.ajax({
             url: url,
