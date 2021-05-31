@@ -101,6 +101,10 @@ $(document).ready(function() {
 				data: causaleJson,
 				success: function(result) {
 					$('#alertCausale').empty().append(alertContent.replace('@@alertText@@','Causale modificata con successo').replace('@@alertResult@@', 'success'));
+
+					setTimeout(function() {
+                        window.location.href = "causali.html";
+                    }, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertCausale').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica della causale').replace('@@alertResult@@', 'danger'));
@@ -130,6 +134,10 @@ $(document).ready(function() {
 				data: caualeJson,
 				success: function(result) {
 					$('#alertCausale').empty().append(alertContent.replace('@@alertText@@','Causale creata con successo').replace('@@alertResult@@', 'success'));
+
+					setTimeout(function() {
+                        window.location.href = "causali.html";
+                    }, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertCausale').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione della causale').replace('@@alertResult@@', 'danger'));

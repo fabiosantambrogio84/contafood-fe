@@ -173,19 +173,22 @@ $(document).ready(function() {
 		$('#deleteClienteModal').modal('hide');
 		var idCliente = $(this).attr('data-id');
 
+        var alertContent = '<div id="alertClienteContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+        				alertContent = alertContent + '@@alertText@@\n' +
+        					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
 		$.ajax({
 			url: baseUrl + "clienti/" + idCliente,
 			type: 'DELETE',
 			success: function() {
-				var alertContent = '<div id="alertClienteContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Cliente</strong> cancellato con successo.\n' +
-					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertCliente').empty().append(alertContent);
+				$('#alertCliente').empty().append(alertContent.replace('@@alertText@@', 'Cliente cancellato con successo.').replace('@@alertResult@@', 'success'));
 
 				$('#clientiTable').DataTable().ajax.reload();
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
+				alertText = 'Errore nella cancellazione del cliente.<br/>Assicurarsi di aver cancellato eventuali listini, articoli, telefonate e punti di consegna associati.'
+                $('#alertCliente').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger'));
 			}
 		});
 	});
