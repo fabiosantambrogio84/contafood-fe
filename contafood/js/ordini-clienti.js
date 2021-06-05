@@ -1468,9 +1468,9 @@ $.fn.getTelefonata = function(idTelefonata){
 						url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
 						type: 'GET',
 						dataType: 'json',
-						success: function(result) {
-							if(result != null && result != undefined && result != ''){
-								$.each(result, function(i, item){
+						success: function(result2) {
+							if(result2 != null && result2 != undefined && result2 != ''){
+								$.each(result2, function(i, item){
 									var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
 									var selected = '';
 									if(result.puntoConsegna != null){

@@ -63,7 +63,7 @@ $.fn.loadFattureTable = function(url) {
 			{"name": "tipo", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var tipo = data.tipoFattura;
 				if(tipo != null){
-					if(tipo.id != null && tipo.id != undefined && tipo.id != '' && tipo.id == 1){
+					if(tipo.id != null && tipo.id != undefined && tipo.id == 1){
 						return "Si";
 					}
 				}
@@ -109,7 +109,7 @@ $.fn.loadFattureTable = function(url) {
 				var tipo = data.tipoFattura;
 				var pagamentoUrl = "pagamenti-new.html?";
 				if(tipo != null){
-					if(tipo.id != null && tipo.id != undefined && tipo.id != '' && tipo.id == 1){
+					if(tipo.id != null && tipo.id != undefined && tipo.id == 1){
 						pagamentoUrl += "idFatturaAccompagnatoria="+data.id;
 					} else {
 						pagamentoUrl += "idFattura="+data.id;
@@ -127,7 +127,7 @@ $.fn.loadFattureTable = function(url) {
 
 				var tipo = data.tipoFattura;
                 if(tipo != null){
-                    if(tipo.id != null && tipo.id != undefined && tipo.id != '' && tipo.id == 0){
+                    if(tipo.id != null && tipo.id != undefined && tipo.id == 0){
                         var cliente = data.cliente;
                         if(cliente != null){
                             var email = cliente.email;

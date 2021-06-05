@@ -15,10 +15,18 @@ $(document).ready(function() {
 
 			var idAutista = $('#autista option:selected').val();
 			var dataConsegna = $('#dataConsegna').val();
+			var params = {};
+            if(idAutista != null && idAutista != undefined && idAutista != ''){
+                params.idAutista = idAutista;
+            }
+            if(dataConsegna != null && dataConsegna != undefined && dataConsegna != ''){
+                params.dataConsegna = dataConsegna;
+            }
+            var url = baseUrl + "ordini-clienti?" + $.param( params );
 
 			$('#ordiniAutistiTable').DataTable({
 				"ajax": {
-					"url": baseUrl + "ordini-clienti?idAutista="+idAutista+"&dataConsegna="+dataConsegna,
+					"url": url,
 					"type": "GET",
 					"content-type": "json",
 					"cache": false,
@@ -126,6 +134,7 @@ $(document).ready(function() {
 				"createdRow": function(row, data, dataIndex,cells){
 					$(row).addClass('rowOrdine');
 					$(row).attr('data-id-ordine', data.id);
+					$(row).css('font-size', '12px');
 				}
 			});
 
@@ -134,6 +143,10 @@ $(document).ready(function() {
 
 	$(document).on('click','#printOrdiniAutisti', function(event){
 		event.preventDefault();
+
+        var alertContent = '<div id="alertOrdineAutistaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+        		alertContent = alertContent + '<strong>@@alertText@@\n' +
+        			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 		var idAutista = $('#autista option:selected').val();
 		var dataConsegna = $('#dataConsegna').val();
@@ -144,7 +157,25 @@ $(document).ready(function() {
 			ids += id+",";
 		});
 
-		window.open(baseUrl + "stampe/ordini-autisti?idAutista="+idAutista+"&dataConsegna="+dataConsegna+"&ids="+ids, '_blank');
+		var params = {};
+        if(idAutista != null && idAutista != undefined && idAutista != ''){
+            params.idAutista = idAutista;
+        } else {
+            $('#alertOrdineAutista').empty().append(alertContent.replace('@@alertText@@', 'Selezionare un autista').replace('@@alertResult@@', 'danger'));
+            return;
+        }
+        if(dataConsegna != null && dataConsegna != undefined && dataConsegna != ''){
+            params.dataConsegna = dataConsegna;
+        } else {
+            $('#alertOrdineAutista').empty().append(alertContent.replace('@@alertText@@', 'Selezionare una data di consegna').replace('@@alertResult@@', 'danger'));
+            return;
+        }
+        if(ids != null && ids != undefined && ids != ''){
+            params.ids = ids;
+        }
+        var url = baseUrl + "stampe/ordini-autisti?" + $.param( params );
+
+		window.open(url, '_blank');
 
 	});
 
@@ -174,7 +205,7 @@ $.fn.getAutisti = function(){
 					$('#autista').append('<option value="'+item.id+'">'+label+'</option>');
 				});
 			}
-			$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
+			//$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);

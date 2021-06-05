@@ -107,7 +107,6 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				if((totale - acconto) != 0){
 					links += '<a class="payNotaAccredito pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idNotaAccredito=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 				}
-				links += '<a class="emailNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Spedizione email"><i class="fa fa-envelope"></i></a>';
 				links += '<a class="printNotaAccredito pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 				links += '<a class="downloadAdeXml pr-1" data-id="' + data.id + '" href="#" title="Download XML AdE"><i class="fa fa-download"></i></a>';
 				var cliente = data.cliente;
