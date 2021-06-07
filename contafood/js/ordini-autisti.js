@@ -105,6 +105,18 @@ $(document).ready(function() {
 							return '';
 						}
 					}},
+					{"name":"telefono", "data": null, render: function ( data, type, row ) {
+                        if(data.telefonata != null){
+                            var telefonataHtml = '';
+
+                            if(data.telefonata.telefono != null){
+                                telefonataHtml += data.telefonata.telefono;
+                            }
+                            return telefonataHtml;
+                        } else {
+                            return '';
+                        }
+                    }},
 					{"name": "dataConsegna", "data": null, render: function ( data, type, row ) {
 						if(data.dataConsegna != null){
 							var a = moment(data.dataConsegna);
@@ -152,10 +164,10 @@ $(document).ready(function() {
 		var dataConsegna = $('#dataConsegna').val();
 		var ids = "";
 
-		$(".rowOrdine").each(function(i, item){
+		/*$(".rowOrdine").each(function(i, item){
 			var id = $(this).attr('data-id-ordine');
 			ids += id+",";
-		});
+		});*/
 
 		var params = {};
         if(idAutista != null && idAutista != undefined && idAutista != ''){
@@ -170,9 +182,9 @@ $(document).ready(function() {
             $('#alertOrdineAutista').empty().append(alertContent.replace('@@alertText@@', 'Selezionare una data di consegna').replace('@@alertResult@@', 'danger'));
             return;
         }
-        if(ids != null && ids != undefined && ids != ''){
+        /*if(ids != null && ids != undefined && ids != ''){
             params.ids = ids;
-        }
+        }*/
         var url = baseUrl + "stampe/ordini-autisti?" + $.param( params );
 
 		window.open(url, '_blank');

@@ -409,6 +409,12 @@ $(document).ready(function() {
 				ordineCliente.agente = agente;
 			}
 			ordineCliente.dataConsegna = $('#dataConsegna').val();
+			var telefonataId = $('#hiddenIdTelefonata').val();
+            if(telefonataId != null && telefonataId != ''){
+                var telefonata = new Object();
+                telefonata.id = telefonataId;
+                ordineCliente.telefonata = telefonata;
+            }
 			ordineCliente.note = $('#note').val();
 
 			var articoliLength = $('.rowArticolo').length;
@@ -764,6 +770,8 @@ $(document).ready(function() {
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
 
+			$('#hiddenIdTelefonata').attr('value', '');
+
 		} else {
 			$('#agente option').removeAttr('selected');
 
@@ -772,6 +780,7 @@ $(document).ready(function() {
 			$('#loadingDiv').addClass('d-none');
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
+			$('#hiddenIdTelefonata').attr('value', '');
 		}
 	});
 
