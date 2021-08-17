@@ -90,6 +90,7 @@ $(document).ready(function() {
 				  contentDetails = contentDetails + '<p><strong>Telefono3: </strong>'+$.fn.printVariable(result.telefono3)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Email: </strong>'+$.fn.printVariable(result.email)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Email PEC: </strong>'+$.fn.printVariable(result.emailPec)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Email Ordini: </strong>'+$.fn.printVariable(result.emailOrdini)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Codice univoco SDI: </strong>'+$.fn.printVariable(result.codiceUnivocoSdi)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Iban: </strong>'+$.fn.printVariable(result.iban)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+$.fn.printVariable(result.pagamento)+'</p>';
@@ -179,6 +180,7 @@ $(document).ready(function() {
 			fornitore.telefono3 = $('#telefono3').val();
 			fornitore.email = $('#email').val();
 			fornitore.emailPec = $('#emailPec').val();
+			fornitore.emailOrdini = $('#emailOrdini').val();
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
@@ -234,6 +236,7 @@ $(document).ready(function() {
 			fornitore.telefono3 = $('#telefono3').val();
 			fornitore.email = $('#email').val();
 			fornitore.emailPec = $('#emailPec').val();
+			fornitore.emailOrdini = $('#emailOrdini').val();
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
@@ -365,6 +368,7 @@ $.fn.getFornitore = function(idFornitore){
 			$('#telefono3').attr('value', result.telefono3);
 			$('#email').attr('value', result.email);
 			$('#emailPec').attr('value', result.emailPec);
+			$('#emailOrdini').attr('value', result.emailOrdini);
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#iban').attr('value', result.iban);
 			$('#pagamento').attr('value', result.pagamento);

@@ -56,13 +56,24 @@ $(document).ready(function() {
 					return '';
 				}
 			}},
-			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="detailsOrdineFornitore pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-				links += '<a class="updateOrdineFornitore pr-2" data-id="'+data.id+'" href="ordini-fornitori-edit.html?idOrdineFornitore=' + data.id + '"><i class="far fa-edit"></i></a>';
+			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
+				var links = '<a class="detailsOrdineFornitore pr-1" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+				links += '<a class="updateOrdineFornitore pr-1" data-id="'+data.id+'" href="ordini-fornitori-edit.html?idOrdineFornitore=' + data.id + '"><i class="far fa-edit"></i></a>';
+				links += '<a class="printOrdineFornitore pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+				var fornitore = data.fornitore;
+				if(fornitore != null){
+					var email = fornitore.emailOrdini;
+					if(email != null && email != undefined && email != ""){
+						links += '<a class="emailOrdineFornitore pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+					}
+				}
 				links += '<a class="deleteOrdineFornitore" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			$(row).css('font-size', '12px');
+		}
 	});
 
 	$(document).on('click','.detailsOrdineFornitore', function(){
@@ -177,6 +188,46 @@ $(document).ready(function() {
 		});
 	});
 
+	$(document).on('click','.printOrdineFornitore', function(){
+		var idOrdineFornitore = $(this).attr('data-id');
+
+		window.open(baseUrl + "stampe/ordini-fornitori/"+idOrdineFornitore, '_blank');
+	});
+
+	$(document).on('click','.emailOrdineFornitore', function(){
+		var idOrdineFornitore = $(this).attr('data-id');
+		var email = $(this).attr('data-email-to');
+		$('#confirmSendEmailOrdineFornitore').attr('data-id', idOrdineFornitore);
+		$('#sendEmailOrdineFornitoreModalBody').html("L'ordine fornitore verrà inviato a <b>"+email+"</b>. Confermi?");
+		$('#sendEmailOrdineFornitoreModal').modal('show');
+	});
+
+	$(document).on('click','#confirmSendEmailOrdineFornitore', function(){
+		$('#sendEmailOrdineFornitoreModal').modal('hide');
+		var idOrdineFornitore = $(this).attr('data-id');
+
+		var alertContent = '<div id="alertOrdineFornitoreContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@\n' +
+			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		var url = baseUrl + "emails/ordini-fornitori/" + idOrdineFornitore;
+
+		$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@', 'Invio email in corso...').replace('@@alertResult@@', 'warning'));
+
+		$.ajax({
+			url: url,
+			type: 'GET',
+			success: function() {
+				$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@', 'Email inviata con successo.').replace('@@alertResult@@', 'success'));
+				$('#ordiniFornitoriTable').DataTable().ajax.reload();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@', "Errore nell'invio dell'email").replace('@@alertResult@@', 'danger'));
+			}
+		});
+	});
+
 	if($('#updateOrdineFornitoreButton') != null && $('#updateOrdineFornitoreButton') != undefined){
 		$(document).on('submit','#updateOrdineFornitoreForm', function(event){
 			event.preventDefault();
@@ -225,6 +276,11 @@ $(document).ready(function() {
 				data: ordineFornitoreJson,
 				success: function(result) {
 					$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@','Ordine fornitore modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the page with the list of Ordini Fornitori
+					setTimeout(function() {
+						window.location.href = "ordini-fornitori.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell ordine fornitore').replace('@@alertResult@@', 'danger'));
@@ -277,6 +333,11 @@ $(document).ready(function() {
 				data: ordineFornitoreJson,
 				success: function(result) {
 					$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@','Ordine fornitore creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the page with the list of Ordini Fornitori
+					setTimeout(function() {
+						window.location.href = "ordini-fornitori.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ordine fornitore').replace('@@alertResult@@', 'danger'));

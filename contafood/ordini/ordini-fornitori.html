@@ -80,11 +80,11 @@
 
         <!-- DataTales Example -->
         <div class="card shadow mb-4" id="ordiniFornitoriMainDiv">
-          <div class="card-body">
+          <div class="card-body" style="font-size: 0.9rem;">
             <div class="table-responsive ordiniFornitoriTable">
               <table class="table table-bordered" id="ordiniFornitoriTable" width="100%" cellspacing="0">
                 <thead>
-                <tr>
+                <tr style="font-size:12px;">
                   <th>Codice</th>
                   <th>Fornitore</th>
                   <th>Data inserimento</th>
@@ -151,6 +151,29 @@
                   </table>
                 </div>
 
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Send Email -->
+        <div class="modal fade" id="sendEmailOrdineFornitoreModal" tabindex="-1" role="dialog" aria-labelledby="sendEmailOrdineFornitoreModal" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="sendEmailOrdineFornitoreModalTitle">Invio email Ordine Fornitore</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div>
+                  <h6 id="sendEmailOrdineFornitoreModalBody"></h6>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" id="confirmSendEmailOrdineFornitore">Conferma</button>
               </div>
             </div>
           </div>
