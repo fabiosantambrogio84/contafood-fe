@@ -45,7 +45,12 @@
   <script>
     var idTelefonata = $.fn.extractIdTelefonataFromUrl();
     if(idTelefonata != null && idTelefonata != undefined){
-      $.when($.fn.preloadFields(), $.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then($.fn.getTelefonata(idTelefonata));
+      $.when($.fn.preloadFields(), $.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).done(function(resp1, resp2, resp3, resp4, resp5) {
+        // the code here will be executed when all four ajax requests resolve.
+        $.fn.getTelefonata(idTelefonata)
+      });
+
+      //$.when($.fn.preloadFields(), $.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then($.fn.getTelefonata(idTelefonata));
     } else {
       $.when($.fn.preloadFields(), $.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then();
     }

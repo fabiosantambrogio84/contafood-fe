@@ -1130,8 +1130,8 @@ $.fn.normalizeIfEmptyOrNullVariable = function(variable){
 
 $.fn.getClienti = function(){
 
-	return $.Deferred(function() {
-		$.ajax({
+	//return $.Deferred(function() {
+	return	$.ajax({
 			url: baseUrl + "clienti",
 			type: 'GET',
 			dataType: 'json',
@@ -1153,6 +1153,7 @@ $.fn.getClienti = function(){
 						}
 						$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'">'+label+'</option>');
 					});
+					console.log("CLIENTI");
 				}
 				$('#dataConsegna').val(moment().add(1, 'days').format('YYYY-MM-DD'));
 
@@ -1162,13 +1163,13 @@ $.fn.getClienti = function(){
 			}
 		});
 
-	});
+	//});
 }
 
 $.fn.getAutisti = function(){
 
-	return $.Deferred(function() {
-		$.ajax({
+	//return $.Deferred(function() {
+	return	$.ajax({
 			url: baseUrl + "autisti",
 			type: 'GET',
 			dataType: 'json',
@@ -1185,13 +1186,13 @@ $.fn.getAutisti = function(){
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		});
-	});
+	//});
 }
 
 $.fn.getAgenti = function(){
 
-	return $.Deferred(function() {
-		$.ajax({
+	//return $.Deferred(function() {
+	return	$.ajax({
 			url: baseUrl + "agenti",
 			type: 'GET',
 			dataType: 'json',
@@ -1208,13 +1209,13 @@ $.fn.getAgenti = function(){
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		});
-	});
+	//});
 }
 
 $.fn.getArticoli = function(){
 
-	return $.Deferred(function() {
-		$.ajax({
+	//return $.Deferred(function() {
+	return	$.ajax({
 			url: baseUrl + "articoli?attivo=true",
 			type: 'GET',
 			dataType: 'json',
@@ -1233,11 +1234,11 @@ $.fn.getArticoli = function(){
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		});
-	});
+	//});
 }
 
 $.fn.preloadFields = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "ordini-clienti/progressivo",
 		type: 'GET',
 		dataType: 'json',
@@ -1501,6 +1502,8 @@ $.fn.getTelefonata = function(idTelefonata){
 				}
 				$('#articolo').removeAttr('disabled');
 				$('#articolo').selectpicker('refresh');
+
+				console.log("TELEFONATA");
 
 			} else{
 				$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero della telefonata'));
