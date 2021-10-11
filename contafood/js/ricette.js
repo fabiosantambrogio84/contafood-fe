@@ -506,7 +506,7 @@ $.fn.extractIdRicettaFromUrl = function(){
 
 $.fn.getCostoOrarioPreparazione = function(){
 	$.ajax({
-		url: baseUrl + "parametri?nome=COSTO_ORARIO_PREPARAZIONE_RICETTA",
+		url: baseUrl + "configurazione/parametri?nome=COSTO_ORARIO_PREPARAZIONE_RICETTA",
 		type: 'GET',
 		dataType: 'json',
 		headers: {

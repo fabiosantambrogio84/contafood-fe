@@ -46,7 +46,7 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="ordini"></ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion toggled" id="accordionSidebar" data-page-type="ordini"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -69,19 +69,28 @@
 
           <form id="newOrdineFornitoreForm" class="needs-validation" novalidate>
             <div class="form-row">
-              <div class="form-group col-md-4">
+              <div class="form-group col-md-3">
                 <label for="fornitore">Fornitore*</label>
-                <select id="fornitore" class="form-control" required>
+                <select id="fornitore" class="form-control form-control-sm" required>
                   <option value=""></option>
                 </select>
                 <div class="invalid-feedback">
                   Seleziona un fornitore
                 </div>
               </div>
+              <div class="form-group col-md-2">
+                <label for="dataDa">Data da</label>
+                <input type="date" class="form-control form-control-sm" id="dataDa">
+              </div>
+              <div class="form-group col-md-2">
+                <label for="dataA">Data a</label>
+                <input type="date" class="form-control form-control-sm" id="dataA">
+              </div>
             </div>
+            <a id="cercaArticoliLink" href="" class="btn btn-primary btn-sm mb-4">Cerca</a>
 
             <div class="form-row" id="formRowArticoli">
-              <div class="form-group col-md-12" id="formRowArticoliBody">
+              <div class="form-group col-md-6" id="formRowArticoliBody">
                 <label for="articoli">Articoli</label>
                 <div id="articoli" class="mb-2">
                   <a id="addArticolo" href="#" class="btn btn-primary btn-sm">Aggiungi</a>
@@ -89,9 +98,9 @@
               </div>
             </div>
             <div class="form-row">
-              <div class="form-group col-md-6">
+              <div class="form-group col-md-3">
                 <label for="note">Note</label>
-                <textarea class="form-control" id="note"></textarea>
+                <textarea class="form-control form-control-sm" id="note"></textarea>
               </div>
             </div>
 
@@ -118,7 +127,7 @@
                 });
               }, false);
             })();
-            </script>
+          </script>
 
         </div>
         <!-- /.container-fluid -->

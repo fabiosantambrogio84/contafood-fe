@@ -253,9 +253,11 @@ $(document).ready(function() {
 					var ordineFornitoreArticolo = {};
 					var ordineFornitoreArticoloId = new Object();
 					var articoloId = item.id.replace('formRowArticolo_','');
+					var idOrdiniClienti = $(this).attr('data-id-ordini-clienti');
 					ordineFornitoreArticoloId.articoloId = articoloId;
 					ordineFornitoreArticolo.id = ordineFornitoreArticoloId;
 					ordineFornitoreArticolo.numeroPezziOrdinati = $('#pezziArticolo_'+articoloId).val();
+					ordineFornitoreArticolo.idOrdiniClienti = idOrdiniClienti;
 
 					ordineFornitoreArticoli.push(ordineFornitoreArticolo);
 				});
@@ -310,9 +312,11 @@ $(document).ready(function() {
 					var ordineFornitoreArticolo = {};
 					var ordineFornitoreArticoloId = new Object();
 					var articoloId = item.id.replace('formRowArticolo_','');
+					var idOrdiniClienti = $(this).attr('data-id-ordini-clienti');
 					ordineFornitoreArticoloId.articoloId = articoloId;
 					ordineFornitoreArticolo.id = ordineFornitoreArticoloId;
 					ordineFornitoreArticolo.numeroPezziOrdinati = $('#pezziArticolo_'+articoloId).val();
+					ordineFornitoreArticolo.idOrdiniClienti = idOrdiniClienti;
 
 					ordineFornitoreArticoli.push(ordineFornitoreArticolo);
 				});
@@ -418,26 +422,26 @@ $(document).ready(function() {
 				} else{
 					var descrizione = $('#'+item.id).attr('data-descrizione');
 
-					var rowHtml = '<div class="form-row formRowArticolo col-md-8" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
+					var rowHtml = '<div class="form-row formRowArticolo col-md-12" data-id="'+id+'" id="formRowArticolo_'+id+'">' +
 						'<div class="form-group col-md-2">';
 
 					if(i == 0 && alreadyAddedRows == 0){
 						rowHtml = rowHtml + '<label for="codiceArticolo">Codice</label>';
 					}
-					rowHtml = rowHtml + '<input type="text" class="form-control" id="codiceArticolo_'+id+'" disabled value="'+codice+'"></div>';
+					rowHtml = rowHtml + '<input type="text" class="form-control form-control-sm" id="codiceArticolo_'+id+'" disabled value="'+codice+'"></div>';
 					rowHtml = rowHtml + '<div class="form-group col-md-4">';
 
 					if(i == 0 && alreadyAddedRows == 0){
 						rowHtml = rowHtml + '<label for="descrizioneArticolo">Descrizione</label>';
 					}
-					rowHtml = rowHtml + '<input type="text" class="form-control" id="descrizioneArticolo_'+id+'" disabled value="'+descrizione+'"></div>';
+					rowHtml = rowHtml + '<input type="text" class="form-control form-control-sm" id="descrizioneArticolo_'+id+'" disabled value="'+descrizione+'"></div>';
 					rowHtml = rowHtml + '<div class="form-group col-md-2">';
 
 					if(i == 0 && alreadyAddedRows == 0){
-						rowHtml = rowHtml + '<label for="pezziArticolo">Numero pezzi</label>';
+						rowHtml = rowHtml + '<label for="pezziArticolo">Nr. pezzi</label>';
 					}
 					rowHtml = rowHtml + '<div class="input-group">';
-					rowHtml = rowHtml + '<input type="number" class="form-control pezziArticolo" id="pezziArticolo_'+id+'" step="1" min="0">';
+					rowHtml = rowHtml + '<input type="number" class="form-control form-control-sm pezziArticolo" id="pezziArticolo_'+id+'" step="1" min="0">';
 					rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddArticolo" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
 					rowHtml = rowHtml + '</div></div></div>';
 					rowHtml = rowHtml + '</div>';
@@ -464,7 +468,7 @@ $(document).ready(function() {
 			firstId = -1;
 		}
 		var id = $(this).attr('data-id');
-		$('#formRowarticolo_'+id).remove();
+		$('#formRowArticolo_'+id).remove();
 		if(id == firstId){
 			var firstRow = $('.formRowArticolo').first();
 			if(firstRow != null && firstRow != undefined && firstRow.length != 0){
@@ -476,7 +480,7 @@ $(document).ready(function() {
 					} else if(id.indexOf('descrizione') != '-1'){
 						label = '<label for="descrizioneArticolo">Descrizione</label>';
 					} else{
-						label = '<label for="pezziArticolo">Numero pezzi</label>';
+						label = '<label for="pezziArticolo">Nr. pezzi</label>';
 					}
 					if(id.indexOf('pezzi') != '-1'){
 						$('#'+id).parent().before(label);
@@ -486,6 +490,116 @@ $(document).ready(function() {
 				});
 			}
 		}
+	});
+
+	$(document).on('click','#cercaArticoliLink', function(event){
+		event.preventDefault();
+
+		$('#alertOrdineFornitore').empty();
+
+		var idFornitore = $('#fornitore').val();
+		var dataDa = $('#dataDa').val();
+		var dataA = $('#dataA').val();
+
+		var alertContent = '<div id="alertOrdineFornitoreContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		if(idFornitore == null || idFornitore == undefined || idFornitore == ""){
+			$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@','Selezionare un fornitore').replace('@@alertResult@@', 'danger'));
+			return;
+		}
+		if(dataDa == null || dataDa == undefined || dataDa == ""){
+			$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@',"Inserire un valore per il campo 'Data da'").replace('@@alertResult@@', 'danger'));
+			return;
+		}
+		if(dataA == null || dataA == undefined || dataA == ""){
+			$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@',"Inserire un valore per il campo 'Data a'").replace('@@alertResult@@', 'danger'));
+			return;
+		}
+		if(dataDa > dataA){
+			$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@',"'Data da' non può essere maggiore di 'Data a'").replace('@@alertResult@@', 'danger'));
+			return;
+		}
+
+		$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@',"Recupero articoli in corso...").replace('@@alertResult@@', 'warning'));
+
+		$.ajax({
+			url: baseUrl + "ordini-clienti/articoli-for-ordine-fornitore?idFornitore="+idFornitore+"&dataFrom="+dataDa+"&dataTo="+dataA,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				$('#alertOrdineFornitore').empty();
+
+				var alreadyAddedRows = $('.formRowArticolo').length;
+				if(alreadyAddedRows == null || alreadyAddedRows == undefined){
+					alreadyAddedRows = 0;
+				}
+				if(alreadyAddedRows != 0){
+					var rowsIdPresent = [];
+					$('.formRowArticolo').each(function(i,item){
+						var itemId = item.id;
+						rowsIdPresent.push(itemId.replace('formRowArticolo_',''));
+					});
+				}
+
+				if(result != null && result != undefined && result != ''){
+
+					$.each(result, function(i, item){
+
+						var id = item.idArticolo;
+						var codice = item.codiceArticolo;
+						var descrizione = item.descrizioneArticolo;
+						var numPezzi = item.numeroPezziOrdinati;
+
+						// check if the article is already present
+						var numPezziArticoloField = $('#pezziArticolo_'+id);
+						if(numPezziArticoloField != null && numPezziArticoloField != undefined && numPezziArticoloField.length > 0){
+							var numPezziArticolo = numPezziArticoloField.val();
+							if(numPezziArticolo != null && numPezziArticolo != undefined && numPezziArticolo != ""){
+								numPezziArticolo = parseInt(numPezziArticolo) + parseInt(numPezzi);
+							} else {
+								numPezziArticolo = parseInt(numPezzi);
+							}
+							$('#pezziArticolo_'+id).val(numPezziArticolo);
+							$('#formRowArticolo_'+id).attr('data-id-ordini-clienti', item.idOrdiniClienti);
+						} else {
+							var rowHtml = '<div class="form-row formRowArticolo col-md-12" data-id="'+id+'" id="formRowArticolo_'+id+'" data-id-ordini-clienti="'+item.idOrdiniClienti+'">' +
+								'<div class="form-group col-md-2">';
+
+							if(i == 0 && alreadyAddedRows == 0){
+								rowHtml = rowHtml + '<label for="codiceArticolo">Codice</label>';
+							}
+							rowHtml = rowHtml + '<input type="text" class="form-control form-control-sm" id="codiceArticolo_'+id+'" disabled value="'+codice+'"></div>';
+							rowHtml = rowHtml + '<div class="form-group col-md-4">';
+
+							if(i == 0 && alreadyAddedRows == 0){
+								rowHtml = rowHtml + '<label for="descrizioneArticolo">Descrizione</label>';
+							}
+							rowHtml = rowHtml + '<input type="text" class="form-control form-control-sm" id="descrizioneArticolo_'+id+'" disabled value="'+descrizione+'"></div>';
+							rowHtml = rowHtml + '<div class="form-group col-md-2">';
+
+							if(i == 0 && alreadyAddedRows == 0){
+								rowHtml = rowHtml + '<label for="pezziArticolo">Nr. pezzi</label>';
+							}
+							rowHtml = rowHtml + '<div class="input-group">';
+							rowHtml = rowHtml + '<input type="number" class="form-control form-control-sm pezziArticolo" id="pezziArticolo_'+id+'" step="1" min="0" value="'+numPezzi+'">';
+							rowHtml = rowHtml + '<div class="input-group-append ml-1 mt-1"><a class="deleteAddArticolo" data-id="'+id+'"><i class="far fa-trash-alt"></a>';
+							rowHtml = rowHtml + '</div></div></div>';
+							rowHtml = rowHtml + '</div>';
+
+							$('#formRowArticoli').append(rowHtml);
+						}
+					});
+				} else {
+					$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@','Nessun articolo trovato').replace('@@alertResult@@', 'warning'));
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertOrdineFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nel recupero degli articoli').replace('@@alertResult@@', 'danger'));
+			}
+		});
+
 	});
 
 });
