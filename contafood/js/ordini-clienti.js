@@ -915,11 +915,13 @@ $.fn.loadOrdiniClientiTable = function(url){
 					"info": false,
 					"autoWidth": false,
 					"order": [
-						[0, 'asc'],
+						[0, 'desc'],
 						[1, 'desc']
 						//[6, 'desc']
 					],
 					"columns": [
+						{"name":"progressivo", "data": "progressivo", "width":"5%", "visible": false},
+						{"name":"annoContabile", "data": "annoContabile", "width":"5%", "visible": false},
 						{"name":"stato", "data": "statoOrdine.ordine", "width":"5%", "visible": false},
 						{"name":"dataConsegna", "data": "dataConsegna", "width":"5%", "visible": false},
 						{"name":"codice", "width":"8%", "data": null, render: function ( data, type, row ) {
@@ -1014,13 +1016,13 @@ $.fn.loadOrdiniClientiTable = function(url){
 								return '';
 							}
 						}},
-						{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
+						{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
 							var links = '<a class="detailsOrdineCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 
 							var stato = data.statoOrdine;
-							if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_EVADERE'){
-								links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
-							}
+							//if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_EVADERE'){
+							//	links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
+							//}
 							links += '<a class="deleteOrdineCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 							return links;
 						}}
