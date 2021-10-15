@@ -156,6 +156,8 @@ $(document).ready(function() {
 	$(document).on('click','#printOrdiniAutisti', function(event){
 		event.preventDefault();
 
+		$('#alertOrdineAutista').empty()
+
         var alertContent = '<div id="alertOrdineAutistaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
         		alertContent = alertContent + '<strong>@@alertText@@\n' +
         			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';

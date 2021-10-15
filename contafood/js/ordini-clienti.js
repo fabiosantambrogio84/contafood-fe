@@ -915,14 +915,14 @@ $.fn.loadOrdiniClientiTable = function(url){
 					"info": false,
 					"autoWidth": false,
 					"order": [
-						[0, 'desc'],
-						[1, 'desc']
-						//[6, 'desc']
+						[0, 'asc'],
+						[1, 'desc'],
+						[2, 'desc']
 					],
 					"columns": [
+						{"name":"stato", "data": "statoOrdine.ordine", "width":"5%", "visible": false},
 						{"name":"progressivo", "data": "progressivo", "width":"5%", "visible": false},
 						{"name":"annoContabile", "data": "annoContabile", "width":"5%", "visible": false},
-						{"name":"stato", "data": "statoOrdine.ordine", "width":"5%", "visible": false},
 						{"name":"dataConsegna", "data": "dataConsegna", "width":"5%", "visible": false},
 						{"name":"codice", "width":"8%", "data": null, render: function ( data, type, row ) {
 							return data.progressivo + '/' + data.annoContabile;
