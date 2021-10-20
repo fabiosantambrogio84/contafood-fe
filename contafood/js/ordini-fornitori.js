@@ -58,12 +58,14 @@ $(document).ready(function() {
 			}},
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="detailsOrdineFornitore pr-1" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-				links += '<a class="updateOrdineFornitore pr-1" data-id="'+data.id+'" href="ordini-fornitori-edit.html?idOrdineFornitore=' + data.id + '"><i class="far fa-edit"></i></a>';
+				if(data.emailInviata == 'N'){
+					links += '<a class="updateOrdineFornitore pr-1" data-id="'+data.id+'" href="ordini-fornitori-edit.html?idOrdineFornitore=' + data.id + '"><i class="far fa-edit"></i></a>';
+				}
 				links += '<a class="printOrdineFornitore pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 				var fornitore = data.fornitore;
 				if(fornitore != null){
 					var email = fornitore.emailOrdini;
-					if(email != null && email != undefined && email != ""){
+					if(data.emailInviata == 'N' && email != null && email != undefined && email != ""){
 						links += '<a class="emailOrdineFornitore pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
 					}
 				}

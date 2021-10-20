@@ -107,8 +107,8 @@ $(document).ready(function() {
                 var note = data.note;
                 var noteTrunc = note;
                 var noteHtml = '<div>'+noteTrunc+'</div>';
-                if(note.length > 100){
-                    noteTrunc = note.substring(0, 100)+'...';
+                if(note.length > 15){
+                    noteTrunc = note.substring(0, 15)+'...';
                     noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
                 }
 

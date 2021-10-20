@@ -14,14 +14,18 @@ $(document).ready(function() {
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 			var idAutista = $('#autista option:selected').val();
-			var dataConsegna = $('#dataConsegna').val();
+			var dataConsegnaDa = $('#dataConsegnaDa').val();
+			var dataConsegnaA = $('#dataConsegnaA').val();
 			var params = {};
             if(idAutista != null && idAutista != undefined && idAutista != ''){
                 params.idAutista = idAutista;
             }
-            if(dataConsegna != null && dataConsegna != undefined && dataConsegna != ''){
-                params.dataConsegna = dataConsegna;
+            if(dataConsegnaDa != null && dataConsegnaDa != undefined && dataConsegnaDa != ''){
+                params.dataConsegnaDa = dataConsegnaDa;
             }
+			if(dataConsegnaA != null && dataConsegnaA != undefined && dataConsegnaA != ''){
+				params.dataConsegnaA = dataConsegnaA;
+			}
             var url = baseUrl + "ordini-clienti?" + $.param( params );
 
 			$('#ordiniAutistiTable').DataTable({
@@ -163,7 +167,8 @@ $(document).ready(function() {
         			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
 		var idAutista = $('#autista option:selected').val();
-		var dataConsegna = $('#dataConsegna').val();
+		var dataConsegnaDa = $('#dataConsegnaDa').val();
+		var dataConsegnaA = $('#dataConsegnaA').val();
 		var ids = "";
 
 		/*$(".rowOrdine").each(function(i, item){
@@ -178,12 +183,18 @@ $(document).ready(function() {
             $('#alertOrdineAutista').empty().append(alertContent.replace('@@alertText@@', 'Selezionare un autista').replace('@@alertResult@@', 'danger'));
             return;
         }
-        if(dataConsegna != null && dataConsegna != undefined && dataConsegna != ''){
-            params.dataConsegna = dataConsegna;
+        if(dataConsegnaDa != null && dataConsegnaDa != undefined && dataConsegnaDa != ''){
+            params.dataConsegnaDa = dataConsegnaDa;
         } else {
             $('#alertOrdineAutista').empty().append(alertContent.replace('@@alertText@@', 'Selezionare una data di consegna').replace('@@alertResult@@', 'danger'));
             return;
         }
+		if(dataConsegnaA != null && dataConsegnaA != undefined && dataConsegnaA != ''){
+			params.dataConsegnaA = dataConsegnaA;
+		} else {
+			$('#alertOrdineAutista').empty().append(alertContent.replace('@@alertText@@', 'Selezionare una data di consegna').replace('@@alertResult@@', 'danger'));
+			return;
+		}
         /*if(ids != null && ids != undefined && ids != ''){
             params.ids = ids;
         }*/
