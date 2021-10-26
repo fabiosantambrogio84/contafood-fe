@@ -1205,7 +1205,6 @@ $.fn.getAgenti = function(){
 						$('#agente').append('<option value="'+item.id+'">'+label+'</option>');
 					});
 				}
-
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);

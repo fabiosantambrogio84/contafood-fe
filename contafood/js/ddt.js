@@ -1605,7 +1605,8 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 }
 
 $.fn.getClienti = function(){
-	$.ajax({
+
+	return $.ajax({
 		url: baseUrl + "clienti?bloccaDdt=false&privato=false",
 		type: 'GET',
 		dataType: 'json',
@@ -1631,9 +1632,9 @@ $.fn.getClienti = function(){
 						idListino = listino.id;
 					}
 					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
-
-					$('#cliente').selectpicker('refresh');
 				});
+				$('#cliente').selectpicker('refresh');
+				console.log("CLIENTI");
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -1643,7 +1644,8 @@ $.fn.getClienti = function(){
 }
 
 $.fn.getTipologieTrasporto = function(){
-	$.ajax({
+
+	return $.ajax({
 		url: baseUrl + "utils/tipologie-trasporto-ddt",
 		type: 'GET',
 		dataType: 'json',
@@ -1655,9 +1657,9 @@ $.fn.getTipologieTrasporto = function(){
 					} else {
 						$('#tipoTrasporto').append('<option value="'+item+'">'+item+'</option>');
 					}
-
 				});
 			}
+			console.log("TIPOLOGIE TRASPORTO");
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
@@ -1666,7 +1668,8 @@ $.fn.getTipologieTrasporto = function(){
 }
 
 $.fn.getCausali = function(){
-	$.ajax({
+
+	return $.ajax({
 		url: baseUrl + "causali",
 		type: 'GET',
 		dataType: 'json',
@@ -1682,6 +1685,7 @@ $.fn.getCausali = function(){
 					}
 				});
 			}
+			console.log("CAUSALI");
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
@@ -1791,6 +1795,9 @@ $.fn.getDdt = function(idDdt){
 				$('#annoContabile').attr('value', result.annoContabile);
 				$('#data').attr('value', result.data);
 				if(result.cliente != null && result.cliente != undefined){
+
+					console.log("DDT");
+
 					$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
 
 					$.ajax({

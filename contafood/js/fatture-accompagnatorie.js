@@ -772,7 +772,7 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 
 $.fn.getClienti = function(){
 	$.ajax({
-		url: baseUrl + "clienti?bloccaDdt=false",
+		url: baseUrl + "clienti?bloccaDdt=false&privato=false",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

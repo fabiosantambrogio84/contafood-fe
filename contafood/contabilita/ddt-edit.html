@@ -37,8 +37,12 @@
   <script src="../js/bootstrap-select/bootstrap-select-1.13.12.js"></script>
   <script src="../js/bootstrap-select/i18n/defaults-it_IT.js"></script>
 
-  <script src="../js/commons.js"></script>
+  <!-- Page level plugins -->
+  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
+  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
   <script src="../js/core/moment.js"></script>
+  <script src="../js/commons.js"></script>
 
   <script src="../js/ddt.js"></script>
 
@@ -47,12 +51,11 @@
   <script>
     var idDdt = $.fn.extractIdDdtFromUrl();
     if(idDdt != null && idDdt != undefined){
-      $.when($.fn.getClienti(), $.fn.getTipologieTrasporto(), $.fn.getCausali()).then($.fn.getDdt(idDdt));
-      /*
-      $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getTipologieTrasporto()).then(function(f1,f2,f3){
+      //$.when($.fn.getClienti(), $.fn.getCausali(), $.fn.getTipologieTrasporto()).then($.fn.getDdt(idDdt));
+
+      $.when($.fn.getClienti(), $.fn.getCausali(), $.fn.getTipologieTrasporto()).then(function(f1,f2,f3){
         $.fn.getDdt(idDdt);
       });
-      */
     }
   </script>
 
@@ -351,10 +354,6 @@
 
 <!-- Custom scripts for all pages-->
 <script src="../js/sb-admin-2.min.js"></script>
-
-<!-- Page level plugins -->
-<script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-<script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
 </body>
 

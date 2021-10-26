@@ -1113,7 +1113,7 @@ $.fn.preloadFields = function(){
 
 $.fn.getClienti = function(){
 	$.ajax({
-		url: baseUrl + "clienti",
+		url: baseUrl + "clienti?privato=false",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -1121,7 +1121,7 @@ $.fn.getClienti = function(){
 				$.each(result, function(i, item){
 					var label = '';
 					if(item.dittaIndividuale){
-						label += item.cognome + ' - ' + item.nome;
+						label += item.cognome + ' ' + item.nome;
 					} else {
 						label += item.ragioneSociale;
 					}
