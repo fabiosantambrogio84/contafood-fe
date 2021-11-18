@@ -103,6 +103,20 @@ $(document).ready(function() {
 		});
 	});
 
+	$(document).on('change','#fornitore', function(){
+		var idTipoFornitore = $(this).find('option:selected').attr('data-id-tipo-fornitore');
+		var barcodeMask = $(this).find('option:selected').attr('data-barcode-mask');
+		if(idTipoFornitore != null && idTipoFornitore != "" && idTipoFornitore==1) {
+			if(barcodeMask != null && barcodeMask != undefined && barcodeMask != "" && barcodeMask != "null"){
+				$('#barcodeMask').val(barcodeMask);
+			}
+			$('#barcodeMask').attr('disabled', false);
+		} else {
+			$('#barcodeMask').val(null);
+			$('#barcodeMask').attr('disabled', true);
+		}
+	});
+
 	if($('#updateArticoloButton') != null && $('#updateArticoloButton') != undefined){
 		$(document).on('submit','#updateArticoloForm', function(event){
 			event.preventDefault();
@@ -154,6 +168,7 @@ $(document).ready(function() {
 			}else{
 				articolo.completeBarcode = false;
 			}
+			articolo.barcodeMask = $('#barcodeMask').val();
 			if($('#sitoWeb').prop('checked') === true){
 				articolo.sitoWeb = true;
 			}else{
@@ -177,7 +192,17 @@ $(document).ready(function() {
 					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@','Articolo modificato con successo').replace('@@alertResult@@', 'success'));
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell articolo').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nella modifica dell articolo';
+					if(jqXHR != null && jqXHR != undefined && jqXHR != ""){
+						var responseJson = jqXHR.responseJSON;
+						if(responseJson != null && responseJson != undefined && responseJson != ""){
+							var message = jqXHR.responseJSON.message;
+							if(message != null && message != undefined && message != ""){
+								errorMessage += '. '+message;
+							}
+						}
+					}
+					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -233,6 +258,7 @@ $(document).ready(function() {
 			}else{
 				articolo.completeBarcode = false;
 			}
+			articolo.barcodeMask = $('#barcodeMask').val();
 			if($('#sitoWeb').prop('checked') === true){
 				articolo.sitoWeb = true;
 			}else{
@@ -261,7 +287,17 @@ $(document).ready(function() {
 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell articolo').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nella creazione dell articolo';
+					if(jqXHR != null && jqXHR != undefined && jqXHR != ""){
+						var responseJson = jqXHR.responseJSON;
+						if(responseJson != null && responseJson != undefined && responseJson != ""){
+							var message = jqXHR.responseJSON.message;
+							if(message != null && message != undefined && message != ""){
+								errorMessage += '. '+message;
+							}
+						}
+					}
+					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -295,8 +331,20 @@ $.fn.getFornitori = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					$('#fornitore').append('<option value="'+item.id+'">'+item.ragioneSociale+'</option>');
+					$('#fornitore').append('<option value="'+item.id+'" data-id-tipo-fornitore="'+item.tipoFornitore.id+'" data-barcode-mask="'+item.barcodeMask+'">'+item.ragioneSociale+'</option>');
 				});
+
+				var firstIdTipoFornitore = $('#fornitore option:selected').attr('data-id-tipo-fornitore');
+				var firstBarcodeMask = $('#fornitore option:selected').attr('data-barcode-mask');
+				if(firstIdTipoFornitore != null && firstIdTipoFornitore != "" && firstIdTipoFornitore==1) {
+					if(firstBarcodeMask != null && firstBarcodeMask != undefined && firstBarcodeMask != "" && firstBarcodeMask != "null"){
+						$('#barcodeMask').attr('value', firstBarcodeMask);
+					}
+					$('#barcodeMask').attr('disabled', false);
+				} else {
+					$('#barcodeMask').val(null);
+					$('#barcodeMask').attr('disabled', true);
+				}
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -401,6 +449,16 @@ $.fn.getArticolo = function(idCliente){
 			if(result.completeBarcode === true){
 				$('#completeBarcode').prop('checked', true);
 			}
+
+			var idTipoFornitore = $('#fornitore option:selected').attr('data-id-tipo-fornitore');
+			if(idTipoFornitore != null && idTipoFornitore != "" && idTipoFornitore==1) {
+				$('#barcodeMask').attr('disabled', false);
+			} else {
+				$('#barcodeMask').val(null);
+				$('#barcodeMask').attr('disabled', true);
+			}
+			$('#barcodeMask').val(result.barcodeMask);
+
 			if(result.sitoweb === true){
 				$('#sitoWeb').prop('checked', true);
 			}

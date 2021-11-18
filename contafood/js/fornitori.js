@@ -138,6 +138,16 @@ $(document).ready(function() {
 		});
 	});
 
+	$(document).on('change','#tipoFornitore', function(){
+		var idTipoFornitore = $(this).val();
+		if(idTipoFornitore != null && idTipoFornitore != "" && idTipoFornitore==1) {
+			$('#barcodeMask').attr('disabled', false);
+		} else {
+			$('#barcodeMask').val(null);
+			$('#barcodeMask').attr('disabled', true);
+		}
+	});
+
     /*
 	if($('#dittaIndividuale') != null && $('#dittaIndividuale') != undefined){
 		$(document).on('change','#dittaIndividuale', function(){
@@ -184,6 +194,7 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
+			fornitore.barcodeMask = $('#barcodeMask').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -207,7 +218,18 @@ $(document).ready(function() {
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica del fornitore').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nella modifica del fornitore';
+					if(jqXHR != null && jqXHR != undefined && jqXHR != ""){
+						var responseJson = jqXHR.responseJSON;
+						if(responseJson != null && responseJson != undefined && responseJson != ""){
+							var message = jqXHR.responseJSON.message;
+							if(message != null && message != undefined && message != ""){
+								errorMessage += '. '+message;
+							}
+						}
+					}
+
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -240,6 +262,7 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
+			fornitore.barcodeMask = $('#barcodeMask').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -263,7 +286,17 @@ $(document).ready(function() {
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione del fornitore').replace('@@alertResult@@', 'danger'));
+					var errorMessage = 'Errore nella creazione del fornitore';
+					if(jqXHR != null && jqXHR != undefined && jqXHR != ""){
+						var responseJson = jqXHR.responseJSON;
+						if(responseJson != null && responseJson != undefined && responseJson != ""){
+							var message = jqXHR.responseJSON.message;
+							if(message != null && message != undefined && message != ""){
+								errorMessage += '. '+message;
+							}
+						}
+					}
+					$('#alertFornitore').empty().append(alertContent.replace('@@alertText@@',errorMessage).replace('@@alertResult@@', 'danger'));
 				}
 			});
 		});
@@ -352,6 +385,13 @@ $.fn.getFornitore = function(idFornitore){
 			var tipoFornitore = result.tipoFornitore;
 			if(tipoFornitore != null){
 				$('#tipoFornitore option[value="' + tipoFornitore.id +'"]').attr('selected', true);
+
+				if(tipoFornitore.id != null && tipoFornitore.id != "" && tipoFornitore.id==1) {
+					$('#barcodeMask').attr('disabled', false);
+				} else {
+					$('#barcodeMask').val(null);
+					$('#barcodeMask').attr('disabled', true);
+				}
 			}
 			$('#codiceFornitore').attr('value', result.codice);
             $('#ragioneSociale').attr('value', result.ragioneSociale);
@@ -372,6 +412,7 @@ $.fn.getFornitore = function(idFornitore){
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#iban').attr('value', result.iban);
 			$('#pagamento').attr('value', result.pagamento);
+			$('#barcodeMask').attr('value', result.barcodeMask);
 			$('#note').val(result.note);
 
           } else{
