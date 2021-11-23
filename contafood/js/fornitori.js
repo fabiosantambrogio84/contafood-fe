@@ -141,10 +141,10 @@ $(document).ready(function() {
 	$(document).on('change','#tipoFornitore', function(){
 		var idTipoFornitore = $(this).val();
 		if(idTipoFornitore != null && idTipoFornitore != "" && idTipoFornitore==1) {
-			$('#barcodeMask').attr('disabled', false);
+			$('#barcodeMaskLottoScadenza').attr('disabled', false);
 		} else {
-			$('#barcodeMask').val(null);
-			$('#barcodeMask').attr('disabled', true);
+			$('#barcodeMaskLottoScadenza').val(null);
+			$('#barcodeMaskLottoScadenza').attr('disabled', true);
 		}
 	});
 
@@ -194,7 +194,7 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
-			fornitore.barcodeMask = $('#barcodeMask').val();
+			fornitore.barcodeMaskLottoScadenza = $('#barcodeMaskLottoScadenza').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -262,7 +262,7 @@ $(document).ready(function() {
 			fornitore.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			fornitore.iban = $('#iban').val();
 			fornitore.pagamento = $('#pagamento').val();
-			fornitore.barcodeMask = $('#barcodeMask').val();
+			fornitore.barcodeMaskLottoScadenza = $('#barcodeMaskLottoScadenza').val();
 			fornitore.note = $('#note').val();
 
 			var fornitoreJson = JSON.stringify(fornitore);
@@ -387,10 +387,10 @@ $.fn.getFornitore = function(idFornitore){
 				$('#tipoFornitore option[value="' + tipoFornitore.id +'"]').attr('selected', true);
 
 				if(tipoFornitore.id != null && tipoFornitore.id != "" && tipoFornitore.id==1) {
-					$('#barcodeMask').attr('disabled', false);
+					$('#barcodeMaskLottoScadenza').attr('disabled', false);
 				} else {
-					$('#barcodeMask').val(null);
-					$('#barcodeMask').attr('disabled', true);
+					$('#barcodeMaskLottoScadenza').val(null);
+					$('#barcodeMaskLottoScadenza').attr('disabled', true);
 				}
 			}
 			$('#codiceFornitore').attr('value', result.codice);
@@ -412,7 +412,7 @@ $.fn.getFornitore = function(idFornitore){
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#iban').attr('value', result.iban);
 			$('#pagamento').attr('value', result.pagamento);
-			$('#barcodeMask').attr('value', result.barcodeMask);
+			$('#barcodeMaskLottoScadenza').attr('value', result.barcodeMaskLottoScadenza);
 			$('#note').val(result.note);
 
           } else{

@@ -105,15 +105,15 @@ $(document).ready(function() {
 
 	$(document).on('change','#fornitore', function(){
 		var idTipoFornitore = $(this).find('option:selected').attr('data-id-tipo-fornitore');
-		var barcodeMask = $(this).find('option:selected').attr('data-barcode-mask');
+		var barcodeMaskLottoScadenza = $(this).find('option:selected').attr('data-barcode-mask-lotto-scadenza');
 		if(idTipoFornitore != null && idTipoFornitore != "" && idTipoFornitore==1) {
-			if(barcodeMask != null && barcodeMask != undefined && barcodeMask != "" && barcodeMask != "null"){
-				$('#barcodeMask').val(barcodeMask);
+			if(barcodeMaskLottoScadenza != null && barcodeMaskLottoScadenza != undefined && barcodeMaskLottoScadenza != "" && barcodeMaskLottoScadenza != "null"){
+				$('#barcodeMaskLottoScadenza').val(barcodeMaskLottoScadenza);
 			}
-			$('#barcodeMask').attr('disabled', false);
+			$('#barcodeMaskLottoScadenza').attr('disabled', false);
 		} else {
-			$('#barcodeMask').val(null);
-			$('#barcodeMask').attr('disabled', true);
+			$('#barcodeMaskLottoScadenza').val(null);
+			$('#barcodeMaskLottoScadenza').attr('disabled', true);
 		}
 	});
 
@@ -168,7 +168,7 @@ $(document).ready(function() {
 			}else{
 				articolo.completeBarcode = false;
 			}
-			articolo.barcodeMask = $('#barcodeMask').val();
+			articolo.barcodeMaskLottoScadenza = $('#barcodeMaskLottoScadenza').val();
 			if($('#sitoWeb').prop('checked') === true){
 				articolo.sitoWeb = true;
 			}else{
@@ -258,7 +258,7 @@ $(document).ready(function() {
 			}else{
 				articolo.completeBarcode = false;
 			}
-			articolo.barcodeMask = $('#barcodeMask').val();
+			articolo.barcodeMaskLottoScadenza = $('#barcodeMaskLottoScadenza').val();
 			if($('#sitoWeb').prop('checked') === true){
 				articolo.sitoWeb = true;
 			}else{
@@ -331,19 +331,19 @@ $.fn.getFornitori = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					$('#fornitore').append('<option value="'+item.id+'" data-id-tipo-fornitore="'+item.tipoFornitore.id+'" data-barcode-mask="'+item.barcodeMask+'">'+item.ragioneSociale+'</option>');
+					$('#fornitore').append('<option value="'+item.id+'" data-id-tipo-fornitore="'+item.tipoFornitore.id+'" data-barcode-mask-lotto-scadenza="'+item.barcodeMaskLottoScadenza+'">'+item.ragioneSociale+'</option>');
 				});
 
 				var firstIdTipoFornitore = $('#fornitore option:selected').attr('data-id-tipo-fornitore');
-				var firstBarcodeMask = $('#fornitore option:selected').attr('data-barcode-mask');
+				var firstBarcodeMaskLottoScadenza = $('#fornitore option:selected').attr('data-barcode-mask-lotto-scadenza');
 				if(firstIdTipoFornitore != null && firstIdTipoFornitore != "" && firstIdTipoFornitore==1) {
-					if(firstBarcodeMask != null && firstBarcodeMask != undefined && firstBarcodeMask != "" && firstBarcodeMask != "null"){
-						$('#barcodeMask').attr('value', firstBarcodeMask);
+					if(firstBarcodeMaskLottoScadenza != null && firstBarcodeMaskLottoScadenza != undefined && firstBarcodeMaskLottoScadenza != "" && firstBarcodeMaskLottoScadenza != "null"){
+						$('#barcodeMaskLottoScadenza').attr('value', firstBarcodeMaskLottoScadenza);
 					}
-					$('#barcodeMask').attr('disabled', false);
+					$('#barcodeMaskLottoScadenza').attr('disabled', false);
 				} else {
-					$('#barcodeMask').val(null);
-					$('#barcodeMask').attr('disabled', true);
+					$('#barcodeMaskLottoScadenza').val(null);
+					$('#barcodeMaskLottoScadenza').attr('disabled', true);
 				}
 			}
 		},
@@ -452,12 +452,12 @@ $.fn.getArticolo = function(idCliente){
 
 			var idTipoFornitore = $('#fornitore option:selected').attr('data-id-tipo-fornitore');
 			if(idTipoFornitore != null && idTipoFornitore != "" && idTipoFornitore==1) {
-				$('#barcodeMask').attr('disabled', false);
+				$('#barcodeMaskLottoScadenza').attr('disabled', false);
 			} else {
-				$('#barcodeMask').val(null);
-				$('#barcodeMask').attr('disabled', true);
+				$('#barcodeMaskLottoScadenza').val(null);
+				$('#barcodeMaskLottoScadenza').attr('disabled', true);
 			}
-			$('#barcodeMask').val(result.barcodeMask);
+			$('#barcodeMaskLottoScadenza').val(result.barcodeMaskLottoScadenza);
 
 			if(result.sitoweb === true){
 				$('#sitoWeb').prop('checked', true);

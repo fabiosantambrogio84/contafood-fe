@@ -1398,7 +1398,7 @@ $(document).ready(function() {
 	});
 
 	$.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,currentPezzi,lotto,scadenza,prezzo,sconto,
-										 quantita,pezzi,codiceFornitore,lottoRegexp,dataScadenzaRegexp,totale){
+										 quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale){
 
 		var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
 		var newPezzi = pezzi + $.fn.parseValue(currentPezzi,'int');
