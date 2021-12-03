@@ -2164,15 +2164,17 @@ $.fn.groupArticoloRow = function(insertedRow){
 $.fn.fixDecimalPlaces = function(quantita, decimalPlaces){
 	var quantitaFixed = quantita;
 
-	if(typeof quantita != "string"){
-		quantita = quantita.toString();
-	}
+	if(quantita != null && quantita != undefined && quantita != ''){
+		if(typeof quantita != "string"){
+			quantita = quantita.toString();
+		}
 
-	if(quantita.indexOf('.') != -1){
-		var numDecimalPlaces = quantita.substring(quantita.indexOf('.')+1, quantita.length).length;
-		if(numDecimalPlaces > decimalPlaces){
-			quantitaFixed = quantita.substring(0, quantita.indexOf('.')+1);
-			quantitaFixed += quantita.substring(quantita.indexOf('.')+1, quantita.indexOf('.')+4);
+		if(quantita.indexOf('.') != -1){
+			var numDecimalPlaces = quantita.substring(quantita.indexOf('.')+1, quantita.length).length;
+			if(numDecimalPlaces > decimalPlaces){
+				quantitaFixed = quantita.substring(0, quantita.indexOf('.')+1);
+				quantitaFixed += quantita.substring(quantita.indexOf('.')+1, quantita.indexOf('.')+4);
+			}
 		}
 	}
 
@@ -2491,6 +2493,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		});
 	}
 
+	var rowIndex;
 	var totale = 0;
 	quantita = $.fn.parseValue(quantita, 'float');
 	prezzo = $.fn.parseValue(prezzo, 'float');
@@ -2509,11 +2512,15 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentSconto,
 			quantita,pezzi,codiceFornitore,lottoRegexp,dataScadenzaRegexp,totale);
 
+		rowIndex = currentRowIndex;
+
 	} else {
 		// inserisco nuova riga
 		$.fn.inserisciRigaArticolo(table,null,articoloId,articoloLabel,
 			lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,
 			totale,iva);
+
+		rowIndex = table.rows().count();
 	}
 
 	$.fn.computeTotale();
@@ -2575,6 +2582,10 @@ $(document).ready(function() {
 			scannerLog += 'Focus lotto? '+isLottoFocused+'\n';
 
 			if(isLottoFocused){
+
+				//barcode = '01980259970004323103001208103203230015211214';
+				//barcodeType = 'ean128';
+
 				var lottoFocused = $(':focus');
 				//var codiceFornitore = lottoFocused.attr("data-codice-fornitore");
 				var lottoRegexp = lottoFocused.attr("data-lotto-regexp");
@@ -2586,8 +2597,8 @@ $(document).ready(function() {
 
 					lottoFocused.val(barcodeToSearch);
 				} else {
-					var lotto = lottoRegexp.exec(barcode)[1];
-					var dataScadenza = dataScadenzaRegexp.exec(barcode)[1];
+					var lotto = new RegExp(lottoRegexp).exec(barcode)[1];
+					var dataScadenza = new RegExp(dataScadenzaRegexp).exec(barcode)[1];
 					dataScadenza = moment(dataScadenza, 'YYMMDD').format('YYYY-MM-DD');
 
 					scannerLog += 'Lotto: '+lotto+'\n';
