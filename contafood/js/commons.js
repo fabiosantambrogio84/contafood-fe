@@ -97,6 +97,24 @@ $.fn.isFatturaAccompagnatoria = function(){
     return result;
 }
 
+$.fn.isRicevutaPrivato = function(){
+    var result = false;
+    var ricevutaPrivatoArticoliTableLength = $('#ricevutaPrivatoArticoliTable').length;
+    if(ricevutaPrivatoArticoliTableLength > 0){
+        result = true;
+    }
+    return result;
+}
+
+$.fn.isDdtAcquisto = function(){
+    var result = false;
+    var ddtAcquistoArticoliTableLength = $('#ddtAcquistoArticoliTable').length;
+    if(ddtAcquistoArticoliTableLength > 0){
+        result = true;
+    }
+    return result;
+}
+
 $.fn.extractDataTrasportoFromUrl = function(){
     var pageUrl = window.location.search.substring(1);
 
@@ -240,6 +258,8 @@ $.fn.emptyArticoli = function(){
         idTable += '#ddtArticoliTable';
     } else if($.fn.isFatturaAccompagnatoria()){
         idTable += '#fatturaAccompagnatoriaArticoliTable';
+    } else if($.fn.isRicevutaPrivato()){
+        idTable += '#ricevutaPrivatoArticoliTable';
     }
 
     $(idTable).DataTable().rows()
@@ -366,7 +386,7 @@ $.fn.computeTotale = function() {
 
         totaleDocumento += totaleConIva;
 
-        if($.fn.isFatturaAccompagnatoria()){
+        if($.fn.isFatturaAccompagnatoria() || $.fn.isRicevutaPrivato()){
             // populating the table with iva and imponibile
             $('tr[data-valore='+key+']').find('td').eq(1).text($.fn.formatNumber((totalePerIva * key/100)));
             $('tr[data-valore='+key+']').find('td').eq(2).text($.fn.formatNumber(totalePerIva));
@@ -379,6 +399,41 @@ $.fn.computeTotale = function() {
     $('#totale').val(Number(Math.round(totaleDocumento+'e2')+'e-2'));
 }
 
+$.fn.computeTotaleAndImponibile = function() {
+    var ivaMap = new Map();
+    var totaleDocumento = 0;
+    var imponibileDocumento = 0;
+
+    $('.rowProdotto').each(function(i, item){
+        var iva = $(this).children().eq(7).find('a').attr('data-iva');
+        iva = $.fn.parseValue(iva, 'float');
+        var imponibile = $(this).children().eq(7).find('a').attr('data-imponibile');
+        imponibile = $.fn.parseValue(imponibile, 'float');
+
+        var totaliIva;
+        if(ivaMap.has(iva)){
+            totaliIva = ivaMap.get(iva);
+        } else {
+            totaliIva = [];
+        }
+        totaliIva.push(imponibile);
+        ivaMap.set(iva, totaliIva);
+
+    });
+    ivaMap.forEach( (value, key, map) => {
+        var totalePerIva = value.reduce((a, b) => a + b, 0);
+        var totaleConIva = totalePerIva + (totalePerIva * key/100);
+
+        imponibileDocumento += totalePerIva;
+        totaleDocumento += totaleConIva;
+    });
+
+    totaleDocumento = parseFloat(totaleDocumento);
+    imponibileDocumento = parseFloat(imponibileDocumento);
+    $('#totale').val($.fn.formatNumber(totaleDocumento));
+    $('#totaleImponibile').val($.fn.formatNumber(imponibileDocumento));
+}
+
 $.fn.loadArticoliFromOrdiniClienti = function(){
 
     var alertLabel = 'alert';
@@ -386,6 +441,8 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
         alertLabel += 'Ddt';
     } else if($.fn.isFatturaAccompagnatoria()){
         alertLabel += 'FattureAccompagnatorie';
+    } else if($.fn.isRicevutaPrivato()){
+        alertLabel += 'RicevutaPrivato';
     }
 
     var idStatoOrdineEvaso = $.fn.getStatoOrdineClienteEvaso();
@@ -529,6 +586,8 @@ $.fn.groupArticoloRow = function(insertedRow){
         table = $('#ddtArticoliTable').DataTable();
     } else if($.fn.isFatturaAccompagnatoria()){
         table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+    } else if($.fn.isRicevutaPrivato()){
+        table = $('#ricevutaPrivatoArticoliTable').DataTable();
     }
 
     if(found >= 1){
@@ -546,12 +605,80 @@ $.fn.groupArticoloRow = function(insertedRow){
         // aggiorno la riga
         $.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,lotto,scadenza,prezzo,sconto,
             quantita,pezzi,null,null,null,totale);
+
         table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
     }
 
     $.fn.computeTotale();
 
     $.fn.checkPezziOrdinati();
+}
+
+$.fn.groupProdottoRow = function(insertedRow){
+    var insertedRowIndex = insertedRow.attr("data-row-index");
+    var articoloId = insertedRow.attr("data-id");
+    var iva = insertedRow.attr("data-iva");
+    var	lotto = insertedRow.children().eq(1).children().eq(0).val();
+    var	scadenza = insertedRow.children().eq(2).children().eq(0).val();
+    var quantita = insertedRow.children().eq(4).children().eq(0).val();
+    var	prezzo = insertedRow.children().eq(5).children().eq(0).val();
+    var	sconto = insertedRow.children().eq(6).children().eq(0).val();
+
+    var found = 0;
+    var currentRowIndex = 0;
+    var currentIdArticolo;
+    var currentLotto;
+    var currentScadenza;
+    var currentPrezzo;
+    var currentSconto;
+    var currentQuantita = 0;
+
+    var ddtProdottiLength = $('.rowProdotto').length;
+    if(ddtProdottiLength != null && ddtProdottiLength != undefined && ddtProdottiLength != 0) {
+        $('.rowProdotto').each(function(i, item){
+
+            if(found != 1){
+                currentRowIndex = $(this).attr('data-row-index');
+                if(currentRowIndex != insertedRowIndex){
+                    //currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
+                    currentIdArticolo = $(this).attr('data-id');
+                    currentLotto = $(this).children().eq(1).children().eq(0).val();
+                    currentScadenza = $(this).children().eq(2).children().eq(0).val();
+                    currentPrezzo = $(this).children().eq(5).children().eq(0).val();
+                    currentSconto = $(this).children().eq(6).children().eq(0).val();
+
+                    if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+                        && $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+                        && $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+                        && $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
+                        && $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+                        found = 1;
+                        currentQuantita = $(this).children().eq(4).children().eq(0).val();
+                    }
+                }
+            }
+        });
+    }
+
+    var table = $('#ddtAcquistoProdottiTable').DataTable();
+    if(found >= 1){
+
+        var imponibile = 0;
+        quantita = $.fn.parseValue(quantita, 'float');
+        prezzo = $.fn.parseValue(prezzo, 'float');
+        sconto = $.fn.parseValue(sconto, 'float');
+
+        var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
+        var scontoValue = (sconto/100)*quantitaPerPrezzo;
+        imponibile = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+        // aggiorno la riga
+        $.fn.aggiornaRigaProdotto(table,currentRowIndex,articoloId,currentQuantita,lotto,scadenza,prezzo,sconto,quantita,null,null,null,iva,imponibile);
+        table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
+    }
+
+    $.fn.computeTotaleAndImponibile();
+
 }
 
 $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,articolo,
@@ -563,6 +690,10 @@ $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,ar
         deleteLinkClass += 'DdtArticolo';
     } else if($.fn.isFatturaAccompagnatoria()){
         deleteLinkClass += 'FatturaAccompagnatoriaArticolo';
+    } else if($.fn.isRicevutaPrivato()){
+        deleteLinkClass += 'RicevutaPrivatoArticolo';
+    } else if($.fn.isDdtAcquisto()){
+        deleteLinkClass += 'DdtProdotto';
     }
     var deleteLink = '<a class="'+deleteLinkClass+'" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
@@ -582,7 +713,11 @@ $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,ar
         deleteLink
     ] ).draw( false ).node();
     $(rowNode).css('text-align', 'center').css('color','#080707');
-    $(rowNode).addClass('rowArticolo');
+    var cssClass = 'rowArticolo';
+    if($.fn.isDdtAcquisto()){
+        cssClass = 'rowProdotto';
+    }
+    $(rowNode).addClass(cssClass);
     $(rowNode).attr('data-id', articoloId);
     $(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
 }
@@ -614,3 +749,46 @@ $.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,curre
     table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 }
 
+$.fn.inserisciRigaProdotto = function(table,articoloId,articolo,lottoHtml,scadenzaHtml,udm,quantitaHtml,prezzoHtml,scontoHtml,iva,imponibile){
+
+    var deleteLink = '<a class="deleteDdtProdotto" data-id="'+articoloId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+    var rowsCount = table.rows().count();
+
+    var rowNode = table.row.add( [
+        articolo,
+        lottoHtml,
+        scadenzaHtml,
+        udm,
+        quantitaHtml,
+        prezzoHtml,
+        scontoHtml,
+        deleteLink
+    ] ).draw( false ).node();
+    $(rowNode).css('text-align', 'center').css('color','#080707');
+    $(rowNode).addClass('rowProdotto');
+    $(rowNode).attr('data-id', articoloId);
+    $(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
+}
+
+$.fn.aggiornaRigaProdotto = function(table,currentRowIndex,articoloId,currentQuantita,lotto,scadenza,prezzo,sconto,
+                                     quantita,codiceFornitore,lottoRegexp,dataScadenzaRegexp,iva,imponibile){
+
+    var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+
+    var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
+    var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+lotto+'" data-codice-fornitore="'+codiceFornitore+'" data-lotto-regexp="'+lottoRegExp+'" data-scadenza-regexp="'+dataScadenzaRegExp+'">';
+    var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
+    var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
+    var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
+    var newDeleteLink = '<a class="deleteDdtProdotto" data-id="'+articoloId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+    var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
+    rowData[1] = lottoHtml;
+    rowData[2] = scadenzaHtml;
+    rowData[4] = newQuantitaHtml;
+    rowData[5] = prezzoHtml;
+    rowData[6] = scontoHtml;
+    rowData[7] = newDeleteLink;
+    table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+}

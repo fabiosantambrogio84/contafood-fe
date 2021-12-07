@@ -1,8 +1,14 @@
 
-$.fn.getScontoArticolo = function(idArticolo, data, cliente){
+$.fn.getScontoArticolo = function(idArticolo, data, clienteOrFornitore){
 	var sconto = null;
+
+	var urlParam = "idCliente=";
+	if($.fn.isDdtAcquisto()){
+		urlParam = "idFornitore=";
+	}
+
 	$.ajax({
-		url: baseUrl + "sconti?idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
+		url: baseUrl + "sconti?"+urlParam+clienteOrFornitore+"&data="+moment(data.data).format('YYYY-MM-DD'),
 		type: 'GET',
 		dataType: 'json',
 		async: false,
@@ -45,8 +51,6 @@ $.fn.getPrezzoListinoClienteArticolo = function(idArticolo, idListino){
 	}
 	return prezzoListino;
 }
-
-
 
 $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, scadenza, prezzoListino, sconto){
 	var articoloId = articolo.id;
@@ -150,6 +154,8 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		table = $('#ddtArticoliTable').DataTable();
 	} else if($.fn.isFatturaAccompagnatoria()){
 		table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+	} else if($.fn.isRicevutaPrivato()){
+		table = $('#ricevutaPrivatoArticoliTable').DataTable();
 	}
 
 	if(found >= 1){
@@ -176,6 +182,103 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	$('tr[data-row-index='+rowIndex+']').children().eq(1).children().eq(0).focus();
 }
 
+$.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, scadenza, prezzoListino, sconto, iva){
+	var articoloId = articolo.id;
+
+	var articoloLabel = articolo.codice + ' ' + articolo.descrizione;
+	var udm;
+	if(!$.fn.checkVariableIsNull(articolo.unitaMisura)){
+		udm = articolo.unitaMisura.etichetta;
+	}
+	var lotto = lotto;
+	var scadenza = scadenza;
+	if(!$.fn.checkVariableIsNull(scadenza)){
+		scadenza = moment(scadenza).format('YYYY-MM-DD');
+	}
+	var quantita = quantita;
+	var prezzo;
+	if(!$.fn.checkVariableIsNull(prezzoListino)){
+		prezzo = prezzoListino;
+	} else {
+		prezzo = articolo.prezzoListinoBase;
+	}
+	var sconto = sconto;
+	var codiceFornitore = articolo.fornitore.codice;
+	var lottoRegexp = $.fn.getLottoRegExp(articolo);
+	var dataScadenzaRegexp = $.fn.getDataScadenzaRegExp(articolo);
+
+	if(lotto != null && lotto != undefined && lotto != ''){
+		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+lotto+'" data-codice-fornitore="'+codiceFornitore+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
+	} else {
+		var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="" data-codice-fornitore="'+codiceFornitore+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
+	}
+	var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+scadenza+'">';
+	var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
+	var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
+	var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
+
+	// check if a same Articolo was already added
+	var found = 0;
+	var currentRowIndex;
+	var currentIdArticolo;
+	var currentLotto;
+	var currentPrezzo;
+	var currentSconto;
+	var currentScadenza;
+	var currentQuantita= 0;
+
+	var ddtProdottiLength = $('.rowProdotto').length;
+	if(ddtProdottiLength != null && ddtProdottiLength != undefined && ddtProdottiLength != 0) {
+		$('.rowProdotto').each(function(i, item){
+
+			if(found != 1){
+				currentRowIndex = $(this).attr('data-row-index');
+				//currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
+				currentIdArticolo = $(this).attr('data-id');
+				currentLotto = $(this).children().eq(1).children().eq(0).val();
+				currentScadenza = $(this).children().eq(2).children().eq(0).val();
+				currentPrezzo = $(this).children().eq(5).children().eq(0).val();
+				currentSconto = $(this).children().eq(6).children().eq(0).val();
+
+				if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+					&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
+					&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+					&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
+					&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
+					found = 1;
+					currentQuantita = $(this).children().eq(4).children().eq(0).val();
+				}
+			}
+		});
+	}
+
+	var imponibile = 0;
+	quantita = $.fn.parseValue(quantita, 'float');
+	prezzo = $.fn.parseValue(prezzo, 'float');
+	sconto = $.fn.parseValue(sconto, 'float');
+
+	var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
+	var scontoValue = (sconto/100)*quantitaPerPrezzo;
+	imponibile = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+	var table = $('#ddtAcquistoProdottiTable').DataTable();
+
+	if(found >= 1){
+
+		// aggiorno la riga
+		$.fn.aggiornaRigaProdotto(table,currentRowIndex,currentIdArticolo,currentQuantita,currentLotto,currentScadenza,currentPrezzo,currentSconto, quantita,codiceFornitore,lottoRegexp,dataScadenzaRegexp,iva,imponibile);
+
+	} else {
+		// inserisco nuova riga
+		$.fn.inserisciRigaProdotto(table,articoloId,articoloLabel,lottoHtml,scadenzaHtml,udm,quantitaHtml,prezzoHtml,scontoHtml,iva,imponibile);
+	}
+
+	$.fn.computeTotaleAndImponibile();
+
+	//$.fn.checkPezziOrdinati();
+
+	$('tr[data-row-index='+rowIndex+']').children().eq(1).children().eq(0).focus();
+}
 
 $(document).ready(function() {
 	// https://github.com/axenox/onscan.js
@@ -199,11 +302,29 @@ $(document).ready(function() {
 			alertOverlayContent = alertOverlayContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close closeOverlay"><span aria-hidden="true">&times;</span></button></div>';
 
-			var cliente = $('#cliente option:selected').val();
-			if($.fn.checkVariableIsNull(cliente)){
-				var alertText = "Selezionare un cliente prima di effettuare la lettura del barcode";
-				$('#alertOverlay').empty().append(alertOverlayContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger')).show();
-				return;
+			var fornitore;
+			var tipoFornitore;
+			var cliente;
+			if($.fn.isDdtAcquisto()){
+				fornitore = $('#fornitore option:selected').val();
+				if($.fn.checkVariableIsNull(fornitore)){
+					var alertText = "Selezionare un fornitore prima di effettuare la lettura del barcode";
+					$('#alertOverlay').empty().append(alertOverlayContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger')).show();
+					return;
+				}
+				tipoFornitore = $('#fornitore option:selected').attr('data-tipo');
+				if(!$.fn.checkVariableIsNull(tipoFornitore) && tipoFornitore == 'FORNITORE_INGREDIENTI'){
+					var alertText = "Lettura barcode non abilitata per fornitori di ingredienti";
+					$('#alertOverlay').empty().append(alertOverlayContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger')).show();
+					return;
+				}
+			} else {
+				cliente = $('#cliente option:selected').val();
+				if($.fn.checkVariableIsNull(cliente)){
+					var alertText = "Selezionare un cliente prima di effettuare la lettura del barcode";
+					$('#alertOverlay').empty().append(alertOverlayContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'danger')).show();
+					return;
+				}
 			}
 
 			/*
@@ -271,20 +392,33 @@ $(document).ready(function() {
 				}
 				lottoFocused.blur();
 
-				$.fn.groupArticoloRow(lottoFocused.parent().parent());
+				if($.fn.isDdtAcquisto()){
+					$.fn.groupProdottoRow(lottoFocused.parent().parent());
+				} else {
+					$.fn.groupArticoloRow(lottoFocused.parent().parent());
+				}
 
 				scannerLog += '--------------------------------------------------\n';
 				$('#scannerLog').append(scannerLog);
 
 			} else {
+				var url = baseUrl + "articoli?attivo=true&barcode="+barcodeToSearch;
+				if($.fn.isDdtAcquisto()){
+					url = baseUrl + "articoli?attivo=true&barcode="+barcodeToSearch+"&idFornitore="+fornitore;
+				}
 				$.ajax({
-					url: baseUrl + "articoli?attivo=true&barcode="+barcodeToSearch,
+					url: url,
 					type: 'GET',
 					dataType: 'json',
 					success: function(result) {
 						if(result != null && result != undefined && result.length!=0){
 							$.each(result, function(i, item){
 								var idArticolo = item.id;
+								var dataIva = '';
+								var iva = item.aliquotaIva;
+								if(iva != null && iva != undefined){
+									dataIva = iva.valore;
+								}
 
 								$('.bs-searchbox > input').val(null);
 								$('#articolo').selectpicker('refresh');
@@ -431,17 +565,20 @@ $(document).ready(function() {
 
 								quantita = $.fn.fixDecimalPlaces(quantita, 3);
 
-								// add articolo to table
-								$.fn.addArticoloFromScanner(item, numPezzi, quantita, lotto, scadenza, prezzoListino, sconto);
+								if($.fn.isDdtAcquisto()){
+									// add prodotto to table
+									$.fn.addProdottoFromScanner(item, numPezzi, quantita, lotto, scadenza, prezzoListino, sconto, dataIva);
+								} else {
+									// add articolo to table
+									$.fn.addArticoloFromScanner(item, numPezzi, quantita, lotto, scadenza, prezzoListino, sconto);
+								}
 
 								scannerLog += '--------------------------------------------------\n';
 								$('#scannerLog').append(scannerLog);
-
 							});
 						} else {
 							var barcodeTruncate = barcode.substring(0, 6);
 							var alertText = "Nessun articolo trovato con barcode completo '"+barcode+"' o barcode '"+barcodeTruncate+"'";
-							//$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning'));
 							$('#alertOverlay').empty().append(alertOverlayContent.replace('@@alertText@@', alertText).replace('@@alertResult@@', 'warning')).show();
 
 							scannerLog += '--------------------------------------------------\n';
@@ -479,7 +616,11 @@ $(document).ready(function() {
 					// check if some rows could be grouped together
 					var insertedRow = $(event.target).parent().parent();
 
-					$.fn.groupArticoloRow(insertedRow);
+					if($.fn.isDdtAcquisto()){
+						$.fn.groupProdottoRow(insertedRow);
+					} else {
+						$.fn.groupArticoloRow(insertedRow);
+					}
 				}
 			}
 		}
