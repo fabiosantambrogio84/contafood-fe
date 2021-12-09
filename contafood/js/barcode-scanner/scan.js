@@ -200,7 +200,7 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	if(!$.fn.checkVariableIsNull(prezzoListino)){
 		prezzo = prezzoListino;
 	} else {
-		prezzo = articolo.prezzoListinoBase;
+		prezzo = articolo.prezzoAcquisto;
 	}
 	var sconto = sconto;
 	var codiceFornitore = articolo.fornitore.codice;
@@ -252,6 +252,7 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		});
 	}
 
+	var rowIndex;
 	var imponibile = 0;
 	quantita = $.fn.parseValue(quantita, 'float');
 	prezzo = $.fn.parseValue(prezzo, 'float');
@@ -268,9 +269,13 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		// aggiorno la riga
 		$.fn.aggiornaRigaProdotto(table,currentRowIndex,currentIdArticolo,currentQuantita,currentLotto,currentScadenza,currentPrezzo,currentSconto, quantita,codiceFornitore,lottoRegexp,dataScadenzaRegexp,iva,imponibile);
 
+		rowIndex = currentRowIndex;
+
 	} else {
 		// inserisco nuova riga
 		$.fn.inserisciRigaProdotto(table,articoloId,articoloLabel,lottoHtml,scadenzaHtml,udm,quantitaHtml,prezzoHtml,scontoHtml,iva,imponibile);
+
+		rowIndex = table.rows().count();
 	}
 
 	$.fn.computeTotaleAndImponibile();

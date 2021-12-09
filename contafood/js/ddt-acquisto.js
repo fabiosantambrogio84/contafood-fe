@@ -639,9 +639,9 @@ $(document).ready(function() {
 		var prezzo = $('#prezzo').val();
 		var sconto = $('#sconto').val();
 		var iva = $('#prodotto option:selected').attr('data-iva');
-		var codiceFornitore = $('#articolo option:selected').attr("data-codice-fornitore");
-		var lottoRegExp = $('#articolo option:selected').attr("data-lotto-regexp");
-		var dataScadenzaRegExp = $('#articolo option:selected').attr("data-scadenza-regexp");
+		var codiceFornitore = $('#prodotto option:selected').attr("data-codice-fornitore");
+		var lottoRegExp = $('#prodotto option:selected').attr("data-lotto-regexp");
+		var dataScadenzaRegExp = $('#prodotto option:selected').attr("data-scadenza-regexp");
 
 		if(lotto != null && lotto != undefined && lotto != ''){
 			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'" data-codice-fornitore="'+codiceFornitore+'" data-lotto-regexp="'+lottoRegExp+'" data-scadenza-regexp="'+dataScadenzaRegExp+'">';
@@ -673,13 +673,13 @@ $(document).ready(function() {
 					currentIdProdotto = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
-					currentSconto = $(this).children().eq(7).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(5).children().eq(0).val();
+					currentSconto = $(this).children().eq(6).children().eq(0).val();
 					if(currentSconto == '0'){
 						currentSconto = '';
 					}
 
-					if($.fn.normalizeIfEmptyOrNullVariable(currentIdProdotto) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdProdotto) == $.fn.normalizeIfEmptyOrNullVariable(prodottoId)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
@@ -709,7 +709,7 @@ $(document).ready(function() {
 
 		} else {
 			// inserisco nuova riga
-			$.fn.inserisciRigaProdotto(table,currentIdProdotto,prodotto,lottoHtml,scadenzaHtml,udm,quantitaHtml,prezzoHtml,scontoHtml,iva,imponibile);
+			$.fn.inserisciRigaProdotto(table,prodottoId,prodotto,lottoHtml,scadenzaHtml,udm,quantitaHtml,prezzoHtml,scontoHtml,iva,imponibile);
 		}
 
 		/*
