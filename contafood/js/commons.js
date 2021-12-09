@@ -81,8 +81,8 @@ $(document).ready(function() {
  */
 $.fn.isDdt = function(){
     var result = false;
-    var ddtArticoliTableLength = $('#ddtArticoliTable').length;
-    if(ddtArticoliTableLength > 0){
+    var ddtLength = $('#containerDdt').length;
+    if(ddtLength > 0){
         result = true;
     }
     return result;
@@ -90,8 +90,8 @@ $.fn.isDdt = function(){
 
 $.fn.isFatturaAccompagnatoria = function(){
     var result = false;
-    var fatturaAccompagnatoriaArticoliTableLength = $('#fatturaAccompagnatoriaArticoliTable').length;
-    if(fatturaAccompagnatoriaArticoliTableLength > 0){
+    var fatturaAccompagnatoriaLength = $('#containerFatturaAccompagnatoria').length;
+    if(fatturaAccompagnatoriaLength > 0){
         result = true;
     }
     return result;
@@ -99,8 +99,8 @@ $.fn.isFatturaAccompagnatoria = function(){
 
 $.fn.isRicevutaPrivato = function(){
     var result = false;
-    var ricevutaPrivatoArticoliTableLength = $('#ricevutaPrivatoArticoliTable').length;
-    if(ricevutaPrivatoArticoliTableLength > 0){
+    var ricevutaPrivatoLength = $('#containerRicevutaPrivato').length;
+    if(ricevutaPrivatoLength > 0){
         result = true;
     }
     return result;
@@ -108,8 +108,8 @@ $.fn.isRicevutaPrivato = function(){
 
 $.fn.isDdtAcquisto = function(){
     var result = false;
-    var ddtAcquistoArticoliTableLength = $('#ddtAcquistoArticoliTable').length;
-    if(ddtAcquistoArticoliTableLength > 0){
+    var ddtAcquistoLength = $('#containerDdtAcquisto').length;
+    if(ddtAcquistoLength > 0){
         result = true;
     }
     return result;
@@ -772,7 +772,7 @@ $.fn.inserisciRigaProdotto = function(table,articoloId,articolo,lottoHtml,scaden
 }
 
 $.fn.aggiornaRigaProdotto = function(table,currentRowIndex,articoloId,currentQuantita,lotto,scadenza,prezzo,sconto,
-                                     quantita,codiceFornitore,lottoRegexp,dataScadenzaRegexp,iva,imponibile){
+                                     quantita,codiceFornitore,lottoRegExp,dataScadenzaRegExp,iva,imponibile){
 
     var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
 
