@@ -196,6 +196,7 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		scadenza = moment(scadenza).format('YYYY-MM-DD');
 	}
 	var quantita = quantita;
+	var pezzi = numeroPezzi;
 	var prezzo;
 	if(!$.fn.checkVariableIsNull(prezzoListino)){
 		prezzo = prezzoListino;
@@ -203,6 +204,10 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		prezzo = articolo.prezzoAcquisto;
 	}
 	var sconto = sconto;
+	var iva;
+	if(!$.fn.checkVariableIsNull(articolo.aliquotaIva)){
+		iva = articolo.aliquotaIva.valore;
+	}
 	var codiceFornitore = articolo.fornitore.codice;
 	var lottoRegexp = $.fn.getLottoRegExp(articolo);
 	var dataScadenzaRegexp = $.fn.getDataScadenzaRegExp(articolo);
@@ -214,6 +219,7 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	}
 	var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+scadenza+'">';
 	var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
+	var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
 	var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
 	var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
 
@@ -226,6 +232,7 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	var currentSconto;
 	var currentScadenza;
 	var currentQuantita= 0;
+	var currentPezzi = 0;
 
 	var ddtProdottiLength = $('.rowProdotto').length;
 	if(ddtProdottiLength != null && ddtProdottiLength != undefined && ddtProdottiLength != 0) {
@@ -239,6 +246,9 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 				currentScadenza = $(this).children().eq(2).children().eq(0).val();
 				currentPrezzo = $(this).children().eq(5).children().eq(0).val();
 				currentSconto = $(this).children().eq(6).children().eq(0).val();
+				if(currentSconto == '0'){
+					currentSconto = '';
+				}
 
 				if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
@@ -247,33 +257,35 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 					&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 					found = 1;
 					currentQuantita = $(this).children().eq(4).children().eq(0).val();
+					currentPezzi = $(this).children().eq(5).children().eq(0).val();
 				}
 			}
 		});
 	}
 
 	var rowIndex;
-	var imponibile = 0;
+	var totale = 0;
 	quantita = $.fn.parseValue(quantita, 'float');
 	prezzo = $.fn.parseValue(prezzo, 'float');
 	sconto = $.fn.parseValue(sconto, 'float');
+	pezzi = $.fn.parseValue(pezzi, 'int');
 
 	var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
 	var scontoValue = (sconto/100)*quantitaPerPrezzo;
-	imponibile = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+	totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
 	var table = $('#ddtAcquistoProdottiTable').DataTable();
 
 	if(found >= 1){
 
 		// aggiorno la riga
-		$.fn.aggiornaRigaProdotto(table,currentRowIndex,currentIdArticolo,currentQuantita,currentLotto,currentScadenza,currentPrezzo,currentSconto, quantita,codiceFornitore,lottoRegexp,dataScadenzaRegexp,iva,imponibile);
+		$.fn.aggiornaRigaProdotto(table,currentRowIndex,currentIdArticolo,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentSconto,quantita,pezzi,codiceFornitore,lottoRegexp,dataScadenzaRegexp,totale);
 
 		rowIndex = currentRowIndex;
 
 	} else {
 		// inserisco nuova riga
-		$.fn.inserisciRigaProdotto(table,articoloId,articoloLabel,lottoHtml,scadenzaHtml,udm,quantitaHtml,prezzoHtml,scontoHtml,iva,imponibile);
+		$.fn.inserisciRigaProdotto(table,articoloId,articoloLabel,lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,totale,iva,'articolo');
 
 		rowIndex = table.rows().count();
 	}

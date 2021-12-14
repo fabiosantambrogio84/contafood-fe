@@ -401,14 +401,15 @@ $.fn.computeTotale = function() {
 
 $.fn.computeTotaleAndImponibile = function() {
     var ivaMap = new Map();
+    var totaleIva = 0;
     var totaleDocumento = 0;
     var imponibileDocumento = 0;
 
     $('.rowProdotto').each(function(i, item){
-        var iva = $(this).children().eq(7).find('a').attr('data-iva');
+        var iva = $(this).children().eq(9).text();
         iva = $.fn.parseValue(iva, 'float');
-        var imponibile = $(this).children().eq(7).find('a').attr('data-imponibile');
-        imponibile = $.fn.parseValue(imponibile, 'float');
+        var totale = $(this).children().eq(8).text();
+        totale = $.fn.parseValue(totale, 'float');
 
         var totaliIva;
         if(ivaMap.has(iva)){
@@ -416,7 +417,7 @@ $.fn.computeTotaleAndImponibile = function() {
         } else {
             totaliIva = [];
         }
-        totaliIva.push(imponibile);
+        totaliIva.push(totale);
         ivaMap.set(iva, totaliIva);
 
     });
@@ -424,13 +425,16 @@ $.fn.computeTotaleAndImponibile = function() {
         var totalePerIva = value.reduce((a, b) => a + b, 0);
         var totaleConIva = totalePerIva + (totalePerIva * key/100);
 
+        totaleIva += (totalePerIva * key/100);
         imponibileDocumento += totalePerIva;
         totaleDocumento += totaleConIva;
     });
 
+    totaleIva = parseFloat(totaleIva);
     totaleDocumento = parseFloat(totaleDocumento);
     imponibileDocumento = parseFloat(imponibileDocumento);
     $('#totale').val($.fn.formatNumber(totaleDocumento));
+    $('#totaleIva').val($.fn.formatNumber(totaleIva));
     $('#totaleImponibile').val($.fn.formatNumber(imponibileDocumento));
 }
 
@@ -575,7 +579,6 @@ $.fn.groupArticoloRow = function(insertedRow){
                         currentQuantita = $(this).children().eq(4).children().eq(0).val();
                         currentPezzi = $(this).children().eq(5).children().eq(0).val();
                     }
-
                 }
             }
         });
@@ -617,12 +620,12 @@ $.fn.groupArticoloRow = function(insertedRow){
 $.fn.groupProdottoRow = function(insertedRow){
     var insertedRowIndex = insertedRow.attr("data-row-index");
     var articoloId = insertedRow.attr("data-id");
-    var iva = insertedRow.attr("data-iva");
     var	lotto = insertedRow.children().eq(1).children().eq(0).val();
     var	scadenza = insertedRow.children().eq(2).children().eq(0).val();
     var quantita = insertedRow.children().eq(4).children().eq(0).val();
-    var	prezzo = insertedRow.children().eq(5).children().eq(0).val();
-    var	sconto = insertedRow.children().eq(6).children().eq(0).val();
+    var pezzi = insertedRow.children().eq(5).children().eq(0).val();
+    var	prezzo = insertedRow.children().eq(6).children().eq(0).val();
+    var	sconto = insertedRow.children().eq(7).children().eq(0).val();
 
     var found = 0;
     var currentRowIndex = 0;
@@ -632,6 +635,7 @@ $.fn.groupProdottoRow = function(insertedRow){
     var currentPrezzo;
     var currentSconto;
     var currentQuantita = 0;
+    var currentPezzi = 0;
 
     var ddtProdottiLength = $('.rowProdotto').length;
     if(ddtProdottiLength != null && ddtProdottiLength != undefined && ddtProdottiLength != 0) {
@@ -646,6 +650,9 @@ $.fn.groupProdottoRow = function(insertedRow){
                     currentScadenza = $(this).children().eq(2).children().eq(0).val();
                     currentPrezzo = $(this).children().eq(5).children().eq(0).val();
                     currentSconto = $(this).children().eq(6).children().eq(0).val();
+                    if(currentSconto == '0'){
+                        currentSconto = '';
+                    }
 
                     if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
                         && $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
@@ -654,6 +661,7 @@ $.fn.groupProdottoRow = function(insertedRow){
                         && $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
                         found = 1;
                         currentQuantita = $(this).children().eq(4).children().eq(0).val();
+                        currentPezzi = $(this).children().eq(5).children().eq(0).val();
                     }
                 }
             }
@@ -663,17 +671,18 @@ $.fn.groupProdottoRow = function(insertedRow){
     var table = $('#ddtAcquistoProdottiTable').DataTable();
     if(found >= 1){
 
-        var imponibile = 0;
+        var totale = 0;
         quantita = $.fn.parseValue(quantita, 'float');
         prezzo = $.fn.parseValue(prezzo, 'float');
         sconto = $.fn.parseValue(sconto, 'float');
+        pezzi = $.fn.parseValue(pezzi, 'int');
 
         var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
         var scontoValue = (sconto/100)*quantitaPerPrezzo;
-        imponibile = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+        totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
         // aggiorno la riga
-        $.fn.aggiornaRigaProdotto(table,currentRowIndex,articoloId,currentQuantita,lotto,scadenza,prezzo,sconto,quantita,null,null,null,iva,imponibile);
+        $.fn.aggiornaRigaProdotto(table,currentRowIndex,articoloId,currentQuantita,currentPezzi,lotto,scadenza,prezzo,sconto,quantita,pezzi,null,null,totale);
         table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
     }
 
@@ -714,9 +723,6 @@ $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,ar
     ] ).draw( false ).node();
     $(rowNode).css('text-align', 'center').css('color','#080707');
     var cssClass = 'rowArticolo';
-    if($.fn.isDdtAcquisto()){
-        cssClass = 'rowProdotto';
-    }
     $(rowNode).addClass(cssClass);
     $(rowNode).attr('data-id', articoloId);
     $(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
@@ -749,9 +755,9 @@ $.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,curre
     table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 }
 
-$.fn.inserisciRigaProdotto = function(table,articoloId,articolo,lottoHtml,scadenzaHtml,udm,quantitaHtml,prezzoHtml,scontoHtml,iva,imponibile){
+$.fn.inserisciRigaProdotto = function(table,articoloId,articolo,lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,totale,iva,tipo){
 
-    var deleteLink = '<a class="deleteDdtProdotto" data-id="'+articoloId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+    var deleteLink = '<a class="deleteDdtProdotto" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
     var rowsCount = table.rows().count();
 
@@ -761,34 +767,41 @@ $.fn.inserisciRigaProdotto = function(table,articoloId,articolo,lottoHtml,scaden
         scadenzaHtml,
         udm,
         quantitaHtml,
+        pezziHtml,
         prezzoHtml,
         scontoHtml,
+        totale,
+        iva,
         deleteLink
     ] ).draw( false ).node();
     $(rowNode).css('text-align', 'center').css('color','#080707');
     $(rowNode).addClass('rowProdotto');
     $(rowNode).attr('data-id', articoloId);
+    $(rowNode).attr('data-tipo', tipo);
     $(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
 }
 
-$.fn.aggiornaRigaProdotto = function(table,currentRowIndex,articoloId,currentQuantita,lotto,scadenza,prezzo,sconto,
-                                     quantita,codiceFornitore,lottoRegExp,dataScadenzaRegExp,iva,imponibile){
+$.fn.aggiornaRigaProdotto = function(table,currentRowIndex,articoloId,currentQuantita,currentPezzi,lotto,scadenza,prezzo,sconto,
+                                     quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale){
 
     var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
+    var newPezzi = pezzi + $.fn.parseValue(currentPezzi,'int');
 
     var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(newQuantita, 3) +'">';
+    var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
+
     var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+lotto+'" data-codice-fornitore="'+codiceFornitore+'" data-lotto-regexp="'+lottoRegExp+'" data-scadenza-regexp="'+dataScadenzaRegExp+'">';
     var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
     var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
     var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
-    var newDeleteLink = '<a class="deleteDdtProdotto" data-id="'+articoloId+'" data-iva="'+iva+'" data-imponibile="'+imponibile+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
     var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
     rowData[1] = lottoHtml;
     rowData[2] = scadenzaHtml;
     rowData[4] = newQuantitaHtml;
-    rowData[5] = prezzoHtml;
-    rowData[6] = scontoHtml;
-    rowData[7] = newDeleteLink;
+    rowData[5] = newPezziHtml;
+    rowData[6] = prezzoHtml;
+    rowData[7] = scontoHtml;
+    rowData[8] = totale;
     table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 }

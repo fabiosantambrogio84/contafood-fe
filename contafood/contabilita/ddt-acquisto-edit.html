@@ -128,6 +128,12 @@
                   <label for="udm" class="mb-0">UdM</label>
                   <input type="text" class="form-control form-control-sm text-right" id="udm" disabled>
                 </div>
+                <div class="form-group col-md-1">
+                  <label for="iva" class="mb-0">Iva (%)</label>
+                  <input type="number" class="form-control form-control-sm text-right ignore-barcode-scanner" id="iva" disabled>
+                </div>
+              </div>
+              <div class="form-row">
                 <div class="form-group col-md-2">
                   <label for="lotto" class="mb-0">Lotto*</label>
                   <input type="text" class="form-control form-control-sm text-right" id="lotto">
@@ -141,6 +147,10 @@
                 <div class="form-group col-md-1 mb-0">
                   <label for="quantita" class="mb-0">Quantita</label>
                   <input type="number" class="form-control form-control-sm text-right" id="quantita" step=".01" min="0">
+                </div>
+                <div class="form-group col-md-1 mb-0">
+                  <label for="pezzi" class="mb-0">Pezzi</label>
+                  <input type="number" class="form-control form-control-sm text-right ignore-barcode-scanner" id="pezzi" step="1" min="0">
                 </div>
                 <div class="form-group col-md-1 mb-0">
                   <label for="prezzo" class="mb-0">Prezzo (€)</label>
@@ -171,9 +181,12 @@
                       <th>Lotto</th>
                       <th>Scadenza</th>
                       <th>UdM</th>
-                      <th>Quantita</th>
+                      <th>Q.ta</th>
+                      <th>P.zi</th>
                       <th>Prezzo (€)</th>
                       <th>Sconto (%)</th>
+                      <th>Tot. (€)</th>
+                      <th>Iva (%)</th>
                       <th></th>
                     </tr>
                     </thead>
@@ -183,11 +196,15 @@
               <div class="form-row">
                 <div class="form-group col-md-2 mb-0">
                   <label for="totaleImponibile" class="mb-0">Imponibile (€)</label>
-                  <input type="number" class="form-control form-control-sm text-right" id="totaleImponibile" step=".01" min="0" disabled>
+                  <input type="number" class="form-control form-control-sm text-right" id="totaleImponibile" disabled>
+                </div>
+                <div class="form-group col-md-2 mb-0">
+                  <label for="totaleIva" class="mb-0">Iva (€)</label>
+                  <input type="number" class="form-control form-control-sm text-right" id="totaleIva" disabled>
                 </div>
                 <div class="form-group col-md-2 mb-0">
                   <label for="totale" class="mb-0 font-weight-bold">Totale (€)</label>
-                  <input type="number" class="form-control form-control-sm text-right font-weight-bold" id="totale" step=".01" min="0" disabled>
+                  <input type="number" class="form-control form-control-sm text-right font-weight-bold" id="totale" disabled>
                 </div>
               </div>
 
