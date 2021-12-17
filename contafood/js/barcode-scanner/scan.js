@@ -244,8 +244,8 @@ $.fn.addProdottoFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 				currentIdArticolo = $(this).attr('data-id');
 				currentLotto = $(this).children().eq(1).children().eq(0).val();
 				currentScadenza = $(this).children().eq(2).children().eq(0).val();
-				currentPrezzo = $(this).children().eq(5).children().eq(0).val();
-				currentSconto = $(this).children().eq(6).children().eq(0).val();
+				currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+				currentSconto = $(this).children().eq(7).children().eq(0).val();
 				if(currentSconto == '0'){
 					currentSconto = '';
 				}
