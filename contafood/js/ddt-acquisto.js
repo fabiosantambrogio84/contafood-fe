@@ -715,6 +715,7 @@ $(document).ready(function() {
 		quantita = $.fn.parseValue(quantita, 'float');
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		sconto = $.fn.parseValue(sconto, 'float');
+		pezzi = $.fn.parseValue(pezzi, 'int');
 
 		var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
