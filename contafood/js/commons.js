@@ -682,7 +682,7 @@ $.fn.groupProdottoRow = function(insertedRow){
         totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
         // aggiorno la riga
-        $.fn.aggiornaRigaProdotto(table,currentRowIndex,articoloId,currentQuantita,currentPezzi,lotto,scadenza,prezzo,sconto,quantita,pezzi,null,null,totale);
+        $.fn.aggiornaRigaProdotto(table,currentRowIndex,articoloId,currentQuantita,currentPezzi,lotto,scadenza,prezzo,sconto,quantita,pezzi,null,null,null,totale);
         table.row("[data-row-index='"+insertedRowIndex+"']").remove().draw();
     }
 

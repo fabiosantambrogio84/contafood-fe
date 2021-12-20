@@ -370,6 +370,7 @@ $(document).ready(function() {
 
 				//barcode = '01980259970004323103001208103203230015211214';
 				//barcodeType = 'ean128';
+				//barcode = '(02)18013554104994(15)220110(10)53161370002';
 
 				var lottoFocused = $(':focus');
 				//var codiceFornitore = lottoFocused.attr("data-codice-fornitore");
