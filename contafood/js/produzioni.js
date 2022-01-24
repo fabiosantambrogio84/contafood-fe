@@ -33,9 +33,11 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'desc']
+			[0, 'desc'],
+			[1, 'desc']
 		],
 		"columns": [
+			{"name":"dataProduzioneHidden", "data": "dataProduzione", "width":"5%", "visible": false},
 			{"name": "codice", "data": "codiceProduzione", "width":"10%"},
 			{"name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var a = moment(data.dataProduzione);
