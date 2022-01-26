@@ -220,7 +220,7 @@ $(document).ready(function() {
 
 $.fn.getAutisti = function(){
 	$.ajax({
-		url: baseUrl + "autisti",
+		url: baseUrl + "autisti?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

@@ -170,6 +170,22 @@ $.fn.loadDdtTable = function(url) {
 					$(cells[8]).css('text-align','right');
 					$(cells[9]).css('text-align','right');
 					$(cells[10]).css('text-align','right');
+				},
+				"initComplete": function( settings, json ) {
+					var costoAbilitato = $.fn.getConfigurazioneItemClient('DDT_COSTO');
+					var guadagnoAbilitato = $.fn.getConfigurazioneItemClient('DDT_GUADAGNO');
+
+					var table = $('#ddtTable').DataTable();
+					if(!costoAbilitato){
+						table.column(9).visible(false);
+					} else {
+						table.column(9).visible(true);
+					}
+					if(!guadagnoAbilitato){
+						table.column(10).visible(false);
+					} else {
+						table.column(10).visible(true);
+					}
 				}
 			});
 		}
@@ -328,8 +344,11 @@ $(document).ready(function() {
 								}},
 								{"name": "lotto", "data": "lotto"},
 								{"name": "scadenza", "data": null, render: function (data, type, row) {
-									var a = moment(data.scadenza);
-									return a.format('DD/MM/YYYY');
+									if(!$.fn.checkVariableIsNull(data.scadenza)){
+										var a = moment(data.scadenza);
+										return a.format('DD/MM/YYYY');
+									}
+									return '';
 								}},
 								{"name": "quantita", "data": "quantita"},
 								{"name": "pezzi", "data": "numeroPezzi"},
@@ -337,7 +356,17 @@ $(document).ready(function() {
 								{"name": "sconto", "data": "sconto"},
 								{"name": "imponibile", "data": "imponibile"},
 								{"name": "costo", "data": "costo"}
-							]
+							],
+							"initComplete": function( settings, json ) {
+								var costoAbilitato = $.fn.getConfigurazioneItemClient('DDT_COSTO');
+
+								var table = $('#detailsDdtArticoliModalTable').DataTable();
+								if(!costoAbilitato){
+									table.column(8).visible(false);
+								} else {
+									table.column(8).visible(true);
+								}
+							}
 						});
 					}
 

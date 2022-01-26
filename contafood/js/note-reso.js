@@ -968,7 +968,7 @@ $.fn.getFornitori = function(){
 	return $.Deferred(function() {
 
 		$.ajax({
-			url: baseUrl + "fornitori",
+			url: baseUrl + "fornitori?attivo=true",
 			type: 'GET',
 			dataType: 'json',
 			success: function(result) {

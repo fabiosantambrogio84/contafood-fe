@@ -10833,6 +10833,16 @@ a:focus {
   color: #3a3b45 !important;
 }
 
+.text-red {
+  color: red !important;
+}
+
+.text-red-large {
+  color: red !important;
+  font-weight: bold;
+  font-size: x-large;
+}
+
 .icon-circle {
   height: 2.5rem;
   width: 2.5rem;

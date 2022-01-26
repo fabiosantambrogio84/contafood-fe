@@ -1,3 +1,6 @@
+var baseUrl = "/contafood-be/";
+var configurazioneClient;
+
 $(document).ready(function() {
 
     /*
@@ -7,28 +10,45 @@ $(document).ready(function() {
      */
     var pageType = $('#accordionSidebar').attr('data-page-type');
     if(pageType != null && pageType != undefined){
-        $('.navbar').load('../commons/topbar.html');
+        $('.navbar').load('../commons/topbar.html', function() {
+            $.fn.updateTopbarNav();
+        });
+
+        var sidebarFilePath = '';
         if(pageType == 'anagrafiche'){
-            $('#accordionSidebar').load('../commons/sidebar-anagrafiche.html');
+            sidebarFilePath = '../commons/sidebar-anagrafiche.html';
         } else if(pageType == 'configurazione'){
-            $('#accordionSidebar').load('../commons/sidebar-configurazione.html');
+            sidebarFilePath = '../commons/sidebar-configurazione.html';
         } else if(pageType == 'produzione'){
-            $('#accordionSidebar').load('../commons/sidebar-produzione.html');
+            sidebarFilePath = '../commons/sidebar-produzione.html';
         } else if(pageType == 'magazzino'){
-            $('#accordionSidebar').load('../commons/sidebar-magazzino.html');
+            sidebarFilePath = '../commons/sidebar-magazzino.html';
         } else if(pageType == 'ordini'){
-            $('#accordionSidebar').load('../commons/sidebar-ordini.html');
+            sidebarFilePath = '../commons/sidebar-ordini.html';
         } else if(pageType == 'contabilita'){
-            $('#accordionSidebar').load('../commons/sidebar-contabilita.html');
+            sidebarFilePath = '../commons/sidebar-contabilita.html';
         } else if(pageType == 'lotti-statistiche'){
-            $('#accordionSidebar').load('../commons/sidebar-lotti-statistiche.html');
+            sidebarFilePath = '../commons/sidebar-lotti-statistiche.html';
         } else if(pageType == 'stampe'){
-            $('#accordionSidebar').load('../commons/sidebar-stampe.html');
+            sidebarFilePath = '../commons/sidebar-stampe.html';
         }
 
+        $('#accordionSidebar').load(sidebarFilePath, function() {
+            $.fn.getConfigurazioneClient();
+        });
+
+        $.fn.updateFooter();
+
     } else{
-        $('.navbar').load('commons/topbar.html');
-        $('#accordionSidebar').load('commons/sidebar.html');
+        $('.navbar').load('commons/topbar.html', function() {
+            $.fn.updateTopbarNav();
+        });
+
+        $('#accordionSidebar').load('commons/sidebar.html', function() {
+            $.fn.getConfigurazioneClient();
+        });
+
+        $.fn.updateFooter();
     }
 
     // Toggle the side navigation
@@ -249,6 +269,85 @@ $.fn.parseValue = function(value, resultType){
             return 0;
         }
     }
+}
+
+$.fn.isVersionClient = function(){
+    var result = false;
+    var pathname = window.location.pathname;
+    if(!$.fn.checkVariableIsNull(pathname)){
+        if(pathname.indexOf('contafood-client') != -1){
+            result = true;
+        }
+    }
+    return result;
+}
+
+$.fn.updateTopbarNav = function(){
+    if($.fn.isVersionClient()){
+        var navBarItem = "<li class='nav-item dropdown no-arrow'><a class='nav-link dropdown-toggle' href='#' id='clientVersionDropdown' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'><span class='mr-2 d-none d-lg-inline text-red-large'>Versione Client</span></a></li>";
+        $(navBarItem).insertBefore("#navbarDivider");
+    }
+}
+
+$.fn.updateFooter = function(){
+    if($.fn.isVersionClient()){
+        var spanItem = '<span class="text-red">Versione Client</span>';
+        $('.copyright').append(spanItem);
+    }
+}
+
+$.fn.getConfigurazioneClient = function(){
+
+    if($.fn.isVersionClient()){
+        $.ajax({
+            url: baseUrl + "configurazione/app-client",
+            type: 'GET',
+            dataType: 'json',
+            async: false,
+            success: function(result) {
+                if(result != null && result != undefined && result != ''){
+                    configurazioneClient = result;
+
+                    configurazioneClient.forEach((item) => {
+                        if(item.codice == 'MENU_CONFIGURAZIONE'){
+                            if(item.abilitato){
+                                $('#configurazioneNavItem').removeAttr('hidden');
+                                $('#configurazioneDivider').removeAttr('hidden');
+                            } else {
+                                $('#configurazioneNavItem').attr('hidden',true);
+                                $('#configurazioneDivider').attr('hidden',true);
+                            }
+                            return false;
+
+                        } else if(item.codice == 'RICEVUTA_PRIVATO'){
+                            if(item.abilitato){
+                                $('#ricevutePrivatiLink').removeAttr('hidden');
+                            } else {
+                                $('#ricevutePrivatiLink').attr('hidden',true);
+                            }
+                            return false;
+                        }
+                    });
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Response text: ' + jqXHR.responseText);
+            }
+        });
+    }
+}
+
+$.fn.getConfigurazioneItemClient = function(codice){
+    var abilitato = true;
+    if($.fn.isVersionClient()){
+        configurazioneClient.forEach((item) => {
+            if(item.codice == codice){
+                abilitato = item.abilitato;
+                return false;
+            }
+        });
+    }
+    return abilitato;
 }
 
 $.fn.emptyArticoli = function(){

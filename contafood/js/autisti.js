@@ -44,7 +44,12 @@ $(document).ready(function() {
 				links = links + '<a class="deleteAutista" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			if($.fn.checkVariableIsNull(data.attivo)){
+				$(row).css('background-color', '#FCAFAF');
+			}
+		}
 	});
 
 	$(document).on('click','.deleteAutista', function(){
@@ -62,7 +67,7 @@ $(document).ready(function() {
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<div id="alertAutistaContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Autista</strong> cancellato con successo.\n' +
+				alertContent = alertContent + '<strong>Autista</strong> disabilitato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertAutista').empty().append(alertContent);
 
@@ -83,6 +88,11 @@ $(document).ready(function() {
 			autista.nome = $('#nome').val();
 			autista.cognome = $('#cognome').val();
 			autista.telefono = $('#telefono').val();
+			if($('#attivo').prop('checked') === true){
+				autista.attivo = true;
+			}else{
+				autista.attivo = false;
+			}
 
 			var autistaJson = JSON.stringify(autista);
 
@@ -98,6 +108,11 @@ $(document).ready(function() {
 				data: autistaJson,
 				success: function(result) {
 					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Autista modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list of 'Autista' page
+					setTimeout(function() {
+						window.location.href = "autisti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell\' autista').replace('@@alertResult@@', 'danger'));
@@ -115,6 +130,11 @@ $(document).ready(function() {
 			autista.nome = $('#nome').val();
 			autista.cognome = $('#cognome').val();
 			autista.telefono = $('#telefono').val();
+			if($('#attivo').prop('checked') === true){
+				autista.attivo = true;
+			}else{
+				autista.attivo = false;
+			}
 
 			var autistaJson = JSON.stringify(autista);
 
@@ -130,6 +150,11 @@ $(document).ready(function() {
 				data: autistaJson,
 				success: function(result) {
 					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Autista creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list of 'Autista' page
+					setTimeout(function() {
+						window.location.href = "autisti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertAutista').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell\' autista').replace('@@alertResult@@', 'danger'));
@@ -171,7 +196,10 @@ $.fn.getAutista = function(idAutista){
 			$('#hiddenIdAutista').attr('value', result.id);
 			$('#nome').attr('value', result.nome);
             $('#cognome').attr('value', result.cognome);
-            $('#telefono').attr('value', result.telefono);
+			$('#telefono').attr('value', result.telefono);
+			if(result.attivo === true){
+				$('#attivo').prop('checked', true);
+			}
 
           } else{
             $('#alertAutista').empty().append(alertContent);

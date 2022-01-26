@@ -5,7 +5,7 @@
         <img src="img/ui_avatar.png">
     </div>
 
-    <div class="sidebar-brand-text mx-3">ContaFood</div>
+    <div class="sidebar-brand-text mx-3" id="appNameDiv">ContaFood</div>
 </a>
 
 <!-- Divider -->
@@ -44,7 +44,7 @@
             <a class="collapse-item" href="contabilita/fatture.html">Fatture</a>
             <a class="collapse-item" href="contabilita/note-accredito.html">Note accredito</a>
             <a class="collapse-item" href="contabilita/note-reso.html">Note reso fornitore</a>
-            <a class="collapse-item" href="contabilita/ricevute-privati.html">Ricevute a privati</a>
+            <a class="collapse-item" href="contabilita/ricevute-privati.html" id="ricevutePrivatiLink">Ricevute a privati</a>
         </div>
     </div>
 </li>
@@ -144,9 +144,9 @@
 </li>
 
 <!-- Divider -->
-<hr class="sidebar-divider">
+<hr class="sidebar-divider" id="configurazioneDivider">
 
-<li class="nav-item">
+<li class="nav-item" id="configurazioneNavItem">
     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseConfigurazione" aria-expanded="true" aria-controls="collapseConfigurazione">
         <i class="fas fa-check-double"></i>
         <span>Configurazione</span>
@@ -155,6 +155,7 @@
         <div class="bg-white py-2 collapse-inner rounded">
             <a class="collapse-item" href="configurazione/parametri.html">Parametri</a>
             <a class="collapse-item" href="configurazione/proprieta.html">Proprietà</a>
+            <a class="collapse-item" href="configurazione/app-client.html">App client</a>
         </div>
     </div>
 </li>

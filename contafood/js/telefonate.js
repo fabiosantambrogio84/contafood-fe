@@ -1,9 +1,6 @@
 var baseUrl = "/contafood-be/";
 
-$(document).ready(function() {
-
-    $('[data-toggle="tooltip"]').tooltip();
-
+$.fn.loadTelefonateTable = function() {
 	$('#telefonateTable').DataTable({
 		"processing": true,
 		"ajax": {
@@ -22,23 +19,16 @@ $(document).ready(function() {
 		},
 		"language": {
 			"search": "Cerca",
-			"paginate": {
-				"first": "Inizio",
-				"last": "Fine",
-				"next": "Succ.",
-				"previous": "Prec."
-			},
 			"emptyTable": "Nessuna telefonata disponibile",
 			"zeroRecords": "Nessuna telefonata disponibile"
 		},
-		"pageLength": 20,
-		"lengthChange": false,
+		"paging": false,
 		"info": false,
 		"autoWidth": false,
 		"order": [
 			[0, 'asc'],
-			[5, 'asc'],
-			[7, 'asc']
+			[4, 'asc'],
+			[6, 'asc']
 		],
 		"columns": [
 			{"name": "giornoOrdinale", "data": "giornoOrdinale", "visible": false},
@@ -46,90 +36,110 @@ $(document).ready(function() {
 				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="deleteTelefonataCheckbox">';
 				return checkboxHtml;
 			}},
-			{"name": "cliente", "data": null, render: function ( data, type, row ) {
-                if(data.cliente != null){
-                    var clienteHtml = '';
+			{"name": "cliente", "data": null, "width": "20%", render: function ( data, type, row ) {
+				if(data.cliente != null){
+					var clienteHtml = '';
 
-                    if(data.cliente.dittaIndividuale){
-                        clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
-                    } else {
-                        clienteHtml += data.cliente.ragioneSociale;
-                    }
-                    return clienteHtml;
-                } else {
-                    return '';
-                }
-			}},
-			{"name": "puntoConsegna", "data": null, render: function ( data, type, row ) {
-                if(data.puntoConsegna != null){
-                    var puntoConsegnaHtml = '';
-                    if(data.puntoConsegna.indirizzo != null && data.puntoConsegna.indirizzo != ''){
-                        puntoConsegnaHtml += data.puntoConsegna.indirizzo;
-                    }
-                    if(data.puntoConsegna.localita != null && data.puntoConsegna.localita != ''){
-                        puntoConsegnaHtml += ', '+data.puntoConsegna.localita;
-                    }
-                    return puntoConsegnaHtml;
-                } else {
-                    return '';
-                }
-			}},
-			{"name": "recapito", "data": null, render: function ( data, type, row ) {
-                var recapitoHtml = data.telefono;
-                if(data.telefonoTwo != null && data.telefonoTwo != ''){
-                    recapitoHtml += ', '+data.telefonoTwo;
-                }
-                if(data.telefonoThree != null && data.telefonoThree != ''){
-                    recapitoHtml += ', '+data.telefonoThree;
-                }
-                return recapitoHtml;
-			}},
-			{"name": "autista", "data": null, render: function ( data, type, row ) {
-                var autistaHtml = '';
-                var concat = 'no';
-                if(data.autista != null){
-                    if(data.autista.cognome != null && data.autista.cognome != ''){
-                        autistaHtml += data.autista.cognome;
-                        concat = 'yes';
-                    }
-                    if(data.autista.nome != null && data.autista.nome != null){
-                        if(concat == 'yes'){
-                            autistaHtml += ' - ';
-                        }
-                        autistaHtml += data.autista.nome;
-                    }
-                }
-                return autistaHtml;
-            }},
-			{"name": "giorno", "data": "giorno"},
-			{"name": "ora", "data": "ora"},
-			{"name": "note", "data": null, "width": "25%", render: function ( data, type, row ) {
-                var note = data.note;
-                var noteTrunc = note;
-                var noteHtml = '<div>'+noteTrunc+'</div>';
-                if(note.length > 15){
-                    noteTrunc = note.substring(0, 15)+'...';
-                    noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
-                }
+					if(data.cliente.dittaIndividuale){
+						clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
+					} else {
+						clienteHtml += data.cliente.ragioneSociale;
+					}
 
+					var tooltipText = '';
+					if(data.puntoConsegna != null){
+						if(data.puntoConsegna.indirizzo != null && data.puntoConsegna.indirizzo != ''){
+							tooltipText += data.puntoConsegna.indirizzo;
+						}
+						if(data.puntoConsegna.localita != null && data.puntoConsegna.localita != ''){
+							tooltipText += ', '+data.puntoConsegna.localita;
+						}
+					}
+					tooltipText += ' - '+data.ora;
+
+					clienteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+tooltipText+'">'+clienteHtml+'</div>';
+
+					return clienteHtml;
+				} else {
+					return '';
+				}
+			}},
+			{"name": "recapito", "data": null, "width": "10%", render: function ( data, type, row ) {
+				var recapitoHtml = data.telefono;
+				if(data.telefonoTwo != null && data.telefonoTwo != ''){
+					recapitoHtml += ', '+data.telefonoTwo;
+				}
+				if(data.telefonoThree != null && data.telefonoThree != ''){
+					recapitoHtml += ', '+data.telefonoThree;
+				}
+				return recapitoHtml;
+			}},
+			{"name": "autista", "data": null, "width": "10%", render: function ( data, type, row ) {
+				var autistaHtml = '';
+				var concat = 'no';
+				if(data.autista != null){
+					if(data.autista.cognome != null && data.autista.cognome != ''){
+						autistaHtml += data.autista.cognome;
+						concat = 'yes';
+					}
+					if(data.autista.nome != null && data.autista.nome != null){
+						if(concat == 'yes'){
+							autistaHtml += ' - ';
+						}
+						autistaHtml += data.autista.nome;
+					}
+				}
+				return autistaHtml;
+			}},
+			{"name": "giorno", "data": "giorno", "width": "5%"},
+			{"name": "ora", "data": "ora", "width": "1%", "visible": false},
+			{"name": "note", "data": null, "width": "8%", render: function ( data, type, row ) {
+				var note = data.note;
+				var noteTrunc = note;
+				var noteHtml = '<div>'+noteTrunc+'</div>';
+				if(note.length > 15){
+					noteTrunc = note.substring(0, 15)+'...';
+					noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
+				}
 				return noteHtml;
 			}},
-			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
-				var links = '<a class="detailsTelefonata pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-				links += '<a class="updateTelefonata pr-2" data-id="'+data.id+'" href="telefonate-edit.html?idTelefonata=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links += '<a class="newOrdineClienteFromTelefonata pr-2" data-id="'+data.id+'" href="ordini-clienti-new.html?idTelefonata=' + data.id + '" title="Nuovo Ordine Cliente"><i class="far fa-folder-open"></i></a>';
-
+			{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
+				var links = '<a class="detailsTelefonata pr-1" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+				links += '<a class="updateTelefonata pr-1" data-id="'+data.id+'" href="telefonate-edit.html?idTelefonata=' + data.id + '"><i class="far fa-edit"></i></a>';
+				links += '<a class="newOrdineClienteFromTelefonata pr-1" data-id="'+data.id+'" href="ordini-clienti-new.html?idTelefonata=' + data.id + '" title="Nuovo Ordine Cliente"><i class="far fa-folder-open"></i></a>';
 				links += '<a class="deleteTelefonata" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
+			$(row).attr('data-id-telefonata', data.id);
 		},
 		"initComplete": function( settings, json ) {
-        	$('[data-toggle="tooltip"]').tooltip();
+			$('[data-toggle="tooltip"]').tooltip();
+
+			if(window.location.search.substring(1).indexOf('idTelefonata') != -1){
+				var idTelefonata = new URLSearchParams(window.location.search).get('idTelefonata');
+
+				if(!$.fn.checkVariableIsNull(idTelefonata)){
+					// move to the row related to idTelefonata
+					var w = $(window);
+					var row = $('#telefonateTable').find("tr[data-id-telefonata="+idTelefonata+"]");
+
+					if(row.length){
+						w.scrollTop( row.offset().top - (w.height()/2) );
+					}
+				}
+			}
 		}
 	});
+}
+
+$(document).ready(function() {
+
+    $('[data-toggle="tooltip"]').tooltip();
+
+	$.fn.loadTelefonateTable();
 
 	$(document).on('click','.detailsTelefonata', function(){
 		var idTelefonata = $(this).attr('data-id');
@@ -529,7 +539,7 @@ $.fn.getClienti = function(){
 
 $.fn.getAutisti = function(){
 	$.ajax({
-		url: baseUrl + "autisti",
+		url: baseUrl + "autisti?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

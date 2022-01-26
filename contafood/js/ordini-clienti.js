@@ -453,7 +453,7 @@ $(document).ready(function() {
 					var locationHref = "ordini-clienti.html";
 					var idTelefonata = $('#hiddenIdTelefonata').attr('value');
 					if(idTelefonata != null && idTelefonata != undefined && idTelefonata != ""){
-						locationHref = "telefonate.html";
+						locationHref = "telefonate.html?idTelefonata="+idTelefonata;
 					}
 
 					setTimeout(function() {
@@ -1172,7 +1172,7 @@ $.fn.getAutisti = function(){
 
 	//return $.Deferred(function() {
 	return	$.ajax({
-			url: baseUrl + "autisti",
+			url: baseUrl + "autisti?attivo=true",
 			type: 'GET',
 			dataType: 'json',
 			success: function(result) {
@@ -1468,7 +1468,7 @@ $.fn.getTelefonata = function(idTelefonata){
 			if(result != null && result != undefined && result != ''){
 
 				$('#hiddenIdTelefonata').attr('value', idTelefonata);
-				$('#annullaOrdineClienteButton').attr('href', "telefonate.html");
+				$('#annullaOrdineClienteButton').attr('href', "telefonate.html?idTelefonata="+idTelefonata);
 
 				if(result.autista != null){
 					$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);

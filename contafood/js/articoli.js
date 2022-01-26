@@ -190,6 +190,12 @@ $(document).ready(function() {
 				data: articoloJson,
 				success: function(result) {
 					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@','Articolo modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the list of 'Articoli' page
+					setTimeout(function() {
+						window.location.href = "articoli.html";
+					}, 1000);
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var errorMessage = 'Errore nella modifica dell articolo';
@@ -280,9 +286,9 @@ $(document).ready(function() {
 				success: function(result) {
 					$('#alertArticolo').empty().append(alertContent.replace('@@alertText@@','Articolo creato con successo').replace('@@alertResult@@', 'success'));
 
-					// Returns to the same page
+					// Returns to the list of 'Articoli' page
 					setTimeout(function() {
-						window.location.href = "articoli-new.html";
+						window.location.href = "articoli.html";
 					}, 1000);
 
 				},
@@ -325,7 +331,7 @@ $.fn.getCategorieArticoli = function(){
 
 $.fn.getFornitori = function(){
 	$.ajax({
-		url: baseUrl + "fornitori",
+		url: baseUrl + "fornitori?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

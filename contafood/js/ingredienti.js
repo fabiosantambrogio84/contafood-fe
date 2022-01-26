@@ -197,7 +197,7 @@ $(document).ready(function() {
 
 $.fn.getFornitori = function(){
 	$.ajax({
-		url: baseUrl + "fornitori",
+		url: baseUrl + "fornitori?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

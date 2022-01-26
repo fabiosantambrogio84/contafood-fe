@@ -49,14 +49,19 @@ $(document).ready(function() {
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
-			if(data.tipoFornitore != null){
-				var backgroundColor = '';
-				if(data.tipoFornitore.codice == 'FORNITORE_INGREDIENTI'){
-					backgroundColor = '#cee2f2';
-				} else {
-					backgroundColor = 'trasparent';
+
+			if($.fn.checkVariableIsNull(data.attivo)){
+				$(row).css('background-color', '#FCAFAF');
+			} else {
+				if(data.tipoFornitore != null){
+					var backgroundColor = '';
+					if(data.tipoFornitore.codice == 'FORNITORE_INGREDIENTI'){
+						backgroundColor = '#cee2f2';
+					} else {
+						backgroundColor = 'trasparent';
+					}
+					$(row).css('background-color', backgroundColor);
 				}
-				$(row).css('background-color', backgroundColor);
 			}
 		}
 	});
@@ -95,6 +100,7 @@ $(document).ready(function() {
 				  contentDetails = contentDetails + '<p><strong>Iban: </strong>'+$.fn.printVariable(result.iban)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Pagamento: </strong>'+$.fn.printVariable(result.pagamento)+'</p>';
 				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
+				  contentDetails = contentDetails + '<p><strong>Attivo: </strong>'+$.fn.printVariable(result.attivo)+'</p>';
 
 				  $('#detailsFornitoreMainDiv').empty().append(contentDetails);
 
@@ -126,7 +132,7 @@ $(document).ready(function() {
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<div id="alertFornitoreContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Fornitore</strong> cancellato con successo.\n' +
+				alertContent = alertContent + '<strong>Fornitore</strong> disabilitato con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertFornitore').empty().append(alertContent);
 
@@ -196,6 +202,11 @@ $(document).ready(function() {
 			fornitore.pagamento = $('#pagamento').val();
 			fornitore.barcodeMaskLottoScadenza = $('#barcodeMaskLottoScadenza').val();
 			fornitore.note = $('#note').val();
+			if($('#attivo').prop('checked') === true){
+				fornitore.attivo = true;
+			}else{
+				fornitore.attivo = false;
+			}
 
 			var fornitoreJson = JSON.stringify(fornitore);
 
@@ -264,6 +275,11 @@ $(document).ready(function() {
 			fornitore.pagamento = $('#pagamento').val();
 			fornitore.barcodeMaskLottoScadenza = $('#barcodeMaskLottoScadenza').val();
 			fornitore.note = $('#note').val();
+			if($('#attivo').prop('checked') === true){
+				fornitore.attivo = true;
+			}else{
+				fornitore.attivo = false;
+			}
 
 			var fornitoreJson = JSON.stringify(fornitore);
 
@@ -414,6 +430,9 @@ $.fn.getFornitore = function(idFornitore){
 			$('#pagamento').attr('value', result.pagamento);
 			$('#barcodeMaskLottoScadenza').attr('value', result.barcodeMaskLottoScadenza);
 			$('#note').val(result.note);
+			if(result.attivo === true){
+				$('#attivo').prop('checked', true);
+			}
 
           } else{
             $('#alertFornitore').empty().append(alertContent);
