@@ -127,7 +127,11 @@ $.fn.loadTelefonateTable = function() {
 					var row = $('#telefonateTable').find("tr[data-id-telefonata="+idTelefonata+"]");
 
 					if(row.length){
-						w.scrollTop( row.offset().top - (w.height()/2) );
+						w.scrollTop(row.offset().top - (w.height()/2));
+						row.css("background-color", "#ebf3ff");
+						setTimeout(function() {
+							row.css("background-color", "transparent");
+						}, 2000);
 					}
 				}
 			}
@@ -513,7 +517,7 @@ $.fn.extractIdTelefonataFromUrl = function(){
 }
 
 $.fn.getClienti = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "clienti",
 		type: 'GET',
 		dataType: 'json',
@@ -538,7 +542,7 @@ $.fn.getClienti = function(){
 }
 
 $.fn.getAutisti = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "autisti?attivo=true",
 		type: 'GET',
 		dataType: 'json',
@@ -557,7 +561,7 @@ $.fn.getAutisti = function(){
 }
 
 $.fn.getGiorniSettimana = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "utils/giorni-settimana",
 		type: 'GET',
 		dataType: 'json',
