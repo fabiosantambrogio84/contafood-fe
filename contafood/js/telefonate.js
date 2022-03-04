@@ -33,7 +33,11 @@ $.fn.loadTelefonateTable = function() {
 		"columns": [
 			{"name": "giornoOrdinale", "data": "giornoOrdinale", "visible": false},
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="deleteTelefonataCheckbox">';
+				var checked = '';
+				if(data.eseguito){
+					checked = 'checked';
+				}
+				var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="deleteTelefonataCheckbox patchTelefonata" '+checked+'>';
 				return checkboxHtml;
 			}},
 			{"name": "cliente", "data": null, "width": "20%", render: function ( data, type, row ) {
@@ -114,6 +118,14 @@ $.fn.loadTelefonateTable = function() {
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
 			$(row).attr('data-id-telefonata', data.id);
+			var giornoOrdinale = data.giornoOrdinale;
+			if(!$.fn.checkVariableIsNull(giornoOrdinale)){
+				if(giornoOrdinale % 2 == 0){
+					$(row).css('background-color', 'trasparent');
+				} else {
+					$(row).css('background-color', '#ebebeb');
+				}
+			}
 		},
 		"initComplete": function( settings, json ) {
 			$('[data-toggle="tooltip"]').tooltip();
@@ -210,6 +222,36 @@ $(document).ready(function() {
 		});
 
 		$('#detailsTelefonataModal').modal('show');
+	});
+
+	$(document).on('click','.patchTelefonata', function(){
+		var idTelefonata = $(this).attr('data-id');
+		var eseguito = $(this).prop("checked");
+
+		var telefonataPatched = new Object();
+		telefonataPatched.idTelefonata = parseInt(idTelefonata);
+		telefonataPatched.eseguito = eseguito;
+
+		var telefonataPatchedJson = JSON.stringify(telefonataPatched);
+
+		$.ajax({
+			url: baseUrl + "telefonate/" + idTelefonata,
+			type: 'PATCH',
+			contentType: "application/json",
+			dataType: 'json',
+			data: telefonataPatchedJson,
+			success: function(result) {
+				//$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@','Autista modificato con successo').replace('@@alertResult@@', 'success'));
+				$('#telefonateTable').DataTable().ajax.reload();
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				var alertContent = '<div id="alertTelefonataContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + 'Errore nella modifica della telefonata' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertTelefonata').empty().append(alertContent);
+				$('#telefonateTable').DataTable().ajax.reload();
+			}
+		});
 	});
 
 	$(document).on('click','.deleteTelefonata', function(){

@@ -67,7 +67,12 @@ $(document).ready(function() {
 				links = links + '<a class="deleteArticolo" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			if(!data.attivo){
+				$(row).css('background-color', '#ededed');
+			}
+		}
 	});
 
 	$(document).on('click','.deleteArticolo', function(){
