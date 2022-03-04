@@ -61,9 +61,10 @@ $(document).ready(function() {
             }},
 			{"data": null, "orderable":false, "width":"15%", render: function ( data, type, row ) {
 				var links = '<a class="detailsListino pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
-				links = links + '<a class="updateListino pr-2" data-id="'+data.id+'" href="listini-edit.html?idListino=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links = links + '<a class="refreshListino pr-2" data-id="'+data.id+'" href="listini-refresh.html?idListino=' + data.id + '" title="Aggiorna prezzi"><i class="fas fa-sync"></i></a>';
-				links = links + '<a class="deleteListino" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
+				links += '<a class="updateListino pr-2" data-id="'+data.id+'" href="listini-edit.html?idListino=' + data.id + '"><i class="far fa-edit"></i></a>';
+				links += '<a class="refreshListino pr-2" data-id="'+data.id+'" href="listini-refresh.html?idListino=' + data.id + '" title="Aggiorna prezzi"><i class="fas fa-sync"></i></a>';
+                links += '<a class="printListino pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+                links += '<a class="deleteListino" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
 		],
@@ -180,13 +181,22 @@ $(document).ready(function() {
                     }
                     return result;
                 }}
-            ]
+            ],
+            "createdRow": function(row, data, dataIndex,cells){
+                $(cells[3]).css('text-align','right');
+            }
         });
     });
 
     $(document).on('click','.closeDetailsListino', function(){
         $('#detailsListinoModalTable').DataTable().destroy();
         $('#detailsListinoModal').modal('hide');
+    });
+
+    $(document).on('click','.printListino', function(){
+        var idListino = $(this).attr('data-id');
+
+        window.open(baseUrl + "stampe/listini/"+idListino, '_blank');
     });
 
 	if($('#updateListinoButton') != null && $('#updateListinoButton') != undefined){
