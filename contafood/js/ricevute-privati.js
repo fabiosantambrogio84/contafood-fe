@@ -1222,7 +1222,7 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
-				$('#progressivo').attr('value', result.progressivo);
+				//$('#progressivo').attr('value', result.progressivo);
 				$('#anno').attr('value', result.anno);
 				$('#colli').attr('value', 1);
 				$('#data').val(moment().format('YYYY-MM-DD'));
