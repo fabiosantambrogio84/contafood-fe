@@ -54,7 +54,7 @@
     if(idDdt != null && idDdt != undefined){
       //$.when($.fn.getClienti(), $.fn.getCausali(), $.fn.getTipologieTrasporto()).then($.fn.getDdt(idDdt));
 
-      $.when($.fn.getClienti(), $.fn.getCausali(), $.fn.getTipologieTrasporto()).then(function(f1,f2,f3){
+      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getCausali(), $.fn.getTipologieTrasporto()).then(function(f1,f2,f3){
         $.fn.getDdt(idDdt);
       });
     }
@@ -217,6 +217,14 @@
                 </div>
               </div>
 
+            </div>
+          </div>
+          <div class="form-row mt-2">
+            <div class="form-group col-md-3">
+              <label for="autista">Autista</label>
+              <select id="autista" class="form-control form-control-sm">
+                <option value=""></option>
+              </select>
             </div>
           </div>
           <div class="form-row mt-2">

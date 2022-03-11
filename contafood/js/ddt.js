@@ -6,7 +6,7 @@ var rowBackgroundGiallo = '#fffca3';
 
 $.fn.loadDdtTable = function(url) {
 	$.ajax({
-		url: baseUrl + "autisti",
+		url: baseUrl + "autisti?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(autistiResult) {
@@ -88,7 +88,7 @@ $.fn.loadDdtTable = function(url) {
 						autistaSelect += '<option value=""> - </option>';
 						if(autistiResult != null && autistiResult != undefined && autistiResult != ''){
 							$.each(autistiResult, function(i, item){
-								var label = item.nome + ' ' + item.cognome;
+								var label = item.cognome + ' ' + item.nome;
 								var optionHtml = '<option value="'+item.id+'"';
 								if(autistaId != null && autistaId != undefined){
 									if(autistaId == item.id){
@@ -625,6 +625,13 @@ $(document).ready(function() {
 		causale.id = $('#causale option:selected').val();
 		ddt.causale = causale;
 
+		var autistaId = $('#autista option:selected').val();
+		if(autistaId != null && autistaId != ''){
+			var autista = new Object();
+			autista.id = autistaId;
+			ddt.autista = autista;
+		}
+
 		var ddtArticoliLength = $('.rowArticolo').length;
 		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
 			var ddtArticoli = [];
@@ -838,6 +845,13 @@ $(document).ready(function() {
 			var causale = new Object();
 			causale.id = $('#causale option:selected').val();
 			ddt.causale = causale;
+
+			var autistaId = $('#autista option:selected').val();
+			if(autistaId != null && autistaId != ''){
+				var autista = new Object();
+				autista.id = autistaId;
+				ddt.autista = autista;
+			}
 
 			var ddtArticoliLength = $('.rowArticolo').length;
 			if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
@@ -1413,6 +1427,31 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 
 }
 
+$.fn.getAutisti = function(){
+
+	return	$.ajax({
+		url: baseUrl + "autisti?attivo=true",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					var label = item.cognome + ' ' + item.nome;
+					var selected = '';
+					if(item.cognome.toLowerCase() == 'urbani' && item.nome.toLowerCase() == 'giuseppe'){
+						selected = 'selected';
+					}
+					$('#autista').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
+				});
+			}
+
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
 $.fn.getClienti = function(){
 
 	return $.ajax({
@@ -1616,6 +1655,9 @@ $.fn.getDdt = function(idDdt){
 					$('#cliente').selectpicker('refresh');
 				}
 				$('#causale option[value="' + result.causale.id +'"]').attr('selected', true);
+				if(result.autista != null && result.autista != undefined){
+					$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
+				};
 				$('#colli').attr('value', result.numeroColli);
 				$('#dataTrasporto').attr('value', result.dataTrasporto);
 				$('#oraTrasporto').attr('value', result.oraTrasporto);

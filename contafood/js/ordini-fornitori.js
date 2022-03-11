@@ -33,9 +33,12 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'desc']
+			[0, 'desc'],
+			[1, 'desc']
 		],
 		"columns": [
+			{"name":"annoContabile", "data": "annoContabile", "width":"5%", "visible": false},
+			{"name":"progressivo", "data": "progressivo", "width":"5%", "visible": false},
             {"name":"codice", "data": null, render: function ( data, type, row ) {
                 return data.progressivo + '/' + data.annoContabile;
             }},
