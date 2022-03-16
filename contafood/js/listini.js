@@ -195,9 +195,25 @@ $(document).ready(function() {
 
     $(document).on('click','.printListino', function(){
         var idListino = $(this).attr('data-id');
+        $('#confirmPrintListino').attr('data-id', idListino);
 
-        window.open(baseUrl + "stampe/listini/"+idListino, '_blank');
+        $('#ordinamentoStampaListino').empty();
+        $('#ordinamentoStampaListino').append('<option value="categoria-articolo" selected>Categoria articolo</option>');
+        $('#ordinamentoStampaListino').append('<option value="descrizione-articolo">Descrizione articolo</option>');
+        $('#ordinamentoStampaListino').append('<option value="fornitore">Fornitore</option>');
+
+        $("#ordinamentoStampaListino option[value='categoria-articolo']").attr("selected", "selected");
+        $('#printListinoModal').modal('show');
     });
+
+    $(document).on('click','#confirmPrintListino', function(){
+        $('#printListinoModal').modal('hide');
+        var idListino = $(this).attr('data-id');
+        var orderBy = $('#ordinamentoStampaListino option:selected').val();
+
+        window.open(baseUrl + "stampe/listini/"+idListino+"?orderBy="+orderBy, '_blank');
+    });
+
 
 	if($('#updateListinoButton') != null && $('#updateListinoButton') != undefined){
 		$('#articoloVariazione').selectpicker();

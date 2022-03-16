@@ -207,6 +207,7 @@ $(document).ready(function() {
 					contentDetails += '<p><strong>Ora: </strong>'+$.fn.printVariable(result.ora)+'</p>';
 					contentDetails += '<p><strong>Giorno consegna: </strong>'+$.fn.printVariable(result.giornoConsegna)+'</p>';
 					contentDetails += '<p><strong>Ora consegna: </strong>'+$.fn.printVariable(result.oraConsegna)+'</p>';
+					contentDetails += '<p><strong>Eseguita: </strong>'+$.fn.printVariable(result.eseguito)+'</p>';
 					contentDetails += '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
 
 					$('#detailsTelefonataMainDiv').empty().append(contentDetails);
@@ -269,7 +270,7 @@ $(document).ready(function() {
 			type: 'DELETE',
 			success: function() {
 				var alertContent = '<div id="alertTelefonataContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>Telefonata</strong> cancellato con successo.\n' +
+				alertContent = alertContent + '<strong>Telefonata</strong> cancellata con successo.\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 				$('#alertTelefonata').empty().append(alertContent);
 
@@ -416,7 +417,7 @@ $(document).ready(function() {
 					telefonata.oraConsegna = $('#oraConsegna').val();
 				}
 			}
-
+			telefonata.eseguito = $('#eseguito').prop("checked");
 			telefonata.note = $('#note').val();
 
 			var telefonataJson = JSON.stringify(telefonata);
@@ -502,7 +503,7 @@ $(document).ready(function() {
 					telefonata.oraConsegna = $('#oraConsegna').val();
 				}
 			}
-
+			telefonata.eseguito = $('#eseguito').prop("checked");
 			telefonata.note = $('#note').val();
 
 			var telefonataJson = JSON.stringify(telefonata);
@@ -648,6 +649,9 @@ $.fn.getTelefonata = function(idTelefonata){
 			$('#ora').attr('value', result.ora);
 			$('#giornoConsegna option[value="' + result.giornoConsegnaOrdinale +'"]').attr('selected', true);
 			$('#oraConsegna').attr('value', result.oraConsegna);
+			if(result.eseguito === true){
+				$('#eseguito').prop('checked', true);
+			}
 			$('#note').val(result.note);
 			if(result.cliente != null){
 				$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
