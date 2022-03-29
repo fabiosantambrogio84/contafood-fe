@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>ContaFood - Fattura Nuovo</title>
+  <title>ContaFood - Fattura Modifica</title>
 
   <link rel="icon" href="../img/favicon.png" type="image/png" />
 
@@ -36,9 +36,10 @@
   <script src="../js/fatture.js"></script>
 
   <script>
-    $.fn.preloadFields();
-    $.fn.getClienti();
-    $.fn.getCausali();
+    var idFattura = $.fn.extractIdFatturaFromUrl();
+    if(idFattura != null && idFattura != undefined){
+      $.fn.getFattura(idFattura);
+    }
   </script>
 
 </head>
@@ -66,11 +67,11 @@
       <div class="container-fluid" id="containerFatture">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-4 text-gray-800">Nuova Fattura</h1>
+        <h1 class="h3 mb-4 text-gray-800">Modifica Fattura</h1>
 
         <div id="alertFatture"></div>
 
-        <form id="newFatturaForm" class="needs-validation" novalidate>
+        <form id="updateFatturaForm" class="needs-validation" novalidate>
           <div class="form-row">
             <div class="form-group col-md-2">
               <label for="progressivo" class="mb-0">Progressivo*</label>
@@ -90,49 +91,7 @@
               </div>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="cliente" class="">Cliente*</label>
-              <select id="cliente" class="form-control form-control-sm" required>
-                <option value=""></option>
-              </select>
-              <div class="invalid-feedback">
-                Seleziona un cliente
-              </div>
-            </div>
-          </div>
 
-          <div class="card-body pl-0">
-            <h6>DDT da fatturare*</h6>
-            <div class="form-row">
-              <div class="form-group col-md-10">
-                <div class="table-responsive">
-                  <table class="table table-bordered table-sm" id="fatturaDdtTable" width="100%" cellspacing="0">
-                    <thead class="text-center" style="background-color: #baddf5;">
-                    <tr>
-                      <th></th>
-                      <th>Numero</th>
-                      <th>Data</th>
-                      <th>Importo (€)</th>
-                    </tr>
-                    </thead>
-                  </table>
-                </div>
-              </div>
-            </div>
-
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-2">
-              <label for="totale" class="mb-0">Totale (€)*</label>
-              <input type="number" class="form-control form-control-sm text-right" id="totale" step=".01" min="0" required>
-            </div>
-            <div class="form-group col-md-2">
-              <label for="causale" class="mb-0">Causale</label>
-              <select id="causale" class="form-control form-control-sm ignore-barcode-scanner" >
-              </select>
-            </div>
-          </div>
           <div class="form-row">
             <div class="form-group col-md-4">
               <label for="note">Note</label>
@@ -140,7 +99,8 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary mt-4" id="newFatturaButton">Salva</button>
+          <input type="hidden" id="hiddenIdFattura"/>
+          <button type="submit" class="btn btn-primary mt-4" id="updateFatturaButton">Salva</button>
           <a href="fatture.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 

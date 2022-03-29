@@ -108,7 +108,7 @@ $.fn.loadDdtAcquistoProdottiTable = function() {
 			"emptyTable": "",
 			"zeroRecords": ""
 		},
-		"pageLength": 10,
+		"pageLength": 50,
 		"lengthChange": false,
 		"info": false,
 		"autoWidth": false,
@@ -353,13 +353,16 @@ $(document).ready(function() {
 			fornitore.id = $('#fornitore option:selected').val();
 			ddtAcquisto.fornitore = fornitore;
 
-			var ddtAcquistoProdottiLength = $('.rowProdotto').length;
+			var prodottoTable = $('#ddtAcquistoProdottiTable').DataTable();
+
+			var ddtAcquistoProdottiLength = prodottoTable.rows().nodes().length;
 			if(ddtAcquistoProdottiLength != null && ddtAcquistoProdottiLength != undefined && ddtAcquistoProdottiLength != 0){
 				var ddtAcquistoArticoli = [];
 				var ddtAcquistoIngredienti = [];
-				$('.rowProdotto').each(function(i, item){
-					var tipo = $(this).attr('data-tipo');
-					var prodottoId = $(this).attr('data-id');
+
+				prodottoTable.rows().nodes().each(function(i, item){
+					var tipo = $(i).attr('data-tipo');
+					var prodottoId = $(i).attr('data-id');
 
 					if(tipo == 'articolo'){
 						var ddtAcquistoArticolo = {};
@@ -367,12 +370,12 @@ $(document).ready(function() {
 						ddtAcquistoArticoloId.articoloId = prodottoId;
 						ddtAcquistoArticolo.id = ddtAcquistoArticoloId;
 
-						ddtAcquistoArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-						ddtAcquistoArticolo.dataScadenza = $(this).children().eq(2).children().eq(0).val();
-						ddtAcquistoArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-						ddtAcquistoArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-						ddtAcquistoArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-						ddtAcquistoArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+						ddtAcquistoArticolo.lotto = $(i).children().eq(1).children().eq(0).val();
+						ddtAcquistoArticolo.dataScadenza = $(i).children().eq(2).children().eq(0).val();
+						ddtAcquistoArticolo.quantita = $(i).children().eq(4).children().eq(0).val();
+						ddtAcquistoArticolo.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+						ddtAcquistoArticolo.prezzo = $(i).children().eq(6).children().eq(0).val();
+						ddtAcquistoArticolo.sconto = $(i).children().eq(7).children().eq(0).val();
 
 						ddtAcquistoArticoli.push(ddtAcquistoArticolo);
 
@@ -382,12 +385,12 @@ $(document).ready(function() {
 						ddtAcquistoIngredienteId.ingredienteId = prodottoId;
 						ddtAcquistoIngrediente.id = ddtAcquistoIngredienteId;
 
-						ddtAcquistoIngrediente.lotto = $(this).children().eq(1).children().eq(0).val();
-						ddtAcquistoIngrediente.dataScadenza = $(this).children().eq(2).children().eq(0).val();
-						ddtAcquistoIngrediente.quantita = $(this).children().eq(4).children().eq(0).val();
-						ddtAcquistoIngrediente.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-						ddtAcquistoIngrediente.prezzo = $(this).children().eq(6).children().eq(0).val();
-						ddtAcquistoIngrediente.sconto = $(this).children().eq(7).children().eq(0).val();
+						ddtAcquistoIngrediente.lotto = $(i).children().eq(1).children().eq(0).val();
+						ddtAcquistoIngrediente.dataScadenza = $(i).children().eq(2).children().eq(0).val();
+						ddtAcquistoIngrediente.quantita = $(i).children().eq(4).children().eq(0).val();
+						ddtAcquistoIngrediente.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+						ddtAcquistoIngrediente.prezzo = $(i).children().eq(6).children().eq(0).val();
+						ddtAcquistoIngrediente.sconto = $(i).children().eq(7).children().eq(0).val();
 
 						ddtAcquistoIngredienti.push(ddtAcquistoIngrediente);
 					}
@@ -469,13 +472,16 @@ $(document).ready(function() {
 			fornitore.id = $('#fornitore option:selected').val();
 			ddtAcquisto.fornitore = fornitore;
 
-			var ddtAcquistoProdottiLength = $('.rowProdotto').length;
+			var prodottoTable = $('#ddtAcquistoProdottiTable').DataTable();
+
+			var ddtAcquistoProdottiLength = prodottoTable.rows().nodes().length;;
 			if(ddtAcquistoProdottiLength != null && ddtAcquistoProdottiLength != undefined && ddtAcquistoProdottiLength != 0){
 				var ddtAcquistoArticoli = [];
 				var ddtAcquistoIngredienti = [];
-				$('.rowProdotto').each(function(i, item){
-					var tipo = $(this).attr('data-tipo');
-					var prodottoId = $(this).attr('data-id');
+
+				prodottoTable.rows().nodes().each(function(i, item){
+					var tipo = $(i).attr('data-tipo');
+					var prodottoId = $(i).attr('data-id');
 
 					if(tipo == 'articolo'){
 						var ddtAcquistoArticolo = {};
@@ -483,12 +489,12 @@ $(document).ready(function() {
 						ddtAcquistoArticoloId.articoloId = prodottoId;
 						ddtAcquistoArticolo.id = ddtAcquistoArticoloId;
 
-						ddtAcquistoArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-						ddtAcquistoArticolo.dataScadenza = $(this).children().eq(2).children().eq(0).val();
-						ddtAcquistoArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-						ddtAcquistoArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-						ddtAcquistoArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-						ddtAcquistoArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+						ddtAcquistoArticolo.lotto = $(i).children().eq(1).children().eq(0).val();
+						ddtAcquistoArticolo.dataScadenza = $(i).children().eq(2).children().eq(0).val();
+						ddtAcquistoArticolo.quantita = $(i).children().eq(4).children().eq(0).val();
+						ddtAcquistoArticolo.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+						ddtAcquistoArticolo.prezzo = $(i).children().eq(6).children().eq(0).val();
+						ddtAcquistoArticolo.sconto = $(i).children().eq(7).children().eq(0).val();
 
 						ddtAcquistoArticoli.push(ddtAcquistoArticolo);
 
@@ -498,12 +504,12 @@ $(document).ready(function() {
 						ddtAcquistoIngredienteId.ingredienteId = prodottoId;
 						ddtAcquistoIngrediente.id = ddtAcquistoIngredienteId;
 
-						ddtAcquistoIngrediente.lotto = $(this).children().eq(1).children().eq(0).val();
-						ddtAcquistoIngrediente.dataScadenza = $(this).children().eq(2).children().eq(0).val();
-						ddtAcquistoIngrediente.quantita = $(this).children().eq(4).children().eq(0).val();
-						ddtAcquistoIngrediente.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-						ddtAcquistoIngrediente.prezzo = $(this).children().eq(6).children().eq(0).val();
-						ddtAcquistoIngrediente.sconto = $(this).children().eq(7).children().eq(0).val();
+						ddtAcquistoIngrediente.lotto = $(i).children().eq(1).children().eq(0).val();
+						ddtAcquistoIngrediente.dataScadenza = $(i).children().eq(2).children().eq(0).val();
+						ddtAcquistoIngrediente.quantita = $(i).children().eq(4).children().eq(0).val();
+						ddtAcquistoIngrediente.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+						ddtAcquistoIngrediente.prezzo = $(i).children().eq(6).children().eq(0).val();
+						ddtAcquistoIngrediente.sconto = $(i).children().eq(7).children().eq(0).val();
 
 						ddtAcquistoIngredienti.push(ddtAcquistoIngrediente);
 					}
@@ -564,36 +570,7 @@ $(document).ready(function() {
 	}
 
 	$(document).on('change','#fornitore', function(){
-		$('#prodotto option[value=""]').prop('selected', true);
-		$('#udm').val('');
-		$('#iva').val('');
-		$('#lotto').val('');
-		$('#scadenza').val('');
-		$('#quantita').val('');
-		$('#prezzo').val('');
-		$('#sconto').val('');
-
-		var fornitore = $('#fornitore option:selected').val();
-		if(fornitore != null && fornitore != ''){
-			var tipoFornitore = $('#fornitore option:selected').attr("data-tipo");
-			if(tipoFornitore == 'FORNITORE_ARTICOLI'){
-				$('#aggiungiTitle').text('Aggiungi articolo');
-				$('#prodottoLabel').text('Articolo');
-				$('#tableHeaderProdotto').text('Articolo');
-
-				$.fn.getArticoli(fornitore);
-
-			} else if(tipoFornitore == 'FORNITORE_INGREDIENTI'){
-				$('#aggiungiTitle').text('Aggiungi ingrediente');
-				$('#prodottoLabel').text('Ingrediente');
-				$('#tableHeaderProdotto').text('Ingrediente');
-
-				$.fn.getIngredienti(fornitore);
-			}
-
-		} else {
-			$('#prodotto').empty();
-		}
+		$.fn.preloadArticoloOrIngredienteSection();
 	});
 
 	$(document).on('change','#prodotto', function(){
@@ -803,6 +780,39 @@ $.fn.preloadFields = function(){
 	$('#fornitore').focus();
 }
 
+$.fn.preloadArticoloOrIngredienteSection = function(){
+	$('#prodotto option[value=""]').prop('selected', true);
+	$('#udm').val('');
+	$('#iva').val('');
+	$('#lotto').val('');
+	$('#scadenza').val('');
+	$('#quantita').val('');
+	$('#prezzo').val('');
+	$('#sconto').val('');
+
+	var fornitore = $('#fornitore option:selected').val();
+	if(fornitore != null && fornitore != ''){
+		var tipoFornitore = $('#fornitore option:selected').attr("data-tipo");
+		if(tipoFornitore == 'FORNITORE_ARTICOLI'){
+			$('#aggiungiTitle').text('Aggiungi articolo');
+			$('#prodottoLabel').text('Articolo');
+			$('#tableHeaderProdotto').text('Articolo');
+
+			$.fn.getArticoli(fornitore);
+
+		} else if(tipoFornitore == 'FORNITORE_INGREDIENTI'){
+			$('#aggiungiTitle').text('Aggiungi ingrediente');
+			$('#prodottoLabel').text('Ingrediente');
+			$('#tableHeaderProdotto').text('Ingrediente');
+
+			$.fn.getIngredienti(fornitore);
+		}
+
+	} else {
+		$('#prodotto').empty();
+	}
+}
+
 $.fn.getFornitori = function(){
 	$.ajax({
 		url: baseUrl + "fornitori?attivo=true",
@@ -952,6 +962,8 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 				$('#colli').attr('value', result.numeroColli);
 				$('#note').val(result.note);
 
+				$.fn.preloadArticoloOrIngredienteSection();
+
 				if(result.ddtAcquistoArticoli != null && result.ddtAcquistoArticoli != undefined && result.ddtAcquistoArticoli.length != 0){
 					result.ddtAcquistoArticoli.forEach(function(item, i){
 						var articolo = item.articolo;
@@ -1004,7 +1016,7 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 							iva,
 							deleteLink
 						] ).draw( false ).node();
-						$(rowNode).css('text-align', 'center');
+						$(rowNode).css('text-align', 'center').css('color','#080707');
 						$(rowNode).addClass('rowProdotto');
 						$(rowNode).attr('data-id', articoloId);
 						$(rowNode).attr('data-tipo', 'articolo');
@@ -1031,9 +1043,9 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 						var dataScadenzaRegexp = $.fn.getDataScadenzaRegExp(item);
 
 						if(lotto != null && lotto != undefined && lotto != ''){
-							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'" data-codice-fornitore="'+articolo.fornitore.codice+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="'+lotto+'" data-codice-fornitore="'+ingrediente.fornitore.codice+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
 						} else {
-							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="" data-codice-fornitore="'+articolo.fornitore.codice+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale" value="" data-codice-fornitore="'+ingrediente.fornitore.codice+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
 						}
 
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';

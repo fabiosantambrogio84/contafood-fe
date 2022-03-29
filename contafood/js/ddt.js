@@ -632,23 +632,25 @@ $(document).ready(function() {
 			ddt.autista = autista;
 		}
 
-		var ddtArticoliLength = $('.rowArticolo').length;
+		var articoliTable = $('#ddtArticoliTable').DataTable();
+
+		var ddtArticoliLength = articoliTable.rows().nodes().length;
 		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
 			var ddtArticoli = [];
-			$('.rowArticolo').each(function(i, item){
-				var articoloId = $(this).attr('data-id');
+			articoliTable.rows().nodes().each(function(i, item){
+				var articoloId = $(i).attr('data-id');
 
 				var ddtArticolo = {};
 				var ddtArticoloId = new Object();
 				ddtArticoloId.articoloId = articoloId;
 				ddtArticolo.id = ddtArticoloId;
 
-				ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-				ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
-				ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-				ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-				ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-				ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+				ddtArticolo.lotto = $(i).children().eq(1).children().eq(0).val();
+				ddtArticolo.scadenza = $(i).children().eq(2).children().eq(0).val();
+				ddtArticolo.quantita = $(i).children().eq(4).children().eq(0).val();
+				ddtArticolo.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+				ddtArticolo.prezzo = $(i).children().eq(6).children().eq(0).val();
+				ddtArticolo.sconto = $(i).children().eq(7).children().eq(0).val();
 
 				ddtArticoli.push(ddtArticolo);
 			});
@@ -691,10 +693,11 @@ $(document).ready(function() {
 
 				// Update ordini clienti
 				var articoliOrdiniClienti = [];
-				$('.ordineClienteArticolo').each(function(i, item){
-					var idArticolo = $(this).attr('data-id-articolo');
-					var idsOrdiniClienti = $(this).attr('data-ids-ordini');
-					var numeroPezziDaEvadere = $(this).parent().parent().attr('data-num-pezzi-evasi');
+				var ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
+				ordineClienteArticoliTable.rows().nodes().each(function(i, item){
+					var idArticolo = $(i).attr('data-id-articolo');
+					var idsOrdiniClienti = $(i).attr('data-ids-ordini');
+					var numeroPezziDaEvadere = $(i).parent().parent().attr('data-num-pezzi-evasi');
 
 					var articoloOrdiniClienti = new Object();
 					articoloOrdiniClienti.idArticolo = idArticolo;
@@ -728,7 +731,6 @@ $(document).ready(function() {
 								window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
 							}, 2000);
 
-
 						},
 						error: function(jqXHR, textStatus, errorThrown) {
 							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "DDT creato con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
@@ -739,7 +741,6 @@ $(document).ready(function() {
 					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT creato con successo').replace('@@alertResult@@', 'success'));
 
 					if(print){
-
 						w = window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
 						w.focus();
 						w.print();
@@ -749,7 +750,6 @@ $(document).ready(function() {
 					setTimeout(function() {
 						window.location.href = "ddt-new.html?dt="+ddt.dataTrasporto+"&ot="+oraTrasporto;
 					}, 1000);
-
 				}
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
@@ -814,8 +814,8 @@ $(document).ready(function() {
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			var validLotto = $.fn.validateLotto();
 			/*
+			var validLotto = $.fn.validateLotto();
 			if(!validLotto){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
 				return false;
@@ -853,24 +853,26 @@ $(document).ready(function() {
 				ddt.autista = autista;
 			}
 
-			var ddtArticoliLength = $('.rowArticolo').length;
+			var articoliTable = $('#ddtArticoliTable').DataTable();
+
+			var ddtArticoliLength = articoliTable.rows().nodes().length;
 			if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0){
 				var ddtArticoli = [];
-				$('.rowArticolo').each(function(i, item){
-					var articoloId = $(this).attr('data-id');
+				articoliTable.rows().nodes().each(function(i, item){
+					var articoloId = $(i).attr('data-id');
 
 					var ddtArticolo = {};
 					var ddtArticoloId = new Object();
 					ddtArticoloId.articoloId = articoloId;
 					ddtArticolo.id = ddtArticoloId;
 
-					ddtArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-					ddtArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
-					ddtArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-					ddtArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
+					ddtArticolo.lotto = $(i).children().eq(1).children().eq(0).val();
+					ddtArticolo.scadenza = $(i).children().eq(2).children().eq(0).val();
+					ddtArticolo.quantita = $(i).children().eq(4).children().eq(0).val();
+					ddtArticolo.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
 					//ddtArticolo.numeroPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
-					ddtArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-					ddtArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+					ddtArticolo.prezzo = $(i).children().eq(6).children().eq(0).val();
+					ddtArticolo.sconto = $(i).children().eq(7).children().eq(0).val();
 
 					/*var idOrdiniClienti = $(this).attr('data-id-ordine-cliente');
 					if(idOrdiniClienti != null && idOrdiniClienti != ''){
@@ -1202,18 +1204,20 @@ $(document).ready(function() {
 		var currentPezzi = 0;
 		//var currentPezziDaEvadere = 0;
 
-		var ddtArticoliLength = $('.rowArticolo').length;
+		var articoliTable = $('#ddtArticoliTable').DataTable();
+
+		var ddtArticoliLength = articoliTable.rows().nodes().length;
 		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
-			$('.rowArticolo').each(function(i, item){
+			articoliTable.rows().nodes().each(function(i, item){
 
 				if(found != 1){
-					currentRowIndex = $(this).attr('data-row-index');
+					currentRowIndex = $(i).attr('data-row-index');
 					//currentIdOrdineCliente = $(this).attr('data-id-ordine-cliente');
-					currentIdArticolo = $(this).attr('data-id');
-					currentLotto = $(this).children().eq(1).children().eq(0).val();
-					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
-					currentSconto = $(this).children().eq(7).children().eq(0).val();
+					currentIdArticolo = $(i).attr('data-id');
+					currentLotto = $(i).children().eq(1).children().eq(0).val();
+					currentScadenza = $(i).children().eq(2).children().eq(0).val();
+					currentPrezzo = $(i).children().eq(6).children().eq(0).val();
+					currentSconto = $(i).children().eq(7).children().eq(0).val();
 					if(currentSconto == '0'){
 						currentSconto = '';
 					}
@@ -1225,10 +1229,9 @@ $(document).ready(function() {
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 						found = 1;
-						currentQuantita = $(this).children().eq(4).children().eq(0).val();
-						currentPezzi = $(this).children().eq(5).children().eq(0).val();
+						currentQuantita = $(i).children().eq(4).children().eq(0).val();
+						currentPezzi = $(i).children().eq(5).children().eq(0).val();
 					}
-
 				}
 			});
 		}
@@ -1243,16 +1246,15 @@ $(document).ready(function() {
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var table = $('#ddtArticoliTable').DataTable();
 		if(found >= 1){
 
 			// aggiorno la riga
-			$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentSconto,
+			$.fn.aggiornaRigaArticolo(articoliTable,currentRowIndex,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentSconto,
 				quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale);
 
 		} else {
 			// inserisco nuova riga
-			$.fn.inserisciRigaArticolo(table,null,articoloId,articolo,
+			$.fn.inserisciRigaArticolo(articoliTable,null,articoloId,articolo,
 				lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,
 				totale,iva);
 		}

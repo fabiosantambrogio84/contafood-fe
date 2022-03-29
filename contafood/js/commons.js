@@ -401,9 +401,11 @@ $.fn.checkPezziOrdinati = function(){
     var articoliArray = [];
     var ordiniClientiArticoliArray = [];
 
-    $('.rowArticolo').each(function(i, item){
-        var idArticolo = $(this).attr('data-id');
-        var numeroPezzi = $(this).children().eq(5).children().eq(0).val();
+    var articoliTable = $('#ddtArticoliTable').DataTable();
+
+    articoliTable.rows().nodes().each(function(i, item){
+        var idArticolo = $(i).attr('data-id');
+        var numeroPezzi = $(i).children().eq(5).children().eq(0).val();
         numeroPezzi = $.fn.parseValue(numeroPezzi, 'int');
 
         var totaliPezzi;
@@ -416,10 +418,11 @@ $.fn.checkPezziOrdinati = function(){
         articoliMap.set(idArticolo, totaliPezzi);
 
         articoliArray.push(idArticolo);
-
     });
 
-    $('.ordineClienteArticolo').each(function(i, item){
+    var ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
+
+    ordineClienteArticoliTable.rows().nodes().each(function(i, item){
         var idArticolo = $(this).attr('data-id-articolo');
         ordiniClientiArticoliArray.push(idArticolo);
     });
@@ -450,8 +453,15 @@ $.fn.checkPezziOrdinati = function(){
             var rowData = table.row("[data-id-articolo='"+key+"']").data();
             rowData["numeroPezziEvasi"] = newNumeroPezziEvasi;
             table.row("[data-id-articolo='"+key+"']").data(rowData).draw();
+        } else {
+            // articolo non presente in quelli ordinati
+            var pathname = window.location.pathname;
+            if(!$.fn.checkVariableIsNull(pathname)){
+                if(pathname.indexOf('ddt-new') != -1){
+                    $('tr[data-id='+key+']').css('background-color', '#F9BCBC');
+                }
+            }
         }
-
     });
 
     $(ordiniClientiArticoliArray).not(articoliArray).each(function(i, item){
@@ -463,10 +473,12 @@ $.fn.computeTotale = function() {
     var ivaMap = new Map();
     var totaleDocumento = 0;
 
-    $('.rowArticolo').each(function(i, item){
-        var totale = $(this).children().eq(8).text();
+    var articoliTable = $('#ddtArticoliTable').DataTable();
+
+    articoliTable.rows().nodes().each(function(i, item){
+        var totale = $(i).children().eq(8).text();
         totale = $.fn.parseValue(totale, 'float');
-        var iva = $(this).children().eq(9).text();
+        var iva = $(i).children().eq(9).text();
         iva = $.fn.parseValue(iva, 'int');
 
         var totaliIva;
@@ -504,10 +516,12 @@ $.fn.computeTotaleAndImponibile = function() {
     var totaleDocumento = 0;
     var imponibileDocumento = 0;
 
-    $('.rowProdotto').each(function(i, item){
-        var iva = $(this).children().eq(9).text();
+    var prodottoTable = $('#ddtAcquistoProdottiTable').DataTable();
+
+    prodottoTable.rows().nodes().each(function(i, item){
+        var iva = $(i).children().eq(9).text();
         iva = $.fn.parseValue(iva, 'float');
-        var totale = $(this).children().eq(8).text();
+        var totale = $(i).children().eq(8).text();
         totale = $.fn.parseValue(totale, 'float');
 
         var totaliIva;
@@ -604,12 +618,12 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
             "columns": [
                 {"name": "codiciOrdiniClienti", "data": "codiciOrdiniClienti", "width":"10%"},
                 {"name": "articolo", "data": null, "width":"20%", render: function ( data, type, row ) {
-                        var articolo = data.articolo;
-                        var span = '<span class="ordineClienteArticolo "';
-                        span += 'data-id-articolo="'+data.idArticolo+'" data-ids-ordini="'+data.idsOrdiniClienti+'"';
-                        span += '>'+articolo+'</span>';
-                        return span;
-                    }},
+                    var articolo = data.articolo;
+                    var span = '<span class="ordineClienteArticolo "';
+                    span += 'data-id-articolo="'+data.idArticolo+'" data-ids-ordini="'+data.idsOrdiniClienti+'"';
+                    span += '>'+articolo+'</span>';
+                    return span;
+                }},
                 {"name": "prezzoListinoBase", "data": "prezzoListinoBase", "width":"5%"},
                 {"name": "numeroPezziDaEvadere", "data": "numeroPezziOrdinati", "width":"3%"},
                 {"name": "numeroPezziEvasi", "data": "numeroPezziEvasi", "width":"3%"}

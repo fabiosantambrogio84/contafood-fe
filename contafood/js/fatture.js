@@ -119,6 +119,7 @@ $.fn.loadFattureTable = function(url) {
 				var stato = data.statoFattura;
 
 				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+				links += '<a class="updateFattura pr-1" data-id="'+data.id+'" href="fatture-edit.html?idFattura=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 				if((totale - acconto) != 0){
 					links += '<a class="payFattura pr-1" data-id="'+data.id+'" href="' + pagamentoUrl + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 				}
@@ -128,13 +129,11 @@ $.fn.loadFattureTable = function(url) {
 				var tipo = data.tipoFattura;
                 if(tipo != null){
                     if(tipo.id != null && tipo.id != undefined && tipo.id == 0){
-                        var cliente = data.cliente;
-                        if(cliente != null){
-                            var email = cliente.email;
-                            if(email != null && email != undefined && email != ""){
-                                links += '<a class="emailFattura pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
-                            }
-                        }
+						var cliente = data.cliente;
+						if(cliente != null){
+							var email = cliente.email;
+							links += '<a class="emailFattura pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+						}
                     }
                 }
 
@@ -912,6 +911,57 @@ $(document).ready(function() {
 		});
 	}
 
+	if($('#updateFatturaButton') != null && $('#updateFatturaButton') != undefined && $('#updateFatturaButton').length > 0){
+
+		$(document).on('submit','#updateFatturaForm', function(event){
+			event.preventDefault();
+
+			var alertContent = '<div id="alertFattureContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var fattura = new Object();
+			fattura.id = parseInt($('#hiddenIdFattura').val());
+			fattura.progressivo = parseInt($('#progressivo').val());
+			fattura.anno = parseInt($('#anno').val());
+			fattura.data = $('#data').val();
+			fattura.note = $('#note').val();
+
+			var fatturaJson = JSON.stringify(fattura);
+
+			$.ajax({
+				url: baseUrl + "fatture/" + fattura.id,
+				type: 'PATCH',
+				contentType: "application/json",
+				dataType: 'json',
+				data: fatturaJson,
+				success: function(result) {
+					$('#alertFatture').empty().append(alertContent.replace('@@alertText@@','Fattura modificata con successo').replace('@@alertResult@@', 'success'));
+
+					$('#updateFatturaButton').attr("disabled", true);
+
+					// Returns to the same page
+					setTimeout(function() {
+						window.location.href = "fatture.html";
+					}, 1000);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var errorMessage = 'Errore nella modifica della fattura';
+					if(jqXHR != null && jqXHR != undefined){
+						var jqXHRResponseJson = jqXHR.responseJSON;
+						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+								errorMessage = jqXHRResponseJsonMessage;
+							}
+						}
+					}
+					$('#alertFatture').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+				}
+			});
+		});
+	}
+
 	if($('#creazioneAutomaticaFattureButton') != null && $('#creazioneAutomaticaFattureButton') != undefined){
 		$(document).on('submit','#creazioneAutomaticaFattureForm', function(event){
 			event.preventDefault();
@@ -1178,6 +1228,26 @@ $(document).on('change','#cliente', function(){
 $(document).on('change','#data', function(){
 	$.fn.loadDdtDaFatturare();
 });
+
+$.fn.getFattura = function(idFattura){
+	$.ajax({
+		url: baseUrl + "fatture/" + idFattura,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$('#hiddenIdFattura').attr('value', result.id);
+				$('#progressivo').attr('value', result.progressivo);
+				$('#anno').attr('value', result.anno);
+				$('#data').attr('value', result.data);
+				$('#note').val(result.note);
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
 
 $.fn.loadDdtDaFatturare = function(){
 	var cliente = $('#cliente option:selected').val();
