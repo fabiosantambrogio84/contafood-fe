@@ -1313,9 +1313,9 @@ $.fn.preloadFields = function(){
 
 $.fn.getClienti = function(){
 
-	return $.Deferred(function() {
+	//return $.Deferred(function() {
 
-		$.ajax({
+		return $.ajax({
 			url: baseUrl + "clienti?bloccaDdt=false",
 			type: 'GET',
 			dataType: 'json',
@@ -1353,11 +1353,12 @@ $.fn.getClienti = function(){
 			}
 		});
 
-	});
+	//});
 }
 
 $.fn.getCausali = function(){
-	$.ajax({
+
+	return $.ajax({
 		url: baseUrl + "causali",
 		type: 'GET',
 		dataType: 'json',
@@ -1383,9 +1384,9 @@ $.fn.getCausali = function(){
 
 $.fn.getArticoli = function(){
 
-	return $.Deferred(function() {
+	//return $.Deferred(function() {
 
-		$.ajax({
+		return $.ajax({
 			url: baseUrl + "articoli?attivo=true",
 			type: 'GET',
 			dataType: 'json',
@@ -1416,16 +1417,14 @@ $.fn.getArticoli = function(){
 				console.log('Response text: ' + jqXHR.responseText);
 			}
 		});
-
-	});
+	//});
 }
-
 
 $.fn.getUnitaMisura = function(){
 
-	return $.Deferred(function() {
+	//return $.Deferred(function() {
 
-		$.ajax({
+		return $.ajax({
 			url: baseUrl + "unita-misura",
 			type: 'GET',
 			dataType: 'json',
@@ -1446,14 +1445,14 @@ $.fn.getUnitaMisura = function(){
 			}
 		});
 
-	});
+	//});
 }
 
 $.fn.getAliquoteIva = function(){
 
-	return $.Deferred(function() {
+	//return $.Deferred(function() {
 
-		$.ajax({
+		return $.ajax({
 			url: baseUrl + "aliquote-iva",
 			type: 'GET',
 			dataType: 'json',
@@ -1475,7 +1474,7 @@ $.fn.getAliquoteIva = function(){
 			}
 		});
 
-	});
+	//});
 }
 
 $.fn.extractIdNotaAccreditoFromUrl = function(){

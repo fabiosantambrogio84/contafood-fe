@@ -334,10 +334,29 @@ $(document).ready(function() {
 			return false;
 		}
 
-		$('#alertStampe').empty().append(alertContent.replace('@@alertText@@','Invio emails in corso...').replace('@@alertResult@@', 'warning'));
+		//$('#alertStampe').empty().append(alertContent.replace('@@alertText@@','Invio emails in corso...').replace('@@alertResult@@', 'warning'));
 
 		var url = $.fn.createUrl("spedizioneFattureMail");
 
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'text',
+			success: function(result) {
+				var alertResult = 'success';
+				if(!$.fn.checkVariableIsNull(result)){
+					if(result.includes('Error')){
+						alertResult = 'danger';
+					}
+				}
+				$('#alertStampe').empty().append(alertContent.replace('@@alertText@@', result).replace('@@alertResult@@', alertResult));
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertStampe').empty().append(alertContent.replace('@@alertText@@', "Errore nell'invio email").replace('@@alertResult@@', 'danger'));
+			}
+		});
+
+		/*
 		$.ajax({
 			type : "GET",
 			url : url,
@@ -392,6 +411,7 @@ $(document).ready(function() {
 				$('#alertStampe').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 			}
 		});
+		*/
 	});
 
 	$(document).on('click','#spedizioneFatturePec', function(event){
