@@ -287,17 +287,20 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var privato = $('#searchPrivato option:selected').val();
+			var idListino = $('#searchListino option:selected').val();
 
 			var params = {};
 
 			if(privato != null && privato != undefined && privato != ''){
 				params.privato = privato;
 			}
+			if(idListino != null && idListino != undefined && idListino != ''){
+				params.idListino = idListino;
+			}
 			var url = baseUrl + "clienti?" + $.param( params );
 
 			$('#clientiTable').DataTable().destroy();
 			$.fn.loadClientiTable(url);
-
 		});
 	}
 
@@ -801,3 +804,20 @@ $.fn.getCliente = function(idCliente){
     });
 }
 
+$.fn.preloadSearchFields = function(){
+	$.ajax({
+		url: baseUrl + "listini",
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					$('#searchListino').append('<option value="'+item.id+'" >'+item.nome+'</option>');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}

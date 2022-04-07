@@ -637,6 +637,15 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
                 $(cells[2]).css('text-align','center');
                 $(cells[3]).css('text-align','center');
                 $(cells[4]).css('text-align','center');
+
+                var note = data.note;
+                var actualNote = $('#ordiniNote').val();
+                if(!$.fn.checkVariableIsNull(actualNote)){
+                    if(!actualNote.includes(note)){
+                        note = actualNote + '\n' + note;
+                    }
+                }
+                $('#ordiniNote').val(note);
             }
         });
     }

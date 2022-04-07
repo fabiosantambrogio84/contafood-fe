@@ -334,64 +334,28 @@ $(document).ready(function() {
 			return false;
 		}
 
-		$('#alertStampe').empty().append(alertContent.replace('@@alertText@@','Invio emails in corso...').replace('@@alertResult@@', 'warning'));
+		//$('#alertStampe').empty().append(alertContent.replace('@@alertText@@','Invio emails in corso...').replace('@@alertResult@@', 'warning'));
 
 		var url = $.fn.createUrl("spedizioneFattureMail");
 
 		$.ajax({
-			type : "GET",
-			url : url,
-			//xhrFields: {
-			//	responseType: 'blob'
-			//},
-			xhr: function() {
-				var xhr = new XMLHttpRequest();
-				xhr.onreadystatechange = function() {
-					if (xhr.readyState == 2) {
-						if (xhr.status == 200) {
-							xhr.responseType = "blob";
-						} else {
-							xhr.responseType = "text";
-						}
-					}
-				};
-				return xhr;
-			},
-			success: function(response, status, xhr){
-				//console.log(response);
-
-				var contentDisposition = xhr.getResponseHeader("Content-Disposition");
-				var fileName = contentDisposition.substring(contentDisposition.indexOf("; ") + 1);
-				fileName = fileName.replace("filename=","").trim();
-
-				var blob = new Blob([response], { type: "application/text" });
-				var downloadUrl = URL.createObjectURL(blob);
-				var a = document.createElement("a");
-				a.href = downloadUrl;
-				a.download = fileName;
-				document.body.appendChild(a);
-				a.click();
-				a.remove();
-				window.URL.revokeObjectURL(url);
-
-				$('#alertStampe').empty();
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				var errorMessage = "Errore nell'invio delle email";
-				if(jqXHR != null && jqXHR != undefined){
-					var jqXHRResponseJson = jqXHR.responseJSON;
-					if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
-						var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
-						if(jqXHRResponseJsonMessage != null
-							&& jqXHRResponseJsonMessage != undefined
-							&& jqXHRResponseJsonMessage != ''){
-							errorMessage = jqXHRResponseJsonMessage;
-						}
+			url: url,
+			type: 'GET',
+			dataType: 'text',
+			success: function(result) {
+				var alertResult = 'success';
+				if(!$.fn.checkVariableIsNull(result)){
+					if(result.includes('Error')){
+						alertResult = 'danger';
 					}
 				}
-				$('#alertStampe').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+				$('#alertStampe').empty().append(alertContent.replace('@@alertText@@', result).replace('@@alertResult@@', alertResult));
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#alertStampe').empty().append(alertContent.replace('@@alertText@@', "Errore nell'invio email").replace('@@alertResult@@', 'danger'));
 			}
 		});
+
 	});
 
 	$(document).on('click','#spedizioneFatturePec', function(event){

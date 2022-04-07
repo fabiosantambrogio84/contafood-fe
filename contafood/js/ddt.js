@@ -1001,6 +1001,7 @@ $(document).ready(function() {
 
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
+		var nascondiPrezzi = $('#cliente option:selected').attr('data-nascondi-prezzi');
 		if(cliente != null && cliente != ''){
 			$.ajax({
 				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
@@ -1056,6 +1057,20 @@ $(document).ready(function() {
 					$.fn.getArticoli(cliente);
 
 					$.fn.loadArticoliFromOrdiniClienti();
+
+					var ddtArticoliTable = $('#ddtArticoliTable').DataTable();
+					if(nascondiPrezzi == "true"){
+						$('#totale').parent().hide();
+
+						ddtArticoliTable.column(6).visible(false);
+						ddtArticoliTable.column(7).visible(false);
+						ddtArticoliTable.column(8).visible(false);
+					} else {
+						$('#totale').parent().show();
+						ddtArticoliTable.column(6).visible(true);
+						ddtArticoliTable.column(7).visible(true);
+						ddtArticoliTable.column(8).visible(true);
+					}
 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1481,7 +1496,7 @@ $.fn.getClienti = function(){
 					if(listino != null && listino != undefined){
 						idListino = listino.id;
 					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'" data-nascondi-prezzi='+item.nascondiPrezzi+'>'+label+'</option>');
 				});
 				$('#cliente').selectpicker('refresh');
 				console.log("CLIENTI");

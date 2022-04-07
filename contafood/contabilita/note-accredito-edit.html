@@ -50,7 +50,9 @@
           $.fn.getNotaAccredito(idNotaAccredito);
       });
       */
-      $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva(), $.fn.getCausali()).then($.fn.getNotaAccredito(idNotaAccredito));
+      $.when($.fn.getClienti(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva(), $.fn.getCausali()).done(function(f1,f2,f3,f4,f5){
+        $.fn.getNotaAccredito(idNotaAccredito)
+      });
     }
   </script>
 
