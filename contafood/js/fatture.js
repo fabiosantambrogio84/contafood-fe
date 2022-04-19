@@ -119,7 +119,9 @@ $.fn.loadFattureTable = function(url) {
 				var stato = data.statoFattura;
 
 				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-				links += '<a class="updateFattura pr-1" data-id="'+data.id+'" href="fatture-edit.html?idFattura=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE') {
+					links += '<a class="updateFattura pr-1" data-id="' + data.id + '" href="fatture-edit.html?idFattura=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+				}
 				if((totale - acconto) != 0){
 					links += '<a class="payFattura pr-1" data-id="'+data.id+'" href="' + pagamentoUrl + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 				}

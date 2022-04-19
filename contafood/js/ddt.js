@@ -1058,6 +1058,7 @@ $(document).ready(function() {
 
 					$.fn.loadArticoliFromOrdiniClienti();
 
+					/*
 					var ddtArticoliTable = $('#ddtArticoliTable').DataTable();
 					if(nascondiPrezzi == "true"){
 						$('#totale').parent().hide();
@@ -1071,6 +1072,7 @@ $(document).ready(function() {
 						ddtArticoliTable.column(7).visible(true);
 						ddtArticoliTable.column(8).visible(true);
 					}
+					*/
 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {

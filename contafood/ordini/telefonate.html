@@ -71,6 +71,7 @@
             <h1 class="h3 mb-4 text-gray-800">Elenco Telefonate</h1>
           </div>
           <div class="col-md-4 text-right">
+            <a href="#" class="btn btn-primary" id="setEseguitoTelefonateBulk">Rimuovi spunta</a>
             <a href="#" class="btn btn-primary" id="deleteTelefonateBulk">Cancella</a>
             <a href="telefonate-new.html" class="btn btn-primary">Nuovo</a>
           </div>
@@ -138,6 +139,27 @@
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
                 <button type="button" class="btn btn-primary" id="confirmDeleteTelefonateBulk">Conferma</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Confirm BULK Set Eseguito-->
+        <div class="modal fade" id="setEseguitoTelefonateBulkModal" tabindex="-1" role="dialog" aria-labelledby="setEseguitoTelefonateBulkModal" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="setEseguitoTelefonateBulkModalTitle">Conferma rimozione spunta telefonate selezionate</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                Sei sicuro di voler rimuovere la spunta sulle telefonate selezionate?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" id="confirmSetEseguitoTelefonateBulk">Conferma</button>
               </div>
             </div>
           </div>

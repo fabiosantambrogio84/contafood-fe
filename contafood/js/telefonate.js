@@ -330,6 +330,47 @@ $(document).ready(function() {
 		}
 	});
 
+	$(document).on('click','#setEseguitoTelefonateBulk', function(){
+		$('#setEseguitoTelefonateBulkModal').modal('show');
+	});
+
+	$(document).on('click','#confirmSetEseguitoTelefonateBulk', function(){
+		$('#setEseguitoTelefonateBulkModal').modal('hide');
+
+		var alertContent = '<div id="alertTelefonataContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		var numChecked = $('.deleteTelefonataCheckbox:checkbox:checked').length;
+		if(numChecked == null || numChecked == undefined || numChecked == 0){
+			var alertContent = '<div id="alertTelefonataContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>Selezionare almeno una telefonata</strong>\n' +
+				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$('#alertTelefonata').empty().append(alertContent);
+		} else{
+			var telefonateIds = [];
+			$('.deleteTelefonataCheckbox:checkbox:checked').each(function(i, item) {
+				var id = item.id.replace('checkbox_', '');
+				telefonateIds.push(id);
+			});
+			$.ajax({
+				url: baseUrl + "telefonate/operations/set-eseguito?value=false",
+				type: 'POST',
+				contentType: "application/json",
+				dataType: 'json',
+				data: JSON.stringify(telefonateIds),
+				success: function(result) {
+					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@',"Telefonate aggiornate in 'Da eseguire' con successo").replace('@@alertResult@@', 'success'));
+
+					$('#telefonateTable').DataTable().ajax.reload();
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$('#alertTelefonata').empty().append(alertContent.replace('@@alertText@@',"Errore nell' aggiornamento delle telefonate").replace('@@alertResult@@', 'danger'));
+				}
+			});
+		}
+	});
+
 	$(document).on('change','#cliente', function(){
         $('#loadingDiv').removeClass('d-none');
         var cliente = $('#cliente option:selected').val();
