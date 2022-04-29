@@ -37,6 +37,13 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "descrizione", "data": "descrizione"},
+			{"name": "predefinito", "data": null, "width":"5%", render: function ( data, type, row ) {
+				if(data.predefinito){
+					return 'Si';
+				} else {
+					return 'No';
+				}
+			}},
 			{"data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 				var links = '<a class="updateCausale pr-2" data-id="'+data.id+'" href="causali-edit.html?idCausale=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links = links + '<a class="deleteCausale" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
@@ -86,6 +93,11 @@ $(document).ready(function() {
 			var causale = new Object();
 			causale.id = $('#hiddenIdCausale').val();
 			causale.descrizione = $('#descrizione').val();
+			if($('#predefinito').prop('checked') === true){
+				causale.predefinito = true;
+			}else{
+				causale.predefinito = false;
+			}
 
 			var causaleJson = JSON.stringify(causale);
 
@@ -117,10 +129,15 @@ $(document).ready(function() {
 		$(document).on('submit','#newCausaleForm', function(event){
 			event.preventDefault();
 
-			var cauale = new Object();
-			cauale.descrizione = $('#descrizione').val();
+			var causale = new Object();
+			causale.descrizione = $('#descrizione').val();
+			if($('#predefinito').prop('checked') === true){
+				causale.predefinito = true;
+			}else{
+				causale.predefinito = false;
+			}
 
-			var caualeJson = JSON.stringify(cauale);
+			var causaleJson = JSON.stringify(causale);
 
 			var alertContent = '<div id="alertCausaleContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
@@ -131,7 +148,7 @@ $(document).ready(function() {
 				type: 'POST',
 				contentType: "application/json",
 				dataType: 'json',
-				data: caualeJson,
+				data: causaleJson,
 				success: function(result) {
 					$('#alertCausale').empty().append(alertContent.replace('@@alertText@@','Causale creata con successo').replace('@@alertResult@@', 'success'));
 
@@ -178,6 +195,9 @@ $.fn.getCausale = function(idCausale){
 
 				$('#hiddenIdCausale').attr('value', result.id);
 				$('#descrizione').attr('value', result.descrizione);
+				if(result.predefinito === true){
+					$('#predefinito').prop('checked', true);
+				}
 
 			} else{
 				$('#alertCausale').empty().append(alertContent);

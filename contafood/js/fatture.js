@@ -1262,7 +1262,7 @@ $.fn.loadDdtDaFatturare = function(){
 
 		$('#fatturaDdtTable').DataTable().destroy();
 
-		var url = baseUrl + "ddts?idCliente="+cliente+"&fatturato=false&dataA="+dataString;
+		var url = baseUrl + "ddts/search?idCliente="+cliente+"&fatturato=false&dataA="+dataString;
 		$('#fatturaDdtTable').DataTable({
 			"ajax": {
 				"url": url,

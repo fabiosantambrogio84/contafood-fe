@@ -1366,7 +1366,7 @@ $.fn.getCausali = function(){
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
 					if(item != null && item != ''){
-						if(item.descrizione == 'Sconto merce'){
+						if(item.predefinito === true){
 							$('#causale').append('<option value="'+item.id+'" selected>'+item.descrizione+'</option>');
 						} else{
 							$('#causale').append('<option value="'+item.id+'">'+item.descrizione+'</option>');
@@ -1521,6 +1521,10 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 				$('#tipoRiferimento option[value="' + result.tipoRiferimento +'"]').attr('selected', true);
 				$('#numeroDocumento').val(result.documentoRiferimento);
 				$('#dataDocumento').val(result.dataDocumentoRiferimento);
+				if(result.causale != null && result.causale != undefined){
+					$('#causale option:selected').attr('selected', false);
+					$('#causale option[value="' + result.causale.id +'"]').attr('selected', true);
+				}
 				$('#note').val(result.note);
 
 				if(result.notaAccreditoRighe != null && result.notaAccreditoRighe != undefined && result.notaAccreditoRighe.length != 0){
@@ -1616,7 +1620,6 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 						var quantitaPerPrezzo = (quantita * prezzo);
 						var scontoValue = (sconto/100)*quantitaPerPrezzo;
 						totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
-
 
 						var rowsCount = $.fn.getMaxRowsCountArticoliTable();
 

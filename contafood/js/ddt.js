@@ -8,6 +8,7 @@ $.fn.loadDdtTable = function(url) {
 	$.ajax({
 		url: baseUrl + "autisti?attivo=true",
 		type: 'GET',
+		async: false,
 		dataType: 'json',
 		success: function(autistiResult) {
 			$('#ddtTable').DataTable({
@@ -41,6 +42,7 @@ $.fn.loadDdtTable = function(url) {
 				"pageLength": 20,
 				"lengthChange": false,
 				"info": false,
+				"dom": '<"top"p>rt<"bottom"p>',
 				"autoWidth": false,
 				"order": [
 					[0, 'desc']
@@ -59,30 +61,16 @@ $.fn.loadDdtTable = function(url) {
 						}
 					}},
 					{"name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
-						var cliente = data.cliente;
-						if(cliente != null){
-							return cliente.ragioneSociale;
-						}
-						return '';
+						return data.cliente;
 					}},
 					{"name": "agente", "data": null, "width":"10%", render: function ( data, type, row ) {
-						var cliente = data.cliente;
-						if(cliente != null){
-							var agente = cliente.agente;
-							if(agente != null){
-								return agente.nome + ' ' + agente.cognome;
-							}
-						}
-						return '';
+						return data.agente;
 					}},
 					{"name":"autista", "data": null, "width":"13%", render: function ( data, type, row ) {
 						var ddtId = data.id;
 						var selectId = "autista_" + ddtId;
 
-						var autistaId = null;
-						if(data.autista != null){
-							autistaId = data.autista.id;
-						}
+						var autistaId = data.idAutista;
 
 						var autistaSelect = '<select id="'+selectId+'" class="form-control form-control-sm autistaDdt" data-id="'+ddtId+'">';
 						autistaSelect += '<option value=""> - </option>';
@@ -127,24 +115,21 @@ $.fn.loadDdtTable = function(url) {
 						if(totale == null || totale == undefined || totale == ''){
 							totale = 0;
 						}
-						var stato = data.statoDdt;
+						var stato = data.stato;
 
 						var links = '<a class="detailsDdt pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')){
+						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato == 'DA_PAGARE')){
 							links += '<a class="updateDdt pr-1" data-id="'+data.id+'" href="ddt-edit.html?idDdt=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 						}
 						if((totale - acconto) != 0){
 							links += '<a class="payDdt pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idDdt=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 						}
 						links += '<a class="printDdt pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-						var cliente = data.cliente;
-                        if(cliente != null){
-                            var email = cliente.email;
-                            if(email != null && email != undefined && email != ""){
-                                links += '<a class="emailDdt pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
-                            }
-                        }
-						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')) {
+						var clienteEmail = data.clienteEmail;
+						if(clienteEmail != null && clienteEmail != undefined && clienteEmail != ""){
+							links += '<a class="emailDdt pr-1" data-id="'+data.id+'" data-email-to="'+clienteEmail+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+						}
+						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato == 'DA_PAGARE')) {
 							links += '<a class="deleteDdt" data-id="' + data.id + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 						}
 						return links;
@@ -153,11 +138,11 @@ $.fn.loadDdtTable = function(url) {
 				"createdRow": function(row, data, dataIndex,cells){
 					$(row).css('font-size', '12px').addClass('rowDdt');
 					$(row).attr('data-id-ddt', data.id);
-					if(data.statoDdt != null){
+					if(data.stato != null){
 						var backgroundColor = '';
-						if(data.statoDdt.codice == 'DA_PAGARE'){
+						if(data.stato == 'DA_PAGARE'){
 							backgroundColor = '#fcf456';
-						} else if(data.statoDdt.codice == 'PARZIALMENTE_PAGATO'){
+						} else if(data.stato == 'PARZIALMENTE_PAGATO'){
 							backgroundColor = '#fcc08b';
 						} else {
 							backgroundColor = 'trasparent';
@@ -233,7 +218,7 @@ $.fn.loadDdtArticoliTable = function() {
 
 $(document).ready(function() {
 
-	$.fn.loadDdtTable(baseUrl + "ddts");
+	$.fn.loadDdtTable(baseUrl + "ddts/search");
 
 	if(window.location.search.substring(1).indexOf('idDdt') == -1){
 		$.fn.loadDdtArticoliTable();
@@ -244,7 +229,7 @@ $(document).ready(function() {
 		$('#searchDdtForm select option[value=""]').attr('selected', true);
 
 		$('#ddtTable').DataTable().destroy();
-		$.fn.loadDdtTable(baseUrl + "ddts");
+		$.fn.loadDdtTable(baseUrl + "ddts/search");
 	});
 
 	$(document).on('click','.detailsDdt', function(){
@@ -588,11 +573,10 @@ $(document).ready(function() {
 			if(stato != null && stato != undefined && stato != ''){
 				params.stato = stato;
 			}
-			var url = baseUrl + "ddts?" + $.param( params );
+			var url = baseUrl + "ddts/search?" + $.param( params );
 
 			$('#ddtTable').DataTable().destroy();
 			$.fn.loadDdtTable(url);
-
 		});
 	}
 
@@ -1364,7 +1348,7 @@ $.fn.preloadSearchFields = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					$('#searchAutista').append('<option value="'+item.id+'" >'+item.nome+' '+item.cognome+'</option>');
+					$('#searchAutista').append('<option value="'+item.id+'" >'+item.cognome+' '+item.nome+'</option>');
 				});
 			}
 		},
@@ -1457,7 +1441,7 @@ $.fn.getAutisti = function(){
 				$.each(result, function(i, item){
 					var label = item.cognome + ' ' + item.nome;
 					var selected = '';
-					if(item.cognome.toLowerCase() == 'urbani' && item.nome.toLowerCase() == 'giuseppe'){
+					if(item.predefinito === true){
 						selected = 'selected';
 					}
 					$('#autista').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
