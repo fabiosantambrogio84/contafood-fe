@@ -86,6 +86,8 @@ $(document).ready(function() {
 
 							if(data.cliente.dittaIndividuale){
 								clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
+							} else if(data.cliente.privato){
+								clienteHtml += item.cognome + ' ' + item.nome;
 							} else {
 								clienteHtml += data.cliente.ragioneSociale;
 							}

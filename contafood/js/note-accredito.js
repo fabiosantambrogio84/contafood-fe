@@ -1325,6 +1325,8 @@ $.fn.getClienti = function(){
 						var label = '';
 						if(item.dittaIndividuale){
 							label += item.cognome + ' - ' + item.nome;
+						} else if(item.privato){
+							label += item.cognome + ' ' + item.nome;
 						} else {
 							label += item.ragioneSociale;
 						}
