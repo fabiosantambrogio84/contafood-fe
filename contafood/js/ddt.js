@@ -681,7 +681,7 @@ $(document).ready(function() {
 				ordineClienteArticoliTable.rows().nodes().each(function(i, item){
 					var idArticolo = $(i).attr('data-id-articolo');
 					var idsOrdiniClienti = $(i).attr('data-ids-ordini');
-					var numeroPezziDaEvadere = $(i).parent().parent().attr('data-num-pezzi-evasi');
+					var numeroPezziDaEvadere = $(i).attr('data-num-pezzi-evasi');
 
 					var articoloOrdiniClienti = new Object();
 					articoloOrdiniClienti.idArticolo = idArticolo;
@@ -990,6 +990,7 @@ $(document).ready(function() {
 			$.ajax({
 				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
 				type: 'GET',
+				async: true,
 				dataType: 'json',
 				success: function(result) {
 					if(result != null && result != undefined && result != ''){
@@ -1003,34 +1004,8 @@ $(document).ready(function() {
 					}
 					$('#puntoConsegna').removeAttr('disabled');
 
-					// load the prices of the Listino associated to the Cliente
-					if(idListino != null && idListino != undefined && idListino != '-1'){
-						$.ajax({
-							url: baseUrl + "listini/"+idListino+"/listini-prezzi",
-							type: 'GET',
-							dataType: 'json',
-							success: function(result) {
-								$.each(result, function(i, item){
-									var articoloId = item.articolo.id;
-									var prezzoListino = item.prezzo;
-									$("#articolo option").each(function(i){
-										var articoloOptionId = $(this).val();
-										if(articoloOptionId == articoloId){
-											$(this).attr('data-prezzo-listino', prezzoListino);
-										}
-									});
-								});
-							},
-							error: function(jqXHR, textStatus, errorThrown) {
-								$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
-							}
-						});
-					} else {
-						$("#articolo option").each(function(i){
-							var prezzoBase = $(this).attr('data-prezzo-base');
-							$(this).attr('data-prezzo-listino', prezzoBase);
-						});
-					}
+
+					$.fn.getArticoli(cliente, idListino);
 
 					// load Sconti associated to the Cliente
 					var data = $('#data').val();
@@ -1038,25 +1013,7 @@ $(document).ready(function() {
 						$.fn.loadScontiArticoli(data, cliente);
 					}
 
-					$.fn.getArticoli(cliente);
-
 					$.fn.loadArticoliFromOrdiniClienti();
-
-					/*
-					var ddtArticoliTable = $('#ddtArticoliTable').DataTable();
-					if(nascondiPrezzi == "true"){
-						$('#totale').parent().hide();
-
-						ddtArticoliTable.column(6).visible(false);
-						ddtArticoliTable.column(7).visible(false);
-						ddtArticoliTable.column(8).visible(false);
-					} else {
-						$('#totale').parent().show();
-						ddtArticoliTable.column(6).visible(true);
-						ddtArticoliTable.column(7).visible(true);
-						ddtArticoliTable.column(8).visible(true);
-					}
-					*/
 
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
@@ -1544,7 +1501,7 @@ $.fn.getCausali = function(){
 	});
 }
 
-$.fn.getArticoli = function(idCliente){
+$.fn.getArticoli = function(idCliente, idListino){
 
 	$('#articolo').empty().append('<option value=""></option>');
 
@@ -1582,6 +1539,38 @@ $.fn.getArticoli = function(idCliente){
 
 					$('#articolo').selectpicker('refresh');
 				});
+
+				// load the prices of the Listino associated to the Cliente
+				if(idListino != null && idListino != undefined && idListino != '-1'){
+					$.ajax({
+						url: baseUrl + "listini/"+idListino+"/listini-prezzi",
+						type: 'GET',
+						async: true,
+						dataType: 'json',
+						success: function(result) {
+							$.each(result, function(i, item){
+								var articoloId = item.articolo.id;
+								var prezzoListino = item.prezzo;
+								$("#articolo option").each(function(i){
+									var articoloOptionId = $(this).val();
+									if(articoloOptionId == articoloId){
+										$(this).attr('data-prezzo-listino', prezzoListino);
+									}
+								});
+							});
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
+						}
+					});
+				} else {
+					$("#articolo option").each(function(i){
+						var prezzoBase = $(this).attr('data-prezzo-base');
+						$(this).attr('data-prezzo-listino', prezzoBase);
+					});
+				}
+
+				$('#articolo').selectpicker('refresh');
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -1629,9 +1618,12 @@ $.fn.getDdt = function(idDdt){
 
 					$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
 
+					var idListino = $('#cliente option[value="' + result.cliente.id +'"]').attr('data-id-listino');
+
 					$.ajax({
 						url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
 						type: 'GET',
+						async: true,
 						dataType: 'json',
 						success: function(result) {
 							if(result != null && result != undefined && result != ''){
@@ -1653,7 +1645,7 @@ $.fn.getDdt = function(idDdt){
 						}
 					});
 
-					$.fn.getArticoli(result.cliente.id);
+					$.fn.getArticoli(result.cliente.id, idListino);
 
 					$('#cliente').selectpicker('refresh');
 				}

@@ -46,7 +46,7 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="contabilita"></ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion toggled" id="accordionSidebar" data-page-type="contabilita"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -85,26 +85,33 @@
               <form id="searchPagamentoForm">
                 <div class="form-row">
                   <div class="form-group col-md-2">
+                    <label for="searchTipologia" class="mb-0">Tipologia</label>
+                    <select id="searchTipologia" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
+                  </div>
+                  <div class="form-group col-md-1">
                     <label for="searchDataFrom" class="mb-0">Data da</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataFrom">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-1">
                     <label for="searchDataTo" class="mb-0">Data a</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataTo">
                   </div>
-                  <div class="form-group col-md-3">
+                  <div class="form-group col-md-2">
                     <label for="searchCliente" class="mb-0">Cliente</label>
                     <input type="text" class="form-control form-control-sm" id="searchCliente">
                   </div>
-                  <div class="form-group col-md-3">
+                  <div class="form-group col-md-2">
                     <label for="searchFornitore" class="mb-0">Fornitore</label>
                     <input type="text" class="form-control form-control-sm" id="searchFornitore">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-1">
                     <label for="searchImporto" class="mb-0">Importo</label>
                     <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
                   </div>
                 </div>
+                <!--
                 <div class="form-row">
                   <div class="form-group col-md-2">
                     <label for="searchTipologia" class="mb-0">Tipologia</label>
@@ -113,6 +120,7 @@
                     </select>
                   </div>
                 </div>
+                -->
 
                 <button type="submit" class="btn btn-primary mt-0" id="searchPagamentoButton">Cerca</button>
                 <a href="#" id="resetSearchPagamentoButton" class="btn btn-secondary mt-0">Svuota</a>

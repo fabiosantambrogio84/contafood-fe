@@ -102,12 +102,20 @@
 
         <form id="newPagamentoForm" class="needs-validation" novalidate>
           <div class="form-row">
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-2">
               <label for="data" class="">Data*</label>
               <input type="date" class="form-control" id="data" placeholder="" required>
               <div class="invalid-feedback">
                 Inserisci una data
               </div>
+            </div>
+            <div class="form-group col-md-3 d-none" id="clienteDiv">
+              <label for="cliente" class="">Cliente</label>
+              <input type="text" class="form-control" id="cliente" placeholder="" disabled>
+            </div>
+            <div class="form-group col-md-3 d-none" id="fornitoreDiv">
+              <label for="fornitore" class="">Fornitore</label>
+              <input type="text" class="form-control" id="fornitore" placeholder="" disabled>
             </div>
           </div>
           <div class="form-row">

@@ -632,6 +632,7 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
                 $(row).css('background-color',rowBackgroundVerde).css('font-size', 'smaller');
                 $(row).attr('data-id-articolo', data.idArticolo);
                 $(row).attr('data-start-num-pezzi-evasi', data.numeroPezziEvasi);
+                $(row).attr('data-ids-ordini', data.idsOrdiniClienti);
                 $(cells[0]).css('text-align','center');
                 $(cells[1]).css('text-align','center');
                 $(cells[2]).css('text-align','center');

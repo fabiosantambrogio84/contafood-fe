@@ -41,61 +41,13 @@ $.fn.loadPagamentiTable = function(url) {
 				var a = moment(data.data);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"name": "cliente", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var clienteHtml = '';
-				var cliente;
-				var ddt = data.ddt;
-				var notaAccredito = data.notaAccredito;
-				var ricevutaPrivato = data.ricevutaPrivato;
-				var fattura = data.fattura;
-				var fatturaAccompagnatoria = data.fatturaAccompagnatoria;
-				if(ddt != null && ddt != ''){
-					cliente = ddt.cliente;
-				} else if(notaAccredito != null && notaAccredito != ''){
-					cliente = notaAccredito.cliente;
-				} else if(ricevutaPrivato != null && ricevutaPrivato != ''){
-					cliente = ricevutaPrivato.cliente;
-				} else if(fattura != null && fattura != ''){
-					cliente = fattura.cliente;
-				} else if(fatturaAccompagnatoria != null && fatturaAccompagnatoria != ''){
-					cliente = fatturaAccompagnatoria.cliente;
-				}
-				if(cliente != null && cliente != undefined && cliente != ''){
-					if(ricevutaPrivato != null && ricevutaPrivato != ''){
-						clienteHtml += cliente.nome + ' ' + cliente.cognome;
-					} else{
-						if(cliente.dittaIndividuale){
-							clienteHtml += cliente.nome + ' ' + cliente.cognome;
-						} else {
-							clienteHtml += cliente.ragioneSociale;
-						}
-					}
-				}
-				return clienteHtml;
-			}},
-			{"name": "fornitore", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var fornitoreHtml = '';
-				var fornitore;
-				var notaReso = data.notaReso;
-				if(notaReso != null && notaReso != ''){
-					fornitore = notaReso.fornitore;
-				}
-				if(fornitore != null && fornitore != undefined && fornitore != ''){
-					fornitoreHtml += fornitore.ragioneSociale;
-				}
-				return fornitoreHtml;
-			}},
+			{"name": "cliente", "data": "cliente", "width":"8%"},
+			{"name": "fornitore", "data": "fornitore", "width":"8%"},
 			{"name": "descrizione", "data": "descrizione", "width":"12%"},
 			{"name": "importo", "data": null, "width":"5%", render: function ( data, type, row ) {
 				return $.fn.formatNumber(data.importo);
 			}},
-			{"name": "tipoPagamento", "data": null, "width":"5%", render: function ( data, type, row ) {
-				var tipoPagamento = data.tipoPagamento;
-				if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
-					return tipoPagamento.descrizione;
-				}
-				return '';
-			}},
+			{"name": "tipoPagamento", "data": "tipoPagamento", "width":"5%"},
 			{"name": "note", "data": null, "width": "12%", render: function ( data, type, row ) {
 				var note = data.note;
 				if(note == null || note == undefined){
@@ -129,14 +81,14 @@ $.fn.loadPagamentiTable = function(url) {
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
 
-	$.fn.loadPagamentiTable(baseUrl + "pagamenti");
+	$.fn.loadPagamentiTable(baseUrl + "pagamenti/search");
 
 	$(document).on('click','#resetSearchPagamentoButton', function(){
 		$('#searchPagamentoForm :input').val(null);
 		$('#searchPagamentoForm select option[value=""]').attr('selected', true);
 
 		$('#pagamentiTable').DataTable().destroy();
-		$.fn.loadPagamentiTable(baseUrl + "pagamenti");
+		$.fn.loadPagamentiTable(baseUrl + "pagamenti/search");
 	});
 
 	$(document).on('click','.deletePagamento', function(){
@@ -217,7 +169,7 @@ $(document).ready(function() {
 			if(tipologia != null && tipologia != undefined && tipologia != ''){
 				params.tipologia = tipologia;
 			}
-			var url = baseUrl + "pagamenti?" + $.param( params );
+			var url = baseUrl + "pagamenti/search?" + $.param( params );
 
 			$('#pagamentiTable').DataTable().destroy();
 			$.fn.loadPagamentiTable(url);
@@ -500,6 +452,14 @@ $.fn.getDdt = function(idDdt){
 
 				var cliente = result.cliente;
 				if(cliente != null && cliente != undefined && cliente != ''){
+					if(cliente.dittaIndividuale){
+						$('#cliente').val(cliente.nome + ' ' + cliente.cognome);
+					} else {
+						$('#cliente').val(cliente.ragioneSociale);
+					}
+					$('#clienteDiv').removeClass('d-none');
+					$('#fornitoreDiv').addClass('d-none');
+
 					var clienteTipoPagamento = cliente.tipoPagamento;
 					if(clienteTipoPagamento != null && clienteTipoPagamento != undefined && clienteTipoPagamento != ''){
 						$('#tipoPagamento option[value="' + clienteTipoPagamento.id +'"]').attr('selected', true);
@@ -542,6 +502,17 @@ $.fn.getNotaAccredito = function(idNotaAccredito){
 				var importo = (totale - totaleAcconto);
 				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
 
+				var cliente = result.cliente;
+				if(cliente != null && cliente != undefined && cliente != ''){
+					if(cliente.dittaIndividuale){
+						$('#cliente').val(cliente.nome + ' ' + cliente.cognome);
+					} else {
+						$('#cliente').val(cliente.ragioneSociale);
+					}
+					$('#clienteDiv').removeClass('d-none');
+					$('#fornitoreDiv').addClass('d-none');
+				}
+
 				var descrizione = "Pagamento NOTA ACCREDITO n. "+result.progressivo+" del "+moment(result.data).format('DD/MM/YYYY');
 				$('#descrizione').val(descrizione);
 
@@ -579,6 +550,13 @@ $.fn.getNotaReso = function(idNotaReso){
 
 				var importo = (totale - totaleAcconto);
 				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
+
+				var fornitore = result.fornitore;
+				if(fornitore != null && fornitore != undefined && fornitore != ''){
+					$('#fornitore').val(fornitore.ragioneSociale);
+					$('#clienteDiv').addClass('d-none');
+					$('#fornitoreDiv').removeClass('d-none');
+				}
 
 				var descrizione = "Pagamento NOTA RESO FORNITORE n. "+result.progressivo+" del "+moment(result.data).format('DD/MM/YYYY');
 				$('#descrizione').val(descrizione);
@@ -620,6 +598,10 @@ $.fn.getRicevutaPrivato = function(idRicevutaPrivato){
 
 				var cliente = result.cliente;
 				if(cliente != null && cliente != undefined && cliente != ''){
+					$('#cliente').val(cliente.nome + ' ' + cliente.cognome);
+					$('#clienteDiv').removeClass('d-none');
+					$('#fornitoreDiv').addClass('d-none');
+
 					var clienteTipoPagamento = cliente.tipoPagamento;
 					if(clienteTipoPagamento != null && clienteTipoPagamento != undefined && clienteTipoPagamento != ''){
 						$('#tipoPagamento option[value="' + clienteTipoPagamento.id +'"]').attr('selected', true);
@@ -664,6 +646,14 @@ $.fn.getFattura = function(idFattura){
 
 				var cliente = result.cliente;
 				if(cliente != null && cliente != undefined && cliente != ''){
+					if(cliente.dittaIndividuale){
+						$('#cliente').val(cliente.nome + ' ' + cliente.cognome);
+					} else {
+						$('#cliente').val(cliente.ragioneSociale);
+					}
+					$('#clienteDiv').removeClass('d-none');
+					$('#fornitoreDiv').addClass('d-none');
+
 					var clienteTipoPagamento = cliente.tipoPagamento;
 					if(clienteTipoPagamento != null && clienteTipoPagamento != undefined && clienteTipoPagamento != ''){
 						$('#tipoPagamento option[value="' + clienteTipoPagamento.id +'"]').attr('selected', true);
@@ -708,6 +698,14 @@ $.fn.getFatturaAccompagnatoria = function(idFatturaAccompagnatoria){
 
 				var cliente = result.cliente;
 				if(cliente != null && cliente != undefined && cliente != ''){
+					if(cliente.dittaIndividuale){
+						$('#cliente').val(cliente.nome + ' ' + cliente.cognome);
+					} else {
+						$('#cliente').val(cliente.ragioneSociale);
+					}
+					$('#clienteDiv').removeClass('d-none');
+					$('#fornitoreDiv').addClass('d-none');
+
 					var clienteTipoPagamento = cliente.tipoPagamento;
 					if(clienteTipoPagamento != null && clienteTipoPagamento != undefined && clienteTipoPagamento != ''){
 						$('#tipoPagamento option[value="' + clienteTipoPagamento.id +'"]').attr('selected', true);
