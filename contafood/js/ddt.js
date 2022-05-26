@@ -482,14 +482,9 @@ $(document).ready(function() {
 	$(document).on('click','#printDdts', function(event){
 		event.preventDefault();
 
-		var ids = "";
+		var url = $.fn.createUrlSearch("stampe/ddts?");
 
-		$(".rowDdt").each(function(i, item){
-			var id = $(this).attr('data-id-ddt');
-			ids += id+",";
-		});
-
-		window.open(baseUrl + "stampe/ddts?ids="+ids, '_blank');
+		window.open(url, '_blank');
 
 	});
 
@@ -527,53 +522,58 @@ $(document).ready(function() {
         });
     });
 
+    $.fn.createUrlSearch = function(path){
+
+		var dataDa = $('#searchDataFrom').val();
+		var dataA = $('#searchDataTo').val();
+		var progressivo = $('#searchProgressivo').val();
+		var importo = $('#searchImporto').val();
+		var tipoPagamento = $('#searchTipoPagamento option:selected').val();
+		var cliente = $('#searchCliente').val();
+		var agente = $('#searchAgente option:selected').val();
+		var autista = $('#searchAutista option:selected').val();
+		var articolo = $('#searchArticolo option:selected').val();
+		var stato = $('#searchStato option:selected').val();
+
+		var params = {};
+		if(dataDa != null && dataDa != undefined && dataDa != ''){
+			params.dataDa = dataDa;
+		}
+		if(dataA != null && dataA != undefined && dataA != ''){
+			params.dataA = dataA;
+		}
+		if(progressivo != null && progressivo != undefined && progressivo != ''){
+			params.progressivo = progressivo;
+		}
+		if(importo != null && importo != undefined && importo != ''){
+			params.importo = importo;
+		}
+		if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
+			params.tipoPagamento = tipoPagamento;
+		}
+		if(cliente != null && cliente != undefined && cliente != ''){
+			params.cliente = cliente;
+		}
+		if(agente != null && agente != undefined && agente != ''){
+			params.agente = agente;
+		}
+		if(autista != null && autista != undefined && autista != ''){
+			params.autista = autista;
+		}
+		if(articolo != null && articolo != undefined && articolo != ''){
+			params.articolo = articolo;
+		}
+		if(stato != null && stato != undefined && stato != ''){
+			params.stato = stato;
+		}
+		return baseUrl + path + $.param( params );
+	}
+
 	if($('#searchDdtButton') != null && $('#searchDdtButton') != undefined) {
 		$(document).on('submit', '#searchDdtForm', function (event) {
 			event.preventDefault();
 
-			var dataDa = $('#searchDataFrom').val();
-			var dataA = $('#searchDataTo').val();
-			var progressivo = $('#searchProgressivo').val();
-			var importo = $('#searchImporto').val();
-			var tipoPagamento = $('#searchTipoPagamento option:selected').val();
-			var cliente = $('#searchCliente').val();
-			var agente = $('#searchAgente option:selected').val();
-			var autista = $('#searchAutista option:selected').val();
-			var articolo = $('#searchArticolo option:selected').val();
-			var stato = $('#searchStato option:selected').val();
-
-			var params = {};
-			if(dataDa != null && dataDa != undefined && dataDa != ''){
-				params.dataDa = dataDa;
-			}
-			if(dataA != null && dataA != undefined && dataA != ''){
-				params.dataA = dataA;
-			}
-			if(progressivo != null && progressivo != undefined && progressivo != ''){
-				params.progressivo = progressivo;
-			}
-			if(importo != null && importo != undefined && importo != ''){
-				params.importo = importo;
-			}
-			if(tipoPagamento != null && tipoPagamento != undefined && tipoPagamento != ''){
-				params.tipoPagamento = tipoPagamento;
-			}
-			if(cliente != null && cliente != undefined && cliente != ''){
-				params.cliente = cliente;
-			}
-			if(agente != null && agente != undefined && agente != ''){
-				params.agente = agente;
-			}
-			if(autista != null && autista != undefined && autista != ''){
-				params.autista = autista;
-			}
-			if(articolo != null && articolo != undefined && articolo != ''){
-				params.articolo = articolo;
-			}
-			if(stato != null && stato != undefined && stato != ''){
-				params.stato = stato;
-			}
-			var url = baseUrl + "ddts/search?" + $.param( params );
+			var url = $.fn.createUrlSearch("ddts/search?");
 
 			$('#ddtTable').DataTable().destroy();
 			$.fn.loadDdtTable(url);

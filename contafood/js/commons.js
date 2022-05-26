@@ -401,7 +401,14 @@ $.fn.checkPezziOrdinati = function(){
     var articoliArray = [];
     var ordiniClientiArticoliArray = [];
 
-    var articoliTable = $('#ddtArticoliTable').DataTable();
+    var articoliTable;
+    if($.fn.isDdt()){
+        articoliTable = $('#ddtArticoliTable').DataTable();
+    } else if($.fn.isFatturaAccompagnatoria()){
+        articoliTable = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+    } else if($.fn.isRicevutaPrivato()){
+        articoliTable = $('#ricevutaPrivatoArticoliTable').DataTable();
+    }
 
     articoliTable.rows().nodes().each(function(i, item){
         var idArticolo = $(i).attr('data-id');
@@ -423,16 +430,18 @@ $.fn.checkPezziOrdinati = function(){
     var ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
 
     ordineClienteArticoliTable.rows().nodes().each(function(i, item){
-        var idArticolo = $(this).attr('data-id-articolo');
+        var idArticolo = $(i).attr('data-id-articolo');
         ordiniClientiArticoliArray.push(idArticolo);
     });
+    var ordineClienteArticoliTableRowsNodes = ordineClienteArticoliTable.rows().nodes().to$();
 
     articoliMap.forEach( (value, key, map) => {
-        var ordiniClientiArticoloLength = $('#ordiniClientiArticoliTable span[data-id-articolo='+key+']').length;
+        var ordiniClientiArticoloLength = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').length;
+        //var ordiniClientiArticoloLength = $('#ordiniClientiArticoliTable span[data-id-articolo='+key+']').length;
 
         if(ordiniClientiArticoloLength != 0){
-            var numeroPezziOrdinati = $('#ordiniClientiArticoliTable span[data-id-articolo='+key+']').parent().parent().children().eq(3).text();
-            var numeroPezziEvasi = $('#ordiniClientiArticoliTable span[data-id-articolo='+key+']').parent().parent().attr('data-start-num-pezzi-evasi');
+            var numeroPezziOrdinati = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').find("td:eq(3)").text();
+            var numeroPezziEvasi = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').attr('data-start-num-pezzi-evasi');
             numeroPezziOrdinati = $.fn.parseValue(numeroPezziOrdinati, 'int');
             numeroPezziEvasi = $.fn.parseValue(numeroPezziEvasi, 'int');
             value = $.fn.parseValue(value, 'int');
@@ -447,12 +456,11 @@ $.fn.checkPezziOrdinati = function(){
             } else {
                 backgroundColor = rowBackgroundGiallo;
             }
-            $('#ordiniClientiArticoliTable span[data-id-articolo='+key+']').parent().parent().css('background-color', backgroundColor).attr('data-num-pezzi-evasi', newNumeroPezziEvasi);
+            ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').css('background-color', backgroundColor).attr('data-num-pezzi-evasi', newNumeroPezziEvasi);
 
-            var table = $('#ordiniClientiArticoliTable').DataTable();
-            var rowData = table.row("[data-id-articolo='"+key+"']").data();
+            var rowData = ordineClienteArticoliTable.row("[data-id-articolo='"+key+"']").data();
             rowData["numeroPezziEvasi"] = newNumeroPezziEvasi;
-            table.row("[data-id-articolo='"+key+"']").data(rowData).draw();
+            ordineClienteArticoliTable.row("[data-id-articolo='"+key+"']").data(rowData).draw();
         } else {
             // articolo non presente in quelli ordinati
             var pathname = window.location.pathname;
@@ -465,7 +473,8 @@ $.fn.checkPezziOrdinati = function(){
     });
 
     $(ordiniClientiArticoliArray).not(articoliArray).each(function(i, item){
-        $('#ordiniClientiArticoliTable span[data-id-articolo='+item+']').parent().parent().css('background-color', rowBackgroundVerde);
+        ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+item+']').css('background-color', rowBackgroundVerde);
+        //$('#ordiniClientiArticoliTable span[data-id-articolo='+item+']').parent().parent().css('background-color', rowBackgroundVerde);
     })
 }
 
@@ -473,7 +482,14 @@ $.fn.computeTotale = function() {
     var ivaMap = new Map();
     var totaleDocumento = 0;
 
-    var articoliTable = $('#ddtArticoliTable').DataTable();
+    var articoliTable;
+    if($.fn.isDdt()){
+        articoliTable = $('#ddtArticoliTable').DataTable();
+    } else if($.fn.isFatturaAccompagnatoria()){
+        articoliTable = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+    } else if($.fn.isRicevutaPrivato()){
+        articoliTable = $('#ricevutaPrivatoArticoliTable').DataTable();
+    }
 
     articoliTable.rows().nodes().each(function(i, item){
         var totale = $(i).children().eq(8).text();

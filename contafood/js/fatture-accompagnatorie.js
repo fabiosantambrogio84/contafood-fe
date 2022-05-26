@@ -628,6 +628,8 @@ $(document).ready(function() {
 		$('#fatturaAccompagnatoriaArticoliTable').focus();
 
 		$.fn.computeTotale();
+
+		$.fn.checkPezziOrdinati();
 	});
 
 	$(document).on('change','.compute-totale', function(){

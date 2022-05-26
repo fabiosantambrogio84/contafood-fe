@@ -67,11 +67,20 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				return a.format('DD/MM/YYYY');
 			}},
 			{"name": "cliente", "data": null, "width":"15%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					return cliente.ragioneSociale;
+				if(data.cliente != null){
+					var clienteHtml = '';
+
+					if(data.cliente.dittaIndividuale){
+						clienteHtml += data.cliente.cognome + ' ' + data.cliente.nome;
+					} else if(data.cliente.privato){
+						clienteHtml += data.cliente.cognome + ' ' + data.cliente.nome;
+					} else {
+						clienteHtml += data.cliente.ragioneSociale;
+					}
+					return clienteHtml;
+				} else {
+					return '';
 				}
-				return '';
 			}},
 			{"name": "agente", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var cliente = data.cliente;
@@ -1324,7 +1333,7 @@ $.fn.getClienti = function(){
 					$.each(result, function(i, item){
 						var label = '';
 						if(item.dittaIndividuale){
-							label += item.cognome + ' - ' + item.nome;
+							label += item.cognome + ' ' + item.nome;
 						} else if(item.privato){
 							label += item.cognome + ' ' + item.nome;
 						} else {

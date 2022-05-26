@@ -85,9 +85,9 @@ $(document).ready(function() {
 							var clienteHtml = '';
 
 							if(data.cliente.dittaIndividuale){
-								clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
+								clienteHtml += data.cliente.cognome + ' ' + data.cliente.nome;
 							} else if(data.cliente.privato){
-								clienteHtml += item.cognome + ' ' + item.nome;
+								clienteHtml += data.cliente.cognome + ' ' + data.cliente.nome;
 							} else {
 								clienteHtml += data.cliente.ragioneSociale;
 							}
