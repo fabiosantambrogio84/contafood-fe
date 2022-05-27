@@ -561,14 +561,9 @@ $(document).ready(function() {
 	$(document).on('click','#printNoteAccredito', function(event){
 		event.preventDefault();
 
-		var ids = "";
+		var url = $.fn.createUrlSearch("stampe/note-accredito?");
 
-		$(".rowNotaAccredito").each(function(i, item){
-			var id = $(this).attr('data-id-nota-accredito');
-			ids += id+",";
-		});
-
-		window.open(baseUrl + "stampe/note-accredito?ids="+ids, '_blank');
+		window.open(url, '_blank');
 
 	});
 
@@ -739,49 +734,53 @@ $(document).ready(function() {
         });
     });
 
+    $.fn.createUrlSearch = function(path) {
+
+		var dataDa = $('#searchDataFrom').val();
+		var dataA = $('#searchDataTo').val();
+		var progressivo = $('#searchProgressivo').val();
+		var importo = $('#searchImporto').val();
+		var cliente = $('#searchCliente').val();
+		var agente = $('#searchAgente option:selected').val();
+		var articolo = $('#searchArticolo option:selected').val();
+		var stato = $('#searchStato option:selected').val();
+
+		var params = {};
+		if(dataDa != null && dataDa != undefined && dataDa != ''){
+			params.dataDa = dataDa;
+		}
+		if(dataA != null && dataA != undefined && dataA != ''){
+			params.dataA = dataA;
+		}
+		if(progressivo != null && progressivo != undefined && progressivo != ''){
+			params.progressivo = progressivo;
+		}
+		if(importo != null && importo != undefined && importo != ''){
+			params.importo = importo;
+		}
+		if(cliente != null && cliente != undefined && cliente != ''){
+			params.cliente = cliente;
+		}
+		if(agente != null && agente != undefined && agente != ''){
+			params.agente = agente;
+		}
+		if(articolo != null && articolo != undefined && articolo != ''){
+			params.articolo = articolo;
+		}
+		if(stato != null && stato != undefined && stato != ''){
+			params.stato = stato;
+		}
+		return baseUrl + path + $.param( params );
+	}
+
 	if($('#searchNoteAccreditoButton') != null && $('#searchNoteAccreditoButton') != undefined) {
 		$(document).on('submit', '#searchNoteAccreditoForm', function (event) {
 			event.preventDefault();
 
-			var dataDa = $('#searchDataFrom').val();
-			var dataA = $('#searchDataTo').val();
-			var progressivo = $('#searchProgressivo').val();
-			var importo = $('#searchImporto').val();
-			var cliente = $('#searchCliente').val();
-			var agente = $('#searchAgente option:selected').val();
-			var articolo = $('#searchArticolo option:selected').val();
-			var stato = $('#searchStato option:selected').val();
-
-			var params = {};
-			if(dataDa != null && dataDa != undefined && dataDa != ''){
-				params.dataDa = dataDa;
-			}
-			if(dataA != null && dataA != undefined && dataA != ''){
-				params.dataA = dataA;
-			}
-			if(progressivo != null && progressivo != undefined && progressivo != ''){
-				params.progressivo = progressivo;
-			}
-			if(importo != null && importo != undefined && importo != ''){
-				params.importo = importo;
-			}
-			if(cliente != null && cliente != undefined && cliente != ''){
-				params.cliente = cliente;
-			}
-			if(agente != null && agente != undefined && agente != ''){
-				params.agente = agente;
-			}
-			if(articolo != null && articolo != undefined && articolo != ''){
-				params.articolo = articolo;
-			}
-			if(stato != null && stato != undefined && stato != ''){
-				params.stato = stato;
-			}
-			var url = baseUrl + "note-accredito?" + $.param( params );
+			var url = $.fn.createUrlSearch("note-accredito?");
 
 			$('#noteAccreditoTable').DataTable().destroy();
 			$.fn.loadNoteAccreditoTable(url);
-
 		});
 	}
 
