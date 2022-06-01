@@ -34,8 +34,8 @@ $.fn.loadGiacenzeTable = function(url) {
 		"autoWidth": false,
 		"order": [
 			[1, 'asc'],
-			[4, 'asc'],
-			[5, 'asc']
+			[5, 'asc'],
+			[8, 'asc']
 		],
 		"columns": [
 			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
@@ -56,7 +56,10 @@ $.fn.loadGiacenzeTable = function(url) {
 			{"name": "fornitore", "data": null, render: function ( data, type, row ) {
 				return data.fornitore;
 			}},
+			{"name": "quantitaKg", "data": "quantitaKg"},
 			{"name": "quantita", "data": "quantita"},
+			{"name": "costo", "data": "prezzoAcquisto"},
+			{"name": "prezzoListinoBase", "data": "prezzoListinoBase"},
 			{"data": null, "orderable":false, "width":"4%", render: function ( data, type, row ) {
 				var links = '<a class="detailsGiacenza pr-2" data-id="'+data.idArticolo+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 				return links;

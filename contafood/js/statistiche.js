@@ -200,6 +200,7 @@ $(document).ready(function() {
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					console.log('Response text: ' + jqXHR.responseText);
+					$('#alertStatistiche').empty().append(alertContent.replace('@@alertText@@','Errore nel calcolo delle statistiche').replace('@@alertResult@@', 'danger'));
 				}
 			});
 

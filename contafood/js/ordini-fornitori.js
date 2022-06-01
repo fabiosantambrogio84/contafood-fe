@@ -126,19 +126,25 @@ $(document).ready(function() {
 							"lengthChange": false,
 							"info": false,
 							"order": [
-								[0, 'asc'],
-								[1, 'asc']
+								[0, 'asc']
 							],
 							"autoWidth": false,
 							"columns": [
-								{"name": "codiceDescrizione", "data": null, render: function (data, type, row) {
+								{"name":"empty", "data":null, "visible":false, render: function (data, type, row) {
+									var result = '';
+									if (data.articolo != null) {
+										result = data.articolo.descrizione;
+									}
+									return result;
+								}},
+								{"name": "codiceDescrizione", "orderable": false, "data": null, render: function (data, type, row) {
 									var result = '';
 									if (data.articolo != null) {
 										result = data.articolo.codice+' - '+data.articolo.descrizione;
 									}
 									return result;
 								}},
-								{"name": "pezziOrdinati", "data": null, render: function (data, type, row) {
+								{"name": "pezziOrdinati", "orderable": false, "data": null, render: function (data, type, row) {
 									var result = data.numeroPezziOrdinati;
 									return result;
 								}}

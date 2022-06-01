@@ -33,9 +33,10 @@ $(document).ready(function() {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[0, 'asc']
+			[0, 'desc']
 		],
 		"columns": [
+			{"name": "attivo", "data": "attivo", "visible":false},
 			{"name": "codice", "data": "codice"},
 			{"name": "descrizione", "data": "descrizione"},
 			{"name": "prezzo", "data": "prezzo"},
@@ -69,7 +70,12 @@ $(document).ready(function() {
 				links = links + '<a class="deleteIngrediente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			if(!data.attivo){
+				$(row).css('background-color', '#d2d4d2');
+			}
+		}
 	});
 
 	$(document).on('click','.deleteIngrediente', function(){
@@ -139,6 +145,11 @@ $(document).ready(function() {
 				data: ingredienteJson,
 				success: function(result) {
 					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente modificato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the page with the list of Ingredienti
+					setTimeout(function() {
+						window.location.href = "ingredienti.html";
+					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella modifica dell ingrediente').replace('@@alertResult@@', 'danger'));
@@ -186,6 +197,12 @@ $(document).ready(function() {
 				data: ingredienteJson,
 				success: function(result) {
 					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Ingrediente creato con successo').replace('@@alertResult@@', 'success'));
+
+					// Returns to the page with the list of Ingredienti
+					setTimeout(function() {
+						window.location.href = "ingredienti.html";
+					}, 1000);
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertIngrediente').empty().append(alertContent.replace('@@alertText@@','Errore nella creazione dell ingrediente').replace('@@alertResult@@', 'danger'));

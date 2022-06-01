@@ -47,13 +47,8 @@ $.fn.loadRicercaLottiDdtTable = function(url) {
 				var a = moment(data.data);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"title":"Cliente", "name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					return cliente.ragioneSociale;
-				}
-				return '';
-			}}
+			{"title":"Quantità", "name": "quantita", "data": "quantita", "width":"8%"},
+			{"title":"Cliente", "name": "cliente", "data": "cliente", "width":"10%"}
 		],
 		"initComplete": function( settings, json ) {
 			$('#ricercaLottiDdtTitle').removeClass('d-none');
@@ -108,13 +103,8 @@ $.fn.loadRicercaLottiDdtAcquistoTable = function(url) {
 				var a = moment(data.data);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"title":"Fornitore", "name": "fornitore", "data": null, "width": "10%", render: function (data, type, row) {
-				var fornitore = data.fornitore;
-				if (fornitore != null) {
-					return fornitore.ragioneSociale;
-				}
-				return '';
-			}}
+			{"title":"Quantità", "name": "quantita", "data": "quantita", "width":"8%"},
+			{"title":"Fornitore", "name": "fornitore", "data": "fornitore", "width": "10%"}
 		],
 		"initComplete": function( settings, json ) {
 			$('#ricercaLottiDdtAcquistoTitle').removeClass('d-none');
@@ -164,7 +154,7 @@ $.fn.loadRicercaLottiProduzioneTable = function(url) {
 			[0, 'desc']
 		],
 		"columns": [
-			{"title":"Codice", "name": "codice", "data": "codice", "width":"10%"},
+			{"title":"Codice", "name": "codice", "data": "codiceProduzione", "width":"10%"},
 			{"title":"Lotto", "name": "lotto", "data": "lotto", "width":"10%"},
 			{"title":"Data", "name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
 				var a = moment(data.dataProduzione);
@@ -174,10 +164,8 @@ $.fn.loadRicercaLottiProduzioneTable = function(url) {
 				var a = moment(data.scadenza);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"title":"Ricetta", "name": "ricetta", "data": null, "orderable":false, render: function ( data, type, row ) {
-				var ricettaResult = data.ricetta.codice+' - '+data.ricetta.nome;
-				return ricettaResult;
-			}}
+			{"title":"Quantità", "name": "quantita", "data": "quantita", "width":"8%"},
+			{"title":"Ricetta", "name": "ricetta", "data": "ricetta", "orderable":false}
 		],
 		"initComplete": function( settings, json ) {
 			$('#ricercaLottiProduzioneTitle').removeClass('d-none');
@@ -199,8 +187,8 @@ $(document).ready(function() {
 		if(lotto != null && lotto != undefined && lotto != ''){
 			$('#alertRicercaLotti').empty().append(alertContent.replace('@@alertText@@','Ricerca lotto in corso...').replace('@@alertResult@@', 'warning'));
 
-			var ricercaLottiDdtUrl = baseUrl + "ddts?lotto="+lotto;
-			var ricercaLottiDdtAcquistoUrl = baseUrl + "ddts-acquisto?lotto="+lotto;
+			var ricercaLottiDdtUrl = baseUrl + "ddts/search-lotto?lotto="+lotto;
+			var ricercaLottiDdtAcquistoUrl = baseUrl + "ddts-acquisto/search-lotto?lotto="+lotto;
 			var ricercaLottiProduzioneUrl = baseUrl + "produzioni?lotto="+lotto;
 
 			$.when($.fn.loadRicercaLottiDdtTable(ricercaLottiDdtUrl),$.fn.loadRicercaLottiDdtAcquistoTable(ricercaLottiDdtAcquistoUrl), $.fn.loadRicercaLottiProduzioneTable(ricercaLottiProduzioneUrl)).then(function(f1,f2,f3){
