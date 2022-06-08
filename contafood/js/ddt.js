@@ -534,6 +534,7 @@ $(document).ready(function() {
 		var autista = $('#searchAutista option:selected').val();
 		var articolo = $('#searchArticolo option:selected').val();
 		var stato = $('#searchStato option:selected').val();
+		var pagato = $('#searchPagato option:selected').val();
 
 		var params = {};
 		if(dataDa != null && dataDa != undefined && dataDa != ''){
@@ -565,6 +566,9 @@ $(document).ready(function() {
 		}
 		if(stato != null && stato != undefined && stato != ''){
 			params.stato = stato;
+		}
+		if(pagato != null && pagato != undefined && pagato != ''){
+			params.pagato = pagato;
 		}
 		return baseUrl + path + $.param( params );
 	}

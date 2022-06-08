@@ -45,7 +45,9 @@
   <script>
     var idNotaReso = $.fn.extractIdNotaResoFromUrl();
     if(idNotaReso != null && idNotaReso != undefined){
-      $.when($.fn.getFornitori(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva(), $.fn.getCausali()).then($.fn.getNotaReso(idNotaReso));
+      $.when($.fn.getFornitori(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva(), $.fn.getCausali()).then(function(f1,f2,f3,f4){
+        $.fn.getNotaReso(idNotaReso)
+      });
     }
   </script>
 
@@ -115,7 +117,7 @@
             <div class="card-body" style="font-size: 0.9rem;">
               <div class="form-row">
                 <div class="form-group col-md-4">
-                  <label for="articolo" class="mb-0">Articolo</label>
+                  <label for="articolo" class="mb-0" id="articoloLabel">Articolo</label>
                   <select id="articolo" class="form-control form-control-sm " data-live-search="true">
                     <option value=""></option>
                   </select>
@@ -229,7 +231,7 @@
           <input type="hidden" id="hiddenIdNotaReso"/>
           <button type="submit" class="btn btn-primary mt-4" id="updateNotaResoButton">Salva</button>
           <button type="submit" class="btn btn-primary mt-4" id="updateAndPrintNotaResoButton" disabled>Salva e Stampa</button>
-          <a href="note-accredito.html" class="btn btn-secondary mt-4">Annulla</a>
+          <a href="note-reso.html" class="btn btn-secondary mt-4">Annulla</a>
         </form>
 
         <script>

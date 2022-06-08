@@ -73,7 +73,7 @@ $.fn.loadPagamentiTable = function(url) {
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px').addClass('rowPagamento');
 			$(row).attr('data-id-pagamento', data.id);
-			$(cells[3]).css('text-align','right');
+			//$(cells[3]).css('text-align','right');
 		}
 	});
 }

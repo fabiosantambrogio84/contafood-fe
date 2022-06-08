@@ -43,7 +43,7 @@
   <script src="../js/note-reso.js"></script>
 
   <script>
-    $.when($.fn.getFornitori(), $.fn.getArticoli(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva(), $.fn.getCausali()).then($.fn.preloadFields(), null);
+    $.when($.fn.getFornitori(), $.fn.getUnitaMisura(), $.fn.getAliquoteIva(), $.fn.getCausali()).then($.fn.preloadFields(), null);
   </script>
 
 </head>
@@ -112,7 +112,7 @@
             <div class="card-body" style="font-size: 0.9rem;">
               <div class="form-row">
                 <div class="form-group col-md-4">
-                  <label for="articolo" class="mb-0">Articolo</label>
+                  <label for="articolo" class="mb-0" id="articoloLabel">Articolo</label>
                   <select id="articolo" class="form-control form-control-sm " data-live-search="true" disabled>
                     <option value=""></option>
                   </select>
