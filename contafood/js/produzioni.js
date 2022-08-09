@@ -39,7 +39,7 @@ $(document).ready(function() {
 		"columns": [
 			{"name":"dataProduzioneHidden", "data": "dataProduzione", "width":"5%", "visible": false},
 			{"name": "codice", "data": "codiceProduzione", "width":"10%"},
-			{"name": "dataProduzione", "data": null, "width":"15%", render: function ( data, type, row ) {
+			{"name": "dataProduzione", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var a = moment(data.dataProduzione);
 				return a.format('DD/MM/YYYY');
 			}},
@@ -48,8 +48,11 @@ $(document).ready(function() {
 				var a = moment(data.scadenza);
 				return a.format('DD/MM/YYYY');
 			}},
-			{"name": "articolo", "data": null, "orderable":false, render: function ( data, type, row ) {
+			{"name": "articolo-ingrediente", "data": null, "orderable":false, render: function ( data, type, row ) {
 				var result = data.codiceArticolo+' - '+data.descrizioneArticolo;
+				if(data.tipologia == 'SCORTA'){
+					result = data.codiceIngrediente+' - '+data.descrizioneIngrediente;
+				}
 				return result;
 			}},
 			{"name": "numeroConfezioni", "data": "numConfezioniProdotte", "width":"12%", "className": "tdAlignRight" },
@@ -58,7 +61,13 @@ $(document).ready(function() {
 				links = links + '<a class="deleteProduzione" data-id="'+data.idProduzione+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
-		]
+		],
+		"createdRow": function(row, data, dataIndex,cells){
+			$(row).css('font-size', '12px');
+			if(data.tipologia == 'SCORTA'){
+				$(row).css('background-color', '#cbe8f5');
+			}
+		}
 	});
 
 	$(document).on('click','.detailsProduzione', function(){
@@ -73,6 +82,11 @@ $(document).ready(function() {
 			dataType: 'json',
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
+					if(result.tipologia == 'SCORTA'){
+						$('#scorta').text('Si');
+					} else {
+						$('#scorta').text('No');
+					}
 					$('#codice').text(result.codice);
 					$('#dataProduzione').text(moment(result.dataProduzione).format('DD/MM/YYYY'));
 					$('#dataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
@@ -122,12 +136,18 @@ $(document).ready(function() {
 							"autoWidth": false,
 							"columns": [
 								{"data": null, "orderable":false, render: function ( data, type, row ) {
-									var articolo = data.articolo;
-									if(articolo != null && articolo != undefined){
-										return articolo.codice+" - "+articolo.descrizione;
+									if(result.tipologia == 'SCORTA'){
+										var ingrediente = data.ingrediente;
+										if(ingrediente != null && ingrediente != undefined){
+											return ingrediente.codice+" - "+ingrediente.descrizione;
+										}
 									} else {
-										return "";
+										var articolo = data.articolo;
+										if(articolo != null && articolo != undefined){
+											return articolo.codice+" - "+articolo.descrizione;
+										}
 									}
+									return "";
 								}},
 								{"data": null, "orderable":false, render: function ( data, type, row ) {
 									return data.lotto;
@@ -138,7 +158,12 @@ $(document).ready(function() {
 								{"data": null, "orderable":false, render: function ( data, type, row ) {
 									return data.numConfezioniProdotte;
 								}}
-							]
+							],
+							"createdRow": function(row, data, dataIndex,cells){
+								if(result.tipologia == 'SCORTA'){
+									$(row).css('background-color', '#cbe8f5');
+								}
+							}
 						});
 					}
 
@@ -344,6 +369,11 @@ $(document).ready(function() {
 			produzione.scopo = $('input[name="generaLotto"]:checked').val();
 			produzione.filmChiusura = $('#filmChiusura').val();
 			produzione.lottoFilmChiusura = $('#lottoFilmChiusura').val();
+			if($('#scorta').prop('checked') === true){
+				produzione.tipologia = 'SCORTA';
+			}else{
+				produzione.tipologia = 'STANDARD';
+			}
 			
 			var confezioniLength = $('.confezioneRow').length;
 			produzione.numeroConfezioni = 0;

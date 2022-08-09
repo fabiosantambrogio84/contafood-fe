@@ -44,6 +44,13 @@ $(document).ready(function() {
 		"columns": [
             {"name": "tipologia", "data": "tipologia", "visible": false},
 		    {"name": "nome", "data": "nome"},
+            {"name": "bloccaPrezzi", "data": null, "width": "15%", render: function ( data, type, row ) {
+                if(data.bloccaPrezzi){
+                    return 'Si';
+                } else {
+                    return 'No'
+                }
+            }},
             {"name": "note", "data": null, "width": "25%", render: function ( data, type, row ) {
                 var note = data.note;
                 if(note != null && note != ''){
@@ -245,6 +252,11 @@ $(document).ready(function() {
                     }
                 }
             }
+            if($('#bloccaPrezzi').prop('checked') === true){
+                listino.bloccaPrezzi = true;
+            }else{
+                listino.bloccaPrezzi = false;
+            }
             listino.note = $('#note').val();
 
             var listinoJson = JSON.stringify(listino);
@@ -353,6 +365,11 @@ $(document).ready(function() {
                         return;
                     }
                 }
+            }
+            if($('#bloccaPrezzi').prop('checked') === true){
+                listino.bloccaPrezzi = true;
+            }else{
+                listino.bloccaPrezzi = false;
             }
             listino.note = $('#note').val();
 
@@ -689,8 +706,13 @@ $.fn.getListino = function(idListino, withRecap){
 			success: function(result) {
 				if(result != null && result != undefined && result != '') {
 					var listinoRow = '<td>'+result.nome+'</td>';
-					listinoRow = listinoRow + '<td>'+result.tipologia+'</td>';
-                    listinoRow = listinoRow + '<td>'+result.note+'</td>';
+					listinoRow += '<td>'+result.tipologia+'</td>';
+					if(result.bloccaPrezzi){
+                        listinoRow += '<td>Si</td>';
+                    } else {
+                        listinoRow += '<td>No</td>';
+                    }
+                    listinoRow += '<td>'+result.note+'</td>';
 
 					$('#listinoRow').append(listinoRow);
 
@@ -714,6 +736,9 @@ $.fn.getListino = function(idListino, withRecap){
 
 			$('#hiddenIdListino').attr('value', result.id);
 			$('#nome').attr('value', result.nome);
+			if(result.bloccaPrezzi === true){
+			    $('#bloccaPrezzi').prop('checked', true);
+			}
 			$('#note').val(result.note);
 
             if(result.tipologia == 'BASE'){

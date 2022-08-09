@@ -569,6 +569,10 @@ $(document).ready(function() {
 			var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+currentPrezzo+'">';
 			var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+currentSconto+'">';
 
+			if($.fn.isVersionClient()){
+				prezzoHtml = prezzoHtml.replace('>', ' disabled>');
+			}
+
 			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
 			rowData[1] = lottoHtml;
 			rowData[2] = scadenzaHtml;
@@ -583,6 +587,10 @@ $(document).ready(function() {
 			var deleteLink = '<a class="deleteFatturaAccompagnatoriaArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 			var rowsCount = table.rows().count();
+
+			if($.fn.isVersionClient()){
+				prezzoHtml = prezzoHtml.replace('>', ' disabled>');
+			}
 
 			var rowNode = table.row.add( [
 				articolo,

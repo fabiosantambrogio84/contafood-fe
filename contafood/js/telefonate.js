@@ -45,7 +45,7 @@ $.fn.loadTelefonateTable = function() {
 					var clienteHtml = '';
 
 					if(data.cliente.dittaIndividuale){
-						clienteHtml += data.cliente.cognome + ' - ' + data.cliente.nome;
+						clienteHtml += data.cliente.cognome + ' ' + data.cliente.nome;
 					} else {
 						clienteHtml += data.cliente.ragioneSociale;
 					}
@@ -110,7 +110,9 @@ $.fn.loadTelefonateTable = function() {
 			{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
 				var links = '<a class="detailsTelefonata pr-1" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 				links += '<a class="updateTelefonata pr-1" data-id="'+data.id+'" href="telefonate-edit.html?idTelefonata=' + data.id + '"><i class="far fa-edit"></i></a>';
-				links += '<a class="newOrdineClienteFromTelefonata pr-1" data-id="'+data.id+'" href="ordini-clienti-new.html?idTelefonata=' + data.id + '" title="Nuovo Ordine Cliente"><i class="far fa-folder-open"></i></a>';
+				if(!data.cliente.bloccaDdt){
+					links += '<a class="newOrdineClienteFromTelefonata pr-1" data-id="'+data.id+'" href="ordini-clienti-new.html?idTelefonata=' + data.id + '" title="Nuovo Ordine Cliente"><i class="far fa-folder-open"></i></a>';
+				}
 				links += '<a class="deleteTelefonata" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -125,6 +127,9 @@ $.fn.loadTelefonateTable = function() {
 				} else {
 					$(row).css('background-color', '#ebebeb');
 				}
+			}
+			if(data.cliente.bloccaDdt){
+				$(row).css('color', 'red');
 			}
 		},
 		"initComplete": function( settings, json ) {
@@ -602,7 +607,7 @@ $.fn.extractIdTelefonataFromUrl = function(){
 
 $.fn.getClienti = function(){
 	return $.ajax({
-		url: baseUrl + "clienti",
+		url: baseUrl + "clienti?bloccaDdt=false",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
@@ -610,7 +615,7 @@ $.fn.getClienti = function(){
 				$.each(result, function(i, item){
 					var label = '';
 					if(item.dittaIndividuale){
-						label += item.cognome + ' - ' + item.nome;
+						label += item.cognome + ' ' + item.nome;
 					} else {
 						label += item.ragioneSociale;
 					}

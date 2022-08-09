@@ -59,7 +59,6 @@ $.fn.loadFattureTable = function(url) {
 				speditoAdeSelect += '</select';
 				return speditoAdeSelect;
 			}},
-
 			{"name": "tipo", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var tipo = data.tipoFattura;
 				if(tipo != null){

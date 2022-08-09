@@ -743,7 +743,7 @@ $.fn.getCliente = function(idCliente){
 			}
 			if(result.raggruppaRiba === true){
 				$('#raggruppaRiba').prop('checked', true);
-				$('#nomeGruppoRiba').attr('disabled', 'false');
+				$('#nomeGruppoRiba').attr('disabled', false);
 			}
 			$('#nomeGruppoRiba').attr('value', result.nomeGruppoRiba);
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);

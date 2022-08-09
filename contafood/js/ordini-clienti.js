@@ -193,10 +193,10 @@ $(document).ready(function() {
 									}
 									return result;
 								}},
-								{"name": "prezzoListinoBase", "data": null, render: function (data, type, row) {
+								{"name": "prezzo", "data": null, render: function (data, type, row) {
 									var result = '';
-									if (data.articolo != null) {
-										result = data.articolo.prezzoListinoBase;
+									if (data.prezzo != null) {
+										result = data.prezzo;
 									}
 									return result;
 								}},

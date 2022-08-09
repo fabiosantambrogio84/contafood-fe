@@ -27,6 +27,14 @@ $(document).ready(function() {
             sidebarFilePath = '../commons/sidebar-ordini.html';
         } else if(pageType == 'contabilita'){
             sidebarFilePath = '../commons/sidebar-contabilita.html';
+
+            if($.fn.isVersionClient()){
+                var pageName = $('#accordionSidebar').attr('data-page-name');
+                if(pageName == 'ddt-new' || pageName == 'ddt-edit' || pageName == 'fatture-accompagnatorie-new'){
+                    $('#prezzo').attr('disabled', true);
+                }
+            }
+
         } else if(pageType == 'lotti-statistiche'){
             sidebarFilePath = '../commons/sidebar-lotti-statistiche.html';
         } else if(pageType == 'stampe'){
@@ -847,6 +855,10 @@ $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,ar
 
     var rowsCount = table.rows().count();
 
+    if($.fn.isVersionClient()){
+        prezzoHtml = prezzoHtml.replace('>', ' disabled>');
+    }
+
     var rowNode = table.row.add( [
         articolo,
         lottoHtml,
@@ -882,6 +894,10 @@ $.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,curre
     //var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
     var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
     var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
+
+    if($.fn.isVersionClient()){
+        prezzoHtml = prezzoHtml.replace('>', ' disabled>');
+    }
 
     var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
     rowData[1] = lottoHtml;

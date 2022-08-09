@@ -40,7 +40,7 @@
   <div id="wrapper">
 
     <!-- Sidebar -->
-    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion" id="accordionSidebar" data-page-type="produzione"></ul>
+    <ul class="navbar-nav bg-gradient-sidebar sidebar sidebar-dark accordion toggled" id="accordionSidebar" data-page-type="produzione"></ul>
     <!-- End of Sidebar -->
 
     <!-- Content Wrapper -->
@@ -77,10 +77,10 @@
         		    <tr>
                       <th></th>
         			  <th>Codice</th>
-                      <th>Data produzione</th>
+                      <th>Data</th>
                       <th>Lotto</th>
                       <th>Scadenza</th>
-        			  <th>Articolo</th>
+        			  <th>Art./Ingr.</th>
 					  <th>Confezioni (pz)</th>
                       <th></th>
                     </tr>
@@ -128,6 +128,14 @@
                             <div class="col-sm">
                                 <div class="card border-0">
                                     <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Scorta</h6>
+                                        <p class="card-text" id="scorta"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
                                         <h6 class="card-title mb-0 font-weight-bold">Codice</h6>
                                         <p class="card-text" id="codice"></p>
                                     </div>
@@ -157,6 +165,9 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-sm">
                                 <div class="card border-0">
                                     <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -165,9 +176,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="row">
                             <div class="col-sm">
                                 <div class="card border-0">
                                     <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -200,6 +208,9 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-sm">
                                 <div class="card border-0">
                                     <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -208,10 +219,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
-
-                        <div class="row">
                             <div class="col-sm">
                                 <div class="card border-0">
                                     <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -237,7 +244,6 @@
                                 </div>
                             </div>
                             <div class="col-sm">&nbsp;</div>
-                            <div class="col-sm">&nbsp;</div>
                         </div>
 
                     </div>
@@ -249,7 +255,7 @@
                         <table class="table table-bordered" id="detailsProduzioneConfezioniModalTable" width="100%" cellspacing="0">
                             <thead>
                             <tr>
-                                <th>Articolo</th>
+                                <th>Art./Ingr.</th>
                                 <th>Lotto</th>
                                 <th>Conf. da produrre (pz)</th>
                                 <th>Conf. prodotte (pz)</th>

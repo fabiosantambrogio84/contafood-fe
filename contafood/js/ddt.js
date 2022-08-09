@@ -45,9 +45,13 @@ $.fn.loadDdtTable = function(url) {
 				"dom": '<"top"p>rt<"bottom"p>',
 				"autoWidth": false,
 				"order": [
-					[0, 'desc']
+					[1, 'desc']
 				],
 				"columns": [
+					{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
+						var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="checkDdt" >';
+						return checkboxHtml;
+					}},
 					{"name": "numero", "data": "progressivo", "width":"5%"},
 					{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
 						var a = moment(data.data);
@@ -90,19 +94,19 @@ $.fn.loadDdtTable = function(url) {
 						autistaSelect += '</select';
 						return autistaSelect;
 					}},
-					{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
+					{"name": "acconto", "data": null, "width":"6%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleAcconto);
 					}},
-					{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
+					{"name": "importo", "data": null, "width":"6%",render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totale);
 					}},
-					{"name": "imponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
+					{"name": "imponibile", "data": null, "width":"6%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleImponibile);
 					}},
 					{"name": "costo", "data": null, "width":"6%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleCosto);
 					}},
-					{"name": "guadagno", "data": null, "width":"8%", render: function ( data, type, row ) {
+					{"name": "guadagno", "data": null, "width":"6%", render: function ( data, type, row ) {
 						var guadagno = data.totaleImponibile - data.totaleCosto;
 						return $.fn.formatNumber(guadagno);
 					}},
@@ -218,11 +222,27 @@ $.fn.loadDdtArticoliTable = function() {
 
 $(document).ready(function() {
 
+	var ddtsToPrint = [];
+
 	$.fn.loadDdtTable(baseUrl + "ddts/search");
 
 	if(window.location.search.substring(1).indexOf('idDdt') == -1){
 		$.fn.loadDdtArticoliTable();
 	}
+
+	$(document).on('click','.checkDdt', function(){
+		var idDdt = $(this).attr('data-id');
+		var toPrint = $(this).prop("checked");
+
+		ddtsToPrint = $.grep(ddtsToPrint, function(value) {
+			return value != idDdt;
+		});
+
+		if(toPrint){
+			ddtsToPrint.push(idDdt);
+		}
+		//console.log('-> '+ddtsToPrint);
+	});
 
 	$(document).on('click','#resetSearchDdtButton', function(){
 		$('#searchDdtForm :input').val(null);
@@ -485,7 +505,82 @@ $(document).ready(function() {
 		var url = $.fn.createUrlSearch("stampe/ddts?");
 
 		window.open(url, '_blank');
+	});
 
+	$(document).on('click','#printDdtsSelected', function(event){
+		event.preventDefault();
+
+		var alertContent = '<div id="alertDdtContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>@@alertText@@\n' +
+			'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+		if(ddtsToPrint != null && ddtsToPrint.length > 0){
+
+			if(ddtsToPrint.length > 30){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Selezionare al massimo 30 DDT').replace('@@alertResult@@', 'danger'));
+			} else {
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Generazione file in corso...').replace('@@alertResult@@', 'warning'));
+
+				var url = baseUrl + "stampe/ddts/checked";
+
+				var body = new Object();
+				body.ddts = ddtsToPrint;
+
+				$.ajax({
+					type: "POST",
+					url: url,
+					contentType: "application/json",
+					data: JSON.stringify(ddtsToPrint),
+					xhr: function () {
+						var xhr = new XMLHttpRequest();
+						xhr.onreadystatechange = function () {
+							if (xhr.readyState == 2) {
+								if (xhr.status == 200) {
+									xhr.responseType = "blob";
+								} else {
+									xhr.responseType = "text";
+								}
+							}
+						};
+						return xhr;
+					},
+					success: function (response, status, xhr) {
+						var contentDisposition = xhr.getResponseHeader("Content-Disposition");
+						var fileName = contentDisposition.substring(contentDisposition.indexOf("; ") + 1);
+						fileName = fileName.replace("filename=", "").trim();
+
+						var blob = new Blob([response], {type: "application/zip"});
+						var downloadUrl = URL.createObjectURL(blob);
+						var a = document.createElement("a");
+						a.href = downloadUrl;
+						a.download = fileName;
+						document.body.appendChild(a);
+						a.click();
+						a.remove();
+						window.URL.revokeObjectURL(url);
+
+						$('#alertDdt').empty();
+					},
+					error: function (jqXHR, textStatus, errorThrown) {
+						var errorMessage = 'Errore nella stampa dei DDT';
+						if (jqXHR != null && jqXHR != undefined) {
+							var jqXHRResponseJson = jqXHR.responseJSON;
+							if (jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != '') {
+								var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+								if (jqXHRResponseJsonMessage != null
+									&& jqXHRResponseJsonMessage != undefined
+									&& jqXHRResponseJsonMessage != '') {
+									errorMessage = jqXHRResponseJsonMessage;
+								}
+							}
+						}
+						$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+					}
+				});
+			}
+		} else {
+			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Selezionare almeno un DDT.').replace('@@alertResult@@', 'danger'));
+		}
 	});
 
     $(document).on('click','.emailDdt', function(){
