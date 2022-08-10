@@ -60,7 +60,6 @@ $(document).ready(function() {
                         noteTrunc = note.substring(0, 100)+'...';
                         noteHtml = '<div data-toggle="tooltip" data-placement="bottom" title="'+note+'">'+noteTrunc+'</div>';
                     }
-
                     return noteHtml;
                 } else {
                     return '';
@@ -70,7 +69,10 @@ $(document).ready(function() {
 				var links = '<a class="detailsListino pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links += '<a class="updateListino pr-2" data-id="'+data.id+'" href="listini-edit.html?idListino=' + data.id + '"><i class="far fa-edit"></i></a>';
 				links += '<a class="refreshListino pr-2" data-id="'+data.id+'" href="listini-refresh.html?idListino=' + data.id + '" title="Aggiorna prezzi"><i class="fas fa-sync"></i></a>';
-                links += '<a class="printListino pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+                if(data.tipologia != 'BASE'){
+                    links += '<a class="duplicateListino pr-2" data-id="'+data.id+'" href="#" title="Duplica"><i class="fas fa-clone"></i></a>';
+                }
+				links += '<a class="printListino pr-1" data-id="'+data.id+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
                 links += '<a class="deleteListino" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
 			}}
@@ -221,6 +223,47 @@ $(document).ready(function() {
         window.open(baseUrl + "stampe/listini/"+idListino+"?orderBy="+orderBy, '_blank');
     });
 
+    $(document).on('click','.duplicateListino', function(){
+        var idListino = $(this).attr('data-id');
+        $('#confirmDuplicateListino').attr('data-id', idListino);
+
+        $('#duplicateListinoModal').modal('show');
+    });
+
+    $(document).on('click','#confirmDuplicateListino', function(){
+        $('#duplicateListinoModal').modal('hide');
+        var idListino = $(this).attr('data-id');
+        var nome = $('#duplicateListinoNome').val();
+
+        var body = new Object();
+        body.name = nome;
+
+        $.ajax({
+            url: baseUrl + "listini/" + idListino + "/duplicate",
+            type: 'POST',
+            contentType: "application/json",
+            dataType: 'json',
+            data: JSON.stringify(body),
+            success: function() {
+                var alertContent = '<div id="alertListinoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
+                alertContent = alertContent + '<strong>Listino</strong> duplicato con successo.\n' +
+                    '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+                $('#alertListino').empty().append(alertContent);
+
+                $('#listiniTable').DataTable().ajax.reload();
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.log('Response text: ' + jqXHR.responseText);
+
+                var alertContent = '<div id="alertListinoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+                alertContent = alertContent + '<strong>Errore</strong> nella duplicazione del listino' +
+                    '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+                $('#alertListino').empty().append(alertContent);
+
+                $('#listiniTable').DataTable().ajax.reload();
+            }
+        });
+    });
 
 	if($('#updateListinoButton') != null && $('#updateListinoButton') != undefined){
 		$('#articoloVariazione').selectpicker();

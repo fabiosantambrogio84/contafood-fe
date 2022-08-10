@@ -493,8 +493,8 @@ $(document).ready(function() {
 	$(document).on('click','.printDdt', function(){
 		var idDdt = $(this).attr('data-id');
 
-		var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-		alertContent = alertContent + '<strong>Errore nella stampa del DDT.</strong></div>';
+		//var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		//alertContent = alertContent + '<strong>Errore nella stampa del DDT.</strong></div>';
 
 		window.open(baseUrl + "stampe/ddts/"+idDdt, '_blank');
 	});
@@ -519,9 +519,14 @@ $(document).ready(function() {
 			if(ddtsToPrint.length > 30){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Selezionare al massimo 30 DDT').replace('@@alertResult@@', 'danger'));
 			} else {
+				$.each(ddtsToPrint, function( index, value ) {
+					window.open(baseUrl + "stampe/ddts/"+value, '_blank');
+				});
+
+				/*
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Generazione file in corso...').replace('@@alertResult@@', 'warning'));
 
-				var url = baseUrl + "stampe/ddts/checked";
+				var url = baseUrl + "stampe/ddts/selected";
 
 				var body = new Object();
 				body.ddts = ddtsToPrint;
@@ -577,6 +582,7 @@ $(document).ready(function() {
 						$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 					}
 				});
+				*/
 			}
 		} else {
 			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Selezionare almeno un DDT.').replace('@@alertResult@@', 'danger'));
@@ -1724,9 +1730,9 @@ $.fn.getDdt = function(idDdt){
 						type: 'GET',
 						async: true,
 						dataType: 'json',
-						success: function(result) {
-							if(result != null && result != undefined && result != ''){
-								$.each(result, function(i, item){
+						success: function(result2) {
+							if(result2 != null && result2 != undefined && result2 != ''){
+								$.each(result2, function(i, item){
 									var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
 									var selected = '';
 									if(result.puntoConsegna != null){
