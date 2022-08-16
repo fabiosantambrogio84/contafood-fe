@@ -519,11 +519,12 @@ $(document).ready(function() {
 			if(ddtsToPrint.length > 30){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Selezionare al massimo 30 DDT').replace('@@alertResult@@', 'danger'));
 			} else {
+				/*
 				$.each(ddtsToPrint, function( index, value ) {
 					window.open(baseUrl + "stampe/ddts/"+value, '_blank');
 				});
+				*/
 
-				/*
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Generazione file in corso...').replace('@@alertResult@@', 'warning'));
 
 				var url = baseUrl + "stampe/ddts/selected";
@@ -550,21 +551,18 @@ $(document).ready(function() {
 						return xhr;
 					},
 					success: function (response, status, xhr) {
-						var contentDisposition = xhr.getResponseHeader("Content-Disposition");
-						var fileName = contentDisposition.substring(contentDisposition.indexOf("; ") + 1);
-						fileName = fileName.replace("filename=", "").trim();
+						//var contentDisposition = xhr.getResponseHeader("Content-Disposition");
+						//var fileName = contentDisposition.substring(contentDisposition.indexOf("; ") + 1);
+						//fileName = fileName.replace("filename=", "").trim();
 
-						var blob = new Blob([response], {type: "application/zip"});
-						var downloadUrl = URL.createObjectURL(blob);
-						var a = document.createElement("a");
-						a.href = downloadUrl;
-						a.download = fileName;
-						document.body.appendChild(a);
-						a.click();
-						a.remove();
-						window.URL.revokeObjectURL(url);
+						var blob = new Blob([response], {type: "application/pdf"});
+						var blobUrl = URL.createObjectURL(blob);
+
+						window.open(blobUrl, '_blank');
 
 						$('#alertDdt').empty();
+						ddtsToPrint = [];
+						$(".checkDdt").prop("checked", false);
 					},
 					error: function (jqXHR, textStatus, errorThrown) {
 						var errorMessage = 'Errore nella stampa dei DDT';
@@ -582,7 +580,7 @@ $(document).ready(function() {
 						$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 					}
 				});
-				*/
+
 			}
 		} else {
 			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', 'Selezionare almeno un DDT.').replace('@@alertResult@@', 'danger'));
