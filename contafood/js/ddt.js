@@ -694,6 +694,16 @@ $(document).ready(function() {
 			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
 			return false;
 		}
+		var validCliente = $('#cliente option:selected').val();
+		if(!validCliente){
+			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Selezionare un cliente").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+		var validData = $('#data').val();
+		if(!validData){
+			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire una data").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
 
 		var ddt = new Object();
 		ddt.progressivo = $('#progressivo').val();
@@ -860,11 +870,18 @@ $(document).ready(function() {
 		$('#articolo').selectpicker();
 		$('#cliente').selectpicker();
 
-		$(document).on('submit','#newDdtForm', function(event){
+		$(document).on('click','#newDdtButton', function(event){
+			if(!event.detail || event.detail == 1) {
+				event.preventDefault();
+				$.fn.createDdt(false);
+			}
+		});
+
+		/*$(document).on('submit','#newDdtForm', function(event){
 			event.preventDefault();
 
 			$.fn.createDdt(false);
-		});
+		});*/
 	}
 
 	if($('#newAndPrintDdtButton') != null && $('#newAndPrintDdtButton') != undefined && $('#newAndPrintDdtButton').length > 0){
@@ -872,9 +889,10 @@ $(document).ready(function() {
 		$('#cliente').selectpicker();
 
 		$(document).on('click','#newAndPrintDdtButton', function(event){
-			event.preventDefault();
-
-			$.fn.createDdt(true);
+			if(!event.detail || event.detail == 1) {
+				event.preventDefault();
+				$.fn.createDdt(true);
+			}
 		});
 	}
 
@@ -883,15 +901,19 @@ $(document).ready(function() {
 		$('#cliente').selectpicker();
 
 		$(document).on('click','#updateDdtButton', function(event){
-			event.preventDefault();
-			$('#updateDdtModal').modal('show');
+			if(!event.detail || event.detail == 1) {
+				event.preventDefault();
+				$('#updateDdtModal').modal('show');
+			}
 		});
 
-		$(document).on('click','#confirmUpdateDdt', function(){
-			var modificaGiacenze = $("input[name='modificaGiacenze']:checked").val();
-			$('#hiddenModificaGiacenze').attr('value', modificaGiacenze);
-			$('#updateDdtModal').modal('hide');
-			$('#updateDdtForm').submit();
+		$(document).on('click','#confirmUpdateDdt', function(event){
+			if(!event.detail || event.detail == 1) {
+				var modificaGiacenze = $("input[name='modificaGiacenze']:checked").val();
+				$('#hiddenModificaGiacenze').attr('value', modificaGiacenze);
+				$('#updateDdtModal').modal('hide');
+				$('#updateDdtForm').submit();
+			}
 		});
 
 		$(document).on('submit','#updateDdtForm', function(event){
@@ -1487,7 +1509,28 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});
+}
 
+$.fn.checkProgressiviDuplicates = function(){
+
+	return	$.ajax({
+		url: baseUrl + "ddts/progressivi-duplicates",
+		type: 'GET',
+		dataType: 'text',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				var alertContent = '<div id="alertDdtContent" class="alert alert-warning alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>ATTENZIONE progressivi duplicati:</strong>\n' + result + '\n' +
+					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+				$('#alertDdt').empty().append(alertContent);
+			}
+
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
 }
 
 $.fn.getAutisti = function(){

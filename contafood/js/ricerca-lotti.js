@@ -189,7 +189,7 @@ $(document).ready(function() {
 
 			var ricercaLottiDdtUrl = baseUrl + "ddts/search-lotto?lotto="+lotto;
 			var ricercaLottiDdtAcquistoUrl = baseUrl + "ddts-acquisto/search-lotto?lotto="+lotto;
-			var ricercaLottiProduzioneUrl = baseUrl + "produzioni?lotto="+lotto;
+			var ricercaLottiProduzioneUrl = baseUrl + "produzioni/search-lotto?lotto="+lotto;
 
 			$.when($.fn.loadRicercaLottiDdtTable(ricercaLottiDdtUrl),$.fn.loadRicercaLottiDdtAcquistoTable(ricercaLottiDdtAcquistoUrl), $.fn.loadRicercaLottiProduzioneTable(ricercaLottiProduzioneUrl)).then(function(f1,f2,f3){
 				$('#alertRicercaLotti').empty();

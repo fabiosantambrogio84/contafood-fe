@@ -343,8 +343,8 @@ $(document).ready(function() {
 								"lengthChange": false,
 								"info": false,
 								"order": [
-									[0, 'desc'],
-									[1, 'desc']
+									[0, 'asc'],
+									[1, 'asc']
 								],
 								"autoWidth": false,
 								"columns": [
@@ -481,8 +481,8 @@ $(document).ready(function() {
 								"lengthChange": false,
 								"info": false,
 								"order": [
-									[0, 'desc'],
-									[1, 'desc']
+									[0, 'asc'],
+									[1, 'asc']
 								],
 								"autoWidth": false,
 								"columns": [
@@ -495,8 +495,11 @@ $(document).ready(function() {
 									}},
 									{"name": "lotto", "data": "lotto"},
 									{"name": "scadenza", "data": null, render: function (data, type, row) {
-										var a = moment(data.scadenza);
-										return a.format('DD/MM/YYYY');
+										var result = '';
+										if (data.scadenza != null) {
+											result = moment(data.scadenza).format('DD/MM/YYYY');
+										}
+										return result;
 									}},
 									{"name": "quantita", "data": "quantita"},
 									{"name": "pezzi", "data": "numeroPezzi"},
