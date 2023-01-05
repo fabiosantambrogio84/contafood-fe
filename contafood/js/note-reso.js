@@ -36,9 +36,11 @@ $.fn.loadNoteResoTable = function(url) {
 		"autoWidth": false,
 		"order": [
 			[0, 'desc'],
-			[1, 'desc']
+			[1, 'desc'],
+			[2, 'desc']
 		],
 		"columns": [
+			{"name": "anno", "data": "anno", "width":"5%", "visible": false},
 			{"name": "speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var speditoAde = data.speditoAde;
 				if(speditoAde){
@@ -775,8 +777,8 @@ $(document).ready(function() {
 		}
 		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+ $.fn.fixDecimalPlaces(quantita,3)+'">';
-		var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+prezzo+'">';
-		var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+sconto+'">';
+		var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+prezzo+'">';
+		var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+sconto+'">';
 
 		var udmHtml = '<select class="form-control form-control-sm ">\n' +
 			'                    <option value=""></option>';
@@ -1220,8 +1222,8 @@ $.fn.getNotaReso = function(idNotaReso){
 						}
 						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+ $.fn.fixDecimalPlaces(quantita,3)+'">';
-						var prezzoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+prezzo+'">';
-						var scontoHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+sconto+'">';
+						var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+prezzo+'">';
+						var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale group" value="'+sconto+'">';
 
 						var udmHtml = '<select class="form-control form-control-sm ">\n' +
 							'                    <option value=""></option>';

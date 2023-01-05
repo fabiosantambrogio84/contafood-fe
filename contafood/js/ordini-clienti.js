@@ -762,6 +762,8 @@ $(document).ready(function() {
 					}
 
 					$.fn.loadStatistiche();
+
+					$.fn.checkOrdiniArticoliDaEvadere(cliente);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
@@ -916,8 +918,8 @@ $.fn.loadOrdiniClientiTable = function(url){
 					"autoWidth": false,
 					"order": [
 						[0, 'asc'],
-						[1, 'desc'],
-						[2, 'desc']
+						[2, 'desc'],
+						[1, 'desc']
 					],
 					"columns": [
 						{"name":"stato", "data": "statoOrdine.ordine", "width":"5%", "visible": false},
@@ -1604,6 +1606,34 @@ $.fn.loadStatistiche = function(){
 		$('#alertOrdineCliente').empty()
 	);
 
+};
+
+$.fn.checkOrdiniArticoliDaEvadere = function(idCliente){
+
+	var alertContent = '<div id="alertOrdineClienteContent" class="alert alert-warning alert-dismissible fade show" role="alert">';
+	alertContent = alertContent + '@@alertText@@\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+	$.ajax({
+		url: baseUrl + "ordini-clienti/ordini-articoli-da-evadere?idCliente="+idCliente,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$('.alertOrdineCliente').empty();
+				var content = '<ul>'
+				$.each(result, function(i, item){
+					content += '<li class="">'+item.descrizione+'</li>';
+				});
+				content += '</ul>'
+				$('#alertOrdineCliente').append(alertContent.replace('@@alertText@@',content));
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel controllo di ordini precedenti da evadere'));
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
 };
 
 $.fn.createArticoloRow = function(id, codice, descrizione, prezzoListinoBase, pezzi, index, alreadyAddedRows){

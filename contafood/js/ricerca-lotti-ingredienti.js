@@ -185,6 +185,62 @@ $.fn.loadRicercaLottiIngredientiDocumentiAcquistoTable = function(url) {
 	});
 }
 
+$.fn.loadRicercaLottiIngredientiDocumentiVenditaTable = function(url) {
+	if($.fn.DataTable.isDataTable( '#ricercaLottiIngredientiDocumentiVenditaTable' )){
+		$('#ricercaLottiIngredientiDocumentiVenditaTable').DataTable().destroy();
+	}
+
+	$('#ricercaLottiIngredientiDocumentiVenditaTable').DataTable({
+		"ajax": {
+			"url": url,
+			"type": "GET",
+			"content-type": "json",
+			"cache": false,
+			"dataSrc": "",
+			"error": function(jqXHR, textStatus, errorThrown) {
+				console.log('Response text: ' + jqXHR.responseText);
+				var alertContent = '<div id="alertRicercaLottiIngredientiContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				alertContent = alertContent + '<strong>Errore nel recupero dei documenti vendita</strong>\n' +
+					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+				$('#alertRicercaLottiIngredienti').empty().append(alertContent);
+			}
+		},
+		"language": {
+			"search": "Cerca",
+			"paginate": {
+				"first": "Inizio",
+				"last": "Fine",
+				"next": "Succ.",
+				"previous": "Prec."
+			},
+			"emptyTable": "Nessun documento disponibile",
+			"zeroRecords": "Nessun documento disponibile"
+		},
+		"searching": true,
+		"responsive":true,
+		"pageLength": 20,
+		"lengthChange": false,
+		"info": false,
+		"autoWidth": false,
+		"order": [
+			[0, 'asc'],
+			[2, 'desc'],
+			[1, 'desc']
+		],
+		"columns": [
+			{"title":"Tipo", "name": "tipo", "data": "tipoDocumento", "width":"5%"},
+			{"title":"Numero", "name": "numero", "data": "numDocumento", "width":"5%"},
+			{"title":"Data", "name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
+				var a = moment(data.dataDocumento);
+				return a.format('DD/MM/YYYY');
+			}}
+		],
+		"initComplete": function( settings, json ) {
+			$('#ricercaLottiIngredientiDocumentiVenditaTitle').removeClass('d-none');
+		}
+	});
+}
+
 $(document).ready(function() {
 
 	$(document).on('submit','#ricercaLottiIngredientiForm', function(event){
@@ -201,11 +257,13 @@ $(document).ready(function() {
 
 			var ricercaLottiIngredientiProduzioniIngredientiUrl = baseUrl + "search-lotto-ingredienti/produzioni-ingredienti?lotto="+lotto;
 			var ricercaLottiIngredientiProduzioniConfezioniUrl = baseUrl + "search-lotto-ingredienti/produzioni-confezioni?lotto="+lotto;
+			var ricercaLottiIngredientiDocumentiVenditaUrl = baseUrl + "search-lotto-ingredienti/documenti-vendite?lotto="+lotto;
 			var ricercaLottiIngredientiDocumentiAcquistoUrl = baseUrl + "search-lotto-ingredienti/documenti-acquisti?lotto="+lotto;
 
 			$.when($.fn.loadRicercaLottiIngredientiProduzioniIngredientiTable(ricercaLottiIngredientiProduzioniIngredientiUrl),
 				$.fn.loadRicercaLottiIngredientiProduzioniConfezioniTable(ricercaLottiIngredientiProduzioniConfezioniUrl),
-				$.fn.loadRicercaLottiIngredientiDocumentiAcquistoTable(ricercaLottiIngredientiDocumentiAcquistoUrl)).then(function(f1,f2,f3){
+				$.fn.loadRicercaLottiIngredientiDocumentiVenditaTable(ricercaLottiIngredientiDocumentiVenditaUrl),
+				$.fn.loadRicercaLottiIngredientiDocumentiAcquistoTable(ricercaLottiIngredientiDocumentiAcquistoUrl)).then(function(f1,f2,f3,f4){
 				$('#alertRicercaLottiIngredienti').empty();
 				$('.custom-divider').removeClass('d-none');
 			});
@@ -220,6 +278,7 @@ $(document).ready(function() {
 
 		$('#ricercaLottiIngredientiProduzioniIngredientiTitle').addClass('d-none');
 		$('#ricercaLottiIngredientiProduzioniConfezioniTitle').addClass('d-none');
+		$('#ricercaLottiIngredientiDocumentiVenditaTitle').addClass('d-none');
 		$('#ricercaLottiIngredientiDocumentiAcquistoTitle').addClass('d-none');
 
 		$('.custom-divider').addClass('d-none');
@@ -240,6 +299,11 @@ $(document).ready(function() {
 		if($.fn.DataTable.isDataTable( '#ricercaLottiIngredientiProduzioniConfezioniTable' )){
 			ricercaLottiIngredientiProduzioniConfezioniTable.DataTable().destroy(true);
 			$(tableContent.replace('@@tableId@@', 'ricercaLottiIngredientiProduzioniConfezioniTable')).insertAfter("#ricercaLottiIngredientiProduzioniConfezioniTitle");
+		}
+		var ricercaLottiIngredientiDocumentiVenditaTable = $('#ricercaLottiIngredientiDocumentiVenditaTable');
+		if($.fn.DataTable.isDataTable( '#ricercaLottiIngredientiDocumentiVenditaTable' )){
+			ricercaLottiIngredientiDocumentiVenditaTable.DataTable().destroy(true);
+			$(tableContent.replace('@@tableId@@', 'ricercaLottiIngredientiDocumentiVenditaTable')).insertAfter("#ricercaLottiIngredientiDocumentiVenditaTitle");
 		}
 		var ricercaLottiIngredientiDocumentiAcquistoTable = $('#ricercaLottiIngredientiDocumentiAcquistoTable');
 		if($.fn.DataTable.isDataTable( '#ricercaLottiIngredientiDocumentiAcquistoTable' )){

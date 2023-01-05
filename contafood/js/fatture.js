@@ -34,9 +34,11 @@ $.fn.loadFattureTable = function(url) {
 		"info": false,
 		"autoWidth": false,
 		"order": [
-			[2, 'desc']
+			[0, 'desc'],
+			[3, 'desc']
 		],
 		"columns": [
+			{"name":"anno", "data": "anno", "width":"5%", "visible": false},
 			{"name":"speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var speditoAde = data.speditoAde;
 				var fatturaId = data.id;
