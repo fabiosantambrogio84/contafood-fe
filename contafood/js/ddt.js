@@ -691,6 +691,12 @@ $(document).ready(function() {
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
+		var dataTrasporto = $('#dataTrasporto').val();
+		if(!dataTrasporto){
+			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire una data di trasporto").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
 		var validDataTrasporto = $.fn.validateDataTrasporto();
 		if(!validDataTrasporto){
 			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
@@ -704,6 +710,18 @@ $(document).ready(function() {
 		var validData = $('#data').val();
 		if(!validData){
 			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire una data").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
+		var numColli = $('#colli').val();
+		if(!numColli){
+			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire un numero colli").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
+		var oraTrasporto = $('#oraTrasporto').val();
+		if(!oraTrasporto){
+			$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire un'ora di trasporto").replace('@@alertResult@@', 'danger'));
 			return false;
 		}
 
@@ -756,12 +774,11 @@ $(document).ready(function() {
 			ddt.ddtArticoli = ddtArticoli;
 		}
 		ddt.fatturato = false;
-		ddt.numeroColli = $('#colli').val();
+		ddt.numeroColli = numColli;
 		ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();
-		ddt.dataTrasporto = $('#dataTrasporto').val();
+		ddt.dataTrasporto = dataTrasporto;
 
 		var regex = /:/g;
-		var oraTrasporto = $('#oraTrasporto').val();
 		if(oraTrasporto != null && oraTrasporto != ''){
 			var count = oraTrasporto.match(regex);
 			count = (count) ? count.length : 0;
@@ -925,17 +942,37 @@ $(document).ready(function() {
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			/*
-			var validLotto = $.fn.validateLotto();
-			if(!validLotto){
-				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
+			var dataTrasporto = $('#dataTrasporto').val();
+			if(!dataTrasporto){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire una data di trasporto").replace('@@alertResult@@', 'danger'));
 				return false;
 			}
-			 */
 
 			var validDataTrasporto = $.fn.validateDataTrasporto();
 			if(!validDataTrasporto){
 				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+			var validCliente = $('#cliente option:selected').val();
+			if(!validCliente){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Selezionare un cliente").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+			var validData = $('#data').val();
+			if(!validData){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire una data").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var numColli = $('#colli').val();
+			if(!numColli){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire un numero colli").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var oraTrasporto = $('#oraTrasporto').val();
+			if(!oraTrasporto){
+				$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "Inserire un'ora di trasporto").replace('@@alertResult@@', 'danger'));
 				return false;
 			}
 
@@ -995,12 +1032,11 @@ $(document).ready(function() {
 				ddt.ddtArticoli = ddtArticoli;
 			}
 			ddt.fatturato = false;
-			ddt.numeroColli = $('#colli').val();
+			ddt.numeroColli = numColli;
 			ddt.tipoTrasporto = $('#tipoTrasporto option:selected').val();
-			ddt.dataTrasporto = $('#dataTrasporto').val();
+			ddt.dataTrasporto = dataTrasporto;
 
 			var regex = /:/g;
-			var oraTrasporto = $('#oraTrasporto').val();
 			if(oraTrasporto != null && oraTrasporto != ''){
 				var count = oraTrasporto.match(regex);
 				count = (count) ? count.length : 0;
