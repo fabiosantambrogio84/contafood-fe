@@ -8,7 +8,7 @@ $(document).ready(function() {
 			"type": "GET",
 			"content-type": "json",
 			"cache": false,
-			"dataSrc": "",
+			"dataSrc": "data",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
 				var alertContent = '<div id="alertProduzioneContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
@@ -26,20 +26,23 @@ $(document).ready(function() {
 				"previous": "Prec."
 			},
 			"emptyTable": "Nessuna produzione disponibile",
-			"zeroRecords": "Nessuna produzione disponibile"
+			"zeroRecords": "Nessuna produzione disponibile",
+			"info": "Da _START_ a _END_ di _TOTAL_ risultati"
 		},
 		"pageLength": 20,
 		"lengthChange": false,
-		"info": false,
+		"processing": true,
+		"serverSide": true,
+		"info": true,
 		"autoWidth": false,
 		"order": [
 			[0, 'desc'],
 			[1, 'desc']
 		],
 		"columns": [
-			{"name":"dataProduzioneHidden", "data": "dataProduzione", "width":"5%", "visible": false},
-			{"name": "codice", "data": "codiceProduzione", "width":"10%"},
-			{"name": "dataProduzione", "data": null, "width":"8%", render: function ( data, type, row ) {
+			{"name": "data_produzione", "data": "dataProduzione", "width":"5%", "visible": false},
+			{"name": "codice_produzione", "data": "codiceProduzione", "width":"10%"},
+			{"name": "data_produzione", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var a = moment(data.dataProduzione);
 				return a.format('DD/MM/YYYY');
 			}},
@@ -55,7 +58,7 @@ $(document).ready(function() {
 				}
 				return result;
 			}},
-			{"name": "numeroConfezioni", "data": "numConfezioniProdotte", "width":"12%", "className": "tdAlignRight" },
+			{"name": "num_confezioni_prodotte", "data": "numConfezioniProdotte", "width":"12%", "className": "tdAlignRight" },
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 				var links = '<a class="detailsProduzione pr-2" data-id="'+data.idProduzione+'" href="#"><i class="fas fa-info-circle"></i></a>';
 				links = links + '<a class="deleteProduzione" data-id="'+data.idProduzione+'" href="#"><i class="far fa-trash-alt"></i></a>';

@@ -17,7 +17,7 @@ $.fn.loadDdtTable = function(url) {
 					"type": "GET",
 					"content-type": "json",
 					"cache": false,
-					"dataSrc": "",
+					"dataSrc": "data",
 					"error": function(jqXHR, textStatus, errorThrown) {
 						console.log('Response text: ' + jqXHR.responseText);
 						var alertContent = '<div id="alertDdtContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
@@ -35,26 +35,29 @@ $.fn.loadDdtTable = function(url) {
 						"previous": "Prec."
 					},
 					"emptyTable": "Nessun DDT disponibile",
-					"zeroRecords": "Nessun DDT disponibile"
+					"zeroRecords": "Nessun DDT disponibile",
+					"info": "Da _START_ a _END_ di _TOTAL_ risultati"
 				},
 				"searching": false,
 				"responsive":true,
 				"pageLength": 20,
 				"lengthChange": false,
-				"info": false,
-				"dom": '<"top"p>rt<"bottom"p>',
+				"processing": true,
+				"serverSide": true,
+				"info": true,
+				"dom": '<"top"p>rt<"bottom"ip>',
 				"autoWidth": false,
 				"order": [
 					[0, 'desc'],
 					[2, 'desc']
 				],
 				"columns": [
-					{"name":"annoContabile", "data": "annoContabile", "width":"5%", "visible": false},
+					{"name":"anno_contabile", "data": "annoContabile", "width":"5%", "visible": false},
 					{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
 						var checkboxHtml = '<input type="checkbox" data-id="'+data.id+'" id="checkbox_'+data.id+'" class="checkDdt" >';
 						return checkboxHtml;
 					}},
-					{"name": "numero", "data": "progressivo", "width":"5%"},
+					{"name": "progressivo", "data": "progressivo", "width":"5%"},
 					{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
 						var a = moment(data.data);
 						return a.format('DD/MM/YYYY');
@@ -96,19 +99,19 @@ $.fn.loadDdtTable = function(url) {
 						autistaSelect += '</select';
 						return autistaSelect;
 					}},
-					{"name": "acconto", "data": null, "width":"6%", render: function ( data, type, row ) {
+					{"name": "totale_acconto", "data": null, "width":"6%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleAcconto);
 					}},
-					{"name": "importo", "data": null, "width":"6%",render: function ( data, type, row ) {
+					{"name": "totale", "data": null, "width":"6%",render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totale);
 					}},
-					{"name": "imponibile", "data": null, "width":"6%", render: function ( data, type, row ) {
+					{"name": "totale_imponibile", "data": null, "width":"6%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleImponibile);
 					}},
-					{"name": "costo", "data": null, "width":"6%", render: function ( data, type, row ) {
+					{"name": "totale_costo", "data": null, "width":"6%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleCosto);
 					}},
-					{"name": "guadagno", "data": null, "width":"6%", render: function ( data, type, row ) {
+					{"name": "guadagno", "data": null, "orderable":false, "width":"6%", render: function ( data, type, row ) {
 						var guadagno = data.totaleImponibile - data.totaleCosto;
 						return $.fn.formatNumber(guadagno);
 					}},
