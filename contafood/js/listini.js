@@ -219,8 +219,10 @@ $(document).ready(function() {
         $('#printListinoModal').modal('hide');
         var idListino = $(this).attr('data-id');
         var orderBy = $('#ordinamentoStampaListino option:selected').val();
+        var fornitore = $('#filtroStampaListinoFornitore option:selected').val();
+        var categoriaArticolo = $('#filtroStampaListinoCategoriaArticolo option:selected').val();
 
-        window.open(baseUrl + "stampe/listini/"+idListino+"?orderBy="+orderBy, '_blank');
+        window.open(baseUrl + "stampe/listini/"+idListino+"?"+"fornitore="+fornitore+"&categoriaArticolo="+categoriaArticolo+"&orderBy="+orderBy, '_blank');
     });
 
     $(document).on('click','.duplicateListino', function(){
@@ -679,6 +681,41 @@ $.fn.extractIdListinoFromUrl = function(){
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
+}
+
+$.fn.preloadPrintOptionsFields = function(){
+    $.ajax({
+        url: baseUrl + "fornitori?attivo=true",
+        type: 'GET',
+        dataType: 'json',
+        success: function(result) {
+            if(result != null && result != undefined && result != ''){
+                $.each(result, function(i, item){
+                    var label = item.ragioneSociale;
+                    $('#filtroStampaListinoFornitore').append('<option value="'+item.id+'">'+label+'</option>');
+                });
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log('Response text: ' + jqXHR.responseText);
+        }
+    });
+
+    $.ajax({
+        url: baseUrl + "categorie-articoli",
+        type: 'GET',
+        dataType: 'json',
+        success: function(result) {
+            if(result != null && result != undefined && result != ''){
+                $.each(result, function(i, item){
+                    $('#filtroStampaListinoCategoriaArticolo').append('<option value="'+item.id+'" >'+item.nome+'</option>');
+                });
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log('Response text: ' + jqXHR.responseText);
+        }
+    });
 }
 
 $.fn.getTipologieVariazioniPrezzo = function(){

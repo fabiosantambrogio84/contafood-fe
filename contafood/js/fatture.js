@@ -7,7 +7,7 @@ $.fn.loadFattureTable = function(url) {
 			"type": "GET",
 			"content-type": "json",
 			"cache": false,
-			"dataSrc": "",
+			"dataSrc": "data",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
 				var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
@@ -25,13 +25,16 @@ $.fn.loadFattureTable = function(url) {
 				"previous": "Prec."
 			},
 			"emptyTable": "Nessuna fattura disponibile",
-			"zeroRecords": "Nessuna fattura disponibile"
+			"zeroRecords": "Nessuna fattura disponibile",
+			"info": "Da _START_ a _END_ di _TOTAL_ risultati"
 		},
 		"searching": false,
 		"responsive":true,
 		"pageLength": 20,
 		"lengthChange": false,
-		"info": false,
+		"processing": true,
+		"serverSide": true,
+		"info": true,
 		"autoWidth": false,
 		"order": [
 			[0, 'desc'],
@@ -39,12 +42,12 @@ $.fn.loadFattureTable = function(url) {
 		],
 		"columns": [
 			{"name":"anno", "data": "anno", "width":"5%", "visible": false},
-			{"name":"speditoAde", "data": null, "width":"8%", render: function ( data, type, row ) {
+			{"name":"spedito_ade", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var speditoAde = data.speditoAde;
 				var fatturaId = data.id;
 				var selectId = "speditoAde_" + fatturaId;
 
-				var speditoAdeSelect = '<select id="'+selectId+'" class="form-control form-control-sm speditoAdeFattura" data-id="'+fatturaId+'" data-value="'+speditoAde+'" data-tipo="'+data.tipoFattura.codice+'">';
+				var speditoAdeSelect = '<select id="'+selectId+'" class="form-control form-control-sm speditoAdeFattura" data-id="'+fatturaId+'" data-value="'+speditoAde+'" data-tipo="'+data.tipoCodice+'">';
 				var optionHtml = '<option value="si"';
 				if(speditoAde){
 					optionHtml += ' selected'
@@ -62,15 +65,13 @@ $.fn.loadFattureTable = function(url) {
 				return speditoAdeSelect;
 			}},
 			{"name": "tipo", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var tipo = data.tipoFattura;
-				if(tipo != null){
-					if(tipo.id != null && tipo.id != undefined && tipo.id == 1){
-						return "Si";
-					}
+				var idTipo = data.idTipo;
+				if(idTipo != null && idTipo != undefined && idTipo == 1) {
+					return "Si";
 				}
-				return "No";
+					return "No";
 			}},
-			{"name": "numero", "data": "progressivo", "width":"5%"},
+			{"name": "progressivo", "data": "progressivo", "width":"5%"},
 			{"name": "data", "data": null, "width":"8%", render: function ( data, type, row ) {
 				var a = moment(data.data);
 				return a.format('DD/MM/YYYY');
@@ -78,17 +79,14 @@ $.fn.loadFattureTable = function(url) {
 			{"name": "cliente", "data": null, "width":"10%", render: function ( data, type, row ) {
 				var cliente = data.cliente;
 				if(cliente != null){
-					return cliente.ragioneSociale;
+					return cliente;
 				}
 				return '';
 			}},
 			{"name": "agente", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var cliente = data.cliente;
-				if(cliente != null){
-					var agente = cliente.agente;
-					if(agente != null){
-						return agente.nome + ' ' + agente.cognome;
-					}
+				var agente = data.agente;
+				if(agente != null){
+					return agente;
 				}
 				return '';
 			}},
@@ -107,41 +105,38 @@ $.fn.loadFattureTable = function(url) {
 				if(totale == null || totale == undefined || totale == ''){
 					totale = 0;
 				}
-				var tipo = data.tipoFattura;
+				var tipo = data.idTipo;
 				var pagamentoUrl = "pagamenti-new.html?";
-				if(tipo != null){
-					if(tipo.id != null && tipo.id != undefined && tipo.id == 1){
+				if(idTipo != null && idTipo != undefined){
+					if(idTipo == 1){
 						pagamentoUrl += "idFatturaAccompagnatoria="+data.id;
 					} else {
 						pagamentoUrl += "idFattura="+data.id;
 					}
 				}
 
-				var stato = data.statoFattura;
+				var stato = data.statoCodice;
 
-				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE') {
+				var links = '<a class="detailsFatture pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoCodice+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+				if(stato != null && stato != undefined && stato != '' && stato == 'DA_PAGARE') {
 					links += '<a class="updateFattura pr-1" data-id="' + data.id + '" href="fatture-edit.html?idFattura=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
 				}
 				if((totale - acconto) != 0){
 					links += '<a class="payFattura pr-1" data-id="'+data.id+'" href="' + pagamentoUrl + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 				}
-				links += '<a class="printFattura pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-				links += '<a class="downloadAdeXml pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Download XML AdE"><i class="fa fa-download"></i></a>';
+				links += '<a class="printFattura pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoCodice+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+				links += '<a class="downloadAdeXml pr-1" data-id="'+data.id+'" data-tipo="'+data.tipoCodice+'" href="#" title="Download XML AdE"><i class="fa fa-download"></i></a>';
 
-				var tipo = data.tipoFattura;
-                if(tipo != null){
-                    if(tipo.id != null && tipo.id != undefined && tipo.id == 0){
-						var cliente = data.cliente;
-						if(cliente != null){
-							var email = cliente.email;
-							links += '<a class="emailFattura pr-1" data-id="'+data.id+'" data-email-to="'+email+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
-						}
-                    }
-                }
+				var idTipo = data.idTipo;
+				if(idTipo != null && idTipo != undefined && idTipo == 0){
+					var clienteEmail = data.clienteEmail;
+					if(clienteEmail != null){
+						links += '<a class="emailFattura pr-1" data-id="'+data.id+'" data-email-to="'+clienteEmail+'" href="#" title="Invio email"><i class="fa fa-envelope"></i></a>';
+					}
+				}
 
-				if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE') {
-					links += '<a class="deleteFatture" data-id="' + data.id + '" data-tipo="'+data.tipoFattura.codice+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+				if(stato != null && stato != undefined && stato != '' && stato == 'DA_PAGARE') {
+					links += '<a class="deleteFatture" data-id="' + data.id + '" data-tipo="'+data.tipoCodice+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				}
 				return links;
 			}}
@@ -1273,7 +1268,7 @@ $.fn.loadDdtDaFatturare = function(){
 				"type": "GET",
 				"content-type": "json",
 				"cache": false,
-				"dataSrc": "",
+				"dataSrc": "data",
 				"error": function(jqXHR, textStatus, errorThrown) {
 					console.log('Response text: ' + jqXHR.responseText);
 					var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';

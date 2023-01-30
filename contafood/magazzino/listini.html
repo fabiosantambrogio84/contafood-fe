@@ -39,6 +39,11 @@
 
   <script src="../js/commons.js"></script>
 
+  <script src="../js/listini.js"></script>
+
+  <script>
+    $.fn.preloadPrintOptionsFields();
+  </script>
 </head>
 
 <body id="page-top">
@@ -148,7 +153,7 @@
             <div class="modal-dialog" role="document">
               <div class="modal-content">
                 <div class="modal-header">
-                  <h5 class="modal-title" id="printListinoModalTitle">Seleziona ordinamento stampa</h5>
+                  <h5 class="modal-title" id="printListinoModalTitle">Opzioni stampa</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -159,6 +164,25 @@
                       <div class="form-group col-md-6">
                         <label for="ordinamentoStampaListino">Ordina per</label>
                         <select id="ordinamentoStampaListino" class="form-control">
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-12">
+                        <span>Filtra per</span>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group col-md-6">
+                        <label for="filtroStampaListinoFornitore">Fornitore</label>
+                        <select id="filtroStampaListinoFornitore" class="form-control">
+                          <option value=""></option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-6">
+                        <label for="filtroStampaListinoCategoriaArticolo">Categoria articolo</label>
+                        <select id="filtroStampaListinoCategoriaArticolo" class="form-control">
+                          <option value=""></option>
                         </select>
                       </div>
                     </div>
@@ -233,8 +257,6 @@
   <!-- Page level plugins -->
   <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-  <script src="../js/listini.js"></script>
 
 </body>
 
