@@ -105,7 +105,7 @@ $.fn.loadFattureTable = function(url) {
 				if(totale == null || totale == undefined || totale == ''){
 					totale = 0;
 				}
-				var tipo = data.idTipo;
+				var idTipo = data.idTipo;
 				var pagamentoUrl = "pagamenti-new.html?";
 				if(idTipo != null && idTipo != undefined){
 					if(idTipo == 1){
@@ -144,11 +144,11 @@ $.fn.loadFattureTable = function(url) {
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px').addClass('rowFattura');
 			$(row).attr('data-id-fattura', data.id);
-			if(data.statoFattura != null){
+			if(data.statoCodice != null){
 				var backgroundColor = '';
-				if(data.statoFattura.codice == 'DA_PAGARE'){
+				if(data.statoCodice == 'DA_PAGARE'){
 					backgroundColor = '#fcf456';
-				} else if(data.statoFattura.codice == 'PARZIALMENTE_PAGATA'){
+				} else if(data.statoCodice == 'PARZIALMENTE_PAGATA'){
 					backgroundColor = '#fcc08b';
 				} else {
 					backgroundColor = 'trasparent';

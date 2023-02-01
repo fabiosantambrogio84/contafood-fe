@@ -685,7 +685,7 @@ $.fn.extractIdListinoFromUrl = function(){
 
 $.fn.preloadPrintOptionsFields = function(){
     $.ajax({
-        url: baseUrl + "fornitori?attivo=true",
+        url: baseUrl + "fornitori?attivo=true&codiceTipo=FORNITORE_ARTICOLI",
         type: 'GET',
         dataType: 'json',
         success: function(result) {
