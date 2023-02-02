@@ -501,7 +501,11 @@ $.fn.computeTotale = function() {
 
     articoliTable.rows().nodes().each(function(i, item){
         var totale = $(i).children().eq(8).text();
+        if($.fn.isRicevutaPrivato()){
+            totale = $(i).children().eq(6).children().eq(0).attr('data-totale');
+        }
         totale = $.fn.parseValue(totale, 'float');
+
         var iva = $(i).children().eq(9).text();
         iva = $.fn.parseValue(iva, 'int');
 

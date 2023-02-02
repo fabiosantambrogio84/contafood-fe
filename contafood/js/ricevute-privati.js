@@ -366,7 +366,7 @@ $(document).ready(function() {
 								}},
 								{"name": "quantita", "data": "quantita"},
 								{"name": "pezzi", "data": "numeroPezzi"},
-								{"name": "prezzo", "data": "prezzo"},
+								{"name": "prezzo", "data": "prezzoIva"},
 								{"name": "sconto", "data": "sconto"},
 								{"name": "imponibile", "data": "imponibile"},
 								{"name": "costo", "data": "costo"}
@@ -605,6 +605,30 @@ $(document).ready(function() {
 			return false;
 		}
 
+		var numeroColli = $('#colli').val();
+		if(!numeroColli){
+			$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Inserire un numero colli").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
+		var oraTrasporto = $('#oraTrasporto').val();
+		if(!oraTrasporto){
+			$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Inserire un'ora di trasporto").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
+		var trasportatore = $('#tipoTrasporto').val();
+		if(!trasportatore){
+			$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Selezionare un trasportatore").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
+		var idCausale = $('#causale option:selected').val();
+		if(!idCausale){
+			$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Selezionare una causale").replace('@@alertResult@@', 'danger'));
+			return false;
+		}
+
 		var ricevutaPrivato = new Object();
 		ricevutaPrivato.progressivo = $('#progressivo').val();
 		ricevutaPrivato.anno = $('#anno').val();
@@ -619,7 +643,7 @@ $(document).ready(function() {
 		ricevutaPrivato.puntoConsegna = puntoConsegna;
 
 		var causale = new Object();
-		causale.id = $('#causale option:selected').val();
+		causale.id = idCausale;
 		ricevutaPrivato.causale = causale;
 
 		var ricevutaPrivatoArticoliLength = $('.rowArticolo').length;
@@ -637,7 +661,8 @@ $(document).ready(function() {
 				ricevutaPrivatoArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
 				ricevutaPrivatoArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
 				ricevutaPrivatoArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-				ricevutaPrivatoArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
+				ricevutaPrivatoArticolo.prezzoIva = $(this).children().eq(6).children().eq(0).val();
+				ricevutaPrivatoArticolo.prezzo = $(this).children().eq(6).children().eq(0).attr('data-prezzo');
 				ricevutaPrivatoArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
 
 				ricevutaPrivatoArticoli.push(ricevutaPrivatoArticolo);
@@ -663,12 +688,11 @@ $(document).ready(function() {
 			ricevutaPrivato.ricevutaPrivatoTotali = ricevutaPrivatoTotali;
 		}
 
-		ricevutaPrivato.numeroColli = $('#colli').val();
+		ricevutaPrivato.numeroColli = numeroColli;
 		ricevutaPrivato.tipoTrasporto = $('#tipoTrasporto option:selected').val();
 		ricevutaPrivato.dataTrasporto = $('#dataTrasporto').val();
 
 		var regex = /:/g;
-		var oraTrasporto = $('#oraTrasporto').val();
 		if(oraTrasporto != null && oraTrasporto != ''){
 			var count = oraTrasporto.match(regex);
 			count = (count) ? count.length : 0;
@@ -678,7 +702,7 @@ $(document).ready(function() {
 				ricevutaPrivato.oraTrasporto = $('#oraTrasporto').val();
 			}
 		}
-		ricevutaPrivato.trasportatore = $('#trasportatore').val();
+		ricevutaPrivato.trasportatore = trasportatore;
 		ricevutaPrivato.note = $('#note').val();
 
 		var ricevutaPrivatoJson = JSON.stringify(ricevutaPrivato);
@@ -919,6 +943,7 @@ $(document).ready(function() {
 				prezzo = prezzoBase;
 			}
 			var sconto = $('#articolo option:selected').attr('data-sconto');
+			var prezzoIva = Number(Math.round(($.fn.parseValue(prezzo, 'float') + ($.fn.parseValue(prezzo, 'float') * ($.fn.parseValue(iva, 'int')/100))) + 'e2') + 'e-2');
 
 			$('#udm').val(udm);
 			$('#iva').val(iva);
@@ -927,6 +952,7 @@ $(document).ready(function() {
 			$('#quantita').val(quantita);
 			$('#pezzi').val('');
 			$('#prezzo').val(prezzo);
+			$('#prezzo').attr("data-prezzo-iva", prezzoIva);
 			$('#sconto').val(sconto);
 		} else {
 			$('#udm').val('');
@@ -936,6 +962,7 @@ $(document).ready(function() {
 			$('#quantita').val('');
 			$('#pezzi').val('');
 			$('#prezzo').val('');
+			$('#prezzo').attr("data-prezzo-iva", '');
 			$('#sconto').val('');
 		}
 	});
@@ -976,6 +1003,7 @@ $(document).ready(function() {
 		var scadenza = $('#scadenza').val();
 		var quantita = $('#quantita').val();
 		var prezzo = $('#prezzo').val();
+		var prezzoIva = $('#prezzo').attr("data-prezzo-iva");
 		var sconto = $('#sconto').val();
 		var iva = $('#iva').val();
 		var codiceFornitore = $('#articolo option:selected').attr("data-codice-fornitore");
@@ -991,7 +1019,6 @@ $(document).ready(function() {
 
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+ $.fn.fixDecimalPlaces(quantita, 3) +'">';
 		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
-		var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+prezzo+'">';
 		var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+sconto+'">';
 
 		// check if a same articolo was already added
@@ -1000,6 +1027,7 @@ $(document).ready(function() {
 		var currentIdArticolo;
 		var currentLotto;
 		var currentPrezzo;
+		var currentPrezzoIva;
 		var currentSconto;
 		var currentScadenza;
 		var currentQuantita = 0;
@@ -1013,12 +1041,13 @@ $(document).ready(function() {
 					currentIdArticolo = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
-					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+					currentPrezzo = $(this).children().eq(6).children().eq(0).attr('data-prezzo');
+					currentPrezzoIva = $(this).children().eq(6).children().eq(0).val();
 					currentSconto = $(this).children().eq(7).children().eq(0).val();
 
 					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
-						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
+						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzoIva) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentScadenza) == $.fn.normalizeIfEmptyOrNullVariable(scadenza)){
 						found = 1;
@@ -1029,15 +1058,21 @@ $(document).ready(function() {
 			});
 		}
 
+		var totaleConIva = 0;
 		var totale = 0;
 		quantita = $.fn.parseValue(quantita, 'float');
+		prezzoIva = $.fn.parseValue(prezzoIva, 'float');
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		sconto = $.fn.parseValue(sconto, 'float');
 		pezzi = $.fn.parseValue(pezzi, 'int');
+		iva = $.fn.parseValue(iva, 'int');
 
-		var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
-		var scontoValue = (sconto/100)*quantitaPerPrezzo;
-		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+		var pezziPerPrezzo = ((pezzi + $.fn.parseValue(currentPezzi,'float')) * prezzo);
+		var scontoValue = (sconto/100)*pezziPerPrezzo;
+		totale = Number(Math.round((pezziPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+		var ivaTotale = (iva/100)*totale;
+		totaleConIva = Number(Math.round((totale + ivaTotale) + 'e2') + 'e-2');
 
 		var table = $('#ricevutaPrivatoArticoliTable').DataTable();
 		if(found >= 1){
@@ -1051,7 +1086,7 @@ $(document).ready(function() {
 			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+currentLotto+'" data-codice-fornitore="'+codiceFornitore+'">';
 			var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(currentScadenza).format('YYYY-MM-DD')+'">';
 
-			var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+currentPrezzo+'">';
+			var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+currentPrezzoIva+'" data-prezzo="'+currentPrezzo+'" data-totale="'+totale+'">';
 			var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+currentSconto+'">';
 
 			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
@@ -1061,10 +1096,11 @@ $(document).ready(function() {
 			rowData[5] = newPezziHtml;
 			rowData[6] = prezzoHtml;
 			rowData[7] = scontoHtml;
-			rowData[8] = totale;
+			rowData[8] = totaleConIva;
 			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 
 		} else {
+			var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+prezzoIva+'" data-prezzo="'+prezzo+'" data-totale="'+totale+'">';
 			var deleteLink = '<a class="deleteRicevutaPrivatoArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 			var rowsCount = table.rows().count();
@@ -1078,7 +1114,7 @@ $(document).ready(function() {
 				pezziHtml,
 				prezzoHtml,
 				scontoHtml,
-				totale,
+				totaleConIva,
 				iva,
 				deleteLink
 			] ).draw( false ).node();
@@ -1100,6 +1136,7 @@ $(document).ready(function() {
 		$('#quantita').val('');
 		$('#pezzi').val('');
 		$('#prezzo').val('');
+		$('#prezzo').attr("data-prezzo-iva",'');
 		$('#sconto').val('');
 
 		$('#articolo').focus();
@@ -1117,18 +1154,25 @@ $(document).ready(function() {
 
 	$(document).on('change','.compute-totale', function(){
 		$.row = $(this).parent().parent();
-		var quantita = $.row.children().eq(4).children().eq(0).val();
-		quantita = $.fn.parseValue(quantita, 'float');
-		var prezzo = $.row.children().eq(6).children().eq(0).val();
+		var pezzi = $.row.children().eq(5).children().eq(0).val();
+		pezzi = $.fn.parseValue(pezzi, 'int');
+		var prezzo = $.row.children().eq(6).children().eq(0).attr('data-prezzo');
 		prezzo = $.fn.parseValue(prezzo, 'float');
 		var sconto = $.row.children().eq(7).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
+		var iva = $.row.children().eq(9).text();
+		iva = $.fn.parseValue(iva, 'int');
 
-		var quantitaPerPrezzo = (quantita * prezzo);
-		var scontoValue = (sconto/100)*quantitaPerPrezzo;
-		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+		var pezziPerPrezzo = (pezzi * prezzo);
+		var scontoValue = (sconto/100)*pezziPerPrezzo;
+		var totale = Number(Math.round((pezziPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		$.row.children().eq(8).text(totale);
+		var ivaTotale = (iva/100)*totale;
+		var totaleConIva = Number(Math.round((totale + ivaTotale) + 'e2') + 'e-2');
+
+
+		$.row.children().eq(8).text(totaleConIva);
+		$.row.children().eq(6).children().eq(0).attr('data-totale',totale);
 
 		$.fn.computeTotale();
 	});
