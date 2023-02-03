@@ -406,6 +406,7 @@ $.fn.validateDataTrasporto = function(){
 $.fn.checkPezziOrdinati = function(){
 
     var articoliMap = new Map();
+    var articoliMapTwo = new Map();
     var articoliArray = [];
     var ordiniClientiArticoliArray = [];
 
@@ -422,6 +423,8 @@ $.fn.checkPezziOrdinati = function(){
         var idArticolo = $(i).attr('data-id');
         var numeroPezzi = $(i).children().eq(5).children().eq(0).val();
         numeroPezzi = $.fn.parseValue(numeroPezzi, 'int');
+        var numeroPezziStart = $(i).children().eq(5).children().eq(0).attr('data-start-num-pezzi');
+        numeroPezziStart = $.fn.parseValue(numeroPezziStart, 'int');
 
         var totaliPezzi;
         if(articoliMap.has(idArticolo)){
@@ -432,58 +435,142 @@ $.fn.checkPezziOrdinati = function(){
         totaliPezzi = totaliPezzi + numeroPezzi;
         articoliMap.set(idArticolo, totaliPezzi);
 
+        var totaliPezziStart;
+        if(articoliMapTwo.has(idArticolo)){
+            totaliPezziStart = articoliMapTwo.get(idArticolo);
+        } else {
+            totaliPezziStart = 0;
+        }
+        totaliPezziStart = totaliPezziStart + numeroPezziStart;
+        articoliMapTwo.set(idArticolo, totaliPezziStart);
+
         articoliArray.push(idArticolo);
     });
 
-    var ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
+    var ordineClienteArticoliTable;
+    if($.fn.DataTable.isDataTable( '#ordiniClientiArticoliTable' )){
+        ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
+    }
 
-    ordineClienteArticoliTable.rows().nodes().each(function(i, item){
-        var idArticolo = $(i).attr('data-id-articolo');
-        ordiniClientiArticoliArray.push(idArticolo);
-    });
-    var ordineClienteArticoliTableRowsNodes = ordineClienteArticoliTable.rows().nodes().to$();
+    if(!$.fn.checkVariableIsNull(ordineClienteArticoliTable)){
+        ordineClienteArticoliTable.rows().nodes().each(function(i, item){
+            var idArticolo = $(i).attr('data-id-articolo');
+            ordiniClientiArticoliArray.push(idArticolo);
+        });
+        var ordineClienteArticoliTableRowsNodes = ordineClienteArticoliTable.rows().nodes().to$();
 
-    articoliMap.forEach( (value, key, map) => {
-        var ordiniClientiArticoloLength = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').length;
-        //var ordiniClientiArticoloLength = $('#ordiniClientiArticoliTable span[data-id-articolo='+key+']').length;
+        articoliMap.forEach( (value, key, map) => {
+            var ordiniClientiArticoloLength = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').length;
+            //var ordiniClientiArticoloLength = $('#ordiniClientiArticoliTable span[data-id-articolo='+key+']').length;
+
+            if(ordiniClientiArticoloLength != 0){
+                var numeroPezziOrdinati = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').find("td:eq(3)").text();
+                var numeroPezziEvasi = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').attr('data-start-num-pezzi-evasi');
+                var numeroPezziStart = articoliMapTwo.get(key);
+                numeroPezziOrdinati = $.fn.parseValue(numeroPezziOrdinati, 'int');
+                numeroPezziEvasi = $.fn.parseValue(numeroPezziEvasi, 'int');
+                numeroPezziStart = $.fn.parseValue(numeroPezziStart, 'int');
+                value = $.fn.parseValue(value, 'int');
+
+                var newNumeroPezziEvasi = numeroPezziEvasi - numeroPezziStart + value;
+
+                var backgroundColor;
+                if(newNumeroPezziEvasi == numeroPezziOrdinati){
+                    backgroundColor = 'transparent';
+                } else if(newNumeroPezziEvasi == 0){
+                    backgroundColor = rowBackgroundVerde;
+                } else if(newNumeroPezziEvasi < numeroPezziOrdinati){
+                    backgroundColor = rowBackgroundRosa;
+                } else {
+                    backgroundColor = rowBackgroundGiallo;
+                }
+                ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').css('background-color', backgroundColor).attr('data-num-pezzi-evasi', newNumeroPezziEvasi).attr('data-set-id-ddt', 'true');
+
+                var rowData = ordineClienteArticoliTable.row("[data-id-articolo='"+key+"']").data();
+                rowData["numeroPezziEvasi"] = newNumeroPezziEvasi;
+                ordineClienteArticoliTable.row("[data-id-articolo='"+key+"']").data(rowData).draw();
+            } else {
+                // articolo non presente in quelli ordinati
+                var pathname = window.location.pathname;
+                if(!$.fn.checkVariableIsNull(pathname)){
+                    if(pathname.indexOf('ddt-new') != -1){
+                        $('tr[data-id='+key+']').css('background-color', '#F9BCBC');
+                    }
+                }
+            }
+        });
+
+        $(ordiniClientiArticoliArray).not(articoliArray).each(function(i, item){
+            ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+item+']').css('background-color', rowBackgroundVerde);
+            //$('#ordiniClientiArticoliTable span[data-id-articolo='+item+']').parent().parent().css('background-color', rowBackgroundVerde);
+        })
+    }
+}
+
+$.fn.checkPezziOrdinatiAfterArticoloDelete = function(idArticolo, idDdt){
+
+    var articoliArray = [];
+    articoliArray.push(idArticolo);
+    var ordiniClientiArticoliArray = [];
+
+    var ordineClienteArticoliTable;
+    if($.fn.DataTable.isDataTable( '#ordiniClientiArticoliTable' )){
+        ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
+    }
+
+    if(!$.fn.checkVariableIsNull(ordineClienteArticoliTable)){
+        var ordineClienteArticoliTableRowsNodes = ordineClienteArticoliTable.rows().nodes().to$();
+        var ordiniClientiArticoloLength = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+idArticolo+']').length;
+
+        ordineClienteArticoliTable.rows().nodes().each(function(i, item){
+            var idArticolo = $(i).attr('data-id-articolo');
+            ordiniClientiArticoliArray.push(idArticolo);
+        });
 
         if(ordiniClientiArticoloLength != 0){
-            var numeroPezziOrdinati = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').find("td:eq(3)").text();
-            var numeroPezziEvasi = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').attr('data-start-num-pezzi-evasi');
+            var numeroPezziOrdinati = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+idArticolo+']').find("td:eq(3)").text();
+            var numeroPezziEvasiStart = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+idArticolo+']').attr('data-start-num-pezzi-evasi');
+            var idsDdts = ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+idArticolo+']').attr('data-ids-ddts');
             numeroPezziOrdinati = $.fn.parseValue(numeroPezziOrdinati, 'int');
-            numeroPezziEvasi = $.fn.parseValue(numeroPezziEvasi, 'int');
-            value = $.fn.parseValue(value, 'int');
+            numeroPezziEvasiStart = $.fn.parseValue(numeroPezziEvasiStart, 'int');
 
-            var newNumeroPezziEvasi = numeroPezziEvasi + value;
+            var newNumeroPezziEvasi = numeroPezziEvasiStart;
+            if(!$.fn.checkVariableIsNull(idsDdts) && !$.fn.checkVariableIsNull(idDdt)){
+                idsDdts = idsDdts.replace(idDdt+',', '');
+                if(idsDdts.length == 0){
+                    newNumeroPezziEvasi = 0;
+                }
+            }
 
             var backgroundColor;
             if(newNumeroPezziEvasi == numeroPezziOrdinati){
                 backgroundColor = 'transparent';
+            } else if(newNumeroPezziEvasi == 0){
+                backgroundColor = rowBackgroundVerde;
             } else if(newNumeroPezziEvasi < numeroPezziOrdinati){
                 backgroundColor = rowBackgroundRosa;
             } else {
                 backgroundColor = rowBackgroundGiallo;
             }
-            ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+key+']').css('background-color', backgroundColor).attr('data-num-pezzi-evasi', newNumeroPezziEvasi);
+            ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+idArticolo+']').css('background-color', backgroundColor).attr('data-num-pezzi-evasi', newNumeroPezziEvasi).attr('data-start-num-pezzi-evasi', newNumeroPezziEvasi).attr('data-ids-ddts', idsDdts).removeAttr('data-set-id-ddt');
 
-            var rowData = ordineClienteArticoliTable.row("[data-id-articolo='"+key+"']").data();
+            var rowData = ordineClienteArticoliTable.row("[data-id-articolo='"+idArticolo+"']").data();
             rowData["numeroPezziEvasi"] = newNumeroPezziEvasi;
-            ordineClienteArticoliTable.row("[data-id-articolo='"+key+"']").data(rowData).draw();
+            ordineClienteArticoliTable.row("[data-id-articolo='"+idArticolo+"']").data(rowData).draw();
         } else {
             // articolo non presente in quelli ordinati
             var pathname = window.location.pathname;
             if(!$.fn.checkVariableIsNull(pathname)){
                 if(pathname.indexOf('ddt-new') != -1){
-                    $('tr[data-id='+key+']').css('background-color', '#F9BCBC');
+                    $('tr[data-id='+idArticolo+']').css('background-color', '#F9BCBC');
                 }
             }
         }
-    });
 
-    $(ordiniClientiArticoliArray).not(articoliArray).each(function(i, item){
-        ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+item+']').css('background-color', rowBackgroundVerde);
-        //$('#ordiniClientiArticoliTable span[data-id-articolo='+item+']').parent().parent().css('background-color', rowBackgroundVerde);
-    })
+        $(ordiniClientiArticoliArray).not(articoliArray).each(function(i, item){
+            ordineClienteArticoliTableRowsNodes.filter('[data-id-articolo='+item+']').css('background-color', rowBackgroundVerde);
+        })
+    }
 }
 
 $.fn.computeTotale = function() {
@@ -582,8 +669,10 @@ $.fn.computeTotaleAndImponibile = function() {
 $.fn.loadArticoliFromOrdiniClienti = function(){
 
     var alertLabel = 'alert';
+    var idDdt;
     if($.fn.isDdt()){
         alertLabel += 'Ddt';
+        idDdt = $('#hiddenIdDdt').attr('value');
     } else if($.fn.isFatturaAccompagnatoria()){
         alertLabel += 'FattureAccompagnatorie';
     } else if($.fn.isRicevutaPrivato()){
@@ -657,10 +746,21 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
                 {"name": "numeroPezziEvasi", "data": "numeroPezziEvasi", "width":"3%"}
             ],
             "createdRow": function(row, data, dataIndex,cells){
+                var idsDdts = data.idsDdts;
+                if($.fn.checkVariableIsNull(idsDdts)){
+                    idsDdts = '';
+                }
                 $(row).css('background-color',rowBackgroundVerde).css('font-size', 'smaller');
                 $(row).attr('data-id-articolo', data.idArticolo);
                 $(row).attr('data-start-num-pezzi-evasi', data.numeroPezziEvasi);
+                $(row).attr('data-num-pezzi-evasi', data.numeroPezziEvasi);
                 $(row).attr('data-ids-ordini', data.idsOrdiniClienti);
+                $(row).attr('data-ids-ddts', idsDdts);
+                if($.fn.isDdt() && !$.fn.checkVariableIsNull(idDdt)){
+                    if(idsDdts.indexOf(idDdt + ',') != -1){
+                        $(row).attr('data-set-id-ddt', 'true');
+                    }
+                }
                 $(cells[0]).css('text-align','center');
                 $(cells[1]).css('text-align','center');
                 $(cells[2]).css('text-align','center');
@@ -857,7 +957,10 @@ $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,ar
     }
     var deleteLink = '<a class="'+deleteLinkClass+'" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
-    var rowsCount = table.rows().count();
+    var rowsCount = 0;
+    if(!$.fn.checkVariableIsNull(table) && !$.fn.checkVariableIsNull(table.rows())){
+        rowsCount = table.rows().count();
+    }
 
     if($.fn.isVersionClient()){
         prezzoHtml = prezzoHtml.replace('>', ' disabled>');

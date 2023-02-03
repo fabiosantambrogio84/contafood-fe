@@ -816,12 +816,26 @@ $(document).ready(function() {
 				ordineClienteArticoliTable.rows().nodes().each(function(i, item){
 					var idArticolo = $(i).attr('data-id-articolo');
 					var idsOrdiniClienti = $(i).attr('data-ids-ordini');
+					var idsDdts = $(i).attr('data-ids-ddts');
+					var setIdDdt = $(i).attr('data-set-id-ddt');
+
+					if(setIdDdt == 'true'){
+						if($.fn.checkVariableIsNull(idsDdts)){
+							idsDdts = idDdt + ',';
+						} else {
+							if(idsDdts.indexOf(idDdt + ',') == -1){
+								idsDdts += idDdt + ',';
+							}
+						}
+					}
+
 					var numeroPezziDaEvadere = $(i).attr('data-num-pezzi-evasi');
 
 					var articoloOrdiniClienti = new Object();
 					articoloOrdiniClienti.idArticolo = idArticolo;
 					articoloOrdiniClienti.numeroPezziDaEvadere = numeroPezziDaEvadere;
 					articoloOrdiniClienti.idsOrdiniClienti = idsOrdiniClienti;
+					articoloOrdiniClienti.idsDdts = idsDdts;
 
 					articoliOrdiniClienti.push(articoloOrdiniClienti);
 				});
@@ -1068,14 +1082,74 @@ $(document).ready(function() {
 				dataType: 'json',
 				data: ddtJson,
 				success: function(result) {
-					$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT aggiornato con successo').replace('@@alertResult@@', 'success'));
+					var idDdt = ddt.id;
 
 					$('#updateDdtButton').attr("disabled", true);
 
-					// Returns to the page with the list of DDTs
-					setTimeout(function() {
-						window.location.href = "ddt.html";
-					}, 1000);
+					// Update ordini clienti
+					var articoliOrdiniClienti = [];
+					var ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
+					ordineClienteArticoliTable.rows().nodes().each(function(i, item){
+						var idArticolo = $(i).attr('data-id-articolo');
+						var idsOrdiniClienti = $(i).attr('data-ids-ordini');
+						var numeroPezziDaEvadere = $(i).attr('data-num-pezzi-evasi');
+						var idsDdts = $(i).attr('data-ids-ddts');
+						var setIdDdt = $(i).attr('data-set-id-ddt');
+
+						if(!$.fn.checkVariableIsNull(idsDdts) && setIdDdt == 'true'){
+							if($.fn.checkVariableIsNull(idsDdts)){
+								idsDdts = idDdt + ',';
+							} else {
+								if(idsDdts.indexOf(idDdt + ',') == -1){
+									idsDdts += idDdt + ',';
+								}
+							}
+						}
+
+						var articoloOrdiniClienti = new Object();
+						articoloOrdiniClienti.idArticolo = idArticolo;
+						articoloOrdiniClienti.numeroPezziDaEvadere = numeroPezziDaEvadere;
+						articoloOrdiniClienti.idsOrdiniClienti = idsOrdiniClienti;
+						articoloOrdiniClienti.idsDdts = idsDdts;
+
+						articoliOrdiniClienti.push(articoloOrdiniClienti);
+					});
+
+					if(articoliOrdiniClienti.length != 0){
+
+						var articoliOrdiniClientiJson = JSON.stringify(articoliOrdiniClienti);
+
+						$.ajax({
+							url: baseUrl + "ordini-clienti/aggregate",
+							type: 'POST',
+							contentType: "application/json",
+							dataType: 'json',
+							data: articoliOrdiniClientiJson,
+							success: function(result) {
+								$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT aggiornato con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
+
+								// Returns to the page with the list of DDTs
+								setTimeout(function() {
+									window.location.href = "ddt.html";
+								}, 1000);
+
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								$('#alertDdt').empty().append(alertContent.replace('@@alertText@@', "DDT aggiornato con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
+							}
+						});
+
+					} else {
+						$('#alertDdt').empty().append(alertContent.replace('@@alertText@@','DDT aggiornato con successo').replace('@@alertResult@@', 'success'));
+
+						$('#updateDdtButton').attr("disabled", true);
+
+						// Returns to the page with the list of DDTs
+						setTimeout(function() {
+							window.location.href = "ddt.html";
+						}, 1000);
+					}
+
 				},
 				error: function(jqXHR, textStatus, errorThrown) {
 					var errorMessage = 'Errore nella modifica del DDT';
@@ -1328,9 +1402,12 @@ $(document).ready(function() {
 		var currentPezzi = 0;
 		//var currentPezziDaEvadere = 0;
 
+		if(!$.fn.DataTable.isDataTable( '#ddtArticoliTable' )){
+			$.fn.loadDdtArticoliTable();
+		}
 		var articoliTable = $('#ddtArticoliTable').DataTable();
+		var ddtArticoliLength = articoliTable.rows().nodes().length;;
 
-		var ddtArticoliLength = articoliTable.rows().nodes().length;
 		if(ddtArticoliLength != null && ddtArticoliLength != undefined && ddtArticoliLength != 0) {
 			articoliTable.rows().nodes().each(function(i, item){
 
@@ -1401,6 +1478,10 @@ $(document).ready(function() {
 	});
 
 	$(document).on('click','.deleteDdtArticolo', function(){
+		var idArticolo = $(this).attr('data-id');
+		var idDdt = $('#hiddenIdDdt').attr('value');
+		//var numPezzi = $(this).parent().parent().children().eq(5).children().eq(0).val();
+
 		$('#ddtArticoliTable').DataTable().row( $(this).parent().parent() )
 			.remove()
 			.draw();
@@ -1408,7 +1489,7 @@ $(document).ready(function() {
 
 		$.fn.computeTotale();
 
-		$.fn.checkPezziOrdinati();
+		$.fn.checkPezziOrdinatiAfterArticoloDelete(idArticolo, idDdt);
 	});
 
 	$(document).on('change','.compute-totale', function(){
@@ -1810,7 +1891,7 @@ $.fn.getDdt = function(idDdt){
 					$.ajax({
 						url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
 						type: 'GET',
-						async: true,
+						async: false,
 						dataType: 'json',
 						success: function(result2) {
 							if(result2 != null && result2 != undefined && result2 != ''){
@@ -1879,7 +1960,7 @@ $.fn.getDdt = function(idDdt){
 						}
 						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
-						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'" data-start-num-pezzi="'+pezzi+'">';
 						//var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
 						var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
 						var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
@@ -1926,6 +2007,15 @@ $.fn.getDdt = function(idDdt){
 
 					});
 				}
+
+				// load Sconti associated to the Cliente
+				var data = $('#data').val();
+				if(data != null && data != undefined && data != ''){
+					$.fn.loadScontiArticoli(data, result.cliente.id);
+				}
+
+				$.fn.loadArticoliFromOrdiniClienti();
+
 			} else{
 				$('#alertDdt').empty().append(alertContent);
 			}
