@@ -997,11 +997,23 @@ $(document).ready(function() {
 			$('#addRicevutaPrivatoArticoloAlert').empty();
 		}
 
+		var quantita = $('#quantita').val();
+		if(quantita == null || quantita == undefined || quantita == ''){
+			var alertContent = '<div class="alert alert-danger alert-dismissable">\n' +
+				'                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>\n' +
+				'                Inserisci la quantità\n' +
+				'              </div>';
+
+			$('#addRicevutaPrivatoArticoloAlert').empty().append(alertContent);
+			return;
+		} else {
+			$('#addRicevutaPrivatoArticoloAlert').empty();
+		}
+
 		var articolo = $('#articolo option:selected').text();
 		var udm = $('#udm').val();
 		var lotto = $('#lotto').val();
 		var scadenza = $('#scadenza').val();
-		var quantita = $('#quantita').val();
 		var prezzo = $('#prezzo').val();
 		var prezzoIva = $('#prezzo').attr("data-prezzo-iva");
 		var sconto = $('#sconto').val();
@@ -1067,12 +1079,12 @@ $(document).ready(function() {
 		pezzi = $.fn.parseValue(pezzi, 'int');
 		iva = $.fn.parseValue(iva, 'int');
 
-		var pezziPerPrezzo = ((pezzi + $.fn.parseValue(currentPezzi,'float')) * prezzo);
-		var scontoValue = (sconto/100)*pezziPerPrezzo;
-		totale = Number(Math.round((pezziPerPrezzo - scontoValue) + 'e2') + 'e-2');
+		var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
+		var scontoValue = (sconto/100)*quantitaPerPrezzo;
+		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var ivaTotale = (iva/100)*totale;
-		totaleConIva = Number(Math.round((totale + ivaTotale) + 'e2') + 'e-2');
+		var quantitaPerPrezzoIva = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzoIva);
+		totaleConIva = Number(Math.round((quantitaPerPrezzoIva - scontoValue) + 'e2') + 'e-2');
 
 		var table = $('#ricevutaPrivatoArticoliTable').DataTable();
 		if(found >= 1){
@@ -1154,22 +1166,23 @@ $(document).ready(function() {
 
 	$(document).on('change','.compute-totale', function(){
 		$.row = $(this).parent().parent();
-		var pezzi = $.row.children().eq(5).children().eq(0).val();
-		pezzi = $.fn.parseValue(pezzi, 'int');
-		var prezzo = $.row.children().eq(6).children().eq(0).attr('data-prezzo');
-		prezzo = $.fn.parseValue(prezzo, 'float');
+		var quantita = $.row.children().eq(4).children().eq(0).val();
+		quantita = $.fn.parseValue(quantita, 'int');
+		//var prezzo = $.row.children().eq(6).children().eq(0).attr('data-prezzo');
+		//prezzo = $.fn.parseValue(prezzo, 'float');
+		var prezzoIva = $.row.children().eq(6).children().eq(0).val();
+		prezzoIva = $.fn.parseValue(prezzoIva, 'float');
 		var sconto = $.row.children().eq(7).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
 		var iva = $.row.children().eq(9).text();
 		iva = $.fn.parseValue(iva, 'int');
 
-		var pezziPerPrezzo = (pezzi * prezzo);
-		var scontoValue = (sconto/100)*pezziPerPrezzo;
-		var totale = Number(Math.round((pezziPerPrezzo - scontoValue) + 'e2') + 'e-2');
+		var quantitaPerPrezzo = (quantita * prezzoIva);
+		var scontoValue = (sconto/100)*quantitaPerPrezzo;
+		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var ivaTotale = (iva/100)*totale;
-		var totaleConIva = Number(Math.round((totale + ivaTotale) + 'e2') + 'e-2');
-
+		var quantitaPerPrezzoIva = (quantita * prezzoIva);
+		var totaleConIva = Number(Math.round((quantitaPerPrezzoIva - scontoValue) + 'e2') + 'e-2');
 
 		$.row.children().eq(8).text(totaleConIva);
 		$.row.children().eq(6).children().eq(0).attr('data-totale',totale);

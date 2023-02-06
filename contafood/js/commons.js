@@ -750,7 +750,18 @@ $.fn.loadArticoliFromOrdiniClienti = function(){
                 if($.fn.checkVariableIsNull(idsDdts)){
                     idsDdts = '';
                 }
-                $(row).css('background-color',rowBackgroundVerde).css('font-size', 'smaller');
+                if(!$.fn.checkVariableIsNull(data.numeroPezziEvasi)){
+                    if(data.numeroPezziEvasi == 0){
+                        $(row).css('background-color',rowBackgroundVerde);
+                    } else if(!$.fn.checkVariableIsNull(data.numeroPezziDaEvadere) && (data.numeroPezziEvasi < data.numeroPezziDaEvadere)) {
+                        $(row).css('background-color',rowBackgroundRosa);
+                    } else if(!$.fn.checkVariableIsNull(data.numeroPezziDaEvadere) && (data.numeroPezziEvasi == data.numeroPezziDaEvadere)){
+                        $(row).css('background-color','transparent');
+                    }
+                } else {
+                    $(row).css('background-color',rowBackgroundVerde);
+                }
+                $(row).css('font-size', 'smaller');
                 $(row).attr('data-id-articolo', data.idArticolo);
                 $(row).attr('data-start-num-pezzi-evasi', data.numeroPezziEvasi);
                 $(row).attr('data-num-pezzi-evasi', data.numeroPezziEvasi);
