@@ -182,18 +182,22 @@ $(document).ready(function() {
 								"autoWidth": false,
 								"columns": [
 									{"name": "articolo", "data": null, render: function (data, type, row) {
-											var result = '';
-											if (data.articolo != null) {
-												result = data.articolo.codice+' - '+data.articolo.descrizione;
-											}
-											return result;
-										}},
+										var result = '';
+										if (data.articolo != null) {
+											result = data.articolo.codice+' - '+data.articolo.descrizione;
+										}
+										return result;
+									}},
 									{"name": "lotto", "data": "lotto"},
 									{"name": "quantita", "data": "quantita"},
 									{"name": "dataScadenza", "data": null, "width":"8%", render: function ( data, type, row ) {
+										var dataScadenza = data.dataScadenza;
+										if(!$.fn.checkVariableIsNull(dataScadenza)){
 											var a = moment(data.dataScadenza);
 											return a.format('DD/MM/YYYY');
-										}},
+										}
+										return '';
+									}},
 									{"name": "prezzo", "data": "prezzo"},
 									{"name": "sconto", "data": "sconto"},
 									{"name": "imponibile", "data": "imponibile"}
@@ -241,8 +245,12 @@ $(document).ready(function() {
 									{"name": "lotto", "data": "lotto"},
 									{"name": "quantita", "data": "quantita"},
 									{"name": "dataScadenza", "data": null, "width":"8%", render: function ( data, type, row ) {
-										var a = moment(data.dataScadenza);
-										return a.format('DD/MM/YYYY');
+										var dataScadenza = data.dataScadenza;
+										if(!$.fn.checkVariableIsNull(dataScadenza)){
+											var a = moment(data.dataScadenza);
+											return a.format('DD/MM/YYYY');
+										}
+										return '';
 									}},
 									{"name": "prezzo", "data": "prezzo"},
 									{"name": "sconto", "data": "sconto"},
@@ -644,7 +652,7 @@ $(document).ready(function() {
 		}
 		var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale" value="'+scadenza+'">';
 		var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale" value="'+quantita+'">';
-		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+		var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
 		var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+prezzo+'">';
 		var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale" value="'+sconto+'">';
 
@@ -985,7 +993,7 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 						}
 
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
-						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
 						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+dataScadenza+'">';
 						var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+prezzo+'">';
 						var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+sconto+'">';
@@ -1049,7 +1057,7 @@ $.fn.getDdtAcquisto = function(idDdtAcquisto){
 						}
 
 						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
-						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'">';
+						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+pezzi+'">';
 						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+dataScadenza+'">';
 						var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+prezzo+'">';
 						var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+sconto+'">';

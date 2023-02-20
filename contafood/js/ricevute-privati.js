@@ -894,10 +894,14 @@ $(document).ready(function() {
 					$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 				}
 			});
+
+			$('#updateClienteNoteDocumenti').removeAttr('hidden');
+
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
 
 		} else {
+			$('#updateClienteNoteDocumenti').attr('hidden', true);
 			$('#puntoConsegna').empty();
 			$('#puntoConsegna').attr('disabled', true);
 			$('#articolo').attr('disabled', true);

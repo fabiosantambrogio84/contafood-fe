@@ -100,6 +100,91 @@ $(document).ready(function() {
         }
     });
 
+    $(document).on('click','.updateClienteNoteDocumenti', function(){
+        var idCliente = $('#cliente option:selected').val();
+
+        var alertContent = '<div id="alertContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+        alertContent = alertContent + '<strong>Errore nel recupero del cliente.</strong>\n' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+        var alertId = '';
+        if($.fn.isDdt()){
+            alertId = '#alertDdt';
+        } else if($.fn.isFatturaAccompagnatoria()){
+            alertId = '#alertFattureAccompagnatorie';
+        } else if($.fn.isNotaAccredito()){
+            alertId = '#alertNoteAccredito';
+        } else if($.fn.isRicevutaPrivato()){
+            alertId = '#alertRicevutaPrivato';
+        } else if($.fn.isOrdineCliente()){
+            alertId = '#alertOrdineCliente';
+        }
+
+        $.ajax({
+            url: baseUrl + "clienti/" + idCliente,
+            type: 'GET',
+            dataType: 'json',
+            success: function(result) {
+                if(result != null && result != undefined && result != ''){
+
+                    $('#noteDocumenti').val(result.noteDocumenti);
+                    $('#confirmUpdateClienteNoteDocumenti').attr('data-id-cliente', idCliente);
+                    $('#updateClienteNoteDocumentiModal').modal('show');
+
+                } else{
+                    $(alertId).empty().append(alertContent);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $(alertId).empty().append(alertContent);
+            }
+        });
+    });
+
+    $(document).on('click','#confirmUpdateClienteNoteDocumenti', function(){
+        $('#updateClienteNoteDocumentiModal').modal('hide');
+        var idCliente = $(this).attr('data-id-cliente');
+
+        var alertContent = '<div id="alertContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+        alertContent = alertContent + '<strong>@@alertText@@\n' +
+            '            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+        var alertId = '';
+        if($.fn.isDdt()){
+            alertId = '#alertDdt';
+        } else if($.fn.isFatturaAccompagnatoria()){
+            alertId = '#alertFattureAccompagnatorie';
+        } else if($.fn.isNotaAccredito()){
+            alertId = '#alertNoteAccredito';
+        } else if($.fn.isRicevutaPrivato()){
+            alertId = '#alertRicevutaPrivato';
+        } else if($.fn.isOrdineCliente()){
+            alertId = '#alertOrdineCliente';
+        }
+
+        var url = baseUrl + "clienti/" + idCliente;
+
+        var clientePatched = new Object();
+        clientePatched.id = parseInt(idCliente);
+        clientePatched.noteDocumenti = $('#noteDocumenti').val();
+
+        var clientePatchedJson = JSON.stringify(clientePatched);
+
+        $.ajax({
+            url: url,
+            type: 'PATCH',
+            contentType: "application/json",
+            dataType: 'json',
+            data: clientePatchedJson,
+            success: function() {
+                //$(alertId).empty().append(alertContent.replace('@@alertText@@', 'Note documenti cliente</strong> aggiornate con successo.').replace('@@alertResult@@', 'success'));
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                $(alertId).empty().append(alertContent.replace('@@alertText@@', "Errore nell'aggiornamento delle note documenti cliente'").replace('@@alertResult@@', 'danger'));
+            }
+        });
+    });
+
 });
 
 /*
@@ -138,6 +223,24 @@ $.fn.isDdtAcquisto = function(){
     var result = false;
     var ddtAcquistoLength = $('#containerDdtAcquisto').length;
     if(ddtAcquistoLength > 0){
+        result = true;
+    }
+    return result;
+}
+
+$.fn.isNotaAccredito = function(){
+    var result = false;
+    var notaAccreditoLength = $('#containerNotaAccredito').length;
+    if(notaAccreditoLength > 0){
+        result = true;
+    }
+    return result;
+}
+
+$.fn.isOrdineCliente = function(){
+    var result = false;
+    var ordineClienteLength = $('#containerOrdineCliente').length;
+    if(ordineClienteLength > 0){
         result = true;
     }
     return result;

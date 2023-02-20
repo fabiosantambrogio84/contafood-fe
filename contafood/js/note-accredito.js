@@ -1018,9 +1018,12 @@ $(document).ready(function() {
 				$.fn.loadScontiArticoli(data, cliente);
 			}
 
+			$('#updateClienteNoteDocumenti').removeAttr('hidden');
+
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
 		} else {
+			$('#updateClienteNoteDocumenti').attr('hidden', true);
 			$('#articolo').attr('disabled', true);
 			$('#articolo').selectpicker('refresh');
 		}

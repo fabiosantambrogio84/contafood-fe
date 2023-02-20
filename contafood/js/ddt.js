@@ -1261,9 +1261,12 @@ $(document).ready(function() {
 				}
 			});
 
+			$('#updateClienteNoteDocumenti').removeAttr('hidden');
+
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
 		} else {
+			$('#updateClienteNoteDocumenti').attr('hidden', true);
 			$('#puntoConsegna').empty();
 			$('#puntoConsegna').attr('disabled', true);
 			$('#articolo').attr('disabled', true);

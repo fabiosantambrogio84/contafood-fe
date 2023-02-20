@@ -769,12 +769,17 @@ $(document).ready(function() {
 					$('#alertOrdineCliente').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
 				}
 			});
+
+			$('#updateClienteNoteDocumenti').removeAttr('hidden');
+
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
 
 			$('#hiddenIdTelefonata').attr('value', '');
 
 		} else {
+			$('#updateClienteNoteDocumenti').attr('hidden', true);
+
 			$('#agente option').removeAttr('selected');
 
 			$('#puntoConsegna').empty();

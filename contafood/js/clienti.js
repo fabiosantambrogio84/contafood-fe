@@ -38,23 +38,23 @@ $.fn.loadClientiTable = function(url) {
 		"columns": [
 			{"name": "codice", "data": "codice"},
 			{"name": "ragioneSocialeNomeCognome", "data": null, render: function ( data, type, row ) {
-					if(data.privato){
-						return data.nome+' '+data.cognome;
-					} else {
-						return data.ragioneSociale;
-					}
-				}},
+				if(data.privato){
+					return data.nome+' '+data.cognome;
+				} else {
+					return data.ragioneSociale;
+				}
+			}},
 			{"name": "indirizzo", "data": "indirizzo"},
 			{"name": "citta", "data": "citta"},
 			{"name": "provincia", "data": "provincia"},
 			{"data": null, "orderable":false, "width":"12%", render: function ( data, type, row ) {
-					var links = '<a class="detailsCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
-					links = links + '<a class="updateCliente pr-2" data-id="'+data.id+'" href="clienti-edit.html?idCliente=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
-					links = links + '<a class="manageClientePuntiConsegna pr-2" data-id="'+data.id+'" href="cliente-punti-consegna.html?idCliente=' + data.id + '"><i class="fas fa-truck-moving" title="Punti di consegna"></i></a>';
-					//links = links + '<a class="manageClienteListini pr-2" data-id="'+data.id+'" href="cliente-listini-associati.html?idCliente=' + data.id + '"><i class="fas fa-list-ul" title="Listini"></i></a>';
-					links = links + '<a class="deleteCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
-					return links;
-				}}
+				var links = '<a class="detailsCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
+				links = links + '<a class="updateCliente pr-2" data-id="'+data.id+'" href="clienti-edit.html?idCliente=' + data.id + '"><i class="far fa-edit" title="Modifica"></i></a>';
+				links = links + '<a class="manageClientePuntiConsegna pr-2" data-id="'+data.id+'" href="cliente-punti-consegna.html?idCliente=' + data.id + '"><i class="fas fa-truck-moving" title="Punti di consegna"></i></a>';
+				//links = links + '<a class="manageClienteListini pr-2" data-id="'+data.id+'" href="cliente-listini-associati.html?idCliente=' + data.id + '"><i class="fas fa-list-ul" title="Listini"></i></a>';
+				links = links + '<a class="deleteCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt" title="Elimina"></i></a>';
+				return links;
+			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			if(data.bloccaDdt){
@@ -91,49 +91,50 @@ $(document).ready(function() {
             success: function(result) {
               if(result != null && result != undefined && result != ''){
               	var contentDetails = '<p><strong>Codice cliente: </strong>'+$.fn.printVariable(result.codice)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ragione sociale: </strong>'+$.fn.printVariable(result.ragioneSociale)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ragione sociale 2: </strong>'+$.fn.printVariable(result.ragioneSociale2)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Ditta individuale: </strong>'+$.fn.printVariable(result.dittaIndividuale)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Nome: </strong>'+$.fn.printVariable(result.nome)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Cognome: </strong>'+$.fn.printVariable(result.cognome)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Indirizzo: </strong>'+$.fn.printVariable(result.indirizzo)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Citt&agrave;: </strong>'+$.fn.printVariable(result.citta)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Provincia: </strong>'+$.fn.printVariable(result.provincia)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Cap: </strong>'+$.fn.printVariable(result.cap)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Partita IVA: </strong>'+$.fn.printVariable(result.partitaIva)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Codice fiscale: </strong>'+$.fn.printVariable(result.codiceFiscale)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Email: </strong>'+$.fn.printVariable(result.email)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Email PEC: </strong>'+$.fn.printVariable(result.emailPec)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Telefono: </strong>'+$.fn.printVariable(result.telefono)+'</p>';
+				  contentDetails += '<p><strong>Ragione sociale: </strong>'+$.fn.printVariable(result.ragioneSociale)+'</p>';
+				  contentDetails += '<p><strong>Ragione sociale 2: </strong>'+$.fn.printVariable(result.ragioneSociale2)+'</p>';
+				  contentDetails += '<p><strong>Ditta individuale: </strong>'+$.fn.printVariable(result.dittaIndividuale)+'</p>';
+				  contentDetails += '<p><strong>Nome: </strong>'+$.fn.printVariable(result.nome)+'</p>';
+				  contentDetails += '<p><strong>Cognome: </strong>'+$.fn.printVariable(result.cognome)+'</p>';
+				  contentDetails += '<p><strong>Indirizzo: </strong>'+$.fn.printVariable(result.indirizzo)+'</p>';
+				  contentDetails += '<p><strong>Citt&agrave;: </strong>'+$.fn.printVariable(result.citta)+'</p>';
+				  contentDetails += '<p><strong>Provincia: </strong>'+$.fn.printVariable(result.provincia)+'</p>';
+				  contentDetails += '<p><strong>Cap: </strong>'+$.fn.printVariable(result.cap)+'</p>';
+				  contentDetails += '<p><strong>Partita IVA: </strong>'+$.fn.printVariable(result.partitaIva)+'</p>';
+				  contentDetails += '<p><strong>Codice fiscale: </strong>'+$.fn.printVariable(result.codiceFiscale)+'</p>';
+				  contentDetails += '<p><strong>Email: </strong>'+$.fn.printVariable(result.email)+'</p>';
+				  contentDetails += '<p><strong>Email PEC: </strong>'+$.fn.printVariable(result.emailPec)+'</p>';
+				  contentDetails += '<p><strong>Telefono: </strong>'+$.fn.printVariable(result.telefono)+'</p>';
 				  if(result.banca != null && result.banca != undefined){
-					  contentDetails = contentDetails + '<p><strong>Banca: </strong>'+$.fn.printVariable(result.banca.nome)+'</p>';
+					  contentDetails += '<p><strong>Banca: </strong>'+$.fn.printVariable(result.banca.nome)+'</p>';
 				  } else {
-					  contentDetails = contentDetails + '<p><strong>Banca: </strong></p>';
+					  contentDetails += '<p><strong>Banca: </strong></p>';
 				  }
-				  contentDetails = contentDetails + '<p><strong>Conto corrente: </strong>'+$.fn.printVariable(result.contoCorrente)+'</p>';
+				  contentDetails += '<p><strong>Conto corrente: </strong>'+$.fn.printVariable(result.contoCorrente)+'</p>';
 				  if(result.tipoPagamento != null && result.tipoPagamento != undefined){
-					  contentDetails = contentDetails + '<p><strong>Tipo pagamento: </strong>'+$.fn.printVariable(result.tipoPagamento.descrizione)+'</p>';
+					  contentDetails += '<p><strong>Tipo pagamento: </strong>'+$.fn.printVariable(result.tipoPagamento.descrizione)+'</p>';
 				  } else {
-					  contentDetails = contentDetails + '<p><strong>Tipo pagamento: </strong></p>';
+					  contentDetails += '<p><strong>Tipo pagamento: </strong></p>';
 				  }
 				  if(result.agente != null && result.agente != undefined){
-					  contentDetails = contentDetails + '<p><strong>Agente: </strong>'+$.fn.printVariable(result.agente.nome)+' '+$.fn.printVariable(result.agente.cognome)+'</p>';
+					  contentDetails += '<p><strong>Agente: </strong>'+$.fn.printVariable(result.agente.nome)+' '+$.fn.printVariable(result.agente.cognome)+'</p>';
 				  } else {
-					  contentDetails = contentDetails + '<p><strong>Agente: </strong></p>';
+					  contentDetails += '<p><strong>Agente: </strong></p>';
 				  }
 				  if(result.listino != null && result.listino != undefined){
-					  contentDetails = contentDetails + '<p><strong>Listino: </strong>'+$.fn.printVariable(result.listino.nome)+'</p>';
+					  contentDetails += '<p><strong>Listino: </strong>'+$.fn.printVariable(result.listino.nome)+'</p>';
 				  } else {
-					  contentDetails = contentDetails + '<p><strong>Agente: </strong></p>';
+					  contentDetails += '<p><strong>Agente: </strong></p>';
 				  }
-                  contentDetails = contentDetails + '<p><strong>Estrazione Conad: </strong>'+$.fn.printVariable(result.estrazioneConad)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Modalita invio fatture: </strong>'+$.fn.printVariable(result.modalitaInvioFatture)+'</p>';
-                  contentDetails = contentDetails + '<p><strong>Blocca DDT: </strong>'+$.fn.printVariable(result.bloccaDdt)+'</p>';
-                  contentDetails = contentDetails + '<p><strong>Nascondi prezzi: </strong>'+$.fn.printVariable(result.nascondiPrezzi)+'</p>';
-                  contentDetails = contentDetails + '<p><strong>Raggruppa RiBa: </strong>'+$.fn.printVariable(result.raggruppaRiba)+'</p>';
-                  contentDetails = contentDetails + '<p><strong>Nome gruppo RiBa: </strong>'+$.fn.printVariable(result.nomeGruppoRiba)+'</p>';
-                  contentDetails = contentDetails + '<p><strong>Codice univoco SDI: </strong>'+$.fn.printVariable(result.codiceUnivocoSdi)+'</p>';
-				  contentDetails = contentDetails + '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
+                  contentDetails += '<p><strong>Estrazione Conad: </strong>'+$.fn.printVariable(result.estrazioneConad)+'</p>';
+				  contentDetails += '<p><strong>Modalita invio fatture: </strong>'+$.fn.printVariable(result.modalitaInvioFatture)+'</p>';
+                  contentDetails += '<p><strong>Blocca DDT: </strong>'+$.fn.printVariable(result.bloccaDdt)+'</p>';
+                  contentDetails += '<p><strong>Nascondi prezzi: </strong>'+$.fn.printVariable(result.nascondiPrezzi)+'</p>';
+                  contentDetails += '<p><strong>Raggruppa RiBa: </strong>'+$.fn.printVariable(result.raggruppaRiba)+'</p>';
+                  contentDetails += '<p><strong>Nome gruppo RiBa: </strong>'+$.fn.printVariable(result.nomeGruppoRiba)+'</p>';
+                  contentDetails += '<p><strong>Codice univoco SDI: </strong>'+$.fn.printVariable(result.codiceUnivocoSdi)+'</p>';
+				  contentDetails += '<p><strong>Note: </strong>'+$.fn.printVariable(result.note)+'</p>';
+				  contentDetails += '<p><strong>Note documenti: </strong>'+$.fn.printVariable(result.noteDocumenti)+'</p>';
 
 				  var articoli = "";
 				  if(result.clienteArticoli != null && result.clienteArticoli != undefined && result.clienteArticoli.length != 0){
@@ -250,6 +251,7 @@ $(document).ready(function() {
 				$('#nomeGruppoRiba').val(null).attr('disabled', true);
 				$('#codiceUnivocoSdi').val(null).attr('disabled', false);
 				$('#note').val(null).attr('disabled', false);
+				$('#noteDocumenti').val(null).attr('disabled', false);
 
 			} else{
 				$('#ragioneSociale').val(null).attr('disabled', false);
@@ -278,6 +280,7 @@ $(document).ready(function() {
 				$('#nomeGruppoRiba').val(null).attr('disabled', false);
 				$('#codiceUnivocoSdi').val(null).attr('disabled', false);
 				$('#note').val(null).attr('disabled', false);
+				$('#noteDocumenti').val(null).attr('disabled', false);
 			}
 		});
 	}
@@ -375,6 +378,7 @@ $(document).ready(function() {
 			cliente.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			cliente.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			cliente.note = $('#note').val();
+			cliente.noteDocumenti = $('#noteDocumenti').val();
 
 			var articoli = $('#articolo').val();
 			if(articoli != null && articoli.length != 0){
@@ -485,6 +489,7 @@ $(document).ready(function() {
 			cliente.nomeGruppoRiba = $('#nomeGruppoRiba').val();
 			cliente.codiceUnivocoSdi = $('#codiceUnivocoSdi').val();
 			cliente.note = $('#note').val();
+			cliente.noteDocumenti = $('#noteDocumenti').val();
 
 			var articoli = $('#articolo').val();
 			if(articoli != null && articoli.length != 0){
@@ -748,6 +753,7 @@ $.fn.getCliente = function(idCliente){
 			$('#nomeGruppoRiba').attr('value', result.nomeGruppoRiba);
 			$('#codiceUnivocoSdi').attr('value', result.codiceUnivocoSdi);
 			$('#note').val(result.note);
+			$('#noteDocumenti').val(result.noteDocumenti);
 
 			console.log("GET_CLIENTE")
 
@@ -790,6 +796,7 @@ $.fn.getCliente = function(idCliente){
 				$('#nomeGruppoRiba').attr('disabled', true);
 				$('#codiceUnivocoSdi').attr('disabled', false);
 				$('#note').attr('disabled', false);
+				$('#noteDocumenti').attr('disabled', false);
 			}
 
           } else{

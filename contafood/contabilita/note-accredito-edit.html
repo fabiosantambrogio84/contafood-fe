@@ -107,7 +107,7 @@
           </div>
           <div class="form-row">
             <div class="form-group col-md-6 mb-0">
-              <label for="cliente" class="mb-0">Cliente*</label>
+              <label for="cliente" class="mb-0">Cliente*</label><a class="updateClienteNoteDocumenti" id="updateClienteNoteDocumenti" href="#" title="Note documenti" hidden><i class="fa fa-book"></i></a>
               <select id="cliente" class="form-control form-control-sm" required data-live-search="true">
                 <option value=""></option>
               </select>
@@ -302,6 +302,34 @@
 
       </div>
       <!-- /.container-fluid -->
+
+      <!-- Modal Cliente NoteDocumenti -->
+      <div class="modal fade" id="updateClienteNoteDocumentiModal" tabindex="-1" role="dialog" aria-labelledby="updateClienteNoteDocumentiModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="updateClienteNoteDocumentiTitle">Aggiorna note documenti cliente</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="">
+                <div class="form-row">
+                  <div class="form-group col-md-12">
+                    <label for="noteDocumenti">Note documenti</label>
+                    <textarea class="form-control" id="noteDocumenti"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+              <button type="button" class="btn btn-primary" id="confirmUpdateClienteNoteDocumenti">Salva</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
     <!-- End of Main Content -->
