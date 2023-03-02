@@ -101,10 +101,9 @@ $(document).ready(function() {
     });
 
     $(document).on('click','.updateClienteNoteDocumenti', function(){
-        var idCliente = $('#cliente option:selected').val();
 
         var alertContent = '<div id="alertContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
-        alertContent = alertContent + '<strong>Errore nel recupero del cliente.</strong>\n' +
+        alertContent = alertContent + '<strong>@@alertText@@.</strong>\n' +
             '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
         var alertId = '';
@@ -120,30 +119,35 @@ $(document).ready(function() {
             alertId = '#alertOrdineCliente';
         }
 
-        $.ajax({
-            url: baseUrl + "clienti/" + idCliente,
-            type: 'GET',
-            dataType: 'json',
-            success: function(result) {
-                if(result != null && result != undefined && result != ''){
+        var idCliente = $('#cliente option:selected').val();
 
-                    $('#noteDocumenti').val(result.noteDocumenti);
-                    $('#confirmUpdateClienteNoteDocumenti').attr('data-id-cliente', idCliente);
-                    $('#updateClienteNoteDocumentiModal').modal('show');
+        if($.fn.checkVariableIsNull(idCliente)){
+            $(alertId).empty().append(alertContent.replace('@@alertText@@', 'Selezionare un cliente'));
+        } else {
+            $.ajax({
+                url: baseUrl + "clienti/" + idCliente,
+                type: 'GET',
+                dataType: 'json',
+                success: function(result) {
+                    if(result != null && result != undefined && result != ''){
 
-                } else{
-                    $(alertId).empty().append(alertContent);
+                        $('#noteDocumenti').val(result.noteDocumenti);
+                        $('#confirmUpdateClienteNoteDocumenti').attr('data-id-cliente', idCliente);
+                        $('#updateClienteNoteDocumentiModal').modal('show');
+
+                    } else{
+                        $(alertId).empty().append(alertContent.replace('@@alertText@@', 'Errore nel recupero del cliente'));
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $(alertId).empty().append(alertContent.replace('@@alertText@@', 'Errore nel recupero del cliente'));
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                $(alertId).empty().append(alertContent);
-            }
-        });
+            });
+        }
     });
 
     $(document).on('click','#confirmUpdateClienteNoteDocumenti', function(){
         $('#updateClienteNoteDocumentiModal').modal('hide');
-        var idCliente = $(this).attr('data-id-cliente');
 
         var alertContent = '<div id="alertContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
         alertContent = alertContent + '<strong>@@alertText@@\n' +
@@ -162,27 +166,33 @@ $(document).ready(function() {
             alertId = '#alertOrdineCliente';
         }
 
-        var url = baseUrl + "clienti/" + idCliente;
+        var idCliente = $(this).attr('data-id-cliente');
 
-        var clientePatched = new Object();
-        clientePatched.id = parseInt(idCliente);
-        clientePatched.noteDocumenti = $('#noteDocumenti').val();
+        if($.fn.checkVariableIsNull(idCliente)){
+            $(alertId).empty().append(alertContent.replace('@@alertText@@', 'Selezionare un cliente'));
+        } else {
+            var url = baseUrl + "clienti/" + idCliente;
 
-        var clientePatchedJson = JSON.stringify(clientePatched);
+            var clientePatched = new Object();
+            clientePatched.id = parseInt(idCliente);
+            clientePatched.noteDocumenti = $('#noteDocumenti').val();
 
-        $.ajax({
-            url: url,
-            type: 'PATCH',
-            contentType: "application/json",
-            dataType: 'json',
-            data: clientePatchedJson,
-            success: function() {
-                //$(alertId).empty().append(alertContent.replace('@@alertText@@', 'Note documenti cliente</strong> aggiornate con successo.').replace('@@alertResult@@', 'success'));
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                $(alertId).empty().append(alertContent.replace('@@alertText@@', "Errore nell'aggiornamento delle note documenti cliente'").replace('@@alertResult@@', 'danger'));
-            }
-        });
+            var clientePatchedJson = JSON.stringify(clientePatched);
+
+            $.ajax({
+                url: url,
+                type: 'PATCH',
+                contentType: "application/json",
+                dataType: 'json',
+                data: clientePatchedJson,
+                success: function() {
+                    //$(alertId).empty().append(alertContent.replace('@@alertText@@', 'Note documenti cliente</strong> aggiornate con successo.').replace('@@alertResult@@', 'success'));
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    $(alertId).empty().append(alertContent.replace('@@alertText@@', "Errore nell'aggiornamento delle note documenti cliente'").replace('@@alertResult@@', 'danger'));
+                }
+            });
+        }
     });
 
 });

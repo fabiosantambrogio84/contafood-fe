@@ -46,6 +46,8 @@ $.fn.loadTelefonateTable = function() {
 
 					if(data.cliente.dittaIndividuale){
 						clienteHtml += data.cliente.cognome + ' ' + data.cliente.nome;
+					} if(data.cliente.privato){
+						clienteHtml += data.cliente.cognome + ' ' + data.cliente.nome;
 					} else {
 						clienteHtml += data.cliente.ragioneSociale;
 					}
@@ -615,6 +617,8 @@ $.fn.getClienti = function(){
 				$.each(result, function(i, item){
 					var label = '';
 					if(item.dittaIndividuale){
+						label += item.cognome + ' ' + item.nome;
+					} if(item.privato){
 						label += item.cognome + ' ' + item.nome;
 					} else {
 						label += item.ragioneSociale;
