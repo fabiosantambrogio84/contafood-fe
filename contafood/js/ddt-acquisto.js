@@ -410,6 +410,7 @@ $(document).ready(function() {
 					ddtAcquisto.ddtAcquistoIngredienti = ddtAcquistoIngredienti;
 				}
 			}
+			ddtAcquisto.fatturato = false;
 			ddtAcquisto.numeroColli = $('#colli').val();
 			ddtAcquisto.note = $('#note').val();
 

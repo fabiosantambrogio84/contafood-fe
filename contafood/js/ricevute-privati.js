@@ -131,9 +131,9 @@ $.fn.loadRicevutaPrivatoTable = function(url) {
 						var stato = data.statoRicevutaPrivato;
 
 						var links = '<a class="detailsRicevutaPrivato pr-1" data-id="'+data.id+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-						//if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')){
-						//	links += '<a class="updateRicevutaPrivato pr-1" data-id="'+data.id+'" href="ricevuta-privato-edit.html?idRicevutaPrivato=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
-						//}
+						if(!data.fatturato && (stato != null && stato != undefined && stato != '' && stato.codice == 'DA_PAGARE')){
+							links += '<a class="updateRicevutaPrivato pr-1" data-id="'+data.id+'" href="ricevute-privati-edit.html?idRicevutaPrivato=' + data.id + '" title="Modifica"><i class="far fa-edit"></i></a>';
+						}
 						if((totale - acconto) != 0){
 							links += '<a class="payRicevutaPrivato pr-1" data-id="'+data.id+'" href="pagamenti-new.html?idRicevutaPrivato=' + data.id + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 						}
@@ -161,20 +161,33 @@ $.fn.loadRicevutaPrivatoTable = function(url) {
 					}
 					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
 					$(cells[6]).css('text-align','right');
-					$(cells[7]).css('font-weight','bold').css('text-align','right');
-					$(cells[8]).css('text-align','right');
+					$(cells[7]).css('text-align','right').css('font-weight','bold');
+					$(cells[8]).css('text-align','right').css('font-weight','bold');
 					$(cells[9]).css('text-align','right');
 					$(cells[10]).css('text-align','right');
+				},
+				"initComplete": function( settings, json ) {
+					var costoAbilitato = $.fn.getConfigurazioneItemClient('DDT_COSTO');
+					var guadagnoAbilitato = $.fn.getConfigurazioneItemClient('DDT_GUADAGNO');
+
+					var table = $('#ricevutePrivatiTable').DataTable();
+					if(!costoAbilitato){
+						table.column(10).visible(false);
+					} else {
+						table.column(10).visible(true);
+					}
+					if(!guadagnoAbilitato){
+						table.column(11).visible(false);
+					} else {
+						table.column(11).visible(true);
+					}
 				}
 			});
 		}
 	});
 }
 
-$(document).ready(function() {
-
-	$.fn.loadRicevutaPrivatoTable(baseUrl + "ricevute-privati");
-
+$.fn.loadRicevutaPrivatoArticoliTable = function() {
 	$('#ricevutaPrivatoArticoliTable').DataTable({
 		"searching": false,
 		"language": {
@@ -208,13 +221,16 @@ $(document).ready(function() {
 			[0, 'asc']
 		]
 	});
+}
 
+$.fn.loadRicevutaPrivatoTotaliTable = function() {
 	$('#ricevutaPrivatoTotaliTable').DataTable({
 		"ajax": {
 			"url": baseUrl + "aliquote-iva",
 			"type": "GET",
 			"content-type": "json",
 			"cache": false,
+			"async": false,
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
@@ -245,14 +261,14 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "valore", "data": null, "width":"8%", render: function ( data, type, row ) {
-				return data.valore;
-			}},
+					return data.valore;
+				}},
 			{"name": "totaleIva", "data": null, "width":"8%", render: function ( data, type, row ) {
-				return ''
-			}},
+					return ''
+				}},
 			{"name": "totaleImponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
-				return ''
-			}}
+					return ''
+				}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).attr('data-id', data.id);
@@ -263,6 +279,16 @@ $(document).ready(function() {
 			$(cells[2]).css('text-align','center');
 		}
 	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadRicevutaPrivatoTable(baseUrl + "ricevute-privati");
+
+	if(window.location.search.substring(1).indexOf('idRicevutaPrivato') == -1){
+		$.fn.loadRicevutaPrivatoArticoliTable();
+		$.fn.loadRicevutaPrivatoTotaliTable();
+	}
 
 	$(document).on('click','#resetSearchRicevutePrivatiButton', function(){
 		$('#searchRicevutePrivatiForm :input').val(null);
@@ -815,6 +841,262 @@ $(document).ready(function() {
 		});
 	}
 
+	if($('#updateRicevutaPrivatoButton') != null && $('#updateRicevutaPrivatoButton') != undefined && $('#updateRicevutaPrivatoButton').length > 0){
+		$('#articolo').selectpicker();
+		$('#cliente').selectpicker();
+
+		$(document).on('click','#updateRicevutaPrivatoButton', function(event){
+			if(!event.detail || event.detail == 1) {
+				event.preventDefault();
+				$('#updateRicevutaPrivatoModal').modal('show');
+			}
+		});
+
+		$(document).on('click','#confirmUpdateRicevutaPrivato', function(event){
+			if(!event.detail || event.detail == 1) {
+				var modificaGiacenze = $("input[name='modificaGiacenze']:checked").val();
+				$('#hiddenModificaGiacenze').attr('value', modificaGiacenze);
+				$('#updateRicevutaPrivatoModal').modal('hide');
+				$('#updateRicevutaPrivatoForm').submit();
+			}
+		});
+
+		$(document).on('submit','#updateRicevutaPrivatoForm', function(event){
+			event.preventDefault();
+
+			var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var dataTrasporto = $('#dataTrasporto').val();
+			if(!dataTrasporto){
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Inserire una data di trasporto").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var validDataTrasporto = $.fn.validateDataTrasporto();
+			if(!validDataTrasporto){
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data del DDT").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+			var validCliente = $('#cliente option:selected').val();
+			if(!validCliente){
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Selezionare un cliente").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+			var validData = $('#data').val();
+			if(!validData){
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Inserire una data").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var numColli = $('#colli').val();
+			if(!numColli){
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Inserire un numero colli").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var oraTrasporto = $('#oraTrasporto').val();
+			if(!oraTrasporto){
+				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Inserire un'ora di trasporto").replace('@@alertResult@@', 'danger'));
+				return false;
+			}
+
+			var ricevutaPrivato = new Object();
+			ricevutaPrivato.id = $('#hiddenIdRicevutaPrivato').val();
+			ricevutaPrivato.progressivo = $('#progressivo').val();
+			ricevutaPrivato.anno = $('#anno').val();
+			ricevutaPrivato.data = $('#data').val();
+
+			var cliente = new Object();
+			cliente.id = $('#cliente option:selected').val();
+			ricevutaPrivato.cliente = cliente;
+
+			var puntoConsegna = new Object();
+			puntoConsegna.id = $('#puntoConsegna option:selected').val();
+			ricevutaPrivato.puntoConsegna = puntoConsegna;
+
+			var causale = new Object();
+			causale.id = $('#causale option:selected').val();
+			ricevutaPrivato.causale = causale;
+
+			var autistaId = $('#autista option:selected').val();
+			if(autistaId != null && autistaId != ''){
+				var autista = new Object();
+				autista.id = autistaId;
+				ricevutaPrivato.autista = autista;
+			}
+
+			var articoliTable = $('#ricevutaPrivatoArticoliTable').DataTable();
+
+			var ricevutaPrivatoArticoliLength = articoliTable.rows().nodes().length;
+			if(ricevutaPrivatoArticoliLength != null && ricevutaPrivatoArticoliLength != undefined && ricevutaPrivatoArticoliLength != 0){
+				var ricevutaPrivatoArticoli = [];
+				articoliTable.rows().nodes().each(function(i, item){
+					var articoloId = $(i).attr('data-id');
+
+					var ricevutaPrivatoArticolo = {};
+					var ricevutaPrivatoArticoloId = new Object();
+					ricevutaPrivatoArticoloId.articoloId = articoloId;
+					ricevutaPrivatoArticolo.id = ricevutaPrivatoArticoloId;
+
+					ricevutaPrivatoArticolo.lotto = $(i).children().eq(1).children().eq(0).val();
+					ricevutaPrivatoArticolo.scadenza = $(i).children().eq(2).children().eq(0).val();
+					ricevutaPrivatoArticolo.quantita = $(i).children().eq(4).children().eq(0).val();
+					ricevutaPrivatoArticolo.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+					//ddtArticolo.numeroPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
+					ricevutaPrivatoArticolo.prezzoIva = $(this).children().eq(6).children().eq(0).val();
+					ricevutaPrivatoArticolo.prezzo = $(this).children().eq(6).children().eq(0).attr('data-prezzo');
+					ricevutaPrivatoArticolo.sconto = $(i).children().eq(7).children().eq(0).val();
+
+					/*var idOrdiniClienti = $(this).attr('data-id-ordine-cliente');
+					if(idOrdiniClienti != null && idOrdiniClienti != ''){
+						ddtArticolo.idOrdiniClienti = idOrdiniClienti.split(";");
+					}*/
+
+					ricevutaPrivatoArticoli.push(ricevutaPrivatoArticolo);
+				});
+				ricevutaPrivato.ricevutaPrivatoArticoli = ricevutaPrivatoArticoli;
+			}
+
+			var ricevutaPrivatoTotaliLength = $('.rowTotaliByIva').length;
+			if(ricevutaPrivatoTotaliLength != null && ricevutaPrivatoTotaliLength != undefined && ricevutaPrivatoTotaliLength != 0){
+				var ricevutaPrivatoTotali = [];
+				$('.rowTotaliByIva').each(function(i, item){
+					var aliquotaIvaId = $(this).attr('data-id');
+
+					var ricevutaPrivatoTotale = {};
+					var ricevutaPrivatoTotaleId = new Object();
+					ricevutaPrivatoTotaleId.aliquotaIvaId = aliquotaIvaId;
+					ricevutaPrivatoTotale.id = ricevutaPrivatoTotaleId;
+
+					ricevutaPrivatoTotale.totaleIva = $(this).find('td').eq(1).text();
+					ricevutaPrivatoTotale.totaleImponibile = $(this).find('td').eq(2).text();
+
+					ricevutaPrivatoTotali.push(ricevutaPrivatoTotale);
+				});
+				ricevutaPrivato.ricevutaPrivatoTotali = ricevutaPrivatoTotali;
+			}
+
+			ricevutaPrivato.numeroColli = numColli;
+			ricevutaPrivato.tipoTrasporto = $('#tipoTrasporto option:selected').val();
+			ricevutaPrivato.dataTrasporto = dataTrasporto;
+
+			var regex = /:/g;
+			if(oraTrasporto != null && oraTrasporto != ''){
+				var count = oraTrasporto.match(regex);
+				count = (count) ? count.length : 0;
+				if(count == 1){
+					ricevutaPrivato.oraTrasporto = $('#oraTrasporto').val() + ':00';
+				} else {
+					ricevutaPrivato.oraTrasporto = $('#oraTrasporto').val();
+				}
+			}
+			ricevutaPrivato.trasportatore = $('#trasportatore').val();
+			ricevutaPrivato.note = $('#note').val();
+			ricevutaPrivato.scannerLog = $('#scannerLog').val();
+			var modificaGiacenze = $('#hiddenModificaGiacenze').val();
+			if(modificaGiacenze != null && modificaGiacenze != '' && modificaGiacenze == 'si'){
+				ricevutaPrivato.modificaGiacenze = true;
+			} else {
+				ricevutaPrivato.modificaGiacenze = false;
+			}
+
+			var ricevutaPrivatoJson = JSON.stringify(ricevutaPrivato);
+
+			$.ajax({
+				url: baseUrl + "ricevute-privati/"+ricevutaPrivato.id,
+				type: 'PUT',
+				contentType: "application/json",
+				dataType: 'json',
+				data: ricevutaPrivatoJson,
+				success: function(result) {
+					var idRicevutaPrivato = ricevutaPrivato.id;
+
+					$('#updateRicevutaPrivatoButton').attr("disabled", true);
+
+					// Update ordini clienti
+					var articoliOrdiniClienti = [];
+					var ordineClienteArticoliTable = $('#ordiniClientiArticoliTable').DataTable();
+					ordineClienteArticoliTable.rows().nodes().each(function(i, item){
+						var idArticolo = $(i).attr('data-id-articolo');
+						var idsOrdiniClienti = $(i).attr('data-ids-ordini');
+						var numeroPezziDaEvadere = $(i).attr('data-num-pezzi-evasi');
+						var idsDdts = $(i).attr('data-ids-ddts');
+						var setIdDdt = $(i).attr('data-set-id-ddt');
+
+						if(!$.fn.checkVariableIsNull(idsDdts) && setIdDdt == 'true'){
+							if($.fn.checkVariableIsNull(idsDdts)){
+								idsDdts = idDdt + ',';
+							} else {
+								if(idsDdts.indexOf(idDdt + ',') == -1){
+									idsDdts += idDdt + ',';
+								}
+							}
+						}
+
+						var articoloOrdiniClienti = new Object();
+						articoloOrdiniClienti.idArticolo = idArticolo;
+						articoloOrdiniClienti.numeroPezziDaEvadere = numeroPezziDaEvadere;
+						articoloOrdiniClienti.idsOrdiniClienti = idsOrdiniClienti;
+						articoloOrdiniClienti.idsDdts = idsDdts;
+
+						articoliOrdiniClienti.push(articoloOrdiniClienti);
+					});
+
+					if(articoliOrdiniClienti.length != 0){
+
+						var articoliOrdiniClientiJson = JSON.stringify(articoliOrdiniClienti);
+
+						$.ajax({
+							url: baseUrl + "ordini-clienti/aggregate",
+							type: 'POST',
+							contentType: "application/json",
+							dataType: 'json',
+							data: articoliOrdiniClientiJson,
+							success: function(result) {
+								$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Ricevuta a privato aggiornata con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
+
+								// Returns to the page with the list of Ricevute a privato
+								setTimeout(function() {
+									window.location.href = "ricevute-privati.html";
+								}, 1000);
+
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', "Ricevuta a privato aggiornata con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
+							}
+						});
+
+					} else {
+						$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Ricevuta a privato aggiornata con successo').replace('@@alertResult@@', 'success'));
+
+						$('#updateRicevutaPrivatoButton').attr("disabled", true);
+
+						// Returns to the page with the list of Ricevute a privato
+						setTimeout(function() {
+							window.location.href = "ricevute-privati.html";
+						}, 1000);
+					}
+
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var errorMessage = 'Errore nella modifica della ricevuta a privato';
+					if(jqXHR != null && jqXHR != undefined){
+						var jqXHRResponseJson = jqXHR.responseJSON;
+						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+								errorMessage = jqXHRResponseJsonMessage;
+							}
+						}
+					}
+					$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+				}
+			});
+		});
+	}
+
 	$(document).on('change','#cliente', function(){
 		$('#articolo option[value=""]').prop('selected', true);
 		$('#udm').val('');
@@ -836,6 +1118,7 @@ $(document).ready(function() {
 
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
+		var hasNoteDocumenti = $('#cliente option:selected').attr('data-has-note-documenti');
 		if(cliente != null && cliente != ''){
 			$.ajax({
 				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
@@ -896,6 +1179,11 @@ $(document).ready(function() {
 			});
 
 			$('#updateClienteNoteDocumenti').removeAttr('hidden');
+			if(hasNoteDocumenti == 1){
+				$('#updateClienteNoteDocumenti').css('color', '#e74a3b');
+			} else {
+				$('#updateClienteNoteDocumenti').css('color', '');
+			}
 
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
@@ -908,29 +1196,6 @@ $(document).ready(function() {
 			$('#articolo').selectpicker('refresh');
 		}
 	});
-
-	$.fn.loadScontiArticoli = function(data, cliente){
-		$.ajax({
-			url: baseUrl + "sconti?idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
-			type: 'GET',
-			dataType: 'json',
-			success: function(result) {
-				$.each(result, function(i, item){
-					var articoloId = item.articolo.id;
-					var valore = item.valore;
-					$("#articolo option").each(function(i){
-						var articoloOptionId = $(this).val();
-						if(articoloOptionId == articoloId){
-							$(this).attr('data-sconto', valore);
-						}
-					});
-				});
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
-			}
-		});
-	}
 
 	$(document).on('change','#articolo', function(){
 		var articolo = $('#articolo option:selected').val();
@@ -1048,8 +1313,8 @@ $(document).ready(function() {
 		var currentScadenza;
 		var currentQuantita = 0;
 		var currentPezzi = 0;
-		var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
-		if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0) {
+		var ricevutaPrivatoArticoliLength = $('.rowArticolo').length;
+		if(ricevutaPrivatoArticoliLength != null && ricevutaPrivatoArticoliLength != undefined && ricevutaPrivatoArticoliLength != 0) {
 			$('.rowArticolo').each(function(i, item){
 
 				if(found != 1){
@@ -1172,16 +1437,16 @@ $(document).ready(function() {
 		$.row = $(this).parent().parent();
 		var quantita = $.row.children().eq(4).children().eq(0).val();
 		quantita = $.fn.parseValue(quantita, 'int');
-		//var prezzo = $.row.children().eq(6).children().eq(0).attr('data-prezzo');
-		//prezzo = $.fn.parseValue(prezzo, 'float');
+		var prezzo = $.row.children().eq(6).children().eq(0).attr('data-prezzo');
+		prezzo = $.fn.parseValue(prezzo, 'float');
 		var prezzoIva = $.row.children().eq(6).children().eq(0).val();
 		prezzoIva = $.fn.parseValue(prezzoIva, 'float');
 		var sconto = $.row.children().eq(7).children().eq(0).val();
 		sconto = $.fn.parseValue(sconto, 'float');
-		var iva = $.row.children().eq(9).text();
-		iva = $.fn.parseValue(iva, 'int');
+		//var iva = $.row.children().eq(9).text();
+		//iva = $.fn.parseValue(iva, 'int');
 
-		var quantitaPerPrezzo = (quantita * prezzoIva);
+		var quantitaPerPrezzo = (quantita * prezzo);
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		var totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
@@ -1195,6 +1460,29 @@ $(document).ready(function() {
 	});
 
 });
+
+$.fn.loadScontiArticoli = function(data, cliente){
+	$.ajax({
+		url: baseUrl + "sconti?idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			$.each(result, function(i, item){
+				var articoloId = item.articolo.id;
+				var valore = item.valore;
+				$("#articolo option").each(function(i){
+					var articoloOptionId = $(this).val();
+					if(articoloOptionId == articoloId){
+						$(this).attr('data-sconto', valore);
+					}
+				});
+			});
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
+		}
+	});
+}
 
 $.fn.preloadSearchFields = function(){
 	$.ajax({
@@ -1318,7 +1606,7 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 }
 
 $.fn.getClienti = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "clienti?bloccaDdt=false&privato=true",
 		type: 'GET',
 		dataType: 'json',
@@ -1339,7 +1627,11 @@ $.fn.getClienti = function(){
 					if(listino != null && listino != undefined){
 						idListino = listino.id;
 					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+					var hasNoteDocumenti = 0;
+					if(!$.fn.checkVariableIsNull(item.noteDocumenti)){
+						hasNoteDocumenti = 1;
+					}
+					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'" data-has-note-documenti='+hasNoteDocumenti+'>'+label+'</option>');
 
 					$('#cliente').selectpicker('refresh');
 				});
@@ -1352,7 +1644,7 @@ $.fn.getClienti = function(){
 }
 
 $.fn.getTipologieTrasporto = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "utils/tipologie-trasporto-ddt",
 		type: 'GET',
 		dataType: 'json',
@@ -1376,7 +1668,7 @@ $.fn.getTipologieTrasporto = function(){
 }
 
 $.fn.getCausali = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "causali",
 		type: 'GET',
 		dataType: 'json',
@@ -1400,7 +1692,7 @@ $.fn.getCausali = function(){
 }
 
 $.fn.getArticoli = function(){
-	$.ajax({
+	return $.ajax({
 		url: baseUrl + "articoli?attivo=true",
 		type: 'GET',
 		dataType: 'json',
@@ -1437,6 +1729,179 @@ $.fn.getArticoli = function(){
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.extractIdRicevutaPrivatoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idRicevutaPrivato') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
+$.fn.getRicevutaPrivato = function(idRicevutaPrivato){
+
+	var alertContent = '<div id="alertRicevutaPrivatoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+	alertContent = alertContent +  '<strong>Errore nel recupero della ricevuta a privato</strong>\n' +
+		'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+	$.ajax({
+		url: baseUrl + "ricevute-privati/" + idRicevutaPrivato,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+
+				$('#hiddenIdRicevutaPrivato').attr('value', result.id);
+				$('#progressivo').attr('value', result.progressivo);
+				$('#anno').attr('value', result.anno);
+				$('#data').attr('value', result.data);
+				if(result.cliente != null && result.cliente != undefined){
+
+					$('#cliente option[value="' + result.cliente.id +'"]').attr('selected', true);
+
+					var idListino = $('#cliente option[value="' + result.cliente.id +'"]').attr('data-id-listino');
+
+					$.ajax({
+						url: baseUrl + "clienti/"+result.cliente.id+"/punti-consegna",
+						type: 'GET',
+						async: false,
+						dataType: 'json',
+						success: function(result2) {
+							if(result2 != null && result2 != undefined && result2 != ''){
+								$.each(result2, function(i, item){
+									var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+'('+item.provincia+')';
+									var selected = '';
+									if(result.puntoConsegna != null){
+										if(result.puntoConsegna.id == item.id){
+											selected = 'selected';
+										}
+									}
+									$('#puntoConsegna').append('<option value="'+item.id+'" '+selected+'>'+label+'</option>');
+								});
+							}
+							$('#puntoConsegna').removeAttr('disabled');
+						},
+						error: function(jqXHR, textStatus, errorThrown) {
+							$('#alertRicevutaPrivato').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
+						}
+					});
+
+					$.fn.getArticoli(result.cliente.id, idListino);
+
+					$('#cliente').selectpicker('refresh');
+				}
+				$('#causale option[value="' + result.causale.id +'"]').attr('selected', true);
+				if(result.autista != null && result.autista != undefined){
+					$('#autista option[value="' + result.autista.id +'"]').attr('selected', true);
+				};
+				$('#colli').attr('value', result.numeroColli);
+				$('#dataTrasporto').attr('value', result.dataTrasporto);
+				$('#oraTrasporto').attr('value', result.oraTrasporto);
+				$('#tipoTrasporto option[value="' + result.tipoTrasporto +'"]').attr('selected', true);
+				$('#trasportatore').attr('value', result.trasportatore);
+				$('#note').val(result.note);
+
+				if(result.ricevutaPrivatoArticoli != null && result.ricevutaPrivatoArticoli != undefined && result.ricevutaPrivatoArticoli.length != 0){
+
+					$.fn.loadRicevutaPrivatoArticoliTable();
+					$.fn.loadRicevutaPrivatoTotaliTable();
+
+					var table = $('#ricevutaPrivatoArticoliTable').DataTable();
+
+					result.ricevutaPrivatoArticoli.forEach(function(item, i){
+						var articolo = item.articolo;
+						var articoloId = item.id.articoloId;
+						var articoloDesc = articolo.codice+' '+articolo.descrizione;
+						var udm = articolo.unitaMisura.etichetta;
+						var iva = articolo.aliquotaIva.valore;
+						var pezzi = item.numeroPezzi;
+						var pezziDaEvadere = '';
+						var quantita = item.quantita;
+						var prezzo = item.prezzo;
+						var prezzoIva = Number(Math.round(($.fn.parseValue(prezzo, 'float') + ($.fn.parseValue(prezzo, 'float') * ($.fn.parseValue(iva, 'int')/100))) + 'e2') + 'e-2');
+						var sconto = item.sconto;
+						var lotto = item.lotto;
+						var scadenza = item.scadenza;
+						var lottoRegexp = $.fn.getLottoRegExp(item);
+						var dataScadenzaRegexp = $.fn.getDataScadenzaRegExp(item);
+						if(lotto != null && lotto != undefined && lotto != ''){
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+lotto+'" data-codice-fornitore="'+articolo.fornitore.codice+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
+						} else {
+							var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="" data-codice-fornitore="'+articolo.fornitore.codice+'" data-lotto-regexp="'+lottoRegexp+'" data-scadenza-regexp="'+dataScadenzaRegexp+'">';
+						}
+						var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
+						var quantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner" value="'+quantita+'">';
+						var pezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+pezzi+'" data-start-num-pezzi="'+pezzi+'">';
+						//var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
+						var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
+
+						var totale = 0;
+						var totaleConIva = 0;
+						quantita = $.fn.parseValue(quantita, 'float');
+						prezzo = $.fn.parseValue(prezzo, 'float');
+						prezzoIva = $.fn.parseValue(prezzoIva, 'float');
+						sconto = $.fn.parseValue(sconto, 'float');
+						iva = $.fn.parseValue(iva, 'int');
+
+						var quantitaPerPrezzo = (quantita * prezzo);
+						var scontoValue = (sconto/100)*quantitaPerPrezzo;
+						totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+						var quantitaPerPrezzoIva = (quantita * prezzoIva);
+						totaleConIva = Number(Math.round((quantitaPerPrezzoIva - scontoValue) + 'e2') + 'e-2');
+
+						var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzoIva+'" data-prezzo="'+prezzo+'" data-totale="'+totale+'">';
+
+						var deleteLink = '<a class="deleteRicevutaPrivatoArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+
+						var rowNode = table.row.add( [
+							articoloDesc,
+							lottoHtml,
+							scadenzaHtml,
+							udm,
+							quantitaHtml,
+							pezziHtml,
+							//pezziDaEvadereHtml,
+							prezzoHtml,
+							scontoHtml,
+							totaleConIva,
+							iva,
+							deleteLink
+						] ).draw( false ).node();
+						$(rowNode).css('text-align', 'center').css('color','#080707');
+						$(rowNode).addClass('rowArticolo');
+						$(rowNode).attr('data-id', articoloId);
+					});
+					$.fn.computeTotale();
+				}
+
+				// load Sconti associated to the Cliente
+				var data = $('#data').val();
+				if(data != null && data != undefined && data != ''){
+					$.fn.loadScontiArticoli(data, result.cliente.id);
+				}
+
+				$.fn.loadArticoliFromOrdiniClienti();
+
+			} else{
+				$('#alertRicevutaPrivato').empty().append(alertContent);
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$('#alertRicevutaPrivato').append(alertContent);
+			$('#updateRicevutaPrivatoButton').attr('disabled', true);
 			console.log('Response text: ' + jqXHR.responseText);
 		}
 	});

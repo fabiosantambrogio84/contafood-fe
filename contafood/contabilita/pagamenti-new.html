@@ -37,14 +37,20 @@
 
   <script>
     var idDdt = $.fn.extractIdDdtFromUrl();
+    var idDdtAcquisto = $.fn.extractIdDdtAcquistoFromUrl();
     var idNotaAccredito = $.fn.extractIdNotaAccreditoFromUrl();
     var idNotaReso = $.fn.extractIdNotaResoFromUrl();
     var idRicevutaPrivato = $.fn.extractIdRicevutaPrivatoFromUrl();
     var idFattura = $.fn.extractIdFatturaFromUrl();
     var idFatturaAccompagnatoria = $.fn.extractIdFatturaAccompagnatoriaFromUrl();
+    var idFatturaAcquisto = $.fn.extractIdFatturaAcquistoFromUrl();
     if(idDdt != null && idDdt != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
         $.fn.getDdt(idDdt);
+      });
+    } else if(idDdtAcquisto != null && idDdtAcquisto != ""){
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getDdtAcquisto(idDdtAcquisto);
       });
     } else if(idNotaAccredito != null && idNotaAccredito != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
@@ -65,6 +71,10 @@
     } else if(idFatturaAccompagnatoria != null && idFatturaAccompagnatoria != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
         $.fn.getFatturaAccompagnatoria(idFatturaAccompagnatoria);
+      });
+    } else if(idFatturaAcquisto != null && idFatturaAcquisto != ""){
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getFatturaAcquisto(idFatturaAcquisto);
       });
     } else {
       $.fn.getTipiPagamento();
@@ -152,10 +162,12 @@
           </div>
 
           <input type="hidden" id="hiddenIdDdt"/>
+          <input type="hidden" id="hiddenIdDdtAcquisto"/>
           <input type="hidden" id="hiddenIdNotaAccredito"/>
           <input type="hidden" id="hiddenIdNotaReso"/>
           <input type="hidden" id="hiddenIdRicevutaPrivato"/>
           <input type="hidden" id="hiddenIdFattura"/>
+          <input type="hidden" id="hiddenIdFatturaAcquisto"/>
           <input type="hidden" id="hiddenIdFatturaAccompagnatoria"/>
 
           <button type="submit" class="btn btn-primary" id="newPagamentoButton">Salva</button>

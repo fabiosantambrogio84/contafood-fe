@@ -79,6 +79,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 	if(!$.fn.checkVariableIsNull(articolo.aliquotaIva)){
 		iva = articolo.aliquotaIva.valore;
 	}
+	var prezzoIva = Number(Math.round(($.fn.parseValue(prezzo, 'float') + ($.fn.parseValue(prezzo, 'float') * ($.fn.parseValue(iva, 'int')/100))) + 'e2') + 'e-2');
 	var codiceFornitore = articolo.fornitore.codice;
 	var lottoRegexp = $.fn.getLottoRegExp(articolo);
 	var dataScadenzaRegexp = $.fn.getDataScadenzaRegExp(articolo);
@@ -119,7 +120,12 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 				currentLotto = $(this).children().eq(1).children().eq(0).val();
 				currentScadenza = $(this).children().eq(2).children().eq(0).val();
 				//currentPezziDaEvadere = $(this).children().eq(6).children().eq(0).val();
-				currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+				if($.fn.isRicevutaPrivato()){
+					currentPrezzo = $(this).children().eq(6).children().eq(0).attr('data-prezzo');
+				} else {
+					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
+				}
+
 				currentSconto = $(this).children().eq(7).children().eq(0).val();
 				if(currentSconto == '0'){
 					currentSconto = '';
@@ -140,14 +146,20 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 
 	var rowIndex;
 	var totale = 0;
+	var totaleConIva = 0;
 	quantita = $.fn.parseValue(quantita, 'float');
 	prezzo = $.fn.parseValue(prezzo, 'float');
+	prezzoIva = $.fn.parseValue(prezzoIva, 'float');
 	sconto = $.fn.parseValue(sconto, 'float');
 	pezzi = $.fn.parseValue(pezzi, 'int');
+	iva = $.fn.parseValue(iva, 'int');
 
 	var quantitaPerPrezzo = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzo);
 	var scontoValue = (sconto/100)*quantitaPerPrezzo;
 	totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
+
+	var quantitaPerPrezzoIva = ((quantita + $.fn.parseValue(currentQuantita,'float')) * prezzoIva);
+	totaleConIva = Number(Math.round((quantitaPerPrezzoIva - scontoValue) + 'e2') + 'e-2');
 
 	var table;
 	if($.fn.isDdt()){
@@ -156,13 +168,14 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
 	} else if($.fn.isRicevutaPrivato()){
 		table = $('#ricevutaPrivatoArticoliTable').DataTable();
+
+		prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzoIva+'" data-prezzo="'+prezzo+'" data-totale="'+totale+'">';
 	}
 
 	if(found >= 1){
-
 		// aggiorno la riga
-		$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentSconto,
-			quantita,pezzi,codiceFornitore,lottoRegexp,dataScadenzaRegexp,totale);
+		$.fn.aggiornaRigaArticolo(table,currentRowIndex,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentPrezzoIva,currentSconto,
+			quantita,pezzi,codiceFornitore,lottoRegexp,dataScadenzaRegexp,totale,totaleConIva);
 
 		rowIndex = currentRowIndex;
 
@@ -170,7 +183,7 @@ $.fn.addArticoloFromScanner = function(articolo, numeroPezzi, quantita, lotto, s
 		// inserisco nuova riga
 		$.fn.inserisciRigaArticolo(table,null,articoloId,articoloLabel,
 			lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,
-			totale,iva);
+			totale,iva,totaleConIva);
 
 		rowIndex = table.rows().count();
 	}

@@ -160,10 +160,11 @@ $.fn.loadDdtTable = function(url) {
 					}
 					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
 					$(cells[6]).css('text-align','right');
-					$(cells[7]).css('font-weight','bold').css('text-align','right');
-					$(cells[8]).css('text-align','right');
-					$(cells[9]).css('text-align','right');
+					$(cells[8]).css('font-weight','bold').css('text-align','right');
+					$(cells[9]).css('font-weight','bold').css('text-align','right');
 					$(cells[10]).css('text-align','right');
+					$(cells[11]).css('text-align','right');
+					$(cells[12]).css('text-align','right');
 				},
 				"initComplete": function( settings, json ) {
 					var costoAbilitato = $.fn.getConfigurazioneItemClient('DDT_COSTO');
@@ -171,14 +172,14 @@ $.fn.loadDdtTable = function(url) {
 
 					var table = $('#ddtTable').DataTable();
 					if(!costoAbilitato){
-						table.column(9).visible(false);
+						table.column(11).visible(false);
 					} else {
-						table.column(9).visible(true);
+						table.column(11).visible(true);
 					}
 					if(!guadagnoAbilitato){
-						table.column(10).visible(false);
+						table.column(12).visible(false);
 					} else {
-						table.column(10).visible(true);
+						table.column(12).visible(true);
 					}
 				}
 			});
@@ -1226,6 +1227,7 @@ $(document).ready(function() {
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
 		var nascondiPrezzi = $('#cliente option:selected').attr('data-nascondi-prezzi');
+		var hasNoteDocumenti = $('#cliente option:selected').attr('data-has-note-documenti');
 		if(cliente != null && cliente != ''){
 			$.ajax({
 				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
@@ -1262,6 +1264,11 @@ $(document).ready(function() {
 			});
 
 			$('#updateClienteNoteDocumenti').removeAttr('hidden');
+			if(hasNoteDocumenti == 1){
+				$('#updateClienteNoteDocumenti').css('color', '#e74a3b');
+			} else {
+				$('#updateClienteNoteDocumenti').css('color', '');
+			}
 
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
@@ -1641,16 +1648,21 @@ $.fn.checkProgressiviDuplicates = function(){
 	return	$.ajax({
 		url: baseUrl + "ddts/progressivi-duplicates",
 		type: 'GET',
-		dataType: 'text',
+		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
-				var alertContent = '<div id="alertDdtContent" class="alert alert-warning alert-dismissible fade show" role="alert">';
-				alertContent = alertContent + '<strong>ATTENZIONE progressivi duplicati:</strong>\n' + result + '\n' +
-					'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-				$('#alertDdt').empty().append(alertContent);
+				var year= result.anno;
+				var progressivi = result.progressivi;
+
+				if(!$.fn.checkVariableIsNull(progressivi)){
+					var alertContent = '<div id="alertDdtContent" class="alert alert-warning alert-dismissible fade show" role="alert">';
+					alertContent = alertContent + "<strong>ATTENZIONE progressivi duplicati per l'anno "+year+":</strong>\n" + progressivi + '\n' +
+						'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+					$('#alertDdt').empty().append(alertContent);
+				}
 			}
-
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
@@ -1710,7 +1722,11 @@ $.fn.getClienti = function(){
 					if(listino != null && listino != undefined){
 						idListino = listino.id;
 					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'" data-nascondi-prezzi='+item.nascondiPrezzi+'>'+label+'</option>');
+					var hasNoteDocumenti = 0;
+					if(!$.fn.checkVariableIsNull(item.noteDocumenti)){
+						hasNoteDocumenti = 1;
+					}
+					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'" data-nascondi-prezzi='+item.nascondiPrezzi+' data-has-note-documenti='+hasNoteDocumenti+'>'+label+'</option>');
 				});
 				$('#cliente').selectpicker('refresh');
 				console.log("CLIENTI");

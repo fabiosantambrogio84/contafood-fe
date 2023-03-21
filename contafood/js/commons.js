@@ -685,6 +685,34 @@ $.fn.checkPezziOrdinatiAfterArticoloDelete = function(idArticolo, idDdt){
         })
     }
 }
+/*
+$.fn.openWindowWithPost = function(url, data) {
+    var form = document.createElement("form");
+    form.target = "_blank";
+    form.method = "POST";
+    form.action = url;
+    form.style.display = "none";
+
+    var input = document.createElement("input");
+    input.type = "hidden";
+    input.id = "data";
+    input.name = "data";
+    input.value = data;
+    form.appendChild(input);
+
+    //for (var key in data) {
+    //    var input = document.createElement("input");
+    //    input.type = "hidden";
+    //    input.name = key;
+    //    input.value = data[key];
+    //    form.appendChild(input);
+    //}
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
+*/
 
 $.fn.computeTotale = function() {
     var ivaMap = new Map();
@@ -1067,7 +1095,7 @@ $.fn.groupProdottoRow = function(insertedRow){
 
 $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,articolo,
                                       lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,
-                                      totale,iva){
+                                      totale,iva,totaleIva){
 
     var deleteLinkClass = 'delete';
     if($.fn.isDdt()){
@@ -1076,6 +1104,7 @@ $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,ar
         deleteLinkClass += 'FatturaAccompagnatoriaArticolo';
     } else if($.fn.isRicevutaPrivato()){
         deleteLinkClass += 'RicevutaPrivatoArticolo';
+        totale = totaleIva;
     } else if($.fn.isDdtAcquisto()){
         deleteLinkClass += 'DdtProdotto';
     }
@@ -1110,8 +1139,8 @@ $.fn.inserisciRigaArticolo = function(table,currentIdOrdineCliente,articoloId,ar
     $(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
 }
 
-$.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,currentPezzi,lotto,scadenza,prezzo,sconto,
-                                     quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale){
+$.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,currentPezzi,lotto,scadenza,prezzo,prezzoIva,sconto,
+                                     quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale,totaleConIva){
 
     var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
     var newPezzi = pezzi + $.fn.parseValue(currentPezzi,'int');
@@ -1123,7 +1152,11 @@ $.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,curre
     var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(scadenza).format('YYYY-MM-DD')+'">';
 
     //var pezziDaEvadereHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezziDaEvadere" value="'+pezziDaEvadere+'">';
-    var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
+    if($.fn.isRicevutaPrivato()){
+        var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzoIva+'" data-prezzo="'+prezzo+'" data-totale="'+totale+'">';
+    } else {
+        var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+prezzo+'">';
+    }
     var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+sconto+'">';
 
     if($.fn.isVersionClient()){
@@ -1137,7 +1170,11 @@ $.fn.aggiornaRigaArticolo = function(table,currentRowIndex,currentQuantita,curre
     rowData[5] = newPezziHtml;
     rowData[6] = prezzoHtml;
     rowData[7] = scontoHtml;
-    rowData[8] = totale;
+    if($.fn.isRicevutaPrivato()){
+        rowData[8] = totaleConIva;
+    } else {
+        rowData[8] = totale;
+    }
     table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 }
 

@@ -181,11 +181,13 @@ $(document).ready(function() {
 			event.preventDefault();
 
 			var idDdt = $('#hiddenIdDdt').val();
+			var idDdtAcquisto = $('#hiddenIdDdtAcquisto').val();
 			var idNotaAccredito = $('#hiddenIdNotaAccredito').val();
 			var idNotaReso = $('#hiddenIdNotaReso').val();
 			var idRicevutaPrivato = $('#hiddenIdRicevutaPrivato').val();
 			var idFattura = $('#hiddenIdFattura').val();
 			var idFatturaAccompagnatoria = $('#hiddenIdFatturaAccompagnatoria').val();
+			var idFatturaAcquisto = $('#hiddenIdFatturaAcquisto').val();
 
 			var pagamento = new Object();
 			pagamento.data = $('#data').val();
@@ -203,6 +205,13 @@ $(document).ready(function() {
 				tipologia = "DDT";
 			}
 			pagamento.ddt = ddt;
+
+			var ddtAcquisto = new Object();
+			if(idDdtAcquisto != null && idDdtAcquisto != ""){
+				ddtAcquisto.id = idDdtAcquisto;
+				tipologia = "DDT_ACQUISTO";
+			}
+			pagamento.ddtAcquisto = ddtAcquisto;
 
 			var notaAccredito = new Object();
 			if(idNotaAccredito != null && idNotaAccredito != ""){
@@ -239,6 +248,13 @@ $(document).ready(function() {
 			}
 			pagamento.fatturaAccompagnatoria = fatturaAccompagnatoria;
 
+			var fatturaAcquisto = new Object();
+			if(idFatturaAcquisto != null && idFatturaAcquisto != ""){
+				fatturaAcquisto.id = idFatturaAcquisto;
+				tipologia = "FATTURA_ACQUISTO";
+			}
+			pagamento.fatturaAcquisto = fatturaAcquisto;
+
 			pagamento.tipologia = tipologia;
 			pagamento.importo = $('#importo').val();
 			pagamento.note = $('#note').val();
@@ -269,6 +285,8 @@ $(document).ready(function() {
 						returnPage = 'ricevute-privati.html';
 					} else if((idFattura != null && idFattura != "") || (idFatturaAccompagnatoria != null && idFatturaAccompagnatoria != "")){
 						returnPage = 'fatture.html';
+					} else if((idFatturaAcquisto != null && idFatturaAcquisto != "") || (idDdtAcquisto != null && idDdtAcquisto != "")){
+						returnPage = 'documenti-acquisto.html';
 					}
 
 					setTimeout(function() {
@@ -327,6 +345,22 @@ $.fn.extractIdDdtFromUrl = function(){
         	return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
         }
     }
+}
+
+$.fn.extractIdDdtAcquistoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idDdtAcquisto') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
 }
 
 $.fn.extractIdNotaAccreditoFromUrl = function(){
@@ -409,6 +443,22 @@ $.fn.extractIdFatturaAccompagnatoriaFromUrl = function(){
 	}
 }
 
+$.fn.extractIdFatturaAcquistoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idFatturaAcquisto') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
 $.fn.getTipiPagamento = function(){
 	$.ajax({
 		url: baseUrl + "tipi-pagamento",
@@ -473,6 +523,49 @@ $.fn.getDdt = function(idDdt){
 				$('#data').val(moment().format('YYYY-MM-DD'));
 
 				$('#annullaPagamentoButton').attr('href', 'ddt.html');
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getDdtAcquisto = function(idDdtAcquisto){
+	$.ajax({
+		url: baseUrl + "ddts-acquisto/" + idDdtAcquisto,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				var totaleAcconto = result.totaleAcconto;
+				var totale = result.totale;
+
+				if(totaleAcconto == null || totaleAcconto == undefined || totaleAcconto == ''){
+					totaleAcconto = 0;
+				}
+
+				if(totale == null || totale == undefined || totale == ''){
+					totale = 0;
+				}
+
+				var importo = (totale - totaleAcconto);
+				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
+
+				var fornitore = result.fornitore;
+				if(fornitore != null && fornitore != undefined && fornitore != ''){
+					$('#fornitore').val(fornitore.ragioneSociale);
+					$('#clienteDiv').addClass('d-none');
+					$('#fornitoreDiv').removeClass('d-none');
+				}
+
+				var descrizione = "Pagamento DDT ACQUISTO n. "+result.numero+" del "+moment(result.data).format('DD/MM/YYYY');
+				$('#descrizione').val(descrizione);
+
+				$('#hiddenIdDdtAcquisto').val(result.id);
+				$('#data').val(moment().format('YYYY-MM-DD'));
+
+				$('#annullaPagamentoButton').attr('href', 'documenti-acquisto.html');
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -727,6 +820,45 @@ $.fn.getFatturaAccompagnatoria = function(idFatturaAccompagnatoria){
 	});
 }
 
-$.fn.formatNumber = function(value){
-	return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
+$.fn.getFatturaAcquisto = function(idFatturaAcquisto){
+	$.ajax({
+		url: baseUrl + "fatture-acquisto/" + idFatturaAcquisto,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				var totaleAcconto = result.totaleAcconto;
+				var totale = result.totale;
+
+				if(totaleAcconto == null || totaleAcconto == undefined || totaleAcconto == ''){
+					totaleAcconto = 0;
+				}
+
+				if(totale == null || totale == undefined || totale == ''){
+					totale = 0;
+				}
+
+				var importo = (totale - totaleAcconto);
+				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
+
+				var fornitore = result.fornitore;
+				if(fornitore != null && fornitore != undefined && fornitore != ''){
+					$('#fornitore').val(fornitore.ragioneSociale);
+					$('#clienteDiv').addClass('d-none');
+					$('#fornitoreDiv').removeClass('d-none');
+				}
+
+				var descrizione = "Pagamento FATTURA ACQUISTO n. "+result.progressivo+" del "+moment(result.data).format('DD/MM/YYYY');
+				$('#descrizione').val(descrizione);
+
+				$('#hiddenIdFatturaAcquisto').val(result.id);
+				$('#data').val(moment().format('YYYY-MM-DD'));
+
+				$('#annullaPagamentoButton').attr('href', 'fatture.html');
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
 }

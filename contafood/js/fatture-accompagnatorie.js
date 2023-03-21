@@ -322,6 +322,7 @@ $(document).ready(function() {
 
 		var cliente = $('#cliente option:selected').val();
 		var idListino = $('#cliente option:selected').attr('data-id-listino');
+		var hasNoteDocumenti = $('#cliente option:selected').attr('data-has-note-documenti');
 		if(cliente != null && cliente != ''){
 			$.ajax({
 				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
@@ -384,6 +385,11 @@ $(document).ready(function() {
 			});
 
 			$('#updateClienteNoteDocumenti').removeAttr('hidden');
+			if(hasNoteDocumenti == 1){
+				$('#updateClienteNoteDocumenti').css('color', '#e74a3b');
+			} else {
+				$('#updateClienteNoteDocumenti').css('color', '');
+			}
 
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
@@ -729,7 +735,11 @@ $.fn.getClienti = function(){
 					if(listino != null && listino != undefined){
 						idListino = listino.id;
 					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'">'+label+'</option>');
+					var hasNoteDocumenti = 0;
+					if(!$.fn.checkVariableIsNull(item.noteDocumenti)){
+						hasNoteDocumenti = 1;
+					}
+					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'" data-has-note-documenti='+hasNoteDocumenti+'>'+label+'</option>');
 
 					$('#cliente').selectpicker('refresh');
 				});
