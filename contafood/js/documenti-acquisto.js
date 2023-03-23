@@ -94,6 +94,7 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 					if((totale - acconto) != 0){
 						links += '<a class="payDdtAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idDdtAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 					}
+					links += '<a class="printDdtAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 					links += '<a class="deleteDdtAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				} else if(data.tipoDocumento === tipoDocumentoFatturaAcquisto){
 					links += '<a class="detailsFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
@@ -101,6 +102,7 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 					if((totale - acconto) != 0){
 						links += '<a class="payFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idFatturaAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 					}
+					links += '<a class="printFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 					links += '<a class="deleteFatturaAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				}
 				return links;
@@ -616,6 +618,16 @@ $(document).ready(function() {
 				}
 			});
 		}
+	});
+
+	$(document).on('click','.printDdtAcquisto', function(){
+		var idDdtAcquisto = $(this).attr('data-id-documento');
+		window.open(baseUrl + "stampe/ddts-acquisto/"+idDdtAcquisto, '_blank');
+	});
+
+	$(document).on('click','.printFatturaAcquisto', function(){
+		var idFatturaAcquisto = $(this).attr('data-id-documento');
+		window.open(baseUrl + "stampe/fatture-acquisto/"+idFatturaAcquisto, '_blank');
 	});
 
 	if($('#searchDocumentoAcquistoButton') != null && $('#searchDocumentoAcquistoButton') != undefined) {

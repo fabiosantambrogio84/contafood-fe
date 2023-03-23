@@ -774,6 +774,7 @@ $(document).ready(function() {
 			$('#updateClienteNoteDocumenti').removeAttr('hidden');
 			if(hasNoteDocumenti == 1){
 				$('#updateClienteNoteDocumenti').css('color', '#e74a3b');
+				$($('#updateClienteNoteDocumenti').children().get(0)).addClass('fa-2x');
 			} else {
 				$('#updateClienteNoteDocumenti').css('color', '');
 			}
