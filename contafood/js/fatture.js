@@ -1121,7 +1121,9 @@ $.fn.preloadSearchFields = function(){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					$('#searchTipo').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
+					if(!item.descrizione.includes('acquisto')){
+						$('#searchTipo').append('<option value="'+item.id+'" >'+item.descrizione+'</option>');
+					}
 				});
 			}
 		},

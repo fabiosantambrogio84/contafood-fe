@@ -530,6 +530,7 @@ $(document).ready(function() {
 					ddtAcquisto.ddtAcquistoIngredienti = ddtAcquistoIngredienti;
 				}
 			}
+			ddtAcquisto.fatturato = false;
 			ddtAcquisto.numeroColli = $('#colli').val();
 			ddtAcquisto.note = $('#note').val();
 			var modificaGiacenze = $('#hiddenModificaGiacenze').val();
@@ -558,7 +559,7 @@ $(document).ready(function() {
 
 					// Returns to the page with the list of DDTs
 					setTimeout(function() {
-						window.location.href = "ddt-acquisto.html";
+						window.location.href = "documenti-acquisto.html";
 					}, 1000);
 				},
 				error: function(jqXHR, textStatus, errorThrown) {

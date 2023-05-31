@@ -5,14 +5,13 @@ var rowBackgroundGiallo = '#fffca3';
 
 $(document).ready(function() {
 
-	$('#fatturaAccompagnatoriaArticoliTable').DataTable({
+	$('#fatturaAccompagnatoriaAcquistoArticoliTable').DataTable({
 		"searching": false,
 		"language": {
 			"paginate": {
 				"first": "Inizio",
 				"last": "Fine",
 				"next": "Succ.",
-				//"previous": "<i class=\"fa fa-backward\" aria-hidden=\"true\"></i>"
 				"previous": "Prec."
 			},
 			"emptyTable": "",
@@ -40,7 +39,7 @@ $(document).ready(function() {
 		]
 	});
 
-	$('#fatturaAccompagnatoriaTotaliTable').DataTable({
+	$('#fatturaAccompagnatoriaAcquistoTotaliTable').DataTable({
 		"ajax": {
 			"url": baseUrl + "aliquote-iva",
 			"type": "GET",
@@ -49,10 +48,10 @@ $(document).ready(function() {
 			"dataSrc": "",
 			"error": function(jqXHR, textStatus, errorThrown) {
 				console.log('Response text: ' + jqXHR.responseText);
-				var alertContent = '<div id="alertFattureContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+				var alertContent = '<div id="alertFattureAccompagnatorieAcquistoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
 				alertContent = alertContent + '<strong>Errore nel recupero delle aliquote iva</strong>\n' +
 					'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-				$('#alertFattureAccompagnatorie').empty().append(alertContent);
+				$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent);
 			}
 		},
 		"language": {
@@ -95,86 +94,75 @@ $(document).ready(function() {
 		}
 	});
 
-	$.fn.createFatturaAccompagnatoria = function(print){
+	$.fn.createFatturaAccompagnatoriaAcquisto = function(print){
 
-		var alertContent = '<div id="alertFattureAccompagnatorieContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		var alertContent = '<div id="alertFattureAccompagnatorieAcquistoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-		var validLotto = $.fn.validateLotto();
-		/*
-        if(!validLotto){
-            $('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', "Compilare tutti i dati 'Lotto'").replace('@@alertResult@@', 'danger'));
-            return false;
-        }
-         */
 		var validDataTrasporto = $.fn.validateDataTrasporto();
 		if(!validDataTrasporto){
-			$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data della Fattura Accompagnatoria").replace('@@alertResult@@', 'danger'));
+			$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent.replace('@@alertText@@', "'Data trasporto' non può essere precedente alla data della Fattura Accompagnatoria Acquisto").replace('@@alertResult@@', 'danger'));
 			return false;
 		}
 
-		var fatturaAccompagnatoria = new Object();
-		fatturaAccompagnatoria.progressivo = $('#progressivo').val();
-		fatturaAccompagnatoria.anno = $('#anno').val();
-		fatturaAccompagnatoria.data = $('#data').val();
+		var fatturaAccompagnatoriaAcquisto = new Object();
+		fatturaAccompagnatoriaAcquisto.numero = $('#numero').val();
+		//fatturaAccompagnatoriaAcquisto.anno = $('#anno').val();
+		fatturaAccompagnatoriaAcquisto.data = $('#data').val();
 
-		var cliente = new Object();
-		cliente.id = $('#cliente option:selected').val();
-		fatturaAccompagnatoria.cliente = cliente;
-
-		var puntoConsegna = new Object();
-		puntoConsegna.id = $('#puntoConsegna option:selected').val();
-		fatturaAccompagnatoria.puntoConsegna = puntoConsegna;
+		var fornitore = new Object();
+		fornitore.id = $('#fornitore option:selected').val();
+		fatturaAccompagnatoriaAcquisto.fornitore = fornitore;
 
 		var causale = new Object();
 		causale.id = $('#causale option:selected').val();
-		fatturaAccompagnatoria.causale = causale;
+		fatturaAccompagnatoriaAcquisto.causale = causale;
 
-		var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
-		if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0){
-			var fatturaAccompagnatoriaArticoli = [];
+		var fatturaAccompagnatoriaAcquistoArticoliLength = $('.rowArticolo').length;
+		if(fatturaAccompagnatoriaAcquistoArticoliLength != null && fatturaAccompagnatoriaAcquistoArticoliLength != undefined && fatturaAccompagnatoriaAcquistoArticoliLength != 0){
+			var fatturaAccompagnatoriaAcquistoArticoli = [];
 			$('.rowArticolo').each(function(i, item){
 				var articoloId = $(this).attr('data-id');
 
-				var fatturaAccompagnatoriaArticolo = {};
-				var fatturaAccompagnatoriaArticoloId = new Object();
-				fatturaAccompagnatoriaArticoloId.articoloId = articoloId;
-				fatturaAccompagnatoriaArticolo.id = fatturaAccompagnatoriaArticoloId;
+				var fatturaAccompagnatoriaAcquistoArticolo = {};
+				var fatturaAccompagnatoriaAcquistoArticoloId = new Object();
+				fatturaAccompagnatoriaAcquistoArticoloId.articoloId = articoloId;
+				fatturaAccompagnatoriaAcquistoArticolo.id = fatturaAccompagnatoriaAcquistoArticoloId;
 
-				fatturaAccompagnatoriaArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-				fatturaAccompagnatoriaArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+				fatturaAccompagnatoriaAcquistoArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
+				fatturaAccompagnatoriaAcquistoArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
+				fatturaAccompagnatoriaAcquistoArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
+				fatturaAccompagnatoriaAcquistoArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
+				fatturaAccompagnatoriaAcquistoArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
+				fatturaAccompagnatoriaAcquistoArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
 
-				fatturaAccompagnatoriaArticoli.push(fatturaAccompagnatoriaArticolo);
+				fatturaAccompagnatoriaAcquistoArticoli.push(fatturaAccompagnatoriaAcquistoArticolo);
 			});
-			fatturaAccompagnatoria.fatturaAccompagnatoriaArticoli = fatturaAccompagnatoriaArticoli;
+			fatturaAccompagnatoriaAcquisto.fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoli;
 		}
-		var fatturaAccompagnatoriaTotaliLength = $('.rowTotaliByIva').length;
-		if(fatturaAccompagnatoriaTotaliLength != null && fatturaAccompagnatoriaTotaliLength != undefined && fatturaAccompagnatoriaTotaliLength != 0){
-			var fatturaAccompagnatoriaTotali = [];
+		var fatturaAccompagnatoriaAcquistoTotaliLength = $('.rowTotaliByIva').length;
+		if(fatturaAccompagnatoriaAcquistoTotaliLength != null && fatturaAccompagnatoriaAcquistoTotaliLength != undefined && fatturaAccompagnatoriaAcquistoTotaliLength != 0){
+			var fatturaAccompagnatoriaAcquistoTotali = [];
 			$('.rowTotaliByIva').each(function(i, item){
 				var aliquotaIvaId = $(this).attr('data-id');
 
-				var fatturaAccompagnatoriaTotale = {};
-				var fatturaAccompagnatoriaTotaleId = new Object();
-				fatturaAccompagnatoriaTotaleId.aliquotaIvaId = aliquotaIvaId;
-				fatturaAccompagnatoriaTotale.id = fatturaAccompagnatoriaTotaleId;
+				var fatturaAccompagnatoriaAcquistoTotale = {};
+				var fatturaAccompagnatoriaAcquistoTotaleId = new Object();
+				fatturaAccompagnatoriaAcquistoTotaleId.aliquotaIvaId = aliquotaIvaId;
+				fatturaAccompagnatoriaAcquistoTotale.id = fatturaAccompagnatoriaAcquistoTotaleId;
 
-				fatturaAccompagnatoriaTotale.totaleIva = $(this).find('td').eq(1).text();
-				fatturaAccompagnatoriaTotale.totaleImponibile = $(this).find('td').eq(2).text();
+				fatturaAccompagnatoriaAcquistoTotale.totaleIva = $(this).find('td').eq(1).text();
+				fatturaAccompagnatoriaAcquistoTotale.totaleImponibile = $(this).find('td').eq(2).text();
 
-				fatturaAccompagnatoriaTotali.push(fatturaAccompagnatoriaTotale);
+				fatturaAccompagnatoriaAcquistoTotali.push(fatturaAccompagnatoriaAcquistoTotale);
 			});
-			fatturaAccompagnatoria.fatturaAccompagnatoriaTotali = fatturaAccompagnatoriaTotali;
+			fatturaAccompagnatoriaAcquisto.fatturaAccompagnatoriaAcquistoTotali = fatturaAccompagnatoriaAcquistoTotali;
 		}
 
-		fatturaAccompagnatoria.numeroColli = $('#colli').val();
-		fatturaAccompagnatoria.tipoTrasporto = $('#tipoTrasporto option:selected').val();
-		fatturaAccompagnatoria.dataTrasporto = $('#dataTrasporto').val();
+		fatturaAccompagnatoriaAcquisto.numeroColli = $('#colli').val();
+		fatturaAccompagnatoriaAcquisto.tipoTrasporto = $('#tipoTrasporto option:selected').val();
+		fatturaAccompagnatoriaAcquisto.dataTrasporto = $('#dataTrasporto').val();
 
 		var regex = /:/g;
 		var oraTrasporto = $('#oraTrasporto').val();
@@ -182,87 +170,41 @@ $(document).ready(function() {
 			var count = oraTrasporto.match(regex);
 			count = (count) ? count.length : 0;
 			if(count == 1){
-				fatturaAccompagnatoria.oraTrasporto = $('#oraTrasporto').val() + ':00';
+				fatturaAccompagnatoriaAcquisto.oraTrasporto = $('#oraTrasporto').val() + ':00';
 			} else {
-				fatturaAccompagnatoria.oraTrasporto = $('#oraTrasporto').val();
+				fatturaAccompagnatoriaAcquisto.oraTrasporto = $('#oraTrasporto').val();
 			}
 		}
-		fatturaAccompagnatoria.trasportatore = $('#trasportatore').val();
-		fatturaAccompagnatoria.note = $('#note').val();
+		fatturaAccompagnatoriaAcquisto.trasportatore = $('#trasportatore').val();
+		fatturaAccompagnatoriaAcquisto.note = $('#note').val();
 
-		var fatturaAccompagnatoriaJson = JSON.stringify(fatturaAccompagnatoria);
+		var fatturaAccompagnatoriaAcquistoJson = JSON.stringify(fatturaAccompagnatoriaAcquisto);
 
 		$.ajax({
-			url: baseUrl + "fatture-accompagnatorie",
+			url: baseUrl + "fatture-accompagnatorie-acquisto",
 			type: 'POST',
 			contentType: "application/json",
 			dataType: 'json',
-			data: fatturaAccompagnatoriaJson,
+			data: fatturaAccompagnatoriaAcquistoJson,
 			success: function(result) {
-				var idFatturaAccompagnatoria = result.id;
+				var idFatturaAccompagnatoriaAcquisto = result.id;
 
-				$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria creata con successo').replace('@@alertResult@@', 'success'));
+				$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria acquisto creata con successo').replace('@@alertResult@@', 'success'));
 
-				$('#newFatturaAccompagnatoriaButton').attr("disabled", true);
+				$('#newFatturaAccompagnatoriaAcquistoButton').attr("disabled", true);
 
-				// Update ordini clienti
-				var articoliOrdiniClienti = [];
-				$('.ordineClienteArticolo').each(function(i, item){
-					var idArticolo = $(this).attr('data-id-articolo');
-					var idsOrdiniClienti = $(this).attr('data-ids-ordini');
-					var numeroPezziDaEvadere = $(this).parent().parent().attr('data-num-pezzi-evasi');
+				// Returns to the same page
+				setTimeout(function() {
+					window.location.href = "fatture-accompagnatorie-acquisto-new.html?dt="+fatturaAccompagnatoriaAcquisto.dataTrasporto+"&ot="+oraTrasporto;
+				}, 1000);
 
-					var articoloOrdiniClienti = new Object();
-					articoloOrdiniClienti.idArticolo = idArticolo;
-					articoloOrdiniClienti.numeroPezziDaEvadere = numeroPezziDaEvadere;
-					articoloOrdiniClienti.idsOrdiniClienti = idsOrdiniClienti;
-
-					articoliOrdiniClienti.push(articoloOrdiniClienti);
-				});
-
-				if(articoliOrdiniClienti.length != 0){
-
-					var articoliOrdiniClientiJson = JSON.stringify(articoliOrdiniClienti);
-
-					$.ajax({
-						url: baseUrl + "ordini-clienti/aggregate",
-						type: 'POST',
-						contentType: "application/json",
-						dataType: 'json',
-						data: articoliOrdiniClientiJson,
-						success: function(result) {
-							$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria creata con successo. Ordini clienti aggiornati con successo.').replace('@@alertResult@@', 'success'));
-
-							// Returns to the same page
-							setTimeout(function() {
-								window.location.href = "fatture-accompagnatorie-new.html?dt="+fatturaAccompagnatoria.dataTrasporto+"&ot="+oraTrasporto;
-							}, 1000);
-
-							if(print){
-								window.open(baseUrl + "stampe/fatture-accompagnatorie/"+idFatturaAccompagnatoria, '_blank');
-							}
-						},
-						error: function(jqXHR, textStatus, errorThrown) {
-							$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', "Fattura accompagnatoria creata con successo. Errore nell aggiornamento degli ordini clienti.").replace('@@alertResult@@', 'warning'));
-						}
-					});
-
-				} else {
-					$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria creata con successo').replace('@@alertResult@@', 'success'));
-
-					// Returns to the same page
-					setTimeout(function() {
-						window.location.href = "fatture-accompagnatorie-new.html?dt="+fatturaAccompagnatoria.dataTrasporto+"&ot="+oraTrasporto;
-					}, 1000);
-
-					if(print){
-						window.open(baseUrl + "stampe/fatture-accompagnatorie/"+idFatturaAccompagnatoria, '_blank');
-					}
+				if(print){
+					window.open(baseUrl + "stampe/fatture-accompagnatorie-acquisto/"+idFatturaAccompagnatoriaAcquisto, '_blank');
 				}
 
 			},
 			error: function(jqXHR, textStatus, errorThrown) {
-				var errorMessage = 'Errore nella creazione della fattura accompagnatoria';
+				var errorMessage = 'Errore nella creazione della fattura accompagnatoria acquisto';
 				if(jqXHR != null && jqXHR != undefined){
 					var jqXHRResponseJson = jqXHR.responseJSON;
 					if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
@@ -272,36 +214,36 @@ $(document).ready(function() {
 						}
 					}
 				}
-				$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+				$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
 			}
 		});
 	}
 
-	if($('#newFatturaAccompagnatoriaButton') != null && $('#newFatturaAccompagnatoriaButton') != undefined && $('#newFatturaAccompagnatoriaButton').length > 0){
+	if($('#newFatturaAccompagnatoriaAcquistoButton') != null && $('#newFatturaAccompagnatoriaAcquistoButton') != undefined && $('#newFatturaAccompagnatoriaAcquistoButton').length > 0){
 
 		$('#articolo').selectpicker();
-		$('#cliente').selectpicker();
+		$('#fornitore').selectpicker();
 
-		$(document).on('submit','#newFatturaAccompagnatoriaForm', function(event){
+		$(document).on('submit','#newFatturaAccompagnatoriaAcquistoForm', function(event){
 			event.preventDefault();
 
-			$.fn.createFatturaAccompagnatoria(false);
+			$.fn.createFatturaAccompagnatoriaAcquisto(false);
 
 		});
 	}
 
-	if($('#newAndPrintFatturaAccompagnatoriaButton') != null && $('#newAndPrintFatturaAccompagnatoriaButton') != undefined && $('#newAndPrintFatturaAccompagnatoriaButton').length > 0){
+	if($('#newAndPrintFatturaAccompagnatoriaAcquistoButton') != null && $('#newAndPrintFatturaAccompagnatoriaAcquistoButton') != undefined && $('#newAndPrintFatturaAccompagnatoriaAcquistoButton').length > 0){
 		$('#articolo').selectpicker();
-		$('#cliente').selectpicker();
+		$('#fornitore').selectpicker();
 
-		$(document).on('click','#newAndPrintFatturaAccompagnatoriaButton', function(event){
+		$(document).on('click','#newAndPrintFatturaAccompagnatoriaAcquistoButton', function(event){
 			event.preventDefault();
 
-			$.fn.createFatturaAccompagnatoria(true);
+			$.fn.createFatturaAccompagnatoriaAcquisto(true);
 		});
 	}
 
-	$(document).on('change','#cliente', function(){
+	$(document).on('change','#fornitore', function(){
 		$('#articolo option[value=""]').prop('selected', true);
 		$('#udm').val('');
 		$('#iva').val('');
@@ -312,114 +254,26 @@ $(document).ready(function() {
 		$('#prezzo').val('');
 		$('#sconto').val('');
 
-		var alertContent = '<div id="alertFatturaAccompagnatoriaContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+		var alertContent = '<div id="alertFatturaAccompagnatoriaAcquistoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
 		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-		$('#alertFattureAccompagnatorie').empty();
+		$('#alertFattureAccompagnatorieAcquisto').empty();
 
 		$.fn.emptyArticoli();
 
-		var cliente = $('#cliente option:selected').val();
-		var idListino = $('#cliente option:selected').attr('data-id-listino');
-		var hasNoteDocumenti = $('#cliente option:selected').attr('data-has-note-documenti');
-		if(cliente != null && cliente != ''){
-			$.ajax({
-				url: baseUrl + "clienti/"+cliente+"/punti-consegna",
-				type: 'GET',
-				dataType: 'json',
-				success: function(result) {
-					if(result != null && result != undefined && result != ''){
-						$('#puntoConsegna').empty();
-						$.each(result, function(i, item){
-							var label = item.nome+' - '+item.indirizzo+' '+item.localita+', '+item.cap+' ('+item.provincia+')';
-							$('#puntoConsegna').append('<option value="'+item.id+'">'+label+'</option>');
-						});
-					} else {
-						$('#puntoConsegna').empty();
-					}
-					$('#puntoConsegna').removeAttr('disabled');
+		var fornitore = $('#fornitore option:selected').val();
+		if(fornitore != null && fornitore != ''){
 
-					// load the prices of the Listino associated to the Cliente
-					if(idListino != null && idListino != undefined && idListino != '-1'){
-						$.ajax({
-							url: baseUrl + "listini/"+idListino+"/listini-prezzi",
-							type: 'GET',
-							dataType: 'json',
-							success: function(result) {
-								$.each(result, function(i, item){
-									var articoloId = item.articolo.id;
-									var prezzoListino = item.prezzo;
-									$("#articolo option").each(function(i){
-										var articoloOptionId = $(this).val();
-										if(articoloOptionId == articoloId){
-											$(this).attr('data-prezzo-listino', prezzoListino);
-										}
-									});
-								});
-							},
-							error: function(jqXHR, textStatus, errorThrown) {
-								$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento dei prezzi di listino').replace('@@alertResult@@', 'danger'));
-							}
-						});
-					} else {
-						$("#articolo option").each(function(i){
-							var prezzoBase = $(this).attr('data-prezzo-base');
-							$(this).attr('data-prezzo-listino', prezzoBase);
-						});
-					}
-
-					// load Sconti associated to the Cliente
-					var data = $('#data').val();
-					if(data != null && data != undefined && data != ''){
-						$.fn.loadScontiArticoli(data, cliente);
-					}
-
-					$.fn.getArticoli(cliente);
-
-					$.fn.loadArticoliFromOrdiniClienti();
-				},
-				error: function(jqXHR, textStatus, errorThrown) {
-					$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@','Errore nel caricamento dei punti di consegna').replace('@@alertResult@@', 'danger'));
-				}
-			});
-
-			$.fn.handleClienteNoteDocumenti(hasNoteDocumenti);
+			$.fn.getArticoli(fornitore);
 
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');
-
 		} else {
-			$('#updateClienteNoteDocumenti').attr('hidden', true);
-			$('#puntoConsegna').empty();
-			$('#puntoConsegna').attr('disabled', true);
 			$('#articolo').attr('disabled', true);
 			$('#articolo').selectpicker('refresh');
 		}
 	});
-
-	$.fn.loadScontiArticoli = function(data, cliente){
-		$.ajax({
-			url: baseUrl + "sconti?idCliente="+cliente+"&data="+moment(data.data).format('YYYY-MM-DD'),
-			type: 'GET',
-			dataType: 'json',
-			success: function(result) {
-				$.each(result, function(i, item){
-					var articoloId = item.articolo.id;
-					var valore = item.valore;
-					$("#articolo option").each(function(i){
-						var articoloOptionId = $(this).val();
-						if(articoloOptionId == articoloId){
-							$(this).attr('data-sconto', valore);
-						}
-					});
-				});
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				$('#alertFattureAccompagnatorie').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli sconti').replace('@@alertResult@@', 'danger'));
-			}
-		});
-	}
 
 	$(document).on('change','#articolo', function(){
 		var articolo = $('#articolo option:selected').val();
@@ -468,10 +322,10 @@ $(document).ready(function() {
 				'                Seleziona un articolo\n' +
 				'              </div>';
 
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty().append(alertContent);
+			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty().append(alertContent);
 			return;
 		} else {
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty();
+			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty();
 		}
 
 		var pezzi = $('#pezzi').val();
@@ -481,10 +335,10 @@ $(document).ready(function() {
 				'                Inserisci il numero di pezzi\n' +
 				'              </div>';
 
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty().append(alertContent);
+			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty().append(alertContent);
 			return;
 		} else {
-			$('#addFatturaAccompagnatoriaArticoloAlert').empty();
+			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty();
 		}
 
 		var articolo = $('#articolo option:selected').text();
@@ -524,8 +378,8 @@ $(document).ready(function() {
 		var currentPezzi = 0;
 		var currentPezziDaEvadere = 0;
 
-		var fatturaAccompagnatoriaArticoliLength = $('.rowArticolo').length;
-		if(fatturaAccompagnatoriaArticoliLength != null && fatturaAccompagnatoriaArticoliLength != undefined && fatturaAccompagnatoriaArticoliLength != 0) {
+		var fatturaAccompagnatoriaAcquistoArticoliLength = $('.rowArticolo').length;
+		if(fatturaAccompagnatoriaAcquistoArticoliLength != null && fatturaAccompagnatoriaAcquistoArticoliLength != undefined && fatturaAccompagnatoriaAcquistoArticoliLength != 0) {
 			$('.rowArticolo').each(function(i, item){
 
 				if(found != 1){
@@ -559,7 +413,7 @@ $(document).ready(function() {
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var table = $('#fatturaAccompagnatoriaArticoliTable').DataTable();
+		var table = $('#fatturaAccompagnatoriaAcquistoArticoliTable').DataTable();
 		if(found >= 1){
 
 			var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
@@ -589,7 +443,7 @@ $(document).ready(function() {
 			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
 
 		} else {
-			var deleteLink = '<a class="deleteFatturaAccompagnatoriaArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
+			var deleteLink = '<a class="deleteFatturaAccompagnatoriaAcquistoArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
 
 			var rowsCount = table.rows().count();
 
@@ -618,7 +472,7 @@ $(document).ready(function() {
 		}
 		$.fn.computeTotale();
 
-		$.fn.checkPezziOrdinati();
+		//$.fn.checkPezziOrdinati();
 
 		$('#articolo option[value=""]').prop('selected',true);
 		$('#udm').val('');
@@ -634,11 +488,11 @@ $(document).ready(function() {
 		$('#articolo').selectpicker('refresh');
 	});
 
-	$(document).on('click','.deleteFatturaAccompagnatoriaArticolo', function(){
-		$('#fatturaAccompagnatoriaArticoliTable').DataTable().row( $(this).parent().parent() )
+	$(document).on('click','.deleteFatturaAccompagnatoriaAcquistoArticolo', function(){
+		$('#fatturaAccompagnatoriaAcquistoArticoliTable').DataTable().row( $(this).parent().parent() )
 			.remove()
 			.draw();
-		$('#fatturaAccompagnatoriaArticoliTable').focus();
+		$('#fatturaAccompagnatoriaAcquistoArticoliTable').focus();
 
 		$.fn.computeTotale();
 
@@ -666,77 +520,43 @@ $(document).ready(function() {
 });
 
 $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
-	$.ajax({
-		url: baseUrl + "fatture-accompagnatorie/progressivo",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				//$('#progressivo').attr('value', result.progressivo);
-				$('#anno').attr('value', result.anno);
-				$('#colli').attr('value', 1);
-				$('#data').val(moment().format('YYYY-MM-DD'));
+	$('#colli').attr('value', 1);
+	$('#data').val(moment().format('YYYY-MM-DD'));
 
-				if(dataTrasporto != null && dataTrasporto != undefined && dataTrasporto != ''){
-					$('#dataTrasporto').val(dataTrasporto);
-				} else {
-					$('#dataTrasporto').val(moment().format('YYYY-MM-DD'));
-				}
+	if(dataTrasporto != null && dataTrasporto != undefined && dataTrasporto != ''){
+		$('#dataTrasporto').val(dataTrasporto);
+	} else {
+		$('#dataTrasporto').val(moment().format('YYYY-MM-DD'));
+	}
 
-				if(oraTrasporto != null && oraTrasporto != undefined && oraTrasporto != ''){
-					$('#oraTrasporto').val(oraTrasporto);
-				} else {
-					$('#oraTrasporto').val(moment().format('HH:mm'));
-				}
+	if(oraTrasporto != null && oraTrasporto != undefined && oraTrasporto != ''){
+		$('#oraTrasporto').val(oraTrasporto);
+	} else {
+		$('#oraTrasporto').val(moment().format('HH:mm'));
+	}
 
-				$('#cliente').focus();
+	$('#fornitore').focus();
 
-				var uri = window.location.toString();
-				if (uri.indexOf("?") > 0) {
-					var clean_uri = uri.substring(0, uri.indexOf("?"));
-					window.history.replaceState({}, document.title, clean_uri);
-				}
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
+	var uri = window.location.toString();
+	if (uri.indexOf("?") > 0) {
+		var clean_uri = uri.substring(0, uri.indexOf("?"));
+		window.history.replaceState({}, document.title, clean_uri);
+	}
 }
 
-$.fn.getClienti = function(){
+$.fn.getFornitori = function(){
 	$.ajax({
-		url: baseUrl + "clienti?bloccaDdt=false&privato=false",
+		url: baseUrl + "fornitori?attivo=true",
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$.each(result, function(i, item){
-					var label = '';
-					if(item.dittaIndividuale){
-						label += item.cognome + ' - ' + item.nome;
-					} else {
-						label += item.ragioneSociale;
-					}
+					var label = item.ragioneSociale;
 					label += ' - ' + item.indirizzo + ' ' + item.citta + ', ' + item.cap + ' (' + item.provincia + ')';
 
-					var agente = item.agente;
-					var idAgente = '-1';
-					if(agente != null && agente != undefined) {
-						idAgente = agente.id;
-					}
-					var listino = item.listino;
-					var idListino = '-1';
-					if(listino != null && listino != undefined){
-						idListino = listino.id;
-					}
-					var hasNoteDocumenti = 0;
-					if(!$.fn.checkVariableIsNull(item.noteDocumenti)){
-						hasNoteDocumenti = 1;
-					}
-					$('#cliente').append('<option value="'+item.id+'" data-id-agente="'+idAgente+'" data-id-listino="'+idListino+'" data-has-note-documenti='+hasNoteDocumenti+'>'+label+'</option>');
-
-					$('#cliente').selectpicker('refresh');
+					$('#fornitore').append('<option value="'+item.id+'" data-tipo="'+item.tipoFornitore.codice+'">'+label+'</option>');
+					$('#fornitore').selectpicker('refresh');
 				});
 			}
 		},
@@ -770,7 +590,7 @@ $.fn.getTipologieTrasporto = function(){
 	});
 }
 
-$.fn.getCausali = function(){
+$.fn.getCausali = function(dataTrasporto, oraTrasporto){
 	$.ajax({
 		url: baseUrl + "causali",
 		type: 'GET',
@@ -786,6 +606,7 @@ $.fn.getCausali = function(){
 						}
 					}
 				});
+				$.fn.preloadFields(dataTrasporto, oraTrasporto);
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
@@ -794,12 +615,12 @@ $.fn.getCausali = function(){
 	});
 }
 
-$.fn.getArticoli = function(idCliente){
+$.fn.getArticoli = function(idFornitore){
 
 	$('#articolo').empty().append('<option value=""></option>');
 
 	$.ajax({
-		url: baseUrl + "articoli?attivo=true&idCliente="+idCliente,
+		url: baseUrl + "articoli?attivo=true&idFornitore="+idFornitore,
 		type: 'GET',
 		dataType: 'json',
 		success: function(result) {

@@ -188,6 +188,7 @@ $(document).ready(function() {
 			var idFattura = $('#hiddenIdFattura').val();
 			var idFatturaAccompagnatoria = $('#hiddenIdFatturaAccompagnatoria').val();
 			var idFatturaAcquisto = $('#hiddenIdFatturaAcquisto').val();
+			var idFatturaAccompagnatoriaAcquisto = $('#hiddenIdFatturaAccompagnatoriaAcquisto').val();
 
 			var pagamento = new Object();
 			pagamento.data = $('#data').val();
@@ -255,6 +256,13 @@ $(document).ready(function() {
 			}
 			pagamento.fatturaAcquisto = fatturaAcquisto;
 
+			var fatturaAccompagnatoriaAcquisto = new Object();
+			if(idFatturaAccompagnatoriaAcquisto != null && idFatturaAccompagnatoriaAcquisto != ""){
+				fatturaAccompagnatoriaAcquisto.id = idFatturaAccompagnatoriaAcquisto;
+				tipologia = "FATTURA_ACCOMPAGNATORIA_ACQUISTO";
+			}
+			pagamento.fatturaAccompagnatoriaAcquisto = fatturaAccompagnatoriaAcquisto;
+
 			pagamento.tipologia = tipologia;
 			pagamento.importo = $('#importo').val();
 			pagamento.note = $('#note').val();
@@ -285,7 +293,7 @@ $(document).ready(function() {
 						returnPage = 'ricevute-privati.html';
 					} else if((idFattura != null && idFattura != "") || (idFatturaAccompagnatoria != null && idFatturaAccompagnatoria != "")){
 						returnPage = 'fatture.html';
-					} else if((idFatturaAcquisto != null && idFatturaAcquisto != "") || (idDdtAcquisto != null && idDdtAcquisto != "")){
+					} else if((idFatturaAcquisto != null && idFatturaAcquisto != "") || (idDdtAcquisto != null && idDdtAcquisto != "") || (idFatturaAccompagnatoriaAcquisto != null && idFatturaAccompagnatoriaAcquisto != "")){
 						returnPage = 'documenti-acquisto.html';
 					}
 
@@ -454,6 +462,22 @@ $.fn.extractIdFatturaAcquistoFromUrl = function(){
 		paramNames = urlVariables[i].split('=');
 
 		if (paramNames[0] === 'idFatturaAcquisto') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
+$.fn.extractIdFatturaAccompagnatoriaAcquistoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idFatturaAccompagnatoriaAcquisto') {
 			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
 		}
 	}
@@ -848,13 +872,56 @@ $.fn.getFatturaAcquisto = function(idFatturaAcquisto){
 					$('#fornitoreDiv').removeClass('d-none');
 				}
 
-				var descrizione = "Pagamento FATTURA ACQUISTO n. "+result.progressivo+" del "+moment(result.data).format('DD/MM/YYYY');
+				var descrizione = "Pagamento FATTURA ACQUISTO n. "+result.numero+" del "+moment(result.data).format('DD/MM/YYYY');
 				$('#descrizione').val(descrizione);
 
 				$('#hiddenIdFatturaAcquisto').val(result.id);
 				$('#data').val(moment().format('YYYY-MM-DD'));
 
-				$('#annullaPagamentoButton').attr('href', 'fatture.html');
+				$('#annullaPagamentoButton').attr('href', 'documenti-acquisto.html');
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getFatturaAccompagnatoriaAcquisto = function(idFatturaAccompagnatoriaAcquisto){
+	$.ajax({
+		url: baseUrl + "fatture-accompagnatorie-acquisto/" + idFatturaAccompagnatoriaAcquisto,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				var totaleAcconto = result.totaleAcconto;
+				var totale = result.totale;
+
+				if(totaleAcconto == null || totaleAcconto == undefined || totaleAcconto == ''){
+					totaleAcconto = 0;
+				}
+
+				if(totale == null || totale == undefined || totale == ''){
+					totale = 0;
+				}
+
+				var importo = (totale - totaleAcconto);
+				$('#importo').val(Number(Math.round(importo+'e2')+'e-2'));
+
+				var fornitore = result.fornitore;
+				if(fornitore != null && fornitore != undefined && fornitore != ''){
+					$('#fornitore').val(fornitore.ragioneSociale);
+					$('#clienteDiv').addClass('d-none');
+					$('#fornitoreDiv').removeClass('d-none');
+				}
+
+				var descrizione = "Pagamento FATTURA ACCOM. ACQUISTO n. "+result.numero+" del "+moment(result.data).format('DD/MM/YYYY');
+				$('#descrizione').val(descrizione);
+
+				$('#hiddenIdFatturaAccompagnatoriaAcquisto').val(result.id);
+				$('#data').val(moment().format('YYYY-MM-DD'));
+
+				$('#annullaPagamentoButton').attr('href', 'documenti-acquisto.html');
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {

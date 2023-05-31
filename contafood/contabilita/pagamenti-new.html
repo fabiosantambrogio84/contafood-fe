@@ -44,6 +44,7 @@
     var idFattura = $.fn.extractIdFatturaFromUrl();
     var idFatturaAccompagnatoria = $.fn.extractIdFatturaAccompagnatoriaFromUrl();
     var idFatturaAcquisto = $.fn.extractIdFatturaAcquistoFromUrl();
+    var idFatturaAccompagnatoriaAcquisto = $.fn.extractIdFatturaAccompagnatoriaAcquistoFromUrl();
     if(idDdt != null && idDdt != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
         $.fn.getDdt(idDdt);
@@ -75,6 +76,10 @@
     } else if(idFatturaAcquisto != null && idFatturaAcquisto != ""){
       $.when($.fn.getTipiPagamento()).then(function(f1){
         $.fn.getFatturaAcquisto(idFatturaAcquisto);
+      });
+    } else if(idFatturaAccompagnatoriaAcquisto != null && idFatturaAccompagnatoriaAcquisto != ""){
+      $.when($.fn.getTipiPagamento()).then(function(f1){
+        $.fn.getFatturaAccompagnatoriaAcquisto(idFatturaAccompagnatoriaAcquisto);
       });
     } else {
       $.fn.getTipiPagamento();
@@ -169,6 +174,7 @@
           <input type="hidden" id="hiddenIdFattura"/>
           <input type="hidden" id="hiddenIdFatturaAcquisto"/>
           <input type="hidden" id="hiddenIdFatturaAccompagnatoria"/>
+          <input type="hidden" id="hiddenIdFatturaAccompagnatoriaAcquisto"/>
 
           <button type="submit" class="btn btn-primary" id="newPagamentoButton">Salva</button>
           <a href="" class="btn btn-secondary" id="annullaPagamentoButton">Annulla</a>

@@ -1019,13 +1019,7 @@ $(document).ready(function() {
 				$.fn.loadScontiArticoli(data, cliente);
 			}
 
-			$('#updateClienteNoteDocumenti').removeAttr('hidden');
-			if(hasNoteDocumenti == 1){
-				$('#updateClienteNoteDocumenti').css('color', '#e74a3b');
-				$($('#updateClienteNoteDocumenti').children().get(0)).addClass('fa-2x');
-			} else {
-				$('#updateClienteNoteDocumenti').css('color', '');
-			}
+			$.fn.handleClienteNoteDocumenti(hasNoteDocumenti);
 
 			$('#articolo').removeAttr('disabled');
 			$('#articolo').selectpicker('refresh');

@@ -66,8 +66,9 @@
             </div>
             <div class="col-md-4">
               <a href="ddt-acquisto-new.html" class="btn btn-primary">Nuovo DDT</a>
-              <a href="#" class="btn btn-primary" id="creaDistinta">Crea Distinta</a>
               <a href="fatture-acquisto-new.html" class="btn btn-primary">Nuova Fattura</a>
+              <a href="fatture-accompagnatorie-acquisto-new.html" class="btn btn-primary">Nuova Fattura Accom.</a>
+              <a href="#" class="btn btn-primary" id="creaDistinta">Crea Distinta</a>
             </div>
           </div>
 
@@ -92,6 +93,7 @@
                       <option value=""></option>
                       <option value="DDT acquisto">DDT acquisto</option>
                       <option value="Fattura acquisto">Fattura acquisto</option>
+                      <option value="Fattura accompagnatoria acquisto">Fattura accom. acquisto</option>
                     </select>
                   </div>
                   <div class="form-group col-md-2 mb-1">
@@ -122,7 +124,6 @@
                 <table class="table table-bordered" id="documentoAcquistoTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                   <thead>
         		    <tr style="">
-                      <th></th>
                       <th>Num.</th>
                       <th>Tipo</th>
                       <th>Data</th>
@@ -442,6 +443,157 @@
                       <th>Importo (€)</th>
                       <th>Pagamento</th>
                       <th>Note</th>
+                      </thead>
+                    </table>
+                  </div>
+
+                </div>
+
+                <div class="modal-body d-none" id="detailsFatturaAccompagnatoriaAcquistoMainDiv" style="font-size: 14px;">
+                  <div class="container">
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Numero</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoNumero"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoData"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data inserimento</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoDataInserimento"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Data aggiornamento</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoDataAggiornamento"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tipo</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoTipo"></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Stato</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoStato"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Fornitore</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoFornitore"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Causale</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoCausale"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Note</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoNote"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">&nbsp;</div>
+
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. imponibile (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoTotaleImponibile"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. iva (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoTotaleIva"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoTotaleAcconto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaAcquistoTotale"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">&nbsp;</div>
+                    </div>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="table-responsive mt-4">
+                    <table class="table table-bordered" id="detailsFattureAccompagnatorieAcquistoArticoliModalTable">
+                      <thead>
+                      <th>Articolo</th>
+                      <th>Lotto</th>
+                      <th>Scadenza</th>
+                      <th>Quantita</th>
+                      <th>Pezzi</th>
+                      <th>Prezzo (€)</th>
+                      <th>Sconto (€)</th>
+                      <th>Imponibile (€)</th>
+                      <th>Costo (€)</th>
+                      </thead>
+                    </table>
+                  </div>
+
+                  <hr class="my-4">
+
+                  <div class="table-responsive mt-4">
+                    <table class="table table-bordered" id="detailsFattureAccompagnatorieAcquistoTotaliModalTable">
+                      <thead>
+                      <th>Iva</th>
+                      <th>Totale Iva (€)</th>
+                      <th>Totale Imponibile (€)</th>
                       </thead>
                     </table>
                   </div>

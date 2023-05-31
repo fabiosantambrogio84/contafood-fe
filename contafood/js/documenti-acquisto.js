@@ -1,6 +1,7 @@
 var baseUrl = "/contafood-be/";
 var tipoDocumentoDdtAcquisto = "DDT acquisto";
 var tipoDocumentoFatturaAcquisto = "Fattura acquisto";
+var tipoDocumentoFatturaAccompagnatoriaAcquisto = "Fattura accompagnatoria acquisto";
 var rowBackgroundAzzurro = '#afe5fa';
 
 $.fn.loadDocumentoAcquistoTable = function(url) {
@@ -42,17 +43,16 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 		"dom": '<"top"p>rt<"bottom"ip>',
 		"autoWidth": false,
 		"order": [
-			[3, 'desc'],
-			[4, 'asc'],
-			[2, 'asc'],
-			[1, 'desc']
+			[2, 'desc'],
+			[3, 'asc'],
+			[1, 'asc'],
+			[0, 'desc']
 		],
 		"columns": [
-			//{"name": "dataHidden", "data": "data", "width":"1%", "visible":false},
-			{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-				var checkboxHtml = '<input type="checkbox" id="checkbox_'+data.id+'" data-id="'+data.id+'" data-tipo-documento="'+data.tipoDocumento+'" data-id-documento="'+data.idDocumento+'" data-partita-iva="'+data.partitaIvaFornitore+'" data-fatturato="'+data.fatturato+'" data-id-fornitore="'+data.idFornitore+'" class="documentoAcquistoCheckbox">';
-				return checkboxHtml;
-			}},
+			//{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
+			//	var checkboxHtml = '<input type="checkbox" id="checkbox_'+data.id+'" data-id="'+data.id+'" data-tipo-documento="'+data.tipoDocumento+'" data-id-documento="'+data.idDocumento+'" data-partita-iva="'+data.partitaIvaFornitore+'" data-fatturato="'+data.fatturato+'" data-id-fornitore="'+data.idFornitore+'" class="documentoAcquistoCheckbox">';
+			//	return checkboxHtml;
+			//}},
 			{"name": "num_documento", "data": "numDocumento", "width":"3%"},
 			{"name": "tipo_documento", "data": "tipoDocumento", "width":"8%"},
 			{"name": "data_documento", "data": null, "width":"8%", render: function ( data, type, row ) {
@@ -104,6 +104,13 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 					}
 					links += '<a class="printFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
 					links += '<a class="deleteFatturaAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+				} else if(data.tipoDocumento === tipoDocumentoFatturaAccompagnatoriaAcquisto){
+					links += '<a class="detailsFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+					if((totale - acconto) != 0){
+						links += '<a class="payFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idFatturaAccompagnatoriaAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
+					}
+					links += '<a class="printFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
+					links += '<a class="deleteFatturaAccompagnatoriaAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				}
 				return links;
 			}}
@@ -114,18 +121,28 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 			$(cells[2]).css('font-weight','bold');
 			$(cells[5]).css('text-align','right');
 			$(cells[6]).css('text-align','right');
-			$(cells[7]).css('text-align','right').css('font-weight','bold');
+			$(cells[7]).css('text-align','left');
 			//if(data.fatturato){
 			//	$(row).css('background-color', rowBackgroundAzzurro);
 			//}
-			if(data.tipoDocumento === tipoDocumentoDdtAcquisto && data.stato != null){
+			if(data.stato != null){
 				var backgroundColor = '';
-				if(data.stato == 'DA_PAGARE'){
-					backgroundColor = '#fcf456';
-				} else if(data.stato == 'PARZIALMENTE_PAGATO'){
-					backgroundColor = '#fcc08b';
-				} else {
-					backgroundColor = 'trasparent';
+				if(data.tipoDocumento === tipoDocumentoDdtAcquisto){
+					if(data.stato == 'DA_PAGARE'){
+						backgroundColor = '#fcf456';
+					} else if(data.stato == 'PARZIALMENTE_PAGATO'){
+						backgroundColor = '#fcc08b';
+					} else {
+						backgroundColor = 'trasparent';
+					}
+				} else if(data.tipoDocumento === tipoDocumentoFatturaAcquisto || data.tipoDocumento === tipoDocumentoFatturaAccompagnatoriaAcquisto){
+					if(data.stato == 'DA_PAGARE'){
+						backgroundColor = '#fcf456';
+					} else if(data.stato == 'PARZIALMENTE_PAGATA'){
+						backgroundColor = '#fcc08b';
+					} else {
+						backgroundColor = 'trasparent';
+					}
 				}
 				$(row).css('background-color', backgroundColor);
 			}
@@ -143,6 +160,7 @@ $(document).ready(function() {
 
 	$.fn.loadDocumentoAcquistoTable(baseUrl + "documenti-acquisto/search");
 
+	/*
 	var documentiAcquistoToPrint = [];
 
 	$(document).on('click','.documentoAcquistoCheckbox', function(){
@@ -157,6 +175,7 @@ $(document).ready(function() {
 			documentiAcquistoToPrint.push(uuidDocumentoAcquisto);
 		}
 	});
+	*/
 
 	$(document).on('click','.detailsDdtAcquisto', function(){
 		var idDdtAcquisto = $(this).attr('data-id-documento');
@@ -172,6 +191,7 @@ $(document).ready(function() {
 				if(result != null && result != undefined && result != '') {
 					$('#detailsDdtAcquistoMainDiv').removeClass("d-none");
 					$('#detailsFatturaAcquistoMainDiv').addClass("d-none");
+					$('#detailsFatturaAccompagnatoriaAcquistoMainDiv').addClass("d-none");
 
 					$('#detailsDocumentoAcquistoModalTitle').text("Dettagli DDT acquisto");
 					$('#ddtAcquistoNumero').text(result.numero);
@@ -383,9 +403,10 @@ $(document).ready(function() {
 				if(result != null && result != undefined && result != '') {
 					$('#detailsDdtAcquistoMainDiv').addClass("d-none");
 					$('#detailsFatturaAcquistoMainDiv').removeClass("d-none");
+					$('#detailsFatturaAccompagnatoriaAcquistoMainDiv').addClass("d-none");
 
 					$('#detailsDocumentoAcquistoModalTitle').text("Dettagli Fattura acquisto");
-					$('#fatturaAcquistoNumero').text(result.progressivo);
+					$('#fatturaAcquistoNumero').text(result.numero);
 					$('#fatturaAcquistoData').text(moment(result.data).format('DD/MM/YYYY'));
 					var fornitore = result.fornitore;
 					if(fornitore != null && fornitore != undefined && fornitore != ''){
@@ -540,6 +561,150 @@ $(document).ready(function() {
 		$('#detailsDocumentoAcquistoModal').modal('show');
 	});
 
+	$(document).on('click','.detailsFatturaAccompagnatoriaAcquisto', function(){
+		var idFatturaAccompagnatoriaAcquisto = $(this).attr('data-id-documento');
+
+		var alertContent = '<div id="alertDocumentoAcquistoContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
+		alertContent = alertContent + '<strong>Errore nel recupero della Fattura accompagnatoria acquisto.</strong></div>';
+
+		$.ajax({
+			url: baseUrl + "fatture-accompagnatorie-acquisto/" + idFatturaAccompagnatoriaAcquisto,
+			type: 'GET',
+			dataType: 'json',
+			success: function(result) {
+				if(result != null && result != undefined && result != '') {
+					$('#detailsDdtAcquistoMainDiv').addClass("d-none");
+					$('#detailsFatturaAcquistoMainDiv').addClass("d-none");
+					$('#detailsFatturaAccompagnatoriaAcquistoMainDiv').removeClass("d-none");
+
+					$('#detailsDocumentoAcquistoModalTitle').text("Dettagli Fattura accompagnatoria acquisto");
+					$('#fatturaAccompagnatoriaAcquistoNumero').text(result.numero);
+					$('#fatturaAccompagnatoriaAcquistoData').text(moment(result.data).format('DD/MM/YYYY'));
+					$('#fatturaAccompagnatoriaAcquistoDataInserimento').text(moment(result.dataInserimento).format('DD/MM/YYYY HH:mm:ss'));
+					var dataAggiornamento = result.dataAggiornamento;
+					if(dataAggiornamento != null && dataAggiornamento != undefined && dataAggiornamento != ''){
+						$('#fatturaAccompagnatoriaAcquistoDataAggiornamento').text(moment(dataAggiornamento).format('DD/MM/YYYY HH:mm:ss'));
+					}
+					var stato = result.statoFattura;
+					if(stato != null && stato != undefined && stato != ''){
+						$('#fatturaAccompagnatoriaAcquistoStato').text(stato.descrizione);
+					}
+					var tipo = result.tipoFattura;
+					if(tipo != null && tipo != undefined && tipo != ''){
+						$('#fatturaAccompagnatoriaAcquistoTipo').text(tipo.descrizione);
+					}
+					var fornitore = result.fornitore;
+					if(fornitore != null && fornitore != undefined && fornitore != ''){
+						var label = fornitore.ragioneSociale + ' - ' + fornitore.indirizzo + ' ' + fornitore.citta + ', ' + fornitore.cap + ' (' + fornitore.provincia + ')';
+						$('#fatturaAccompagnatoriaAcquistoFornitore').text(label);
+					}
+					var causale = result.causale;
+					if(causale != null && causale != undefined && causale != ''){
+						$('#fatturaAccompagnatoriaAcquistoCausale').text(causale.descrizione);
+					}
+					$('#fatturaAccompagnatoriaAcquistoNote').text(result.note);
+					$('#fatturaAccompagnatoriaAcquistoTotaleImponibile').text(result.totaleImponibile);
+					$('#fatturaAccompagnatoriaAcquistoTotaleIva').text(result.totaleIva);
+					$('#fatturaAccompagnatoriaAcquistoTotaleAcconto').text(result.totaleAcconto);
+					$('#fatturaAccompagnatoriaAcquistoTotale').text(result.totale);
+
+					if(result.fatturaAccompagnatoriaAcquistoArticoli != null && result.fatturaAccompagnatoriaAcquistoArticoli != undefined){
+						$('#detailsFattureAccompagnatorieAcquistoArticoliModalTable').DataTable({
+							"data": result.fatturaAccompagnatoriaAcquistoArticoli,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun articolo presente",
+								"zeroRecords": "Nessun articolo presente"
+							},
+							"pageLength": 20,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'asc'],
+								[1, 'asc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "articolo", "data": null, render: function (data, type, row) {
+										var result = '';
+										if (data.articolo != null) {
+											result = data.articolo.codice+' - '+data.articolo.descrizione;
+										}
+										return result;
+									}},
+								{"name": "lotto", "data": "lotto"},
+								{"name": "scadenza", "data": null, render: function (data, type, row) {
+										var result = '';
+										if (data.scadenza != null) {
+											result = moment(data.scadenza).format('DD/MM/YYYY');
+										}
+										return result;
+									}},
+								{"name": "quantita", "data": "quantita"},
+								{"name": "pezzi", "data": "numeroPezzi"},
+								{"name": "prezzo", "data": "prezzo"},
+								{"name": "sconto", "data": "sconto"},
+								{"name": "imponibile", "data": "imponibile"},
+								{"name": "costo", "data": "costo"}
+							]
+						});
+					}
+
+					if(result.fatturaAccompagnatoriaAcquistoTotali != null && result.fatturaAccompagnatoriaAcquistoTotali != undefined){
+						$('#detailsFattureAccompagnatorieAcquistoTotaliModalTable').DataTable({
+							"data": result.fatturaAccompagnatoriaAcquistoTotali,
+							"language": {
+								"paginate": {
+									"first": "Inizio",
+									"last": "Fine",
+									"next": "Succ.",
+									"previous": "Prec."
+								},
+								"search": "Cerca",
+								"emptyTable": "Nessun totale presente",
+								"zeroRecords": "Nessun totale presente"
+							},
+							"paging": false,
+							"searching": false,
+							"lengthChange": false,
+							"info": false,
+							"order": [
+								[0, 'asc']
+							],
+							"autoWidth": false,
+							"columns": [
+								{"name": "aliquotaIva", "data": null, render: function (data, type, row) {
+										var result = '';
+										if (data.aliquotaIva != null) {
+											result = data.aliquotaIva.valore;
+										}
+										return result;
+									}},
+								{"name": "totaleIva", "data": "totaleIva"},
+								{"name": "totaleImponibile", "data": "totaleImponibile"}
+							]
+						});
+					}
+
+				} else{
+					$('#detailsFatturaAccompagnatoriaAcquistoMainDiv').empty().append(alertContent);
+				}
+			},
+			error: function(jqXHR, textStatus, errorThrown) {
+				$('#detailsFatturaAccompagnatoriaAcquistoMainDiv').empty().append(alertContent);
+				console.log('Response text: ' + jqXHR.responseText);
+			}
+		})
+
+		$('#detailsDocumentoAcquistoModal').modal('show');
+	});
+
 	$(document).on('click','.closeDocumentoAcquisto', function(){
 		$('#detailsDocumentoAcquistoArticoliModalTable').DataTable().destroy();
 		$('#detailsDocumentoAcquistoModal').modal('hide');
@@ -554,6 +719,12 @@ $(document).ready(function() {
 	$(document).on('click','.deleteFatturaAcquisto', function(){
 		var idFatturaAcquisto = $(this).attr('data-id-documento');
 		$('#confirmDeleteDocumentoAcquisto').attr('data-id-documento', idFatturaAcquisto).attr('data-tipo-documento',tipoDocumentoFatturaAcquisto);
+		$('#deleteDocumentoAcquistoModal').modal('show');
+	});
+
+	$(document).on('click','.deleteFatturaAccompagnatoriaAcquisto', function(){
+		var idFatturaAccompagnatoriaAcquisto = $(this).attr('data-id-documento');
+		$('#confirmDeleteDocumentoAcquisto').attr('data-id-documento', idFatturaAccompagnatoriaAcquisto).attr('data-tipo-documento',tipoDocumentoFatturaAccompagnatoriaAcquisto);
 		$('#deleteDocumentoAcquistoModal').modal('show');
 	});
 
@@ -607,7 +778,34 @@ $(document).ready(function() {
 				type: 'DELETE',
 				success: function() {
 					var alertContent = '<div id="alertDocumentoAcquistoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
-					alertContent = alertContent + '<strong>Fattura acquisto</strong> cancellato con successo.\n' +
+					alertContent = alertContent + '<strong>Fattura acquisto</strong> cancellata con successo.\n' +
+						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+					$('#alertDocumentoAcquisto').empty().append(alertContent);
+
+					$('#documentoAcquistoTable').DataTable().ajax.reload();
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.log('Response text: ' + jqXHR.responseText);
+				}
+			});
+		} else if(tipoDocumento === tipoDocumentoFatturaAccompagnatoriaAcquisto){
+			var url = baseUrl + "fatture-accompagnatorie-acquisto/" + idDocumento;
+			if(modificaGiacenze != null && modificaGiacenze != ''){
+				if(modificaGiacenze == 'si'){
+					url += "?modificaGiacenze=true";
+				} else {
+					url += "?modificaGiacenze=false";
+				}
+			} else {
+				url += "?modificaGiacenze=false";
+			}
+
+			$.ajax({
+				url: url,
+				type: 'DELETE',
+				success: function() {
+					var alertContent = '<div id="alertDocumentoAcquistoContent" class="alert alert-success alert-dismissible fade show" role="alert">';
+					alertContent = alertContent + '<strong>Fattura accompagnatoria acquisto</strong> cancellata con successo.\n' +
 						'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 					$('#alertDocumentoAcquisto').empty().append(alertContent);
 
@@ -630,33 +828,42 @@ $(document).ready(function() {
 		window.open(baseUrl + "stampe/fatture-acquisto/"+idFatturaAcquisto, '_blank');
 	});
 
+	$(document).on('click','.printFatturaAccompagnatoriaAcquisto', function(){
+		var idFatturaAccompagnatoriaAcquisto = $(this).attr('data-id-documento');
+		window.open(baseUrl + "stampe/fatture-accompagnatorie-acquisto/"+idFatturaAccompagnatoriaAcquisto, '_blank');
+	});
+
+	$.fn.createUrlSearch = function(path){
+		var numDocumento = $('#searchNumero').val();
+		var fornitore = $('#searchFornitore').val();
+		var tipoDocumento = $('#searchTipo option:selected').val();
+		var dataDa = $('#searchDataFrom').val();
+		var dataA = $('#searchDataTo').val();
+
+		var params = {};
+		if(numDocumento != null && numDocumento != undefined && numDocumento != ''){
+			params.numDocumento = numDocumento;
+		}
+		if(fornitore != null && fornitore != undefined && fornitore != ''){
+			params.fornitore = fornitore;
+		}
+		if(tipoDocumento != null && tipoDocumento != undefined && tipoDocumento != ''){
+			params.tipoDocumento = tipoDocumento;
+		}
+		if(dataDa != null && dataDa != undefined && dataDa != ''){
+			params.dataDa = dataDa;
+		}
+		if(dataA != null && dataA != undefined && dataA != ''){
+			params.dataA = dataA;
+		}
+		return baseUrl + path + $.param( params );
+	};
+
 	if($('#searchDocumentoAcquistoButton') != null && $('#searchDocumentoAcquistoButton') != undefined) {
 		$(document).on('submit', '#searchDocumentoAcquistoForm', function (event) {
 			event.preventDefault();
 
-			var numDocumento = $('#searchNumero').val();
-			var fornitore = $('#searchFornitore').val();
-			var tipoDocumento = $('#searchTipo option:selected').val();
-			var dataDa = $('#searchDataFrom').val();
-			var dataA = $('#searchDataTo').val();
-
-			var params = {};
-			if(numDocumento != null && numDocumento != undefined && numDocumento != ''){
-				params.numDocumento = numDocumento;
-			}
-			if(fornitore != null && fornitore != undefined && fornitore != ''){
-				params.fornitore = fornitore;
-			}
-			if(tipoDocumento != null && tipoDocumento != undefined && tipoDocumento != ''){
-				params.tipoDocumento = tipoDocumento;
-			}
-			if(dataDa != null && dataDa != undefined && dataDa != ''){
-				params.dataDa = dataDa;
-			}
-			if(dataA != null && dataA != undefined && dataA != ''){
-				params.dataA = dataA;
-			}
-			var url = baseUrl + "documenti-acquisto/search?" + $.param( params );
+			var url = $.fn.createUrlSearch("documenti-acquisto/search?");
 
 			$('#documentoAcquistoTable').DataTable().destroy();
 			$.fn.loadDocumentoAcquistoTable(url);
@@ -671,72 +878,10 @@ $(document).ready(function() {
 			$.fn.loadDocumentoAcquistoTable(baseUrl + "documenti-acquisto/search");
 		});
 
-		$(document).on('click','#creaDistinta', function() {
-			var alertContent = '<div id="alertDocumentoAcquistoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-			alertContent += '<strong>@@alertText@@</strong>\n' +
-				'            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-			if(documentiAcquistoToPrint != null && documentiAcquistoToPrint.length > 0){
-				if(documentiAcquistoToPrint.length > 30){
-					$('#alertDocumentoAcquisto').empty().append(alertContent.replace('@@alertText@@','Selezionare al massimo 30 elementi'));
-				} else {
-					$('#alertDocumentoAcquisto').empty().append(alertContent.replace('@@alertText@@', 'Generazione file in corso...').replace('@@alertResult@@', 'warning'));
-
-					var url = baseUrl + "stampe/documenti-acquisto/distinta";
-
-					//$.fn.openWindowWithPost(url, JSON.stringify(documentiAcquistoToPrint));
-
-
-					$.ajax({
-						type: "POST",
-						url: url,
-						contentType: "application/json",
-						data: JSON.stringify(documentiAcquistoToPrint),
-						xhr: function () {
-							var xhr = new XMLHttpRequest();
-							xhr.onreadystatechange = function () {
-								if (xhr.readyState == 2) {
-									if (xhr.status == 200) {
-										xhr.responseType = "blob";
-									} else {
-										xhr.responseType = "text";
-									}
-								}
-							};
-							return xhr;
-						},
-						success: function (response, status, xhr) {
-							var blob = new Blob([response], {type: "application/pdf"});
-							var blobUrl = URL.createObjectURL(blob);
-
-							window.open(blobUrl, '_blank');
-
-							$('#alertDocumentoAcquisto').empty();
-							documentiAcquistoToPrint = [];
-							$(".documentoAcquistoCheckbox").prop("checked", false);
-						},
-						error: function (jqXHR, textStatus, errorThrown) {
-							var errorMessage = 'Errore nella stampa dei documenti acquisto';
-							if (jqXHR != null && jqXHR != undefined) {
-								var jqXHRResponseJson = jqXHR.responseJSON;
-								if (jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != '') {
-									var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
-									if (jqXHRResponseJsonMessage != null
-										&& jqXHRResponseJsonMessage != undefined
-										&& jqXHRResponseJsonMessage != '') {
-										errorMessage = jqXHRResponseJsonMessage;
-									}
-								}
-							}
-							$('#alertDocumentoAcquisto').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
-						}
-					});
-
-				}
-			} else {
-				$('#alertDocumentoAcquisto').empty().append(alertContent.replace('@@alertText@@','Selezionare almeno un elemento').replace('@@alertResult@@', 'danger'));
-			}
-
+		$(document).on('click','#creaDistinta', function(event) {
+			event.preventDefault();
+			var url = $.fn.createUrlSearch("stampe/documenti-acquisto/distinta?");
+			window.open(url, '_blank');
 		});
 	}
 });

@@ -41,8 +41,7 @@ $(document).ready(function() {
 				$('#alertFattureAcquisto').empty().append(alertContent.replace('@@alertText@@','Selezionare almeno un DDT acquisto').replace('@@alertResult@@', 'danger'));
 			} else{
 				var fatturaAcquisto = new Object();
-				fatturaAcquisto.progressivo = $('#progressivo').val();
-				fatturaAcquisto.anno = $('#anno').val();
+				fatturaAcquisto.numero = $('#numero').val();
 				fatturaAcquisto.data = $('#data').val();
 
 				var fornitore = new Object();
@@ -90,17 +89,7 @@ $(document).ready(function() {
 						}, 1000);
 					},
 					error: function(jqXHR, textStatus, errorThrown) {
-						var errorMessage = 'Errore nella creazione della fattura acquisto';
-						if(jqXHR != null && jqXHR != undefined){
-							var jqXHRResponseJson = jqXHR.responseJSON;
-							if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
-								var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
-								if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
-									errorMessage = jqXHRResponseJsonMessage;
-								}
-							}
-						}
-						$('#alertFattureAcquisto').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+						$('#alertFattureAcquisto').empty().append(alertContent.replace('@@alertText@@', 'Errore nella creazione della fattura acquisto').replace('@@alertResult@@', 'danger'));
 					}
 				});
 			}
@@ -119,8 +108,7 @@ $(document).ready(function() {
 
 			var fatturaAcquisto = new Object();
 			fatturaAcquisto.id = parseInt($('#hiddenIdFatturaAcquisto').val());
-			fatturaAcquisto.progressivo = parseInt($('#progressivo').val());
-			fatturaAcquisto.anno = parseInt($('#anno').val());
+			fatturaAcquisto.numero = $('#numero').val();
 			fatturaAcquisto.data = $('#data').val();
 			fatturaAcquisto.note = $('#note').val();
 
@@ -160,32 +148,6 @@ $(document).ready(function() {
 	}
 });
 
-$.fn.preloadFields = function(){
-	$.ajax({
-		url: baseUrl + "fatture-acquisto/progressivo",
-		type: 'GET',
-		dataType: 'json',
-		success: function(result) {
-			if(result != null && result != undefined && result != ''){
-				$('#progressivo').attr('value', result.progressivo);
-				$('#anno').attr('value', result.anno);
-				$('#data').val(moment().format('YYYY-MM-DD'));
-
-				$('#fornitore').focus();
-
-				var uri = window.location.toString();
-				if (uri.indexOf("?") > 0) {
-					var clean_uri = uri.substring(0, uri.indexOf("?"));
-					window.history.replaceState({}, document.title, clean_uri);
-				}
-			}
-		},
-		error: function(jqXHR, textStatus, errorThrown) {
-			console.log('Response text: ' + jqXHR.responseText);
-		}
-	});
-}
-
 $.fn.getFornitori = function(){
 	$.ajax({
 		url: baseUrl + "fornitori?attivo=true",
@@ -198,6 +160,9 @@ $.fn.getFornitori = function(){
 					$('#fornitore').append('<option value="'+item.id+'">'+label+'</option>');
 				});
 			}
+			$('#data').val(moment().format('YYYY-MM-DD'));
+
+			$('#fornitore').focus();
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
@@ -245,8 +210,7 @@ $.fn.getFatturaAcquisto = function(idFatturaAcquisto){
 		success: function(result) {
 			if(result != null && result != undefined && result != ''){
 				$('#hiddenIdFatturaAcquisto').attr('value', result.id);
-				$('#progressivo').attr('value', result.progressivo);
-				$('#anno').attr('value', result.anno);
+				$('#numero').attr('value', result.numero);
 				$('#data').attr('value', result.data);
 				$('#note').val(result.note);
 			}
@@ -268,7 +232,7 @@ $.fn.loadDdtAcquistoDaFatturare = function(){
 
 		$('#fatturaAcquistoDdtAcquistoTable').DataTable().destroy();
 
-		var url = baseUrl + "documenti-acquisto/search?idFornitore="+fornitore+"&fatturato=false&dataA="+dataString;
+		var url = baseUrl + "documenti-acquisto/search?tipoDocumento=DDT acquisto&idFornitore="+fornitore+"&fatturato=false&dataA="+dataString;
 		$('#fatturaAcquistoDdtAcquistoTable').DataTable({
 			"ajax": {
 				"url": url,
