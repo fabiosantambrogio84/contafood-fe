@@ -43,16 +43,23 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 		"dom": '<"top"p>rt<"bottom"ip>',
 		"autoWidth": false,
 		"order": [
-			[2, 'desc'],
-			[3, 'asc'],
-			[1, 'asc'],
-			[0, 'desc']
+			[3, 'desc'],
+			[4, 'asc'],
+			[2, 'asc'],
+			[1, 'desc']
 		],
 		"columns": [
 			//{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
 			//	var checkboxHtml = '<input type="checkbox" id="checkbox_'+data.id+'" data-id="'+data.id+'" data-tipo-documento="'+data.tipoDocumento+'" data-id-documento="'+data.idDocumento+'" data-partita-iva="'+data.partitaIvaFornitore+'" data-fatturato="'+data.fatturato+'" data-id-fornitore="'+data.idFornitore+'" class="documentoAcquistoCheckbox">';
 			//	return checkboxHtml;
 			//}},
+			{"name": "fatturato", "data": null, "width":"5%", render: function ( data, type, row ) {
+				if(data.fatturato){
+					return 'Si';
+				} else {
+					return 'No';
+				}
+			}},
 			{"name": "num_documento", "data": "numDocumento", "width":"3%"},
 			{"name": "tipo_documento", "data": "tipoDocumento", "width":"8%"},
 			{"name": "data_documento", "data": null, "width":"8%", render: function ( data, type, row ) {
@@ -98,7 +105,7 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 					links += '<a class="deleteDdtAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				} else if(data.tipoDocumento === tipoDocumentoFatturaAcquisto){
 					links += '<a class="detailsFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-					links += '<a class="updateFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="fatture-acquisto-edit.html?idFatturaAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
+					//links += '<a class="updateFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="fatture-acquisto-edit.html?idFatturaAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
 					if((totale - acconto) != 0){
 						links += '<a class="payFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idFatturaAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 					}
@@ -106,6 +113,7 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 					links += '<a class="deleteFatturaAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
 				} else if(data.tipoDocumento === tipoDocumentoFatturaAccompagnatoriaAcquisto){
 					links += '<a class="detailsFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
+					links += '<a class="updateFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="fatture-accompagnatorie-acquisto-edit.html?idFatturaAccompagnatoriaAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
 					if((totale - acconto) != 0){
 						links += '<a class="payFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idFatturaAccompagnatoriaAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 					}
@@ -135,6 +143,11 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 					} else {
 						backgroundColor = 'trasparent';
 					}
+
+					//if(data.fatturato){
+					//	$(row).css('text-decoration', 'underline');
+					//}
+
 				} else if(data.tipoDocumento === tipoDocumentoFatturaAcquisto || data.tipoDocumento === tipoDocumentoFatturaAccompagnatoriaAcquisto){
 					if(data.stato == 'DA_PAGARE'){
 						backgroundColor = '#fcf456';

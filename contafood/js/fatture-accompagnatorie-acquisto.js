@@ -243,6 +243,56 @@ $(document).ready(function() {
 		});
 	}
 
+	if($('#updateFatturaAccompagnatoriaAcquistoButton') != null && $('#updateFatturaAccompagnatoriaAcquistoButton') != undefined && $('#updateFatturaAccompagnatoriaAcquistoButton').length > 0){
+
+		$(document).on('submit','#updateFatturaAccompagnatoriaAcquistoForm', function(event){
+			event.preventDefault();
+
+			var alertContent = '<div id="alertFattureAccompagnatorieAcquistoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+
+			var fatturaAccompagnatoriaAcquisto = new Object();
+			fatturaAccompagnatoriaAcquisto.id = parseInt($('#hiddenIdFatturaAccompagnatoriaAcquisto').val());
+			fatturaAccompagnatoriaAcquisto.numero = $('#numero').val();
+			fatturaAccompagnatoriaAcquisto.data = $('#data').val();
+			fatturaAccompagnatoriaAcquisto.note = $('#note').val();
+
+			var fatturaAccompagnatoriaAcquistoJson = JSON.stringify(fatturaAccompagnatoriaAcquisto);
+
+			$.ajax({
+				url: baseUrl + "fatture-accompagnatorie-acquisto/" + fatturaAccompagnatoriaAcquisto.id,
+				type: 'PATCH',
+				contentType: "application/json",
+				dataType: 'json',
+				data: fatturaAccompagnatoriaAcquistoJson,
+				success: function(result) {
+					$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent.replace('@@alertText@@','Fattura accompagnatoria acquisto modificata con successo').replace('@@alertResult@@', 'success'));
+
+					$('#updateFatturaAccompagnatoriaAcquistoButton').attr("disabled", true);
+
+					// Returns to the same page
+					setTimeout(function() {
+						window.location.href = "documenti-acquisto.html";
+					}, 1000);
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					var errorMessage = 'Errore nella modifica della fattura accompagnatoria acquisto';
+					if(jqXHR != null && jqXHR != undefined){
+						var jqXHRResponseJson = jqXHR.responseJSON;
+						if(jqXHRResponseJson != null && jqXHRResponseJson != undefined && jqXHRResponseJson != ''){
+							var jqXHRResponseJsonMessage = jqXHR.responseJSON.message;
+							if(jqXHRResponseJsonMessage != null && jqXHRResponseJsonMessage != undefined && jqXHRResponseJsonMessage != '' && jqXHRResponseJsonMessage.indexOf('con progressivo') != -1){
+								errorMessage = jqXHRResponseJsonMessage;
+							}
+						}
+					}
+					$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent.replace('@@alertText@@', errorMessage).replace('@@alertResult@@', 'danger'));
+				}
+			});
+		});
+	}
+
 	$(document).on('change','#fornitore', function(){
 		$('#articolo option[value=""]').prop('selected', true);
 		$('#udm').val('');
@@ -519,6 +569,22 @@ $(document).ready(function() {
 
 });
 
+$.fn.extractIdFatturaAccompagnatoriaAcquistoFromUrl = function(){
+	var pageUrl = window.location.search.substring(1);
+
+	var urlVariables = pageUrl.split('&'),
+		paramNames,
+		i;
+
+	for (i = 0; i < urlVariables.length; i++) {
+		paramNames = urlVariables[i].split('=');
+
+		if (paramNames[0] === 'idFatturaAccompagnatoriaAcquisto') {
+			return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
+		}
+	}
+}
+
 $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 	$('#colli').attr('value', 1);
 	$('#data').val(moment().format('YYYY-MM-DD'));
@@ -653,6 +719,25 @@ $.fn.getArticoli = function(idFornitore){
 
 					$('#articolo').selectpicker('refresh');
 				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+		}
+	});
+}
+
+$.fn.getFatturaAccompagnatoriaAcquisto = function(idFatturaAccompagnatoriaAcquisto){
+	$.ajax({
+		url: baseUrl + "fatture-accompagnatorie-acquisto/" + idFatturaAccompagnatoriaAcquisto,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			if(result != null && result != undefined && result != ''){
+				$('#hiddenIdFatturaAccompagnatoriaAcquisto').attr('value', result.id);
+				$('#numero').attr('value', result.numero);
+				$('#data').attr('value', result.data);
+				$('#note').val(result.note);
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
