@@ -3,9 +3,8 @@ var rowBackgroundVerde = '#96ffb2';
 var rowBackgroundRosa = '#fcd1ff';
 var rowBackgroundGiallo = '#fffca3';
 
-$(document).ready(function() {
-
-	$('#fatturaAccompagnatoriaAcquistoArticoliTable').DataTable({
+$.fn.loadFatturaAccompagnatoriaAcquistoProdottiTable = function() {
+	$('#fatturaAccompagnatoriaAcquistoProdottiTable').DataTable({
 		"searching": false,
 		"language": {
 			"paginate": {
@@ -38,7 +37,9 @@ $(document).ready(function() {
 			[0, 'asc']
 		]
 	});
+}
 
+$.fn.loadFatturaAccompagnatoriaAcquistoTotaliTable = function() {
 	$('#fatturaAccompagnatoriaAcquistoTotaliTable').DataTable({
 		"ajax": {
 			"url": baseUrl + "aliquote-iva",
@@ -75,14 +76,14 @@ $(document).ready(function() {
 		],
 		"columns": [
 			{"name": "valore", "data": null, "width":"8%", render: function ( data, type, row ) {
-				return data.valore;
-			}},
+					return data.valore;
+				}},
 			{"name": "totaleIva", "data": null, "width":"8%", render: function ( data, type, row ) {
-				return ''
-			}},
+					return ''
+				}},
 			{"name": "totaleImponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
-				return ''
-			}}
+					return ''
+				}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).attr('data-id', data.id);
@@ -93,6 +94,13 @@ $(document).ready(function() {
 			$(cells[2]).css('text-align','center');
 		}
 	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadFatturaAccompagnatoriaAcquistoProdottiTable();
+
+	$.fn.loadFatturaAccompagnatoriaAcquistoTotaliTable();
 
 	$.fn.createFatturaAccompagnatoriaAcquisto = function(print){
 
@@ -108,7 +116,6 @@ $(document).ready(function() {
 
 		var fatturaAccompagnatoriaAcquisto = new Object();
 		fatturaAccompagnatoriaAcquisto.numero = $('#numero').val();
-		//fatturaAccompagnatoriaAcquisto.anno = $('#anno').val();
 		fatturaAccompagnatoriaAcquisto.data = $('#data').val();
 
 		var fornitore = new Object();
@@ -119,28 +126,58 @@ $(document).ready(function() {
 		causale.id = $('#causale option:selected').val();
 		fatturaAccompagnatoriaAcquisto.causale = causale;
 
-		var fatturaAccompagnatoriaAcquistoArticoliLength = $('.rowArticolo').length;
-		if(fatturaAccompagnatoriaAcquistoArticoliLength != null && fatturaAccompagnatoriaAcquistoArticoliLength != undefined && fatturaAccompagnatoriaAcquistoArticoliLength != 0){
+		var prodottoTable = $('#fatturaAccompagnatoriaAcquistoProdottiTable').DataTable();
+		var fatturaAccompagnatoriaAcquistoProdottiLength = prodottoTable.rows().nodes().length;
+
+		if(fatturaAccompagnatoriaAcquistoProdottiLength != null && fatturaAccompagnatoriaAcquistoProdottiLength != undefined && fatturaAccompagnatoriaAcquistoProdottiLength != 0){
+
 			var fatturaAccompagnatoriaAcquistoArticoli = [];
-			$('.rowArticolo').each(function(i, item){
-				var articoloId = $(this).attr('data-id');
+			var fatturaAccompagnatoriaAcquistoIngredienti = [];
 
-				var fatturaAccompagnatoriaAcquistoArticolo = {};
-				var fatturaAccompagnatoriaAcquistoArticoloId = new Object();
-				fatturaAccompagnatoriaAcquistoArticoloId.articoloId = articoloId;
-				fatturaAccompagnatoriaAcquistoArticolo.id = fatturaAccompagnatoriaAcquistoArticoloId;
+			prodottoTable.rows().nodes().each(function(i, item){
+				var tipo = $(i).attr('data-tipo');
+				var prodottoId = $(i).attr('data-id');
 
-				fatturaAccompagnatoriaAcquistoArticolo.lotto = $(this).children().eq(1).children().eq(0).val();
-				fatturaAccompagnatoriaAcquistoArticolo.scadenza = $(this).children().eq(2).children().eq(0).val();
-				fatturaAccompagnatoriaAcquistoArticolo.quantita = $(this).children().eq(4).children().eq(0).val();
-				fatturaAccompagnatoriaAcquistoArticolo.numeroPezzi = $(this).children().eq(5).children().eq(0).val();
-				fatturaAccompagnatoriaAcquistoArticolo.prezzo = $(this).children().eq(6).children().eq(0).val();
-				fatturaAccompagnatoriaAcquistoArticolo.sconto = $(this).children().eq(7).children().eq(0).val();
+				if(tipo == 'articolo'){
+					var fatturaAccompagnatoriaAcquistoArticolo = {};
+					var fatturaAccompagnatoriaAcquistoArticoloId = new Object();
+					fatturaAccompagnatoriaAcquistoArticoloId.articoloId = prodottoId;
+					fatturaAccompagnatoriaAcquistoArticolo.id = fatturaAccompagnatoriaAcquistoArticoloId;
 
-				fatturaAccompagnatoriaAcquistoArticoli.push(fatturaAccompagnatoriaAcquistoArticolo);
+					fatturaAccompagnatoriaAcquistoArticolo.lotto = $(i).children().eq(1).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoArticolo.scadenza = $(i).children().eq(2).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoArticolo.quantita = $(i).children().eq(4).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoArticolo.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoArticolo.prezzo = $(i).children().eq(6).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoArticolo.sconto = $(i).children().eq(7).children().eq(0).val();
+
+					fatturaAccompagnatoriaAcquistoArticoli.push(fatturaAccompagnatoriaAcquistoArticolo);
+
+				} else if(tipo == 'ingrediente'){
+					var fatturaAccompagnatoriaAcquistoIngrediente = {};
+					var fatturaAccompagnatoriaAcquistoIngredienteId = new Object();
+					fatturaAccompagnatoriaAcquistoIngredienteId.ingredienteId = prodottoId;
+					fatturaAccompagnatoriaAcquistoIngrediente.id = fatturaAccompagnatoriaAcquistoIngredienteId;
+
+					fatturaAccompagnatoriaAcquistoIngrediente.lotto = $(i).children().eq(1).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoIngrediente.scadenza = $(i).children().eq(2).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoIngrediente.quantita = $(i).children().eq(4).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoIngrediente.numeroPezzi = $(i).children().eq(5).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoIngrediente.prezzo = $(i).children().eq(6).children().eq(0).val();
+					fatturaAccompagnatoriaAcquistoIngrediente.sconto = $(i).children().eq(7).children().eq(0).val();
+
+					fatturaAccompagnatoriaAcquistoIngredienti.push(fatturaAccompagnatoriaAcquistoIngrediente);
+				}
+				if(Array.isArray(fatturaAccompagnatoriaAcquistoArticoli) && fatturaAccompagnatoriaAcquistoArticoli.length){
+					fatturaAccompagnatoriaAcquisto.fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoli;
+				}
+				if(Array.isArray(fatturaAccompagnatoriaAcquistoIngredienti) && fatturaAccompagnatoriaAcquistoIngredienti.length){
+					fatturaAccompagnatoriaAcquisto.fatturaAccompagnatoriaAcquistoIngredienti = fatturaAccompagnatoriaAcquistoIngredienti;
+				}
+
 			});
-			fatturaAccompagnatoriaAcquisto.fatturaAccompagnatoriaAcquistoArticoli = fatturaAccompagnatoriaAcquistoArticoli;
 		}
+
 		var fatturaAccompagnatoriaAcquistoTotaliLength = $('.rowTotaliByIva').length;
 		if(fatturaAccompagnatoriaAcquistoTotaliLength != null && fatturaAccompagnatoriaAcquistoTotaliLength != undefined && fatturaAccompagnatoriaAcquistoTotaliLength != 0){
 			var fatturaAccompagnatoriaAcquistoTotali = [];
@@ -221,7 +258,7 @@ $(document).ready(function() {
 
 	if($('#newFatturaAccompagnatoriaAcquistoButton') != null && $('#newFatturaAccompagnatoriaAcquistoButton') != undefined && $('#newFatturaAccompagnatoriaAcquistoButton').length > 0){
 
-		$('#articolo').selectpicker();
+		$('#prodotto').selectpicker();
 		$('#fornitore').selectpicker();
 
 		$(document).on('submit','#newFatturaAccompagnatoriaAcquistoForm', function(event){
@@ -233,7 +270,7 @@ $(document).ready(function() {
 	}
 
 	if($('#newAndPrintFatturaAccompagnatoriaAcquistoButton') != null && $('#newAndPrintFatturaAccompagnatoriaAcquistoButton') != undefined && $('#newAndPrintFatturaAccompagnatoriaAcquistoButton').length > 0){
-		$('#articolo').selectpicker();
+		$('#prodotto').selectpicker();
 		$('#fornitore').selectpicker();
 
 		$(document).on('click','#newAndPrintFatturaAccompagnatoriaAcquistoButton', function(event){
@@ -294,52 +331,30 @@ $(document).ready(function() {
 	}
 
 	$(document).on('change','#fornitore', function(){
-		$('#articolo option[value=""]').prop('selected', true);
-		$('#udm').val('');
-		$('#iva').val('');
-		$('#lotto').val('');
-		$('#scadenza').val('');
-		$('#quantita').val('');
-		$('#pezzi').val('');
-		$('#prezzo').val('');
-		$('#sconto').val('');
-
-		var alertContent = '<div id="alertFatturaAccompagnatoriaAcquistoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
-		alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
-			'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
-
-		$('#alertFattureAccompagnatorieAcquisto').empty();
-
-		$.fn.emptyArticoli();
-
-		var fornitore = $('#fornitore option:selected').val();
-		if(fornitore != null && fornitore != ''){
-
-			$.fn.getArticoli(fornitore);
-
-			$('#articolo').removeAttr('disabled');
-			$('#articolo').selectpicker('refresh');
-		} else {
-			$('#articolo').attr('disabled', true);
-			$('#articolo').selectpicker('refresh');
-		}
+		$.fn.preloadArticoloOrIngredienteSection();
 	});
 
-	$(document).on('change','#articolo', function(){
-		var articolo = $('#articolo option:selected').val();
-		if(articolo != null && articolo != ''){
-			var udm = $('#articolo option:selected').attr('data-udm');
-			var iva = $('#articolo option:selected').attr('data-iva');
-			var quantita = $('#articolo option:selected').attr('data-qta');
-			var prezzoBase = $('#articolo option:selected').attr('data-prezzo-base');
-			var prezzoListino = $('#articolo option:selected').attr('data-prezzo-listino');
+	$(document).on('change','#prodotto', function(){
+		var prodotto = $('#prodotto option:selected').val();
+		if(prodotto != null && prodotto != ''){
+			var tipo = $('#prodotto option:selected').attr('data-tipo');
+			var udm = $('#prodotto option:selected').attr('data-udm');
+			var iva = $('#prodotto option:selected').attr('data-iva');
+			var quantita = $('#prodotto option:selected').attr('data-qta');
 			var prezzo;
-			if(prezzoListino != null && prezzoListino != undefined && prezzoListino != ''){
-				prezzo = prezzoListino;
+			if(tipo === 'articolo'){
+				var prezzoBase = $('#prodotto option:selected').attr('data-prezzo-base');
+				var prezzoListino = $('#prodotto option:selected').attr('data-prezzo-listino');
+				if(prezzoListino != null && prezzoListino != undefined && prezzoListino != ''){
+					prezzo = prezzoListino;
+				} else {
+					prezzo = prezzoBase;
+				}
 			} else {
-				prezzo = prezzoBase;
+				prezzo = $('#prodotto option:selected').attr('data-prezzo-acquisto');
 			}
-			var sconto = $('#articolo option:selected').attr('data-sconto');
+
+			var sconto = $('#prodotto option:selected').attr('data-sconto');
 
 			$('#udm').val(udm);
 			$('#iva').val(iva);
@@ -361,21 +376,21 @@ $(document).ready(function() {
 		}
 	});
 
-	$(document).on('click','#addArticolo', function(event){
+	$(document).on('click','#addProdotto', function(event){
 		event.preventDefault();
 
-		var articoloId = $('#articolo option:selected').val();
+		var prodottoId = $('#prodotto option:selected').val();
 
-		if(articoloId == null || articoloId == undefined || articoloId == ''){
+		if(prodottoId == null || prodottoId == undefined || prodottoId == ''){
 			var alertContent = '<div class="alert alert-danger alert-dismissable">\n' +
 				'                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>\n' +
-				'                Seleziona un articolo\n' +
+				'                Seleziona un prodotto\n' +
 				'              </div>';
 
-			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty().append(alertContent);
+			$('#addFatturaAccompagnatoriaAcquistoProdottoAlert').empty().append(alertContent);
 			return;
 		} else {
-			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty();
+			$('#addFatturaAccompagnatoriaAcquistoProdottoAlert').empty();
 		}
 
 		var pezzi = $('#pezzi').val();
@@ -385,13 +400,14 @@ $(document).ready(function() {
 				'                Inserisci il numero di pezzi\n' +
 				'              </div>';
 
-			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty().append(alertContent);
+			$('#addFatturaAccompagnatoriaAcquistoProdottoAlert').empty().append(alertContent);
 			return;
 		} else {
-			$('#addFatturaAccompagnatoriaAcquistoArticoloAlert').empty();
+			$('#addFatturaAccompagnatoriaAcquistoProdottoAlert').empty();
 		}
 
-		var articolo = $('#articolo option:selected').text();
+		var prodotto = $('#prodotto option:selected').text();
+		var tipo = $('#prodotto option:selected').attr('data-tipo');
 		var udm = $('#udm').val();
 		var lotto = $('#lotto').val();
 		var scadenza = $('#scadenza').val();
@@ -399,9 +415,9 @@ $(document).ready(function() {
 		var prezzo = $('#prezzo').val();
 		var sconto = $('#sconto').val();
 		var iva = $('#iva').val();
-		var codiceFornitore = $('#articolo option:selected').attr("data-codice-fornitore");
-		var lottoRegExp = $('#articolo option:selected').attr("data-lotto-regexp");
-		var dataScadenzaRegExp = $('#articolo option:selected').attr("data-scadenza-regexp");
+		var codiceFornitore = $('#prodotto option:selected').attr("data-codice-fornitore");
+		var lottoRegExp = $('#prodotto option:selected').attr("data-lotto-regexp");
+		var dataScadenzaRegExp = $('#prodotto option:selected').attr("data-scadenza-regexp");
 
 		if(lotto != null && lotto != undefined && lotto != ''){
 			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+lotto+'" data-codice-fornitore="'+codiceFornitore+'" data-lotto-regexp="'+lottoRegExp+'" data-scadenza-regexp="'+dataScadenzaRegExp+'">';
@@ -418,8 +434,7 @@ $(document).ready(function() {
 		// check if a same articolo was already added
 		var found = 0;
 		var currentRowIndex;
-		var currentIdOrdineCliente;
-		var currentIdArticolo;
+		var currentIdProdotto;
 		var currentLotto;
 		var currentPrezzo;
 		var currentSconto;
@@ -428,19 +443,22 @@ $(document).ready(function() {
 		var currentPezzi = 0;
 		var currentPezziDaEvadere = 0;
 
-		var fatturaAccompagnatoriaAcquistoArticoliLength = $('.rowArticolo').length;
-		if(fatturaAccompagnatoriaAcquistoArticoliLength != null && fatturaAccompagnatoriaAcquistoArticoliLength != undefined && fatturaAccompagnatoriaAcquistoArticoliLength != 0) {
+		var fatturaAccompagnatoriaAcquistoProdottiLength = $('.rowArticolo').length;
+		if(fatturaAccompagnatoriaAcquistoProdottiLength != null && fatturaAccompagnatoriaAcquistoProdottiLength != undefined && fatturaAccompagnatoriaAcquistoProdottiLength != 0) {
 			$('.rowArticolo').each(function(i, item){
 
 				if(found != 1){
 					currentRowIndex = $(this).attr('data-row-index');
-					currentIdArticolo = $(this).attr('data-id');
+					currentIdProdotto = $(this).attr('data-id');
 					currentLotto = $(this).children().eq(1).children().eq(0).val();
 					currentScadenza = $(this).children().eq(2).children().eq(0).val();
 					currentPrezzo = $(this).children().eq(6).children().eq(0).val();
 					currentSconto = $(this).children().eq(7).children().eq(0).val();
+					if(currentSconto == '0'){
+						currentSconto = '';
+					}
 
-					if($.fn.normalizeIfEmptyOrNullVariable(currentIdArticolo) == $.fn.normalizeIfEmptyOrNullVariable(articoloId)
+					if($.fn.normalizeIfEmptyOrNullVariable(currentIdProdotto) == $.fn.normalizeIfEmptyOrNullVariable(prodottoId)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentLotto) == $.fn.normalizeIfEmptyOrNullVariable(lotto)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentPrezzo) == $.fn.normalizeIfEmptyOrNullVariable(prezzo)
 						&& $.fn.normalizeIfEmptyOrNullVariable(currentSconto) == $.fn.normalizeIfEmptyOrNullVariable(sconto)
@@ -463,68 +481,22 @@ $(document).ready(function() {
 		var scontoValue = (sconto/100)*quantitaPerPrezzo;
 		totale = Number(Math.round((quantitaPerPrezzo - scontoValue) + 'e2') + 'e-2');
 
-		var table = $('#fatturaAccompagnatoriaAcquistoArticoliTable').DataTable();
+		var table = $('#fatturaAccompagnatoriaAcquistoProdottiTable').DataTable();
 		if(found >= 1){
 
-			var newQuantita = (quantita + $.fn.parseValue(currentQuantita,'float'));
-			var newPezzi = pezzi + $.fn.parseValue(currentPezzi,'int');
-
-			var newQuantitaHtml = '<input type="number" step=".001" min="0" class="form-control form-control-sm text-center compute-totale gnore-barcode-scanner" value="'+$.fn.fixDecimalPlaces(newQuantita, 3)+'">';
-			var newPezziHtml = '<input type="number" step="1" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner pezzi" value="'+newPezzi+'">';
-
-			var lottoHtml = '<input type="text" class="form-control form-control-sm text-center compute-totale lotto group" value="'+currentLotto+'" data-codice-fornitore="'+codiceFornitore+'">';
-			var scadenzaHtml = '<input type="date" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner scadenza group" value="'+moment(currentScadenza).format('YYYY-MM-DD')+'">';
-
-			var prezzoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+currentPrezzo+'">';
-			var scontoHtml = '<input type="number" step=".01" min="0" class="form-control form-control-sm text-center compute-totale ignore-barcode-scanner group" value="'+currentSconto+'">';
-
-			if($.fn.isVersionClient()){
-				prezzoHtml = prezzoHtml.replace('>', ' disabled>');
-			}
-
-			var rowData = table.row("[data-row-index='"+currentRowIndex+"']").data();
-			rowData[1] = lottoHtml;
-			rowData[2] = scadenzaHtml;
-			rowData[4] = newQuantitaHtml;
-			rowData[5] = newPezziHtml;
-			rowData[6] = prezzoHtml;
-			rowData[7] = scontoHtml;
-			rowData[8] = totale;
-			table.row("[data-row-index='"+currentRowIndex+"']").data(rowData).draw();
+			// aggiorno la riga
+			$.fn.aggiornaRigaProdotto(table,currentRowIndex,currentIdProdotto,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentSconto,quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale);
 
 		} else {
-			var deleteLink = '<a class="deleteFatturaAccompagnatoriaAcquistoArticolo" data-id="'+articoloId+'" href="#"><i class="far fa-trash-alt" title="Rimuovi"></i></a>';
-
-			var rowsCount = table.rows().count();
-
-			if($.fn.isVersionClient()){
-				prezzoHtml = prezzoHtml.replace('>', ' disabled>');
-			}
-
-			var rowNode = table.row.add( [
-				articolo,
-				lottoHtml,
-				scadenzaHtml,
-				udm,
-				quantitaHtml,
-				pezziHtml,
-				prezzoHtml,
-				scontoHtml,
-				totale,
-				iva,
-				deleteLink
-			] ).draw( false ).node();
-			$(rowNode).css('text-align', 'center').css('color','#080707');
-			$(rowNode).addClass('rowArticolo');
-			$(rowNode).attr('data-id', articoloId);
-			$(rowNode).attr('data-row-index', parseInt(rowsCount) + 1);
+			// inserisco nuova riga
+			$.fn.inserisciRigaProdotto(table,prodottoId,prodotto,lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,totale,iva,tipo);
 
 		}
 		$.fn.computeTotale();
 
 		//$.fn.checkPezziOrdinati();
 
-		$('#articolo option[value=""]').prop('selected',true);
+		$('#prodotto option[value=""]').prop('selected',true);
 		$('#udm').val('');
 		$('#iva').val('');
 		$('#lotto').val('');
@@ -534,19 +506,18 @@ $(document).ready(function() {
 		$('#prezzo').val('');
 		$('#sconto').val('');
 
-		$('#articolo').focus();
-		$('#articolo').selectpicker('refresh');
+		$('#prodotto').focus();
+		$('#prodotto').selectpicker('refresh');
 	});
 
-	$(document).on('click','.deleteFatturaAccompagnatoriaAcquistoArticolo', function(){
-		$('#fatturaAccompagnatoriaAcquistoArticoliTable').DataTable().row( $(this).parent().parent() )
+	$(document).on('click','.deleteDdtProdotto', function(){
+		$('#fatturaAccompagnatoriaAcquistoProdottiTable').DataTable().row( $(this).parent().parent() )
 			.remove()
 			.draw();
-		$('#fatturaAccompagnatoriaAcquistoArticoliTable').focus();
+		$('#fatturaAccompagnatoriaAcquistoProdottiTable').focus();
 
 		$.fn.computeTotale();
 
-		$.fn.checkPezziOrdinati();
 	});
 
 	$(document).on('change','.compute-totale', function(){
@@ -607,6 +578,39 @@ $.fn.preloadFields = function(dataTrasporto, oraTrasporto){
 	if (uri.indexOf("?") > 0) {
 		var clean_uri = uri.substring(0, uri.indexOf("?"));
 		window.history.replaceState({}, document.title, clean_uri);
+	}
+}
+
+$.fn.preloadArticoloOrIngredienteSection = function(){
+	$('#prodotto option[value=""]').prop('selected', true);
+	$('#udm').val('');
+	$('#iva').val('');
+	$('#lotto').val('');
+	$('#scadenza').val('');
+	$('#quantita').val('');
+	$('#prezzo').val('');
+	$('#sconto').val('');
+
+	var fornitore = $('#fornitore option:selected').val();
+	if(fornitore != null && fornitore != ''){
+		var tipoFornitore = $('#fornitore option:selected').attr("data-tipo");
+		if(tipoFornitore == 'FORNITORE_ARTICOLI'){
+			$('#aggiungiTitle').text('Aggiungi articolo');
+			$('#prodottoLabel').text('Articolo');
+			$('#tableHeaderProdotto').text('Articolo');
+
+			$.fn.getArticoli(fornitore);
+
+		} else if(tipoFornitore == 'FORNITORE_INGREDIENTI'){
+			$('#aggiungiTitle').text('Aggiungi ingrediente');
+			$('#prodottoLabel').text('Ingrediente');
+			$('#tableHeaderProdotto').text('Ingrediente');
+
+			$.fn.getIngredienti(fornitore);
+		}
+
+	} else {
+		$('#prodotto').empty();
 	}
 }
 
@@ -682,9 +686,6 @@ $.fn.getCausali = function(dataTrasporto, oraTrasporto){
 }
 
 $.fn.getArticoli = function(idFornitore){
-
-	$('#articolo').empty().append('<option value=""></option>');
-
 	$.ajax({
 		url: baseUrl + "articoli?attivo=true&idFornitore="+idFornitore,
 		type: 'GET',
@@ -707,7 +708,8 @@ $.fn.getArticoli = function(idFornitore){
 					var lottoRegexp = $.fn.getLottoRegExp(item);
 					var dataScadenzaRegexp = $.fn.getDataScadenzaRegExp(item);
 
-					$('#articolo').append('<option value="'+item.id+'" ' +
+					$('#prodotto').append('<option value="'+item.id+'" ' +
+						'data-tipo="articolo" ' +
 						'data-udm="'+dataUdm+'" ' +
 						'data-iva="'+dataIva+'" ' +
 						'data-qta="'+dataQta+'" ' +
@@ -717,14 +719,54 @@ $.fn.getArticoli = function(idFornitore){
 						'data-scadenza-regexp="'+dataScadenzaRegexp+'" ' +
 						'>'+item.codice+' '+item.descrizione+'</option>');
 
-					$('#articolo').selectpicker('refresh');
+					$('#prodotto').selectpicker('refresh');
 				});
 			}
 		},
 		error: function(jqXHR, textStatus, errorThrown) {
 			console.log('Response text: ' + jqXHR.responseText);
+			var alertContent = '<div id="alertFattureAccompagnatorieAcquistoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli articoli').replace('@@alertResult@@', 'danger'));
 		}
 	});
+}
+
+$.fn.getIngredienti = function(idFornitore){
+	$.ajax({
+		url: baseUrl + "ingredienti?attivo=true&idFornitore="+idFornitore,
+		type: 'GET',
+		dataType: 'json',
+		success: function(result) {
+			$('#prodotto').empty().append('<option value=""></option>');
+			if(result != null && result != undefined && result != ''){
+				$.each(result, function(i, item){
+					var dataUdm = '';
+					var udm = item.unitaMisura;
+					if(udm != null && udm != undefined){
+						dataUdm = udm.etichetta;
+					}
+					var dataIva = '';
+					var iva = item.aliquotaIva;
+					if(iva != null && iva != undefined){
+						dataIva = iva.valore;
+					}
+					$('#prodotto').append('<option value="'+item.id+'" data-tipo="ingrediente" data-udm="'+dataUdm+'" data-iva="'+dataIva+'" data-qta="" data-prezzo-acquisto="'+item.prezzo+'">'+item.codice+' '+item.descrizione+'</option>');
+
+					$('#prodotto').selectpicker('refresh');
+				});
+			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('Response text: ' + jqXHR.responseText);
+			var alertContent = '<div id="alertFattureAccompagnatorieAcquistoContent" class="alert alert-@@alertResult@@ alert-dismissible fade show" role="alert">';
+			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
+				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
+			$('#alertFattureAccompagnatorieAcquisto').empty().append(alertContent.replace('@@alertText@@', 'Errore nel caricamento degli ingredienti').replace('@@alertResult@@', 'danger'));
+		}
+	});
+
 }
 
 $.fn.getFatturaAccompagnatoriaAcquisto = function(idFatturaAccompagnatoriaAcquisto){

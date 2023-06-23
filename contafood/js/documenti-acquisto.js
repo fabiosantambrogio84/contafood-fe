@@ -622,51 +622,111 @@ $(document).ready(function() {
 					$('#fatturaAccompagnatoriaAcquistoTotale').text(result.totale);
 
 					if(result.fatturaAccompagnatoriaAcquistoArticoli != null && result.fatturaAccompagnatoriaAcquistoArticoli != undefined){
-						$('#detailsFattureAccompagnatorieAcquistoArticoliModalTable').DataTable({
-							"data": result.fatturaAccompagnatoriaAcquistoArticoli,
-							"language": {
-								"paginate": {
-									"first": "Inizio",
-									"last": "Fine",
-									"next": "Succ.",
-									"previous": "Prec."
+
+						if(result.fatturaAccompagnatoriaAcquistoArticoli.length){
+							$('#fatturaAccompagnatoriaAcquistoSpaceArticoli').removeClass("d-none");
+							$('#detailsFatturaAccompagnatoriaAcquistoArticoliModalDiv').removeClass("d-none");
+
+							$('#detailsFattureAccompagnatorieAcquistoArticoliModalTable').DataTable({
+								"data": result.fatturaAccompagnatoriaAcquistoArticoli,
+								"language": {
+									"paginate": {
+										"first": "Inizio",
+										"last": "Fine",
+										"next": "Succ.",
+										"previous": "Prec."
+									},
+									"search": "Cerca",
+									"emptyTable": "Nessun articolo presente",
+									"zeroRecords": "Nessun articolo presente"
 								},
-								"search": "Cerca",
-								"emptyTable": "Nessun articolo presente",
-								"zeroRecords": "Nessun articolo presente"
-							},
-							"pageLength": 20,
-							"lengthChange": false,
-							"info": false,
-							"order": [
-								[0, 'asc'],
-								[1, 'asc']
-							],
-							"autoWidth": false,
-							"columns": [
-								{"name": "articolo", "data": null, render: function (data, type, row) {
-										var result = '';
-										if (data.articolo != null) {
-											result = data.articolo.codice+' - '+data.articolo.descrizione;
-										}
-										return result;
-									}},
-								{"name": "lotto", "data": "lotto"},
-								{"name": "scadenza", "data": null, render: function (data, type, row) {
-										var result = '';
-										if (data.scadenza != null) {
-											result = moment(data.scadenza).format('DD/MM/YYYY');
-										}
-										return result;
-									}},
-								{"name": "quantita", "data": "quantita"},
-								{"name": "pezzi", "data": "numeroPezzi"},
-								{"name": "prezzo", "data": "prezzo"},
-								{"name": "sconto", "data": "sconto"},
-								{"name": "imponibile", "data": "imponibile"},
-								{"name": "costo", "data": "costo"}
-							]
-						});
+								"pageLength": 20,
+								"lengthChange": false,
+								"info": false,
+								"order": [
+									[0, 'asc'],
+									[1, 'asc']
+								],
+								"autoWidth": false,
+								"columns": [
+									{"name": "articolo", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.articolo != null) {
+												result = data.articolo.codice+' - '+data.articolo.descrizione;
+											}
+											return result;
+										}},
+									{"name": "lotto", "data": "lotto"},
+									{"name": "scadenza", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.scadenza != null) {
+												result = moment(data.scadenza).format('DD/MM/YYYY');
+											}
+											return result;
+										}},
+									{"name": "quantita", "data": "quantita"},
+									{"name": "pezzi", "data": "numeroPezzi"},
+									{"name": "prezzo", "data": "prezzo"},
+									{"name": "sconto", "data": "sconto"},
+									{"name": "imponibile", "data": "imponibile"},
+									{"name": "costo", "data": "costo"}
+								]
+							});
+						}
+					}
+
+					if(result.fatturaAccompagnatoriaAcquistoIngredienti != null && result.fatturaAccompagnatoriaAcquistoIngredienti != undefined){
+
+						if(result.fatturaAccompagnatoriaAcquistoIngredienti.length){
+							$('#fatturaAccompagnatoriaAcquistoSpaceIngredienti').removeClass("d-none");
+							$('#detailsFatturaAccompagnatoriaAcquistoIngredientiModalDiv').removeClass("d-none");
+
+							$('#detailsFattureAccompagnatorieAcquistoIngredientiModalTable').DataTable({
+								"data": result.fatturaAccompagnatoriaAcquistoIngredienti,
+								"language": {
+									"paginate": {
+										"first": "Inizio",
+										"last": "Fine",
+										"next": "Succ.",
+										"previous": "Prec."
+									},
+									"search": "Cerca",
+									"emptyTable": "Nessun ingrediente presente",
+									"zeroRecords": "Nessun ingrediente presente"
+								},
+								"pageLength": 20,
+								"lengthChange": false,
+								"info": false,
+								"order": [
+									[0, 'asc'],
+									[1, 'asc']
+								],
+								"autoWidth": false,
+								"columns": [
+									{"name": "ingrediente", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.ingrediente != null) {
+												result = data.ingrediente.codice+' - '+data.ingrediente.descrizione;
+											}
+											return result;
+										}},
+									{"name": "lotto", "data": "lotto"},
+									{"name": "scadenza", "data": null, render: function (data, type, row) {
+											var result = '';
+											if (data.scadenza != null) {
+												result = moment(data.scadenza).format('DD/MM/YYYY');
+											}
+											return result;
+										}},
+									{"name": "quantita", "data": "quantita"},
+									{"name": "pezzi", "data": "numeroPezzi"},
+									{"name": "prezzo", "data": "prezzo"},
+									{"name": "sconto", "data": "sconto"},
+									{"name": "imponibile", "data": "imponibile"},
+									{"name": "costo", "data": "costo"}
+								]
+							});
+						}
 					}
 
 					if(result.fatturaAccompagnatoriaAcquistoTotali != null && result.fatturaAccompagnatoriaAcquistoTotali != undefined){

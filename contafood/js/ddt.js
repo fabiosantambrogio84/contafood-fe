@@ -173,6 +173,7 @@ $.fn.loadDdtTable = function(url) {
 					var table = $('#ddtTable').DataTable();
 					if(!costoAbilitato){
 						table.column(11).visible(false);
+						table.column(8).nodes().to$().css('font-weight','normal');
 					} else {
 						table.column(11).visible(true);
 					}

@@ -749,7 +749,7 @@ $.fn.computeTotale = function() {
     } else if($.fn.isRicevutaPrivato()){
         articoliTable = $('#ricevutaPrivatoArticoliTable').DataTable();
     } else if($.fn.isFatturaAccompagnatoriaAcquisto()){
-        articoliTable = $('#fatturaAccompagnatoriaAcquistoArticoliTable').DataTable();
+        articoliTable = $('#fatturaAccompagnatoriaAcquistoProdottiTable').DataTable();
     }
 
     articoliTable.rows().nodes().each(function(i, item){

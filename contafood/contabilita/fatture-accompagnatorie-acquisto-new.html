@@ -113,15 +113,15 @@
           </div>
 
           <div class="card mt-2">
-            <h6 class="card-header text-center font-weight-bold" style="background-color: #baddf5;">Aggiungi articolo</h6>
+            <h6 id="aggiungiTitle" class="card-header text-center font-weight-bold" style="background-color: #baddf5;">Aggiungi articolo</h6>
             <div class="card-body" style="font-size: 0.9rem;">
 
               <div class="w-50 float-left">
 
                 <div class="form-row">
                   <div class="form-group col-md-6">
-                    <label for="articolo" class="mb-0">Articolo*</label>
-                    <select id="articolo" class="form-control form-control-sm ignore-barcode-scanner" data-live-search="true" disabled>
+                    <label id="prodottoLabel" for="prodotto" class="mb-0">Articolo*</label>
+                    <select id="prodotto" class="form-control form-control-sm ignore-barcode-scanner" data-live-search="true">
                       <option value=""></option>
                     </select>
                   </div>
@@ -162,20 +162,20 @@
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-2">
-                    <button type="submit" class="btn btn-primary btn-sm mt-2" id="addArticolo">Aggiungi</button>
+                    <button type="submit" class="btn btn-primary btn-sm mt-2" id="addProdotto">Aggiungi</button>
                   </div>
                 </div>
 
-                <div id="addFatturaAccompagnatoriaAcquistoArticoloAlert"></div>
+                <div class="alert alert-danger alert-dismissable d-none" id="addFatturaAccompagnatoriaAcquistoProdottoAlert"></div>
 
               </div>
 
               <div class="card-body pl-0 pt-0 pb-0">
                 <div class="table-responsive">
-                  <table class="table table-bordered table-sm" id="fatturaAccompagnatoriaAcquistoArticoliTable" width="100%" cellspacing="0">
+                  <table class="table table-bordered table-sm" id="fatturaAccompagnatoriaAcquistoProdottiTable" width="100%" cellspacing="0">
                     <thead class="text-center" style="background-color: #baddf5;">
                     <tr>
-                      <th>Articolo</th>
+                      <th id="tableHeaderProdotto">Articolo</th>
                       <th>Lotto</th>
                       <th>Scadenza</th>
                       <th>UdM</th>
