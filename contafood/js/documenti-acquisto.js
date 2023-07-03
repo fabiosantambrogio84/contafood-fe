@@ -97,12 +97,16 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 				var links = '';
 				if(data.tipoDocumento === tipoDocumentoDdtAcquisto){
 					links += '<a class="detailsDdtAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-					links += '<a class="updateDdtAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="ddt-acquisto-edit.html?idDdtAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
+					if(data.stato === 'DA_PAGARE'){
+						links += '<a class="updateDdtAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="ddt-acquisto-edit.html?idDdtAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
+					}
 					if((totale - acconto) != 0){
 						links += '<a class="payDdtAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idDdtAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 					}
 					links += '<a class="printDdtAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-					links += '<a class="deleteDdtAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+					if(data.stato === 'DA_PAGARE'){
+						links += '<a class="deleteDdtAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+					}
 				} else if(data.tipoDocumento === tipoDocumentoFatturaAcquisto){
 					links += '<a class="detailsFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
 					//links += '<a class="updateFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="fatture-acquisto-edit.html?idFatturaAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
@@ -110,15 +114,21 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 						links += '<a class="payFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idFatturaAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 					}
 					links += '<a class="printFatturaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-					links += '<a class="deleteFatturaAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+					if(data.stato === 'DA_PAGARE') {
+						links += '<a class="deleteFatturaAcquisto" data-id-documento="' + data.idDocumento + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+					}
 				} else if(data.tipoDocumento === tipoDocumentoFatturaAccompagnatoriaAcquisto){
 					links += '<a class="detailsFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Dettagli"><i class="fas fa-info-circle"></i></a>';
-					links += '<a class="updateFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="fatture-accompagnatorie-acquisto-edit.html?idFatturaAccompagnatoriaAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
+					if(data.stato === 'DA_PAGARE') {
+						links += '<a class="updateFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="' + data.idDocumento + '" href="fatture-accompagnatorie-acquisto-edit.html?idFatturaAccompagnatoriaAcquisto=' + data.idDocumento + '" title="Modifica"><i class="far fa-edit"></i></a>';
+					}
 					if((totale - acconto) != 0){
 						links += '<a class="payFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="pagamenti-new.html?idFatturaAccompagnatoriaAcquisto=' + data.idDocumento + '" title="Pagamento"><i class="fa fa-shopping-cart"></i></a>';
 					}
 					links += '<a class="printFatturaAccompagnatoriaAcquisto pr-1" data-id-documento="'+data.idDocumento+'" href="#" title="Stampa"><i class="fa fa-print"></i></a>';
-					links += '<a class="deleteFatturaAccompagnatoriaAcquisto" data-id-documento="'+data.idDocumento+'" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+					if(data.stato === 'DA_PAGARE') {
+						links += '<a class="deleteFatturaAccompagnatoriaAcquisto" data-id-documento="' + data.idDocumento + '" href="#" title="Elimina"><i class="far fa-trash-alt"></i></a>';
+					}
 				}
 				return links;
 			}}
