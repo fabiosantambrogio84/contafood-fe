@@ -26,7 +26,7 @@ $(document).ready(function() {
 			if(dataConsegnaA != null && dataConsegnaA != undefined && dataConsegnaA != ''){
 				params.dataConsegnaA = dataConsegnaA;
 			}
-            var url = baseUrl + "ordini-clienti?" + $.param( params );
+            var url = baseUrl + "ordini-clienti/autisti?" + $.param( params );
 
 			$('#ordiniAutistiTable').DataTable({
 				"ajax": {
@@ -143,11 +143,11 @@ $(document).ready(function() {
 						} else {
 							return '';
 						}
-					}},
-					{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
-						var links = '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
-						return links;
 					}}
+					//{"data": null, "orderable":false, "width":"5%", render: function ( data, type, row ) {
+					//	var links = '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
+					//	return links;
+					//}}
 				],
 				"createdRow": function(row, data, dataIndex,cells){
 					$(row).addClass('rowOrdine');

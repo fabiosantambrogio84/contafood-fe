@@ -1030,9 +1030,9 @@ $.fn.loadOrdiniClientiTable = function(url){
 							var links = '<a class="detailsOrdineCliente pr-2" data-id="'+data.id+'" href="#"><i class="fas fa-info-circle" title="Dettagli"></i></a>';
 
 							var stato = data.statoOrdine;
-							//if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_EVADERE'){
-							//	links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
-							//}
+							if(stato != null && stato != undefined && stato != '' && stato.codice == 'DA_EVADERE'){
+								links += '<a class="updateOrdineCliente pr-2" data-id="'+data.id+'" href="ordini-clienti-edit.html?idOrdineCliente=' + data.id + '"><i class="far fa-edit"></i></a>';
+							}
 							links += '<a class="deleteOrdineCliente" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 							return links;
 						}}

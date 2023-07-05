@@ -162,8 +162,10 @@
                       <th>Data</th>
                       <th>Cliente</th>
                       <th>Agente</th>
-                      <th>Acconto</th>
-                      <th>Importo</th>
+                      <th>Imponibile (€)</th>
+                      <th>Iva (€)</th>
+                      <th>Acconto (€)</th>
+                      <th>Importo (€)</th>
                       <th></th>
                     </tr>
 
@@ -277,26 +279,6 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
-                            <p class="card-text" id="totaleAcconto"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
-                            <p class="card-text" id="totale"></p>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    <div class="row">
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
                             <h6 class="card-title mb-0 font-weight-bold">Causale</h6>
                             <p class="card-text" id="causale"></p>
                           </div>
@@ -310,6 +292,41 @@
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. imponibile (€)</h6>
+                            <p class="card-text" id="totaleImponibile"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. iva (€)</h6>
+                            <p class="card-text" id="totaleIva"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
+                            <p class="card-text" id="totaleAcconto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
+                            <p class="card-text" id="totale"></p>
+                          </div>
+                        </div>
+                      </div>
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -318,8 +335,6 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm">&nbsp;</div>
-                      <div class="col-sm">&nbsp;</div>
                     </div>
                   </div>
 
@@ -426,26 +441,6 @@
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
-                            <p class="card-text" id="fatturaAccompagnatoriaTotaleAcconto"></p>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
-                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
-                            <p class="card-text" id="fatturaAccompagnatoriaTotale"></p>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    <div class="row">
-                      <div class="col-sm">
-                        <div class="card border-0">
-                          <div class="card-body pr-0 pl-0 pt-0 text-center">
                             <h6 class="card-title mb-0 font-weight-bold">Causale</h6>
                             <p class="card-text" id="fatturaAccompagnatoriaCausale"></p>
                           </div>
@@ -459,6 +454,41 @@
                           </div>
                         </div>
                       </div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. imponibile (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaTotaleImponibile"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. iva (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaTotaleIva"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Tot. acconto (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaTotaleAcconto"></p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm">
+                        <div class="card border-0">
+                          <div class="card-body pr-0 pl-0 pt-0 text-center">
+                            <h6 class="card-title mb-0 font-weight-bold">Totale (€)</h6>
+                            <p class="card-text" id="fatturaAccompagnatoriaTotale"></p>
+                          </div>
+                        </div>
+                      </div>
                       <div class="col-sm">
                         <div class="card border-0">
                           <div class="card-body pr-0 pl-0 pt-0 text-center">
@@ -467,8 +497,6 @@
                           </div>
                         </div>
                       </div>
-                      <div class="col-sm">&nbsp;</div>
-                      <div class="col-sm">&nbsp;</div>
                     </div>
                   </div>
 

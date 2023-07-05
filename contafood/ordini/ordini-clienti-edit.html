@@ -49,7 +49,11 @@
   <script>
 	var idOrdineCliente = $.fn.extractIdOrdineClienteFromUrl();
     if(idOrdineCliente != null && idOrdineCliente != undefined){
-      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then($.fn.getOrdineCliente(idOrdineCliente));
+      //$.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).then($.fn.getOrdineCliente(idOrdineCliente));
+
+      $.when($.fn.getClienti(), $.fn.getAutisti(), $.fn.getAgenti(), $.fn.getArticoli()).done(function(resp1, resp2, resp3, resp4) {
+        $.fn.getOrdineCliente(idOrdineCliente)
+      });
     }
   </script>
 

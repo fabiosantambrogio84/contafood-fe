@@ -90,6 +90,12 @@ $.fn.loadFattureTable = function(url) {
 				}
 				return '';
 			}},
+			{"name": "totaleImponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
+				return $.fn.formatNumber(data.totaleImponibile);
+			}},
+			{"name": "totaleIva", "data": null, "width":"8%", render: function ( data, type, row ) {
+				return $.fn.formatNumber(data.totaleIva);
+			}},
 			{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
 				return $.fn.formatNumber(data.totaleAcconto);
 			}},
@@ -159,6 +165,7 @@ $.fn.loadFattureTable = function(url) {
 			$(cells[4]).css('text-align','left');
 			$(cells[5]).css('text-align','right');
 			$(cells[6]).css('text-align','right');
+			$(cells[10]).css('font-weight','bold');
 		}
 	});
 }
@@ -317,6 +324,8 @@ $(document).ready(function() {
 						if(causale != null && causale != undefined && causale != ''){
 							$('#causale').text(causale.descrizione);
 						}
+						$('#totaleImponibile').text(result.totaleImponibile);
+						$('#totaleIva').text(result.totaleIva);
 						$('#totaleAcconto').text(result.totaleAcconto);
 						$('#totale').text(result.totale);
 						$('#note').text(result.note);
@@ -457,6 +466,8 @@ $(document).ready(function() {
 							$('#fatturaAccompagnatoriaCausale').text(causale.descrizione);
 						}
 						$('#fatturaAccompagnatoriaTotaleAcconto').text(result.totaleAcconto);
+						$('#fatturaAccompagnatoriaTotaleImponibile').text(result.totaleImponibile);
+						$('#fatturaAccompagnatoriaTotaleIva').text(result.totaleIva);
 						$('#fatturaAccompagnatoriaTotale').text(result.totale);
 						$('#fatturaAccompagnatoriaNote').text(result.note);
 
@@ -1344,7 +1355,10 @@ $.fn.extractIdFatturaFromUrl = function(){
 }
 
 $.fn.formatNumber = function(value){
-	return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
+	if(!$.fn.checkVariableIsNull(value)){
+		return parseFloat(Number(Math.round(value+'e2')+'e-2')).toFixed(2);
+	}
+	return '';
 }
 
 $(document).on('change','.fatturaDdtCheckbox', function(){
