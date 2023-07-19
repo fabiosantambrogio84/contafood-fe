@@ -84,29 +84,29 @@
             <div class="card-body">
               <form id="searchPagamentoForm">
                 <div class="form-row">
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchTipologia" class="mb-0">Tipologia</label>
                     <select id="searchTipologia" class="form-control form-control-sm" >
                       <option value=""></option>
                     </select>
                   </div>
-                  <div class="form-group col-md-1">
+                  <div class="form-group col-md-1 mb-1">
                     <label for="searchDataFrom" class="mb-0">Data da</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataFrom">
                   </div>
-                  <div class="form-group col-md-1">
+                  <div class="form-group col-md-1 mb-1">
                     <label for="searchDataTo" class="mb-0">Data a</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataTo">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchCliente" class="mb-0">Cliente</label>
                     <input type="text" class="form-control form-control-sm" id="searchCliente">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchFornitore" class="mb-0">Fornitore</label>
                     <input type="text" class="form-control form-control-sm" id="searchFornitore">
                   </div>
-                  <div class="form-group col-md-1">
+                  <div class="form-group col-md-1 mb-1">
                     <label for="searchImporto" class="mb-0">Importo</label>
                     <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
                   </div>
@@ -122,12 +122,12 @@
                 </div>
                 -->
 
-                <button type="submit" class="btn btn-primary mt-0" id="searchPagamentoButton">Cerca</button>
-                <a href="#" id="resetSearchPagamentoButton" class="btn btn-secondary mt-0">Svuota</a>
+                <button type="submit" class="btn btn-primary mt-0 btn-sm" id="searchPagamentoButton">Cerca</button>
+                <a href="#" id="resetSearchPagamentoButton" class="btn btn-secondary mt-0 btn-sm">Svuota</a>
               </form>
             </div>
 
-            <div class="card-body">
+            <div class="card-body" style="padding-top: 0;">
               <div class="table-responsive">
                 <table class="table table-bordered" id="pagamentiTable" width="100%" cellspacing="0">
                   <thead>
@@ -137,9 +137,9 @@
                       <th>Cliente</th>
                       <th>Fornitore</th>
                       <th>Descrizione</th>
-                      <th>Importo (€)</th>
                       <th>Pagamento</th>
                       <th>Note</th>
+                      <th>Importo (€)</th>
                       <th></th>
                     </tr>
         		  </thead>

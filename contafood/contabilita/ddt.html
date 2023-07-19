@@ -84,27 +84,38 @@
             <div class="card-body">
               <form id="searchDdtForm">
                 <div class="form-row">
-                  <div class="form-group col-md-2 mb-1">
+                  <div class="form-group col-md-1 mb-1">
                     <label for="searchDataFrom" class="mb-0">Data da</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataFrom">
                   </div>
-                  <div class="form-group col-md-2 mb-1">
+                  <div class="form-group col-md-1 mb-1">
                     <label for="searchDataTo" class="mb-0">Data a</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataTo">
+                  </div>
+                  <div class="form-group col-md-1 mb-1">
+                    <label for="searchProgressivo" class="mb-0">Progressivo</label>
+                    <input type="number" class="form-control form-control-sm" id="searchProgressivo" step="1">
+                  </div>
+                  <div class="form-group col-md-1 mb-1">
+                    <label for="searchImporto" class="mb-0">Importo</label>
+                    <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
                   </div>
                   <div class="form-group col-md-2 mb-1">
                     <label for="searchCliente" class="mb-0">Cliente</label>
                     <input type="text" class="form-control form-control-sm" id="searchCliente">
                   </div>
-                  <div class="form-group col-md-2 mb-1">
-                    <label for="searchProgressivo" class="mb-0">Progressivo</label>
-                    <input type="number" class="form-control form-control-sm" id="searchProgressivo" step="1">
+                  <div class="form-group col-md-1 mb-1">
+                    <label for="searchAgente" class="mb-0">Agente</label>
+                    <select id="searchAgente" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
                   </div>
-                  <div class="form-group col-md-2 mb-1">
-                    <label for="searchImporto" class="mb-0">Importo</label>
-                    <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
+                  <div class="form-group col-md-1 mb-1">
+                    <label for="searchAutista" class="mb-0">Autista</label>
+                    <select id="searchAutista" class="form-control form-control-sm" >
+                      <option value=""></option>
+                    </select>
                   </div>
-
                 </div>
                 <div class="form-row">
                   <div class="form-group col-md-2 mb-1">
@@ -113,6 +124,7 @@
                       <option value=""></option>
                     </select>
                   </div>
+                  <!--
                   <div class="form-group col-md-2 mb-1">
                     <label for="searchPagato" class="mb-0">Pagato</label>
                     <select id="searchPagato" class="form-control form-control-sm" >
@@ -121,24 +133,14 @@
                       <option value="false">No</option>
                     </select>
                   </div>
+                  -->
                   <div class="form-group col-md-2 mb-1">
                     <label for="searchTipoPagamento" class="mb-0">Tipo pagamento</label>
                     <select id="searchTipoPagamento" class="form-control form-control-sm" >
                       <option value=""></option>
                     </select>
                   </div>
-                  <div class="form-group col-md-2 mb-1">
-                    <label for="searchAgente" class="mb-0">Agente</label>
-                    <select id="searchAgente" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
-                  <div class="form-group col-md-2 mb-1">
-                    <label for="searchAutista" class="mb-0">Autista</label>
-                    <select id="searchAutista" class="form-control form-control-sm" >
-                      <option value=""></option>
-                    </select>
-                  </div>
+
                   <div class="form-group col-md-3 mb-1">
                     <label for="searchArticolo" class="mb-0">Articolo</label>
                     <select id="searchArticolo" class="form-control form-control-sm" >
@@ -166,11 +168,11 @@
                       <th>Cliente</th>
                       <th>Agente</th>
                       <th>Autista</th>
-                      <th>Acconto</th>
-                      <th>Importo</th>
-                      <th>Imponibile</th>
-                      <th>Costo</th>
-                      <th>Guadagno</th>
+                      <th>Imponibile (€)</th>
+                      <th>Costo (€)</th>
+                      <th>Guadagno (€)</th>
+                      <th>Acconto (€)</th>
+                      <th>Importo (€)</th>
                       <th></th>
                     </tr>
 

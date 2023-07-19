@@ -163,9 +163,12 @@ $.fn.loadFattureTable = function(url) {
 			}
 			$(cells[3]).css('text-align','left');
 			$(cells[4]).css('text-align','left');
-			$(cells[5]).css('text-align','right');
-			$(cells[6]).css('text-align','right');
-			$(cells[10]).css('font-weight','bold');
+			$(cells[5]).css('text-align','left');
+			$(cells[6]).css('text-align','left');
+			$(cells[7]).css('text-align','right');
+			$(cells[8]).css('text-align','right');
+			$(cells[9]).css('text-align','right');
+			$(cells[10]).css('text-align','right').css('font-weight','bold');
 		}
 	});
 }

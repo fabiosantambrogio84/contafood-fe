@@ -103,12 +103,6 @@ $.fn.loadRicevutaPrivatoTable = function(url) {
 						autistaSelect += '</select';
 						return autistaSelect;
 					}},
-					{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
-						return $.fn.formatNumber(data.totaleAcconto);
-					}},
-					{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
-						return $.fn.formatNumber(data.totale);
-					}},
 					{"name": "imponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleImponibile);
 					}},
@@ -119,7 +113,13 @@ $.fn.loadRicevutaPrivatoTable = function(url) {
 						var guadagno = data.totaleImponibile - data.totaleCosto;
 						return $.fn.formatNumber(guadagno);
 					}},
-					{"data": null, "orderable":false, "width":"17%", render: function ( data, type, row ) {
+					{"name": "acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleAcconto);
+					}},
+					{"name": "importo", "data": null, "width":"8%",render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totale);
+					}},
+					{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
 						var acconto = data.totaleAcconto;
 						if(acconto == null || acconto == undefined || acconto == ''){
 							acconto = 0;
@@ -159,12 +159,12 @@ $.fn.loadRicevutaPrivatoTable = function(url) {
 						}
 						$(row).css('background-color', backgroundColor);
 					}
-					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
 					$(cells[6]).css('text-align','right');
-					$(cells[7]).css('text-align','right').css('font-weight','bold');
-					$(cells[8]).css('text-align','right').css('font-weight','bold');
+					$(cells[7]).css('text-align','right');
+					$(cells[8]).css('text-align','right');
 					$(cells[9]).css('text-align','right');
-					$(cells[10]).css('text-align','right');
+					$(cells[10]).css('text-align','right').css('font-weight','bold');
+					$(cells[11]).css('text-align','right').css('font-weight','bold');
 				},
 				"initComplete": function( settings, json ) {
 					var costoAbilitato = $.fn.getConfigurazioneItemClient('DDT_COSTO');
@@ -172,14 +172,14 @@ $.fn.loadRicevutaPrivatoTable = function(url) {
 
 					var table = $('#ricevutePrivatiTable').DataTable();
 					if(!costoAbilitato){
-						table.column(10).visible(false);
+						table.column(8).visible(false);
 					} else {
-						table.column(10).visible(true);
+						table.column(8).visible(true);
 					}
 					if(!guadagnoAbilitato){
-						table.column(11).visible(false);
+						table.column(9).visible(false);
 					} else {
-						table.column(11).visible(true);
+						table.column(9).visible(true);
 					}
 				}
 			});

@@ -44,9 +44,6 @@ $.fn.loadPagamentiTable = function(url) {
 			{"name": "cliente", "data": "cliente", "width":"8%"},
 			{"name": "fornitore", "data": "fornitore", "width":"8%"},
 			{"name": "descrizione", "data": "descrizione", "width":"12%"},
-			{"name": "importo", "data": null, "width":"5%", render: function ( data, type, row ) {
-				return $.fn.formatNumber(data.importo);
-			}},
 			{"name": "tipoPagamento", "data": "tipoPagamento", "width":"5%"},
 			{"name": "note", "data": null, "width": "12%", render: function ( data, type, row ) {
 				var note = data.note;
@@ -62,6 +59,9 @@ $.fn.loadPagamentiTable = function(url) {
 
 				return noteHtml;
 			}},
+			{"name": "importo", "data": null, "width":"5%", render: function ( data, type, row ) {
+				return $.fn.formatNumber(data.importo);
+			}},
 			{"data": null, "orderable":false, "width":"2%", render: function ( data, type, row ) {
 				var links = '<a class="deletePagamento" data-id="'+data.id+'" href="#"><i class="far fa-trash-alt"></i></a>';
 				return links;
@@ -73,6 +73,7 @@ $.fn.loadPagamentiTable = function(url) {
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px').addClass('rowPagamento');
 			$(row).attr('data-id-pagamento', data.id);
+			$(cells[7]).css('text-align','right').css('font-weight','bold');
 			//$(cells[3]).css('text-align','right');
 		}
 	});

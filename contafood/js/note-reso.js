@@ -105,9 +105,9 @@ $.fn.loadNoteResoTable = function(url) {
 				}
 				$(row).css('background-color', backgroundColor);
 			}
-			$(cells[4]).css('text-align','right');
-			$(cells[5]).css('font-weight','bold').css('text-align','right');
-			$(cells[6]).css('padding-right','0px').css('padding-left','3px');
+			$(cells[4]).css('text-align','left');
+			$(cells[5]).css('text-align','right');
+			$(cells[6]).css('text-align','right').css('font-weight','bold');
 		}
 	});
 }

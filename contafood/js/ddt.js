@@ -99,23 +99,23 @@ $.fn.loadDdtTable = function(url) {
 						autistaSelect += '</select';
 						return autistaSelect;
 					}},
-					{"name": "totale_acconto", "data": null, "width":"6%", render: function ( data, type, row ) {
-						return $.fn.formatNumber(data.totaleAcconto);
-					}},
-					{"name": "totale", "data": null, "width":"6%",render: function ( data, type, row ) {
-						return $.fn.formatNumber(data.totale);
-					}},
-					{"name": "totale_imponibile", "data": null, "width":"6%", render: function ( data, type, row ) {
+					{"name": "totale_imponibile", "data": null, "width":"8%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleImponibile);
 					}},
-					{"name": "totale_costo", "data": null, "width":"6%", render: function ( data, type, row ) {
+					{"name": "totale_costo", "data": null, "width":"8%", render: function ( data, type, row ) {
 						return $.fn.formatNumber(data.totaleCosto);
 					}},
-					{"name": "guadagno", "data": null, "orderable":false, "width":"6%", render: function ( data, type, row ) {
+					{"name": "guadagno", "data": null, "orderable":false, "width":"8%", render: function ( data, type, row ) {
 						var guadagno = data.totaleImponibile - data.totaleCosto;
 						return $.fn.formatNumber(guadagno);
 					}},
-					{"data": null, "orderable":false, "width":"17%", render: function ( data, type, row ) {
+					{"name": "totale_acconto", "data": null, "width":"8%", render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totaleAcconto);
+					}},
+					{"name": "totale", "data": null, "width":"8%",render: function ( data, type, row ) {
+						return $.fn.formatNumber(data.totale);
+					}},
+					{"data": null, "orderable":false, "width":"13%", render: function ( data, type, row ) {
 						var acconto = data.totaleAcconto;
 						if(acconto == null || acconto == undefined || acconto == ''){
 							acconto = 0;
@@ -160,11 +160,11 @@ $.fn.loadDdtTable = function(url) {
 					}
 					$(cells[11]).css('padding-right','0px').css('padding-left','3px');
 					$(cells[6]).css('text-align','right');
-					$(cells[8]).css('font-weight','bold').css('text-align','right');
-					$(cells[9]).css('font-weight','bold').css('text-align','right');
+					$(cells[8]).css('text-align','right');
+					$(cells[9]).css('text-align','right');
 					$(cells[10]).css('text-align','right');
-					$(cells[11]).css('text-align','right');
-					$(cells[12]).css('text-align','right');
+					$(cells[11]).css('text-align','right').css('font-weight','bold');
+					$(cells[12]).css('text-align','right').css('font-weight','bold');
 				},
 				"initComplete": function( settings, json ) {
 					var costoAbilitato = $.fn.getConfigurazioneItemClient('DDT_COSTO');
@@ -640,7 +640,7 @@ $(document).ready(function() {
 		var autista = $('#searchAutista option:selected').val();
 		var articolo = $('#searchArticolo option:selected').val();
 		var stato = $('#searchStato option:selected').val();
-		var pagato = $('#searchPagato option:selected').val();
+		//var pagato = $('#searchPagato option:selected').val();
 
 		var params = {};
 		if(dataDa != null && dataDa != undefined && dataDa != ''){
@@ -673,9 +673,9 @@ $(document).ready(function() {
 		if(stato != null && stato != undefined && stato != ''){
 			params.stato = stato;
 		}
-		if(pagato != null && pagato != undefined && pagato != ''){
-			params.pagato = pagato;
-		}
+		//if(pagato != null && pagato != undefined && pagato != ''){
+		//	params.pagato = pagato;
+		//}
 		return baseUrl + path + $.param( params );
 	}
 
@@ -1456,14 +1456,13 @@ $(document).ready(function() {
 		if(found >= 1){
 
 			// aggiorno la riga
-			$.fn.aggiornaRigaArticolo(articoliTable,currentRowIndex,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,currentSconto,
-				quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale);
+			$.fn.aggiornaRigaArticolo(articoliTable,currentRowIndex,currentQuantita,currentPezzi,currentLotto,currentScadenza,currentPrezzo,null,currentSconto,
+				quantita,pezzi,codiceFornitore,lottoRegExp,dataScadenzaRegExp,totale,null);
 
 		} else {
 			// inserisco nuova riga
 			$.fn.inserisciRigaArticolo(articoliTable,null,articoloId,articolo,
-				lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,
-				totale,iva);
+				lottoHtml,scadenzaHtml,udm,quantitaHtml,pezziHtml,prezzoHtml,scontoHtml,totale,null);
 		}
 		$.fn.computeTotale();
 

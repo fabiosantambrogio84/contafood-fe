@@ -146,8 +146,8 @@ $.fn.loadNoteAccreditoTable = function(url) {
 				$(row).css('background-color', backgroundColor);
 			}
 			$(cells[5]).css('text-align','right');
-			$(cells[6]).css('font-weight','bold').css('text-align','right');
-			$(cells[7]).css('padding-right','0px').css('padding-left','3px');
+			$(cells[6]).css('text-align','right');
+			$(cells[7]).css('font-weight','bold').css('text-align','right');
 		}
 	});
 }

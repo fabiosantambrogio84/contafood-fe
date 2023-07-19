@@ -135,11 +135,11 @@ $.fn.loadDocumentoAcquistoTable = function(url) {
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
-			$(cells[0]).css('text-align','center');
+			$(cells[0]).css('text-align','left');
 			$(cells[2]).css('font-weight','bold');
 			$(cells[5]).css('text-align','right');
 			$(cells[6]).css('text-align','right');
-			$(cells[7]).css('text-align','left');
+			$(cells[7]).css('text-align','right').css('font-weight','bold');
 			//if(data.fatturato){
 			//	$(row).css('background-color', rowBackgroundAzzurro);
 			//}

@@ -80,35 +80,35 @@
             <div class="card-body">
               <form id="searchNoteAccreditoForm">
                 <div class="form-row">
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchDataFrom" class="mb-0">Data da</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataFrom">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchDataTo" class="mb-0">Data a</label>
                     <input type="date" class="form-control form-control-sm" id="searchDataTo">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchCliente" class="mb-0">Cliente</label>
                     <input type="text" class="form-control form-control-sm" id="searchCliente">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchProgressivo" class="mb-0">Numero</label>
                     <input type="number" class="form-control form-control-sm" id="searchProgressivo" step="1" min="0">
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchImporto" class="mb-0">Importo</label>
                     <input type="number" class="form-control form-control-sm" id="searchImporto" step=".01" min="0">
                   </div>
                 </div>
                 <div class="form-row">
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchStato" class="mb-0">Stato</label>
                     <select id="searchStato" class="form-control form-control-sm" >
                       <option value=""></option>
                     </select>
                   </div>
-                  <div class="form-group col-md-2">
+                  <div class="form-group col-md-2 mb-1">
                     <label for="searchAgente" class="mb-0">Agente</label>
                     <select id="searchAgente" class="form-control form-control-sm" >
                       <option value=""></option>
@@ -116,24 +116,24 @@
                   </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary mt-0" id="searchNoteAccreditoButton">Cerca</button>
-                <a href="#" id="resetSearchNoteAccreditoButton" class="btn btn-secondary mt-0">Svuota</a>
+                <button type="submit" class="btn btn-primary mt-0 btn-sm" id="searchNoteAccreditoButton">Cerca</button>
+                <a href="#" id="resetSearchNoteAccreditoButton" class="btn btn-secondary mt-0 btn-sm">Svuota</a>
               </form>
             </div>
 
-            <div class="card-body" style="font-size: 0.9rem;">
+            <div class="card-body" style="font-size: 0.9rem; padding-top: 0;">
               <div class="table-responsive">
                 <table class="table table-bordered" id="noteAccreditoTable" width="100%" cellspacing="0" style="color: #080707 !important;">
                   <thead>
-        		    <tr>
+        		    <tr style="font-size:12px;">
                       <th></th>
                       <th>Spedito A.d.E.</th>
                       <th>Num.</th>
                       <th>Data</th>
                       <th>Cliente</th>
                       <th>Agente</th>
-                      <th>Acconto</th>
-                      <th>Importo</th>
+                      <th>Acconto (€)</th>
+                      <th>Importo (€)</th>
                       <th></th>
                     </tr>
 
