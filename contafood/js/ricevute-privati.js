@@ -163,7 +163,7 @@ $.fn.loadRicevutaPrivatoTable = function(url) {
 					$(cells[7]).css('text-align','right');
 					$(cells[8]).css('text-align','right');
 					$(cells[9]).css('text-align','right');
-					$(cells[10]).css('text-align','right').css('font-weight','bold');
+					$(cells[10]).css('text-align','right');
 					$(cells[11]).css('text-align','right').css('font-weight','bold');
 				},
 				"initComplete": function( settings, json ) {
