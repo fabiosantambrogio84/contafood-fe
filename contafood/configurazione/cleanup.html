@@ -142,7 +142,7 @@
                     </div>
                 </div>
 
-                <!-- Modal Confirm Run-->
+                <!-- Modal Confirm Delete Ordini Clienti-->
                 <div class="modal fade" id="deleteOrdiniClientiModal" tabindex="-1" role="dialog" aria-labelledby="deleteOrdiniClientiModal" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -172,6 +172,41 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
                                 <button type="button" class="btn btn-primary" id="confirmDeleteOrdiniClienti">Conferma</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Confirm Delete Etichette-->
+                <div class="modal fade" id="deleteEtichetteModal" tabindex="-1" role="dialog" aria-labelledby="deleteEtichetteModal" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteEtichetteModalTitle">Conferma rimozione Etichette</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div>
+                                    <h6>Sei sicuro di voler rimuovere le Etichette?</h6>
+                                </div>
+                                <div class="mt-4">
+                                    <h6>Inserisci il numero di giorni da considerare come scadenza</h6>
+                                    <div class="form-row">
+                                        <div class="form-group" style="margin-left: 0.5rem;">
+                                            <label for="numeroGiorni">Numero giorni*</label>
+                                            <input type="number" class="form-control" id="numeroGiorniEtichette" placeholder="" required value="1" step="1" min="1">
+                                            <div class="invalid-feedback">
+                                                Inserisci un numero
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                                <button type="button" class="btn btn-primary" id="confirmDeleteEtichette">Conferma</button>
                             </div>
                         </div>
                     </div>

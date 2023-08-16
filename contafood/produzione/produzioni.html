@@ -66,10 +66,37 @@
             </div>
           </div>
 
-          <div id="alertProduzione"></div>
+            <div id="alertProduzione"></div>
 
           <!-- DataTales Example -->
           <div class="card shadow mb-4" id="produzioniMainDiv">
+
+            <div class="card-body">
+              <form id="searchProduzioneForm">
+                  <div class="form-row">
+                      <div class="form-group col-md-2 mb-1">
+                          <label for="searchCodice" class="mb-0">Codice</label>
+                          <input type="number" class="form-control form-control-sm" id="searchCodice" step="1" min="0">
+                      </div>
+                      <div class="form-group col-md-2 mb-1">
+                          <label for="searchRicetta" class="mb-0">Ricetta</label>
+                          <input type="text" class="form-control form-control-sm" id="searchRicetta">
+                      </div>
+                      <div class="form-group col-md-2 mb-1">
+                          <label for="searchBarcodeEan13" class="mb-0">Barcode EAN 13</label>
+                          <input type="text" class="form-control form-control-sm" id="searchBarcodeEan13">
+                      </div>
+                      <div class="form-group col-md-2 mb-1">
+                          <label for="searchBarcodeEan128" class="mb-0">Barcode EAN 128</label>
+                          <input type="text" class="form-control form-control-sm" id="searchBarcodeEan128">
+                      </div>
+
+                  </div>
+                  <button type="submit" class="btn btn-primary mt-0 btn-sm" id="searchProduzioneButton">Cerca</button>
+                  <a href="#" id="resetSearchProduzioneButton" class="btn btn-secondary mt-0 btn-sm">Svuota</a>
+              </form>
+            </div>
+
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-bordered" id="produzioniTable" width="100%" cellspacing="0">
@@ -243,6 +270,27 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm">&nbsp;</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Barcode EAN 13</h6>
+                                        <p class="card-text" id="barcodeEan13"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div class="card border-0">
+                                    <div class="card-body pr-0 pl-0 pt-0 text-center">
+                                        <h6 class="card-title mb-0 font-weight-bold">Barcode EAN 128</h6>
+                                        <p class="card-text" id="barcodeEan128"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm">&nbsp;</div>
+                            <div class="col-sm">&nbsp;</div>
                             <div class="col-sm">&nbsp;</div>
                         </div>
 

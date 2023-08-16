@@ -36,8 +36,8 @@ $(document).ready(function() {
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			var numChecked = $('.fatturaAcquistoDdtAcquistoCheckbox:checkbox:checked').length;
-			if(numChecked == null || numChecked == undefined || numChecked == 0){
+			var ddtAcquistoIds = $('#hiddenDdtAcquistoIds').val();
+			if($.fn.checkVariableIsNull(ddtAcquistoIds)){
 				$('#alertFattureAcquisto').empty().append(alertContent.replace('@@alertText@@','Selezionare almeno un DDT acquisto').replace('@@alertResult@@', 'danger'));
 			} else{
 				var fatturaAcquisto = new Object();
@@ -53,16 +53,19 @@ $(document).ready(function() {
 				fatturaAcquisto.causale = causale;
 
 				var fatturaAcquistoDdtAcquisti = [];
-				$('.fatturaAcquistoDdtAcquistoCheckbox:checkbox:checked').each(function(i, item) {
-					var ddtAcquistoId = $(item).attr('data-id-documento');
+				var ddtAcquistoIdsSplit = ddtAcquistoIds.split(';');
+				for (var i = 0; i < ddtAcquistoIdsSplit.length; i++) {
+					var ddtAcquistoId = ddtAcquistoIdsSplit[i];
 
-					var fatturaAcquistoDdtAcquisto = {};
-					var fatturaAcquistoDdtAcquistoId = new Object();
-					fatturaAcquistoDdtAcquistoId.ddtAcquistoId = ddtAcquistoId;
-					fatturaAcquistoDdtAcquisto.id = fatturaAcquistoDdtAcquistoId;
+					if(!$.fn.checkVariableIsNull(ddtAcquistoId)){
+						var fatturaAcquistoDdtAcquisto = {};
+						var fatturaAcquistoDdtAcquistoId = new Object();
+						fatturaAcquistoDdtAcquistoId.ddtAcquistoId = ddtAcquistoId;
+						fatturaAcquistoDdtAcquisto.id = fatturaAcquistoDdtAcquistoId;
 
-					fatturaAcquistoDdtAcquisti.push(fatturaAcquistoDdtAcquisto);
-				});
+						fatturaAcquistoDdtAcquisti.push(fatturaAcquistoDdtAcquisto);
+					}
+				}
 
 				fatturaAcquisto.fatturaAcquistoDdtAcquisti = fatturaAcquistoDdtAcquisti;
 
@@ -326,4 +329,16 @@ $(document).on('change','.fatturaAcquistoDdtAcquistoCheckbox', function(){
 		});
 		$('#totale').val(parseFloat(Number(Math.round(totale+'e2')+'e-2')).toFixed(2));
 	};
+
+	var ddtAcquistoIds = $('#hiddenDdtAcquistoIds').val();
+	if($.fn.checkVariableIsNull(ddtAcquistoIds)){
+		ddtAcquistoIds = '';
+	}
+	var ddtAcquistoId = $(this).attr('data-id-documento');
+	if($(this).is(':checked')){
+		ddtAcquistoIds = ddtAcquistoIds.concat(ddtAcquistoId, ';');
+	} else {
+		ddtAcquistoIds = ddtAcquistoIds.replace(ddtAcquistoId.concat(';'), '');
+	}
+	$('#hiddenDdtAcquistoIds').val(ddtAcquistoIds);
 });

@@ -846,7 +846,7 @@ $(document).ready(function() {
 		});
 	}
 
-	if($('#newFatturaButton') != null && $('#newFatturaVButton') != undefined){
+	if($('#newFatturaButton') != null && $('#newFatturaButton') != undefined){
 		$(document).on('submit','#newFatturaForm', function(event){
 			event.preventDefault();
 
@@ -854,8 +854,8 @@ $(document).ready(function() {
 			alertContent = alertContent + '<strong>@@alertText@@</strong>\n' +
 				'<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>';
 
-			var numChecked = $('.fatturaDdtCheckbox:checkbox:checked').length;
-			if(numChecked == null || numChecked == undefined || numChecked == 0){
+			var ddtIds = $('#hiddenDdtIds').val();
+			if($.fn.checkVariableIsNull(ddtIds)){
 				$('#alertFatture').empty().append(alertContent.replace('@@alertText@@','Selezionare almeno un DDT').replace('@@alertResult@@', 'danger'));
 			} else{
 				var fattura = new Object();
@@ -872,16 +872,19 @@ $(document).ready(function() {
 				fattura.causale = causale;
 
 				var fatturaDdts = [];
-				$('.fatturaDdtCheckbox:checkbox:checked').each(function(i, item) {
-					var ddtId = item.id.replace('checkbox_', '');
+				var ddtIdsSplit = ddtIds.split(';');
+				for (var i = 0; i < ddtIdsSplit.length; i++) {
+					var ddtId = ddtIdsSplit[i];
 
-					var fatturaDdt = {};
-					var fatturaDdtId = new Object();
-					fatturaDdtId.ddtId = ddtId;
-					fatturaDdt.id = fatturaDdtId;
+					if(!$.fn.checkVariableIsNull(ddtId)){
+						var fatturaDdt = {};
+						var fatturaDdtId = new Object();
+						fatturaDdtId.ddtId = ddtId;
+						fatturaDdt.id = fatturaDdtId;
 
-					fatturaDdts.push(fatturaDdt);
-				});
+						fatturaDdts.push(fatturaDdt);
+					}
+				}
 
 				fattura.fatturaDdts = fatturaDdts;
 
@@ -1377,4 +1380,16 @@ $(document).on('change','.fatturaDdtCheckbox', function(){
 		});
 		$('#totale').val(parseFloat(Number(Math.round(totale+'e2')+'e-2')).toFixed(2));
 	};
+
+	var ddtIds = $('#hiddenDdtIds').val();
+	if($.fn.checkVariableIsNull(ddtIds)){
+		ddtIds = '';
+	}
+	var ddtId = $(this).attr('data-id');
+	if($(this).is(':checked')){
+		ddtIds = ddtIds.concat(ddtId, ';');
+	} else {
+		ddtIds = ddtIds.replace(ddtId.concat(';'), '');
+	}
+	$('#hiddenDdtIds').val(ddtIds);
 });

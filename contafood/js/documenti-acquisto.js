@@ -219,6 +219,10 @@ $(document).ready(function() {
 					$('#detailsDocumentoAcquistoModalTitle').text("Dettagli DDT acquisto");
 					$('#ddtAcquistoNumero').text(result.numero);
 					$('#ddtAcquistoData').text(moment(result.data).format('DD/MM/YYYY'));
+					var stato = result.statoDdt;
+					if(stato != null && stato != undefined && stato != ''){
+						$('#ddtAcquistoStato').text(stato.descrizione);
+					}
 					var fornitore = result.fornitore;
 					if(fornitore != null && fornitore != undefined && fornitore != ''){
 						$('#ddtAcquistoFornitore').text(fornitore.ragioneSociale);

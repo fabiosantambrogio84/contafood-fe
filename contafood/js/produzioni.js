@@ -1,10 +1,10 @@
 var baseUrl = "/contafood-be/";
 
-$(document).ready(function() {
 
+$.fn.loadProduzioniTable = function(url) {
 	$('#produzioniTable').DataTable({
 		"ajax": {
-			"url": baseUrl + "produzioni",
+			"url": url,
 			"type": "GET",
 			"content-type": "json",
 			"cache": false,
@@ -18,7 +18,6 @@ $(document).ready(function() {
 			}
 		},
 		"language": {
-			"search": "Cerca per codice, ricetta, confezione",
 			"paginate": {
 				"first": "Inizio",
 				"last": "Fine",
@@ -27,13 +26,17 @@ $(document).ready(function() {
 			},
 			"emptyTable": "Nessuna produzione disponibile",
 			"zeroRecords": "Nessuna produzione disponibile",
-			"info": "Da _START_ a _END_ di _TOTAL_ risultati"
+			"info": "_TOTAL_ elementi",
+			"infoEmpty": "0 elementi"
 		},
+		"searching": false,
+		"responsive":true,
 		"pageLength": 20,
 		"lengthChange": false,
 		"processing": true,
 		"serverSide": true,
 		"info": true,
+		"dom": '<"top"p>rt<"bottom"ip>',
 		"autoWidth": false,
 		"order": [
 			[0, 'desc'],
@@ -43,27 +46,27 @@ $(document).ready(function() {
 			{"name": "data_produzione", "data": "dataProduzione", "width":"5%", "visible": false},
 			{"name": "codice_produzione", "data": "codiceProduzione", "width":"10%"},
 			{"name": "data_produzione", "data": null, "width":"8%", render: function ( data, type, row ) {
-				var a = moment(data.dataProduzione);
-				return a.format('DD/MM/YYYY');
-			}},
+					var a = moment(data.dataProduzione);
+					return a.format('DD/MM/YYYY');
+				}},
 			{"name": "lotto", "data": "lotto", "width":"10%"},
 			{"name": "scadenza", "data": null, "width":"10%", render: function ( data, type, row ) {
-				var a = moment(data.scadenza);
-				return a.format('DD/MM/YYYY');
-			}},
+					var a = moment(data.scadenza);
+					return a.format('DD/MM/YYYY');
+				}},
 			{"name": "articolo-ingrediente", "data": null, "orderable":false, render: function ( data, type, row ) {
-				var result = data.codiceArticolo+' - '+data.descrizioneArticolo;
-				if(data.tipologia == 'SCORTA'){
-					result = data.codiceIngrediente+' - '+data.descrizioneIngrediente;
-				}
-				return result;
-			}},
+					var result = data.codiceArticolo+' - '+data.descrizioneArticolo;
+					if(data.tipologia == 'SCORTA'){
+						result = data.codiceIngrediente+' - '+data.descrizioneIngrediente;
+					}
+					return result;
+				}},
 			{"name": "num_confezioni_prodotte", "data": "numConfezioniProdotte", "width":"12%", "className": "tdAlignRight" },
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
-				var links = '<a class="detailsProduzione pr-2" data-id="'+data.idProduzione+'" href="#"><i class="fas fa-info-circle"></i></a>';
-				links = links + '<a class="deleteProduzione" data-id="'+data.idProduzione+'" href="#"><i class="far fa-trash-alt"></i></a>';
-				return links;
-			}}
+					var links = '<a class="detailsProduzione pr-2" data-id="'+data.idProduzione+'" href="#"><i class="fas fa-info-circle"></i></a>';
+					links = links + '<a class="deleteProduzione" data-id="'+data.idProduzione+'" href="#"><i class="far fa-trash-alt"></i></a>';
+					return links;
+				}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
@@ -72,6 +75,11 @@ $(document).ready(function() {
 			}
 		}
 	});
+}
+
+$(document).ready(function() {
+
+	$.fn.loadProduzioniTable(baseUrl + "produzioni/search");
 
 	$(document).on('click','.detailsProduzione', function(){
 		var idProduzione = $(this).attr('data-id');
@@ -113,6 +121,8 @@ $(document).ready(function() {
 					$('#numConfezioni').text(result.numeroConfezioni);
 					$('#filmChiusura').text(result.filmChiusura);
 					$('#lottoFilmChiusura').text(result.lottoFilmChiusura);
+					$('#barcodeEan13').text(result.barcodeEan13);
+					$('#barcodeEan128').text(result.barcodeEan128);
 
 					if(result.produzioneConfezioni != null && result.produzioneConfezioni != undefined){
 						$('#detailsProduzioneConfezioniModalTable').DataTable({
@@ -372,6 +382,8 @@ $(document).ready(function() {
 			produzione.scopo = $('input[name="generaLotto"]:checked').val();
 			produzione.filmChiusura = $('#filmChiusura').val();
 			produzione.lottoFilmChiusura = $('#lottoFilmChiusura').val();
+			produzione.barcodeEan13 = $('#barcodeEan13').val();
+			produzione.barcodeEan128 = $('#barcodeEan128').val();
 			if($('#scorta').prop('checked') === true){
 				produzione.tipologia = 'SCORTA';
 			}else{
@@ -538,6 +550,48 @@ $(document).ready(function() {
 			scrollTop: $("#formRowIngredientiBody").offset().top
 		}, 1000);
 	});
+
+	$.fn.createUrlSearch = function(path){
+		var codice = $('#searchCodice').val();
+		var ricetta = $('#searchRicetta').val();
+		var barcodeEan13 = $('#searchBarcodeEan13').val();
+		var barcodeEan128 = $('#searchBarcodeEan128').val();
+
+		var params = {};
+		if(codice != null && codice != undefined && codice != ''){
+			params.codice = codice;
+		}
+		if(ricetta != null && ricetta != undefined && ricetta != ''){
+			params.ricetta = ricetta;
+		}
+		if(barcodeEan13 != null && barcodeEan13 != undefined && barcodeEan13 != ''){
+			params.barcodeEan13 = barcodeEan13;
+		}
+		if(barcodeEan128 != null && barcodeEan128 != undefined && barcodeEan128 != ''){
+			params.barcodeEan128 = barcodeEan128;
+		}
+		return baseUrl + path + $.param( params );
+	};
+
+	if($('#searchProduzioneButton') != null && $('#searchProduzioneButton') != undefined) {
+		$(document).on('submit', '#searchProduzioneForm', function (event) {
+			event.preventDefault();
+
+			var url = $.fn.createUrlSearch("produzioni/search?");
+
+			$('#produzioniTable').DataTable().destroy();
+			$.fn.loadProduzioniTable(url);
+
+		});
+
+		$(document).on('click','#resetSearchProduzioneButton', function(){
+			$('#searchProduzioneForm :input').val(null);
+			$('#searchProduzioneForm select option[value=""]').attr('selected', true);
+
+			$('#produzioniTable').DataTable().destroy();
+			$.fn.loadProduzioniTable(baseUrl + "produzioni/search");
+		});
+	}
 
 });
 
