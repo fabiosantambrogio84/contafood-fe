@@ -317,18 +317,22 @@ $.fn.extractIdFatturaAcquistoFromUrl = function(){
 }
 
 $(document).on('change','.fatturaAcquistoDdtAcquistoCheckbox', function(){
-	var numChecked = $('.fatturaAcquistoDdtAcquistoCheckbox:checkbox:checked').length;
-	if(numChecked == null || numChecked == undefined || numChecked == 0){
-		$('#totale').val(null);
-	} else{
-		var totale = 0;
-		$('.fatturaAcquistoDdtAcquistoCheckbox:checkbox:checked').each(function(i, item) {
-			$(this).parent().parent().find('.ddtTotale').each(function( index ) {
-				totale += parseFloat($(this).text());
-			});
-		});
-		$('#totale').val(parseFloat(Number(Math.round(totale+'e2')+'e-2')).toFixed(2));
-	};
+	var totale = $('#totale').val();
+	if($.fn.checkVariableIsNull(totale)){
+		totale = 0;
+	} else {
+		totale = parseFloat(totale);
+	}
+
+	if($(this).is(':checked')){
+		totale += parseFloat($(this).parent().parent().find('.ddtTotale').first().text());
+	} else {
+		totale = totale - parseFloat($(this).parent().parent().find('.ddtTotale').first().text());
+	}
+	if(totale < 0){
+		totale = 0;
+	}
+	$('#totale').val(parseFloat(Number(Math.round(totale+'e2')+'e-2')).toFixed(2));
 
 	var ddtAcquistoIds = $('#hiddenDdtAcquistoIds').val();
 	if($.fn.checkVariableIsNull(ddtAcquistoIds)){
