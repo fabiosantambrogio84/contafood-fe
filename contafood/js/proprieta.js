@@ -115,22 +115,6 @@ $.fn.extractIdProprietaFromUrl = function(){
     }
 }
 
-$.fn.extractTokenFromUrl = function(){
-    var pageUrl = window.location.search.substring(1);
-
-	var urlVariables = pageUrl.split('&'),
-        paramNames,
-        i;
-
-    for (i = 0; i < urlVariables.length; i++) {
-        paramNames = urlVariables[i].split('=');
-
-        if (paramNames[0] === 'token') {
-            return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
-        }
-    }
-}
-
 $.fn.getProprieta = function(idProprieta, token){
     var alertContent = '<div id="alertProprietaContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
     alertContent = alertContent +  '<strong>Errore nel recupero della proprietà.</strong>\n' +

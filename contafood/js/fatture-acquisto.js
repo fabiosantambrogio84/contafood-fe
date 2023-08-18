@@ -17,10 +17,7 @@ $.fn.loadEmptyFatturaAcquistoDdtAcquistoTable = function() {
 		"lengthChange": false,
 		"info": false,
 		"autoWidth": false,
-		"order": [
-			[1, 'desc'],
-			[2, 'desc']
-		]
+		"ordering": false
 	});
 }
 
@@ -198,11 +195,11 @@ $.fn.getCausali = function(){
 }
 
 $(document).on('change','#fornitore', function(){
-	$.fn.loadDdtAcquistoDaFatturare();
+	$.fn.loadDdtAcquistoDaFatturare(false);
 });
 
 $(document).on('change','#data', function(){
-	$.fn.loadDdtAcquistoDaFatturare();
+	$.fn.loadDdtAcquistoDaFatturare(false);
 });
 
 $.fn.getFatturaAcquisto = function(idFatturaAcquisto){
@@ -224,7 +221,7 @@ $.fn.getFatturaAcquisto = function(idFatturaAcquisto){
 	});
 }
 
-$.fn.loadDdtAcquistoDaFatturare = function(){
+$.fn.loadDdtAcquistoDaFatturare = function(allChecked){
 	var fornitore = $('#fornitore option:selected').val();
 	var data = $('#data').val();
 	if(fornitore != null && fornitore != ''){
@@ -274,7 +271,11 @@ $.fn.loadDdtAcquistoDaFatturare = function(){
 			"columns": [
 				{"name":"data", "data": "dataDocumento", "width":"5%", "visible": false},
 				{"data": null, "orderable":false, "width": "2%", render: function ( data, type, row ) {
-					var checkboxHtml = '<input type="checkbox" id="checkbox_'+data.id+'" data-id="'+data.id+'" data-tipo-documento="'+data.tipoDocumento+'" data-id-documento="'+data.idDocumento+'"  class="fatturaAcquistoDdtAcquistoCheckbox">';
+					var checkboxHtml = '<input type="checkbox" id="checkbox_'+data.id+'" data-id="'+data.id+'" data-tipo-documento="'+data.tipoDocumento+'" data-id-documento="'+data.idDocumento+'"  class="fatturaAcquistoDdtAcquistoCheckbox" ';
+					if(allChecked){
+						checkboxHtml += 'checked';
+					}
+					checkboxHtml += '>';
 					return checkboxHtml;
 				}},
 				{"name": "num_documento", "data": "numDocumento", "width":"5%"},
@@ -291,12 +292,28 @@ $.fn.loadDdtAcquistoDaFatturare = function(){
 				$(cells[2]).css('text-align','center');
 				$(cells[3]).css('text-align','center');
 				$(cells[4]).css('text-align','center').addClass('ddtTotale');
+			},
+			"initComplete": function( settings, json ) {
+				if(allChecked){
+					var ddtAcquistoIds = '';
+					var totale = parseFloat('0');
+					$.each(json.data, function(i, item) {
+						ddtAcquistoIds = ddtAcquistoIds.concat(item.idDocumento, ';');
+						totale = totale + parseFloat(item.totale);
+					});
+					$('#hiddenDdtAcquistoIds').val(ddtAcquistoIds);
+					$('#totale').val($.fn.formatNumber(totale));
+				} else{
+					$('#hiddenDdtAcquistoIds').val(null);
+					$('#totale').val(parseFloat('0.0'));
+				}
 			}
 		});
 	} else {
-		$('#fatturaDdtTable').DataTable().clear();
-		$('#fatturaDdtTable').DataTable().destroy();
-		$.fn.loadEmptyFatturaDdtTable();
+		$('#fatturaAcquistoDdtAcquistoTable').DataTable().clear();
+		$('#fatturaAcquistoDdtAcquistoTable').DataTable().destroy();
+		$('#checkbox_all').attr('data-ids', '');
+		$('#checkbox_all').attr('data-totale', 0);
 	}
 }
 
@@ -325,7 +342,7 @@ $(document).on('change','.fatturaAcquistoDdtAcquistoCheckbox', function(){
 	}
 
 	if($(this).is(':checked')){
-		totale += parseFloat($(this).parent().parent().find('.ddtTotale').first().text());
+		totale = totale + parseFloat($(this).parent().parent().find('.ddtTotale').first().text());
 	} else {
 		totale = totale - parseFloat($(this).parent().parent().find('.ddtTotale').first().text());
 	}
@@ -345,4 +362,12 @@ $(document).on('change','.fatturaAcquistoDdtAcquistoCheckbox', function(){
 		ddtAcquistoIds = ddtAcquistoIds.replace(ddtAcquistoId.concat(';'), '');
 	}
 	$('#hiddenDdtAcquistoIds').val(ddtAcquistoIds);
+});
+
+$(document).on('change','#checkbox_all', function(){
+	if($(this).is(':checked')){
+		$.fn.loadDdtAcquistoDaFatturare(true);
+	} else {
+		$.fn.loadDdtAcquistoDaFatturare(false);
+	}
 });

@@ -116,22 +116,6 @@ $.fn.extractIdParametroFromUrl = function(){
     }
 }
 
-$.fn.extractTokenFromUrl = function(){
-    var pageUrl = window.location.search.substring(1);
-
-	var urlVariables = pageUrl.split('&'),
-        paramNames,
-        i;
-
-    for (i = 0; i < urlVariables.length; i++) {
-        paramNames = urlVariables[i].split('=');
-
-        if (paramNames[0] === 'token') {
-            return paramNames[1] === undefined ? null : decodeURIComponent(paramNames[1]);
-        }
-    }
-}
-
 $.fn.getParametro = function(idParametro, token){
     var alertContent = '<div id="alertParametroContent" class="alert alert-danger alert-dismissible fade show" role="alert">';
     alertContent = alertContent +  '<strong>Errore nel recupero del parametro.</strong>\n' +
