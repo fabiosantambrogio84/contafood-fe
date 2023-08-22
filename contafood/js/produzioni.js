@@ -46,27 +46,28 @@ $.fn.loadProduzioniTable = function(url) {
 			{"name": "data_produzione", "data": "dataProduzione", "width":"5%", "visible": false},
 			{"name": "codice_produzione", "data": "codiceProduzione", "width":"10%"},
 			{"name": "data_produzione", "data": null, "width":"8%", render: function ( data, type, row ) {
-					var a = moment(data.dataProduzione);
-					return a.format('DD/MM/YYYY');
-				}},
+				var a = moment(data.dataProduzione);
+				return a.format('DD/MM/YYYY');
+			}},
 			{"name": "lotto", "data": "lotto", "width":"10%"},
 			{"name": "scadenza", "data": null, "width":"10%", render: function ( data, type, row ) {
-					var a = moment(data.scadenza);
-					return a.format('DD/MM/YYYY');
-				}},
+				var a = moment(data.scadenza);
+				return a.format('DD/MM/YYYY');
+			}},
 			{"name": "articolo-ingrediente", "data": null, "orderable":false, render: function ( data, type, row ) {
-					var result = data.codiceArticolo+' - '+data.descrizioneArticolo;
-					if(data.tipologia == 'SCORTA'){
-						result = data.codiceIngrediente+' - '+data.descrizioneIngrediente;
-					}
-					return result;
-				}},
+				var result = data.codiceArticolo+' - '+data.descrizioneArticolo;
+				if(data.tipologia == 'SCORTA'){
+					result = data.codiceIngrediente+' - '+data.descrizioneIngrediente;
+				}
+				return result;
+			}},
 			{"name": "num_confezioni_prodotte", "data": "numConfezioniProdotte", "width":"12%", "className": "tdAlignRight" },
 			{"data": null, "orderable":false, "width":"10%", render: function ( data, type, row ) {
-					var links = '<a class="detailsProduzione pr-2" data-id="'+data.idProduzione+'" href="#"><i class="fas fa-info-circle"></i></a>';
-					links = links + '<a class="deleteProduzione" data-id="'+data.idProduzione+'" href="#"><i class="far fa-trash-alt"></i></a>';
-					return links;
-				}}
+				var links = '<a class="detailsProduzione pr-2" data-id="'+data.idProduzione+'" href="#"><i class="fas fa-info-circle"></i></a>';
+				links += '<a class="pr-2" data-id="'+data.idProduzione+'" href="../stampe/etichette-new.html?idProduzione='+data.idProduzione+'" title="Genera etichetta"><i class="fas fa-tag"></i></a>';
+				links += '<a class="deleteProduzione" data-id="'+data.idProduzione+'" href="#"><i class="far fa-trash-alt"></i></a>';
+				return links;
+			}}
 		],
 		"createdRow": function(row, data, dataIndex,cells){
 			$(row).css('font-size', '12px');
